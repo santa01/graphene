@@ -1,6 +1,6 @@
 C++11 based signal-slot implementation
 
-Lates version of the plugin is available at:
+Lates version of the signals is available at:
 https://github.com/santa01/signals
 
 Signals project is header only C++ code supposed to be included and used
@@ -58,6 +58,7 @@ Sample code output:
   Callee::mySlot() id = 1
   Callee::mySlot() id = 2
 
-If you are interested in the plugin, you can contact me via santa.ssh@gmail.com
+If you are interested in this signal-slot implementation, you can contact me
+via santa.ssh@gmail.com
 
-The plugin is licensed under MIT license, see COPYING for details.
+Source code is licensed under MIT license, see COPYING for details.
