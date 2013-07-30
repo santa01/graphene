@@ -1,6 +1,6 @@
 C++11 based signal-slot implementation
 
-Lates version of the signals is available at:
+Latest version of the signals is available at:
 https://github.com/santa01/signals
 
 Signals project is header only C++ code supposed to be included and used
