@@ -26,6 +26,3 @@ INCLUDEDIR := $(PREFIX)/include
 
 install:
 	cp $(SOURCE) $(INCLUDEDIR)
-
-uninstall:
-	rm $(INCLUDEDIR)/$(SOURCE)
