@@ -21,8 +21,12 @@
 #
 
 SOURCE := Signals.h
+PKGCONFIG := signals.pc
+
 PREFIX := /usr/local
 INCLUDEDIR := $(PREFIX)/include
+PKGCONFIGDIR := $(PREFIX)/lib/pkgconfig
 
 install:
+	cp $(PKGCONFIG) $(PKGCONFIGDIR)
 	cp $(SOURCE) $(INCLUDEDIR)

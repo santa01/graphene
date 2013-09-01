@@ -1,0 +1,4 @@
+Name: Signals
+Description: C++11 based signal-slot implementation
+Version: 0.1.2
+URL: https://github.com/santa01/signals
