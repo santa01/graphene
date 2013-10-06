@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: @GRAPHENE_NAME@
+Description: @GRAPHENE_DESCRIPTION@
+Version: @GRAPHENE_VERSION@
+URL: https://github.com/santa01/graphene
+Libs: -L${libdir} -lgraphene
+Cflags: -I${includedir}/graphene
