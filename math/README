@@ -1,0 +1,13 @@
+Discrete math library
+
+Latest version of the game is available at:
+https://github.com/santa01/math
+
+The library provides a couple of classes that are:
+ * Vec3, Vec4 - three and four component vectors;
+ * Mat3, Mat4 - 3x3 and 4x4 two dimentional matrices;
+ * Quaternion - quaternion implementation.
+
+If you are interested in the library, you can contact me via santa.ssh@gmail.com
+
+The library is licensed under MIT license, see COPYING for details.
