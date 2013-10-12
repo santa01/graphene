@@ -9,12 +9,16 @@ if (CMAKE_COMPILER_IS_GNUCC)
     if (GCC_VERSION VERSION_GREATER 4.7.0)
         set (CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++11 -g")
     else ()
-        message(FATAL_ERROR "GCC 4.7.0 or higher is required!")
+        message (FATAL_ERROR "GCC 4.7.0 or higher is required!")
     endif ()
 endif ()
 
+find_package (OpenGL REQUIRED)
+find_package (GLEW REQUIRED)
+
 include (FindPkgConfig)
 pkg_search_module (SDL2 REQUIRED sdl2)
+pkg_search_module (SDL2_IMAGE REQUIRED SDL2_image)
 
 set (MATH_LIBRARY "math")
 set (MATH_INCLUDE ${MATH_LIBRARY}/src)
@@ -38,8 +42,19 @@ install (FILES ${PROJECT_BINARY_DIR}/graphene.pc DESTINATION lib/pkgconfig)
 add_library (${GRAPHENE_LIBRARY} OBJECT ${GRAPHENE_SOURCES})
 add_library (${GRAPHENE_STATIC} STATIC $<TARGET_OBJECTS:${GRAPHENE_LIBRARY}>)
 add_library (${GRAPHENE_SHARED} SHARED $<TARGET_OBJECTS:${GRAPHENE_LIBRARY}>)
+
 target_link_libraries (${GRAPHENE_STATIC} ${MATH_LIBRARY}-static)
+target_link_libraries (${GRAPHENE_STATIC} ${OPENGL_LIBRARIES})
+target_link_libraries (${GRAPHENE_STATIC} ${GLEW_LIBRARIES})
+target_link_libraries (${GRAPHENE_STATIC} ${SDL2_LIBRARIES})
+target_link_libraries (${GRAPHENE_STATIC} ${SDL2_IMAGE_LIBRARIES})
+
 target_link_libraries (${GRAPHENE_SHARED} ${MATH_LIBRARY}-shared)
+target_link_libraries (${GRAPHENE_SHARED} ${OPENGL_LIBRARIES})
+target_link_libraries (${GRAPHENE_SHARED} ${GLEW_LIBRARIES})
+target_link_libraries (${GRAPHENE_SHARED} ${SDL2_LIBRARIES})
+target_link_libraries (${GRAPHENE_SHARED} ${SDL2_IMAGE_LIBRARIES})
+
 add_dependencies (${GRAPHENE_LIBRARY} ${MATH_LIBRARY})
 
 # Required to reuse OBJECT for SHARED target, cmake version 2.8.9
