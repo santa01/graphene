@@ -21,7 +21,7 @@ include_directories ("src")
 
 set (MATH_NAME "Math")
 set (MATH_DESCRIPTION "Discrete math library")
-set (MATH_VERSION 0.1.1)
+set (MATH_VERSION 0.1.2)
 
 set (MATH_LIBRARY "math")
 set (MATH_STATIC ${MATH_LIBRARY}-static)
