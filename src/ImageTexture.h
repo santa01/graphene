@@ -34,9 +34,6 @@ public:
     ImageTexture(int width, int height);
 
     bool load(SDL_Surface* image);
-
-private:
-    SDL_Surface* convertToRGBA(SDL_Surface* image);
 };
 
 }  // namespace Graphene

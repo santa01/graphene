@@ -42,9 +42,20 @@ bool ImageTexture::load(SDL_Surface* image) {
         return false;
     }
 
-    SDL_Surface* source = (image->format->BytesPerPixel != 4) ? this->convertToRGBA(image) : image;
-    if (source == nullptr) {
-        return false;
+    SDL_Surface* source = image;
+    if (source->format->BytesPerPixel != 4) {
+        SDL_Surface* rgbaSource = SDL_CreateRGBSurface(0, source->w, source->h, 32,
+                0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+        if (rgbaSource == nullptr) {
+            return false;
+        }
+
+        if (SDL_BlitSurface(source, nullptr, rgbaSource, nullptr) == -1) {
+            SDL_FreeSurface(rgbaSource);
+            return false;
+        }
+
+        source = rgbaSource;
     }
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
@@ -58,21 +69,6 @@ bool ImageTexture::load(SDL_Surface* image) {
     }
 
     return true;
-}
-
-SDL_Surface* ImageTexture::convertToRGBA(SDL_Surface* image) {
-    SDL_Surface* RGBAImage = SDL_CreateRGBSurface(0, image->w, image->h, 32,
-            0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-    if (RGBAImage == nullptr) {
-        return nullptr;
-    }
-
-    if (SDL_BlitSurface(image, nullptr, RGBAImage, nullptr)) {
-        SDL_FreeSurface(RGBAImage);
-        return nullptr;
-    }
-
-    return RGBAImage;
 }
 
 }  // namespace Graphene
