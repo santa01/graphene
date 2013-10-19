@@ -21,54 +21,64 @@
  */
 
 #include <ImageTexture.h>
+#include <SDL2/SDL_image.h>
 
 namespace Graphene {
 
-ImageTexture::ImageTexture(int width, int height) {
-    this->width = width;
-    this->height = height;
+ImageTexture::ImageTexture(const std::string& name) {
+    this->ready = false;
+
+    SDL_Surface* image = IMG_Load(name.c_str());
+    if (image == nullptr) {
+        return;
+    }
+
+    SDL_Surface* source = image;
+    if (image->format->BytesPerPixel != 4) {
+        SDL_Surface* rgbaImage = SDL_CreateRGBSurface(0, image->w, image->h, 32,
+                0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+        if (rgbaImage == nullptr) {
+            return;
+        }
+
+        if (SDL_BlitSurface(image, nullptr, rgbaImage, nullptr) == -1) {
+            SDL_FreeSurface(rgbaImage);
+            return;
+        }
+
+        source = rgbaImage;
+    }
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, this->width, this->height,
-            0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-bool ImageTexture::load(SDL_Surface* image) {
-    if (image == nullptr) {
-        return false;
-    }
-
-    SDL_Surface* source = image;
-    if (source->format->BytesPerPixel != 4) {
-        SDL_Surface* rgbaSource = SDL_CreateRGBSurface(0, source->w, source->h, 32,
-                0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-        if (rgbaSource == nullptr) {
-            return false;
-        }
-
-        if (SDL_BlitSurface(source, nullptr, rgbaSource, nullptr) == -1) {
-            SDL_FreeSurface(rgbaSource);
-            return false;
-        }
-
-        source = rgbaSource;
-    }
-
-    glBindTexture(GL_TEXTURE_2D, this->texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, source->w, source->h, 0,
-            (source->format->Rmask > source->format->Bmask) ? GL_BGRA : GL_RGBA, GL_UNSIGNED_BYTE, source->pixels);
+            (source->format->Rmask > source->format->Bmask) ? GL_BGRA : GL_RGBA,
+            GL_UNSIGNED_BYTE, source->pixels);
+    this->width = source->w;
+    this->height = source->h;
+
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
+    this->ready = true;
 
-    if (source != image) {  // Free only our copy if made
+    if (source != image) {
         SDL_FreeSurface(source);
     }
+}
 
-    return true;
+ImageTexture::ImageTexture(int width, int height) {
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, width, height,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    this->width = width;
+    this->height = height;
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    this->ready = true;
 }
 
 }  // namespace Graphene

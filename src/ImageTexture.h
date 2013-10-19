@@ -24,16 +24,21 @@
 #define IMAGETEXTURE_H
 
 #include <Texture.h>
-#include <SDL2/SDL_image.h>
+#include <string>
 
 namespace Graphene {
 
 class ImageTexture: public Texture {
 public:
-    ImageTexture(): ImageTexture(0, 0) {}
+    ImageTexture(const std::string& name);
     ImageTexture(int width, int height);
 
-    bool load(SDL_Surface* image);
+    bool isReady() const {
+        return this->ready;
+    }
+
+private:
+    bool ready;
 };
 
 }  // namespace Graphene
