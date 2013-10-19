@@ -56,12 +56,12 @@ public:
         return this->height;
     }
 
-    void bindTo(TextureUnit unit) {
+    void bind(TextureUnit unit) {
         glActiveTexture(unit);
         glBindTexture(GL_TEXTURE_2D, this->texture);
     }
 
-    static void clear(TextureUnit unit) {
+    static void release(TextureUnit unit) {
         glActiveTexture(unit);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
