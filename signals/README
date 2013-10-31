@@ -1,0 +1,64 @@
+C++11 based signal-slot implementation
+
+Latest version of the signals is available at:
+https://github.com/santa01/signals
+
+Signals project is header only C++ code supposed to be included and used
+wherever observer-alike pattern is required. Signals utilizes C++11
+std::function template for callable targets wrapping.
+
+Here is a sample code that shows how signals could be used:
+
+  #include <iostream>
+  #include "Signals.h"
+
+  class Caller {
+  public:
+      Signals::Signal<> mySignal;
+  };
+
+  class Callee {
+  public:
+      Callee(int id) {
+          this->id = id;
+      }
+
+      void getId() {
+          std::cout << "Callee::mySlot() id = " << this->id << std::endl;
+      }
+
+  private:
+      int id;
+  };
+
+  int main()
+  {
+      Caller cr;
+      Callee ce1(1), ce2(2);
+
+      cr.mySignal.connect(std::bind(&Callee::getId, &ce1));
+      cr.mySignal.connect(std::bind(&Callee::getId, &ce2));
+      int handle = cr.mySignal.connect(std::bind(&Callee::getId, &ce2));
+      cr.mySignal();
+
+      cr.mySignal.disconnect(handle);
+      cr.mySignal();
+
+      cr.mySignal.disconnectAll();
+      cr.mySignal();
+
+      return 0;
+  }
+
+Sample code output:
+
+  Callee::mySlot() id = 1
+  Callee::mySlot() id = 2
+  Callee::mySlot() id = 2
+  Callee::mySlot() id = 1
+  Callee::mySlot() id = 2
+
+If you are interested in this signal-slot implementation, you can contact me
+via santa.ssh@gmail.com
+
+Source code is licensed under MIT license, see COPYING for details.
