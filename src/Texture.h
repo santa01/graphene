@@ -30,12 +30,7 @@ namespace Graphene {
 
 class Texture: public NonCopyable {
 public:
-    enum TextureUnit {
-        TEXTURE_UNIT_0 = GL_TEXTURE0,
-        TEXTURE_UNIT_1 = GL_TEXTURE1,
-        TEXTURE_UNIT_2 = GL_TEXTURE2,
-        TEXTURE_UNIT_3 = GL_TEXTURE3
-    };
+    friend class FrameBuffer;
 
     Texture() {
         this->width = 0;
@@ -56,14 +51,9 @@ public:
         return this->height;
     }
 
-    void bind(TextureUnit unit) {
-        glActiveTexture(unit);
+    void bind(int textureUnit) {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, this->texture);
-    }
-
-    static void release(TextureUnit unit) {
-        glActiveTexture(unit);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
 protected:
