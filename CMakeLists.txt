@@ -27,6 +27,7 @@ add_subdirectory (${MATH_LIBRARY})
 file (GLOB_RECURSE GRAPHENE_SOURCES "src/*.cpp")
 file (GLOB_RECURSE GRAPHENE_HEADERS "src/*.h")
 include_directories ("src")
+include_directories ("signals")
 
 set (GRAPHENE_NAME "Graphene")
 set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
