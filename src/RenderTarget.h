@@ -26,8 +26,8 @@
 #include <NonCopyable.h>
 #include <Viewport.h>
 #include <GL/glew.h>
+#include <unordered_set>
 #include <memory>
-#include <vector>
 
 namespace Graphene {
 
@@ -58,12 +58,12 @@ public:
         this->autoUpdate = autoUpdate;
     }
 
-    const std::vector<std::shared_ptr<Viewport>>& getViewports() const {
+    const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() const {
         return this->viewports;
     }
 
     void addViewport(const std::shared_ptr<Viewport> viewport) {
-        this->viewports.push_back(viewport);
+        this->viewports.insert(viewport);
     }
 
     void update() {
@@ -75,7 +75,7 @@ public:
     }
 
 protected:
-    std::vector<std::shared_ptr<Viewport>> viewports;
+    std::unordered_set<std::shared_ptr<Viewport>> viewports;
     GLuint fbo;
 
     int width;

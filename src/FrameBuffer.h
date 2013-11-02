@@ -27,32 +27,19 @@
 #include <ImageTexture.h>
 #include <DepthTexture.h>
 #include <GL/glew.h>
+#include <unordered_set>
 #include <memory>
-#include <vector>
 
 namespace Graphene {
 
 class FrameBuffer: public RenderTarget {
 public:
     FrameBuffer(int width, int height):
-            FrameBuffer(width, height, 1) {
-    }
-
-    FrameBuffer(int width, int height, int colorAttachementsNumber):
             RenderTarget(width, height),
             depthAttachement(new DepthTexture(width, height)) {
         glGenFramebuffers(1, &this->fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
-
-        for (int i = 0; i < colorAttachementsNumber; i++) {
-            this->colorAttachements.emplace_back(new ImageTexture(width, height));
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-                    this->colorAttachements[i]->texture, 0);
-        }
-
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                this->depthAttachement->texture, 0);
-
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthAttachement->texture, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -60,8 +47,16 @@ public:
         glDeleteFramebuffers(1, &this->fbo);
     }
 
-    const std::vector<std::shared_ptr<ImageTexture>>& getColorAttachements() const {
+    const std::unordered_set<std::shared_ptr<ImageTexture>>& getColorAttachements() const {
         return this->colorAttachements;
+    }
+
+    void addColorAttachement(const std::shared_ptr<ImageTexture> colorAttachement) {
+        if (this->colorAttachements.find(colorAttachement) == this->colorAttachements.end()) {
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + this->colorAttachements.size(),
+                    colorAttachement->texture, 0);
+            this->colorAttachements.insert(colorAttachement);
+        }
     }
 
     const std::shared_ptr<DepthTexture> getDepthAttachement() const {
@@ -69,7 +64,7 @@ public:
     }
 
 private:
-    std::vector<std::shared_ptr<ImageTexture>> colorAttachements;
+    std::unordered_set<std::shared_ptr<ImageTexture>> colorAttachements;
     std::shared_ptr<DepthTexture> depthAttachement;
 };
 
