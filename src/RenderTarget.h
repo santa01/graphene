@@ -24,16 +24,20 @@
 #define RENDERTARGET_H
 
 #include <NonCopyable.h>
+#include <Viewport.h>
 #include <GL/glew.h>
+#include <memory>
+#include <vector>
 
 namespace Graphene {
 
 class RenderTarget: public NonCopyable {
 public:
     RenderTarget(int width, int height) {
+        this->fbo = 0;
         this->width = width;
         this->height = height;
-        this->fbo = 0;
+        this->autoUpdate = false;
     }
 
     virtual ~RenderTarget() {}
@@ -46,16 +50,38 @@ public:
         return this->height;
     }
 
+    bool isAutoUpdate() const {
+        return this->autoUpdate;
+    }
+
+    void setAutoUpdate(bool autoUpdate) {
+        this->autoUpdate = autoUpdate;
+    }
+
+    const std::vector<std::shared_ptr<Viewport>>& getViewports() const {
+        return this->viewports;
+    }
+
+    void addViewport(const std::shared_ptr<Viewport> viewport) {
+        this->viewports.push_back(viewport);
+    }
+
     void update() {
         glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        for (auto& viewport: this->viewports) {
+            viewport->update();
+        }
     }
 
 protected:
+    std::vector<std::shared_ptr<Viewport>> viewports;
     GLuint fbo;
 
     int width;
     int height;
+
+    bool autoUpdate;
 };
 
 }  // namespace Graphene

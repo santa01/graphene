@@ -64,7 +64,7 @@ public:
         return this->colorAttachements;
     }
 
-    std::shared_ptr<DepthTexture> getDepthAttachement() const {
+    const std::shared_ptr<DepthTexture> getDepthAttachement() const {
         return this->depthAttachement;
     }
 

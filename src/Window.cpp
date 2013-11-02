@@ -32,6 +32,7 @@ Window::Window(int width, int height):
     this->window = nullptr;
     this->context = nullptr;
     this->ready = false;
+    this->autoUpdate = true;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE)) {
         return;
