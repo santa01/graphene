@@ -21,13 +21,14 @@ pkg_search_module (SDL2 REQUIRED sdl2)
 pkg_search_module (SDL2_IMAGE REQUIRED SDL2_image)
 
 set (MATH_LIBRARY "math")
-set (MATH_INCLUDE ${MATH_LIBRARY}/src)
 add_subdirectory (${MATH_LIBRARY})
 
 file (GLOB_RECURSE GRAPHENE_SOURCES "src/*.cpp")
 file (GLOB_RECURSE GRAPHENE_HEADERS "src/*.h")
+
 include_directories ("src")
 include_directories ("signals")
+include_directories (${MATH_LIBRARY}/src)
 
 set (GRAPHENE_NAME "Graphene")
 set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
