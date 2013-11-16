@@ -26,13 +26,16 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 namespace Graphene {
 
-bool Shader::load(const std::string& name) {
-    std::fstream file(name.c_str(), std::ios::binary | std::ios::in);
+Shader::Shader(const std::string& name) {
+    this->program = 0;
+
+    std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
-        return false;
+        throw std::runtime_error("Failed to open `" + name + "'");
     }
 
     file.seekg(0, std::ios::end);
@@ -45,23 +48,22 @@ bool Shader::load(const std::string& name) {
     file.close();
 
     std::vector<GLuint> shaders;
-    std::unordered_map<std::string, ShaderType> shaderTypes = {
-        { "#define TYPE_VERTEX\n", ShaderType::TYPE_VERTEX },
-        { "#define TYPE_FRAGMENT\n", ShaderType::TYPE_FRAGMENT }
+    std::unordered_map<std::string, GLenum> shaderTypes = {
+        { "#define TYPE_VERTEX\n", GL_VERTEX_SHADER },
+        { "#define TYPE_FRAGMENT\n", GL_FRAGMENT_SHADER }
     };
 
     for (auto& shaderType: shaderTypes) {
         std::stringstream modifiedSource;
         modifiedSource << shaderType.first;
         modifiedSource << source.get();
-        shaders.push_back(this->compileShader(modifiedSource.str(), shaderType.second));
+        shaders.push_back(this->compile(modifiedSource.str(), shaderType.second));
     }
 
-    this->program = this->linkShader(shaders);
-    return (this->program != 0);
+    this->program = this->link(shaders);
 }
 
-GLuint Shader::compileShader(const std::string& source, GLenum type) {
+GLuint Shader::compile(const std::string& source, GLenum type) {
     GLuint shader = glCreateShader(type);
     const char* sourceStrings = source.c_str();
 
@@ -72,14 +74,23 @@ GLuint Shader::compileShader(const std::string& source, GLenum type) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
 
     if (compileStatus == GL_FALSE) {
+        GLint infoLogLength;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogLength]);
+        glGetShaderInfoLog(shader, infoLogLength, nullptr, infoLog.get());
+
+        std::stringstream errorMessage;
+        errorMessage << "Failed to compile shader\n" << infoLog.get();
+
         glDeleteShader(shader);
-        shader = 0;
+        throw std::runtime_error(errorMessage.str());
     }
 
     return shader;
 }
 
-GLuint Shader::linkShader(const std::vector<GLuint>& shaders) {
+GLuint Shader::link(const std::vector<GLuint>& shaders) {
     GLuint program = glCreateProgram();
 
     for (auto& shader: shaders) {
@@ -93,8 +104,17 @@ GLuint Shader::linkShader(const std::vector<GLuint>& shaders) {
     glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
 
     if (linkStatus == GL_FALSE) {
+        GLint infoLogLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogLength]);
+        glGetProgramInfoLog(program, infoLogLength, nullptr, infoLog.get());
+
+        std::stringstream errorMessage;
+        errorMessage << "Failed to link shader\n" << infoLog.get();
+
         glDeleteProgram(program);
-        program = 0;
+        throw std::runtime_error(errorMessage.str());
     }
 
     return program;

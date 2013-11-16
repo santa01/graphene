@@ -29,6 +29,7 @@
 #include <GL/glew.h>
 #include <unordered_set>
 #include <memory>
+#include <stdexcept>
 
 namespace Graphene {
 
@@ -52,6 +53,10 @@ public:
     }
 
     void addColorAttachement(const std::shared_ptr<ImageTexture> colorAttachement) {
+        if (colorAttachement == nullptr) {
+           throw std::invalid_argument("ImageTexture cannot be nullptr");
+        }
+
         if (this->colorAttachements.find(colorAttachement) == this->colorAttachements.end()) {
             glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + this->colorAttachements.size(),
                     colorAttachement->texture, 0);

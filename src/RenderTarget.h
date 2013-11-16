@@ -80,7 +80,6 @@ protected:
 
     int width;
     int height;
-
     bool autoUpdate;
 };
 

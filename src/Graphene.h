@@ -30,6 +30,7 @@
 #include <unordered_set>
 #include <memory>
 #include <functional>
+#include <stdexcept>
 
 namespace Graphene {
 
@@ -39,13 +40,15 @@ public:
             window(new Window(width, height)) {
     }
 
-    ~Graphene() {}
-
     const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const {
         return this->frameBuffers;
     }
 
     void addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer) {
+        if (frameBuffer == nullptr) {
+            throw std::invalid_argument("FrameBuffer cannot be nullptr");
+        }
+
         this->frameBuffers.insert(frameBuffer);
     }
 

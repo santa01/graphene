@@ -22,31 +22,21 @@
 
 #include <ImageTexture.h>
 #include <SDL2/SDL_image.h>
+#include <stdexcept>
 
 namespace Graphene {
 
 ImageTexture::ImageTexture(const std::string& name) {
-    this->ready = false;
-
     SDL_Surface* image = IMG_Load(name.c_str());
     if (image == nullptr) {
-        return;
+        throw std::runtime_error("Failed to open `" + name + "'");
     }
 
     SDL_Surface* source = image;
     if (image->format->BytesPerPixel != 4) {
-        SDL_Surface* rgbaImage = SDL_CreateRGBSurface(0, image->w, image->h, 32,
+        source = SDL_CreateRGBSurface(0, image->w, image->h, 32,
                 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-        if (rgbaImage == nullptr) {
-            return;
-        }
-
-        if (SDL_BlitSurface(image, nullptr, rgbaImage, nullptr) == -1) {
-            SDL_FreeSurface(rgbaImage);
-            return;
-        }
-
-        source = rgbaImage;
+        SDL_BlitSurface(image, nullptr, source, nullptr);
     }
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
@@ -60,7 +50,6 @@ ImageTexture::ImageTexture(const std::string& name) {
 
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
-    this->ready = true;
 
     if (source != image) {
         SDL_FreeSurface(source);
@@ -78,7 +67,6 @@ ImageTexture::ImageTexture(int width, int height) {
     this->height = height;
 
     glBindTexture(GL_TEXTURE_2D, 0);
-    this->ready = true;
 }
 
 }  // namespace Graphene

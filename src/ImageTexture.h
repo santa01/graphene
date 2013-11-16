@@ -33,13 +33,6 @@ class ImageTexture: public Texture {
 public:
     ImageTexture(const std::string& name);
     ImageTexture(int width, int height);
-
-    bool isReady() const {
-        return this->ready;
-    }
-
-private:
-    bool ready;
 };
 
 }  // namespace Graphene

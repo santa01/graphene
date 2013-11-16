@@ -48,10 +48,6 @@ public:
         SDL_Quit();
     }
 
-    bool isReady() const {
-        return this->ready;
-    }
-
     void dispatchEvents();
 
     Signals::Signal<const SDL_Event*> onMouseEvent;  // Mouse event
@@ -61,8 +57,6 @@ public:
 private:
     SDL_Window* window;
     SDL_GLContext context;
-
-    bool ready;
 };
 
 }  // namespace Graphene

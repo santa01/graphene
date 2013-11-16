@@ -37,14 +37,7 @@ namespace Graphene {
 
 class Shader: public NonCopyable {
 public:
-    enum ShaderType {
-        TYPE_VERTEX = GL_VERTEX_SHADER,
-        TYPE_FRAGMENT = GL_FRAGMENT_SHADER
-    };
-
-    Shader() {
-        this->program = 0;
-    }
+    Shader(const std::string& name);
 
     ~Shader() {
         if (this->program != 0) {
@@ -94,8 +87,6 @@ public:
         }
     }
 
-    bool load(const std::string& name);
-
     void enable() {
         if (this->program != 0) {
             glUseProgram(this->program);
@@ -113,8 +104,8 @@ private:
         return this->uniforms.at(name);
     }
 
-    GLuint compileShader(const std::string& source, GLenum type);
-    GLuint linkShader(const std::vector<GLuint>& shaders);
+    GLuint compile(const std::string& source, GLenum type);
+    GLuint link(const std::vector<GLuint>& shaders);
 
     std::unordered_map<std::string, GLint> uniforms;
     GLuint program;

@@ -27,20 +27,21 @@
 #include <Camera.h>
 #include <GL/glew.h>
 #include <memory>
+#include <stdexcept>
 
 namespace Graphene {
 
 class Viewport: public NonCopyable {
 public:
-    Viewport(int left, int top, int width, int height) {
+    Viewport(int left, int top, int width, int height, const std::shared_ptr<Camera> camera) {
+        if (camera == nullptr) {
+            throw std::invalid_argument("Camera cannot be nullptr");
+        }
+
         this->left = left;
         this->top = top;
         this->width = width;
         this->height = height;
-    }
-
-    Viewport(int left, int top, int width, int height, std::shared_ptr<Camera> camera):
-            Viewport(left, top, width, height) {
         this->camera = camera;
     }
 
@@ -48,7 +49,11 @@ public:
         return this->camera;
     }
 
-    void setCamera(std::shared_ptr<Camera> camera) {
+    void setCamera(const std::shared_ptr<Camera> camera) {
+        if (camera == nullptr) {
+            throw std::invalid_argument("Camera cannot be nullptr");
+        }
+
         this->camera = camera;
     }
 

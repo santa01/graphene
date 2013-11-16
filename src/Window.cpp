@@ -21,6 +21,7 @@
  */
 
 #include <Window.h>
+#include <stdexcept>
 
 namespace Graphene {
 
@@ -31,11 +32,10 @@ Window::Window(int width, int height):
 
     this->window = nullptr;
     this->context = nullptr;
-    this->ready = false;
     this->autoUpdate = true;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE)) {
-        return;
+        throw std::runtime_error("Failed to initialize SDL");
     }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -48,25 +48,24 @@ Window::Window(int width, int height):
     this->window = SDL_CreateWindow("Graphene", 0, 0, this->width, this->height,
             SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (this->window == nullptr) {
-        return;
+        throw std::runtime_error("Failed to create SDL window");
     }
 
     this->context = SDL_GL_CreateContext(this->window);
     if (this->context == nullptr) {
-        return;
+        throw std::runtime_error("Failed to create OpenGL context");
     }
 
     if (!IMG_Init(IMG_INIT_PNG)) {
-        return;
+        throw std::runtime_error("Failed to initialize SDL_image");
     }
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        return;
+        throw std::runtime_error("Failed to initialize GLEW");
     }
 
     glEnable(GL_CULL_FACE);
-    this->ready = true;
 }
 
 void Window::dispatchEvents() {
