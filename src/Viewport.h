@@ -26,8 +26,8 @@
 #include <NonCopyable.h>
 #include <Camera.h>
 #include <GL/glew.h>
-#include <memory>
 #include <stdexcept>
+#include <memory>
 
 namespace Graphene {
 

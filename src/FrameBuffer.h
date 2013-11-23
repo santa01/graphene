@@ -28,8 +28,8 @@
 #include <DepthTexture.h>
 #include <GL/glew.h>
 #include <unordered_set>
-#include <memory>
 #include <stdexcept>
+#include <memory>
 
 namespace Graphene {
 

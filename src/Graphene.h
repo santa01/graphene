@@ -24,13 +24,14 @@
 #define GRAPHENE_H
 
 #include <NonCopyable.h>
-#include <Window.h>
 #include <FrameBuffer.h>
+#include <Window.h>
+#include <Scene.h>
 #include <SDL2/SDL_events.h>
 #include <unordered_set>
-#include <memory>
 #include <functional>
 #include <stdexcept>
+#include <memory>
 
 namespace Graphene {
 

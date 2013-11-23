@@ -21,10 +21,10 @@
  */
 
 #include <Camera.h>
-#include <Mat3.h>
 #include <Quaternion.h>
-#include <cmath>
+#include <Mat3.h>
 #include <stdexcept>
+#include <cmath>
 
 namespace Graphene {
 

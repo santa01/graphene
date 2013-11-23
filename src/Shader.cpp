@@ -21,12 +21,12 @@
  */
 
 #include <Shader.h>
-#include <fstream>
 #include <unordered_map>
+#include <stdexcept>
 #include <sstream>
+#include <fstream>
 #include <vector>
 #include <memory>
-#include <stdexcept>
 
 namespace Graphene {
 
