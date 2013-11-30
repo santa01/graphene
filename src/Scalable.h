@@ -37,7 +37,7 @@ public:
     virtual float getYFactor() const = 0;
     virtual float getZFactor() const = 0;
 
-    virtual void scale(float factor)  = 0;
+    virtual void scale(float factor) = 0;
 };
 
 }  // namespace Graphene

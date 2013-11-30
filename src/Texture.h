@@ -30,8 +30,6 @@ namespace Graphene {
 
 class Texture: public NonCopyable {
 public:
-    friend class FrameBuffer;
-
     Texture() {
         this->width = 0;
         this->height = 0;
@@ -57,6 +55,7 @@ public:
     }
 
 protected:
+    friend class FrameBuffer;
     GLuint texture;
 
     int width;

@@ -23,11 +23,14 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <Rotatable.h>
+#include <Movable.h>
+#include <Object.h>
 #include <Mat4.h>
 
 namespace Graphene {
 
-class Camera {
+class Camera: public Object, public Rotatable, public Movable {
 public:
     enum ProjectionType {
         TYPE_PERSPECTIVE,
@@ -46,26 +49,26 @@ public:
 
     Camera(float x, float y, float z):
             Camera() {
-        this->setPosition(x, y, z);
+        this->translate(x, y, z);
     }
 
     Camera(const Math::Vec3& position):
             Camera() {
-        this->setPosition(position);
+        this->translate(position);
     }
 
-    void setPosition(float x, float y, float z) {
-        this->setPosition(Math::Vec3(x, y, z));
+    /* Rotatable */
+
+    void roll(float angle) {
+        this->rotate(Math::Vec3::UNIT_X, angle);
     }
 
-    void setPosition(const Math::Vec3& position) {
-        this->translation.set(0, 3, -position.get(Math::Vec3::X));
-        this->translation.set(1, 3, -position.get(Math::Vec3::Y));
-        this->translation.set(2, 3, -position.get(Math::Vec3::Z));
+    void yaw(float angle) {
+        this->rotate(Math::Vec3::UNIT_Y, angle);
     }
 
-    Math::Vec3 getPosition() const {
-        return Math::Vec3(-this->translation.get(0, 3), -this->translation.get(1, 3), -this->translation.get(2, 3));
+    void pitch(float angle) {
+        this->rotate(Math::Vec3::UNIT_Z, angle);
     }
 
     float getXAngle() const {
@@ -80,19 +83,35 @@ public:
         return this->zAngle;
     }
 
-    void roll(float angle) {
-        this->rotate(Math::Vec3::UNIT_X, angle);
-    }
-
-    void yaw(float angle) {
-        this->rotate(Math::Vec3::UNIT_Y, angle);
-    }
-
-    void pitch(float angle) {
-        this->rotate(Math::Vec3::UNIT_Z, angle);
-    }
-
     void rotate(const Math::Vec3& vector, float angle);
+
+    /* Movable */
+
+    void translate(float x, float y, float z) {
+        this->translate(Math::Vec3(x, y, z));
+    }
+
+    void translate(const Math::Vec3& position) {
+        this->translation.set(0, 3, -position.get(Math::Vec3::X));
+        this->translation.set(1, 3, -position.get(Math::Vec3::Y));
+        this->translation.set(2, 3, -position.get(Math::Vec3::Z));
+    }
+
+    void move(float x, float y, float z) {
+        this->move(Math::Vec3(x, y, z));
+    }
+
+    void move(const Math::Vec3& position) {
+        this->translation.set(0, 3, -this->translation.get(0, 3) - position.get(Math::Vec3::X));
+        this->translation.set(1, 3, -this->translation.get(1, 3) - position.get(Math::Vec3::Y));
+        this->translation.set(2, 3, -this->translation.get(2, 3) - position.get(Math::Vec3::Z));
+    }
+
+    Math::Vec3 getPosition() const {
+        return Math::Vec3(-this->translation.get(0, 3), -this->translation.get(1, 3), -this->translation.get(2, 3));
+    }
+
+    /* Camera */
 
     ProjectionType getProjectionType() const {
         return this->projectionType;
@@ -165,7 +184,6 @@ private:
     void updateRotation(const Math::Vec3& right, const Math::Vec3& up, const Math::Vec3& target);
 
     ProjectionType projectionType;
-
     Math::Mat4 projection;
     Math::Mat4 translation;
     Math::Mat4 rotation;
