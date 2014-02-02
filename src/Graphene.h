@@ -26,7 +26,7 @@
 #include <NonCopyable.h>
 #include <FrameBuffer.h>
 #include <Window.h>
-#include <Scene.h>
+#include <SceneManager.h>
 #include <SDL2/SDL_events.h>
 #include <unordered_set>
 #include <functional>
@@ -38,7 +38,8 @@ namespace Graphene {
 class Graphene: public NonCopyable {
 public:
     Graphene(int width, int height):
-            window(new Window(width, height)) {
+            window(new Window(width, height)),
+            sceneManager(new SceneManager()) {
     }
 
     const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() {
@@ -55,6 +56,10 @@ public:
 
     std::shared_ptr<Window> getWindow() {
         return this->window;
+    }
+
+    std::shared_ptr<SceneManager> getSceneManager() {
+        return this->sceneManager;
     }
 
     void setMouseEventHandler(const std::function<void(const SDL_Event*)>& handler) {
@@ -86,6 +91,7 @@ public:
 private:
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::shared_ptr<Window> window;
+    std::shared_ptr<SceneManager> sceneManager;
 };
 
 }  // namespace Graphene

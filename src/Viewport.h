@@ -25,6 +25,8 @@
 
 #include <NonCopyable.h>
 #include <Camera.h>
+#include <SceneNode.h>
+#include <SceneManager.h>
 #include <GL/glew.h>
 #include <stdexcept>
 #include <memory>
@@ -85,7 +87,17 @@ public:
     }
 
     void update() {
+        if (this->camera == nullptr) {
+            return;
+        }
+
+        auto parent = this->camera->getParent();
+        if (parent == nullptr) {
+            return;
+        }
+
         glViewport(this->left, this->top, this->width, this->height);
+        parent->getSceneManager()->render(this->camera);
     }
 
 private:
