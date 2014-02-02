@@ -23,14 +23,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <Rotatable.h>
-#include <Movable.h>
 #include <Object.h>
 #include <Mat4.h>
 
 namespace Graphene {
 
-class Camera: public Object, public Rotatable, public Movable {
+class Camera: public Object {
 public:
     enum ProjectionType {
         TYPE_PERSPECTIVE,

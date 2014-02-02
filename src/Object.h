@@ -23,21 +23,23 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <Rotatable.h>
+#include <Movable.h>
 #include <memory>
 
 namespace Graphene {
 
 class SceneNode;
 
-class Object {
+class Object: public Rotatable, public Movable {
 public:
-    const std::shared_ptr<SceneNode> getParent() {
-        return this->parent;
+    std::shared_ptr<class SceneNode> getParent() {
+        return this->parent.lock();
     }
 
 private:
     friend class SceneNode;
-    std::shared_ptr<SceneNode> parent;
+    std::weak_ptr<class SceneNode> parent;
 };
 
 }  // namespace Graphene

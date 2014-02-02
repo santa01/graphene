@@ -31,10 +31,10 @@
 
 namespace Graphene {
 
+class Graphene;
+
 class Window: public RenderTarget {
 public:
-    Window(int width, int height);
-
     ~Window() {
         if (this->context) {
             SDL_GL_DeleteContext(this->context);
@@ -55,6 +55,9 @@ public:
     Signals::Signal<const SDL_Event*> onQuitEvent;   // User-requested quit
 
 private:
+    friend class Graphene;
+    Window(int width, int height);
+
     SDL_Window* window;
     SDL_GLContext context;
 };

@@ -29,10 +29,8 @@ Window::Window(int width, int height):
         RenderTarget(width, height) {
     this->width = width;
     this->height = height;
-
     this->window = nullptr;
     this->context = nullptr;
-    this->autoUpdate = true;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE)) {
         throw std::runtime_error("Failed to initialize SDL");

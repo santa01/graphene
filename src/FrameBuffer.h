@@ -48,7 +48,7 @@ public:
         glDeleteFramebuffers(1, &this->fbo);
     }
 
-    const std::unordered_set<std::shared_ptr<ImageTexture>>& getColorAttachements() const {
+    const std::unordered_set<std::shared_ptr<ImageTexture>>& getColorAttachements() {
         return this->colorAttachements;
     }
 
@@ -64,7 +64,7 @@ public:
         }
     }
 
-    const std::shared_ptr<DepthTexture> getDepthAttachement() const {
+    std::shared_ptr<DepthTexture> getDepthAttachement() {
         return this->depthAttachement;
     }
 

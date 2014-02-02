@@ -33,19 +33,14 @@ namespace Graphene {
 
 class Viewport: public NonCopyable {
 public:
-    Viewport(int left, int top, int width, int height, const std::shared_ptr<Camera> camera) {
-        if (camera == nullptr) {
-            throw std::invalid_argument("Camera cannot be nullptr");
-        }
-
+    Viewport(int left, int top, int width, int height) {
         this->left = left;
         this->top = top;
         this->width = width;
         this->height = height;
-        this->camera = camera;
     }
 
-    const std::shared_ptr<Camera> getCamera() const {
+    std::shared_ptr<Camera> getCamera() {
         return this->camera;
     }
 

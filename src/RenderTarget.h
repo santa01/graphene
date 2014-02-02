@@ -27,6 +27,7 @@
 #include <Viewport.h>
 #include <GL/glew.h>
 #include <unordered_set>
+#include <stdexcept>
 #include <memory>
 
 namespace Graphene {
@@ -37,7 +38,10 @@ public:
         this->fbo = 0;
         this->width = width;
         this->height = height;
-        this->autoUpdate = false;
+        this->autoUpdate = true;
+
+        auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
+        this->addViewport(viewport);
     }
 
     virtual ~RenderTarget() {}
@@ -58,11 +62,15 @@ public:
         this->autoUpdate = autoUpdate;
     }
 
-    const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() const {
+    const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() {
         return this->viewports;
     }
 
     void addViewport(const std::shared_ptr<Viewport> viewport) {
+        if (viewport == nullptr) {
+            throw std::invalid_argument("Viewport cannot be nullptr");
+        }
+
         this->viewports.insert(viewport);
     }
 

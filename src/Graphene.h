@@ -41,7 +41,7 @@ public:
             window(new Window(width, height)) {
     }
 
-    const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const {
+    const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() {
         return this->frameBuffers;
     }
 
@@ -53,7 +53,7 @@ public:
         this->frameBuffers.insert(frameBuffer);
     }
 
-    const std::shared_ptr<Window> getWindow() const {
+    std::shared_ptr<Window> getWindow() {
         return this->window;
     }
 
