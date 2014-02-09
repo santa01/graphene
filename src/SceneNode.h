@@ -29,6 +29,7 @@
 #include <NonCopyable.h>
 #include <Object.h>
 #include <unordered_set>
+#include <stdexcept>
 #include <memory>
 
 namespace Graphene {
@@ -38,8 +39,12 @@ class SceneManager;
 class SceneNode: public std::enable_shared_from_this<SceneNode>,
         public Rotatable, public Scalable, public Movable, public NonCopyable {
 public:
-    SceneNode(const std::shared_ptr<SceneManager> sceneManager):
-        sceneManager(sceneManager) {
+    SceneNode(const std::shared_ptr<SceneManager> sceneManager) {
+        if (sceneManager == nullptr) {
+            throw std::invalid_argument("SceneManager cannot be nullptr");
+        }
+
+        this->sceneManager = sceneManager;
     }
 
     /* Rotatable */
@@ -83,6 +88,10 @@ public:
     }
 
     void attachNode(std::shared_ptr<SceneNode> node) {
+        if (node == nullptr) {
+            throw std::invalid_argument("SceneNode cannot be nullptr");
+        }
+
         auto inserted = this->nodes.insert(node);
         if (inserted.second) {
             node->parent = this->shared_from_this();
@@ -94,6 +103,10 @@ public:
     }
 
     void attachObject(std::shared_ptr<Object> object) {
+        if (object == nullptr) {
+            throw std::invalid_argument("Object cannot be nullptr");
+        }
+
         auto inserted = this->objects.insert(object);
         if (inserted.second) {
             object->parent = this->shared_from_this();
