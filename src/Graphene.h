@@ -38,8 +38,9 @@ namespace Graphene {
 class Graphene: public NonCopyable {
 public:
     Graphene(int width, int height):
-            window(new Window(width, height)),
-            sceneManager(new SceneManager()) {
+            window(new Window(width, height)) {
+        auto sceneManager = std::make_shared<SceneManager>();
+        this->addSceneManager(sceneManager);
     }
 
     const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() {
@@ -54,31 +55,25 @@ public:
         this->frameBuffers.insert(frameBuffer);
     }
 
+    const std::unordered_set<std::shared_ptr<SceneManager>>& getSceneManagers() {
+        return this->sceneManagers;
+    }
+
+    void addSceneManager(const std::shared_ptr<SceneManager> sceneManager) {
+        if (sceneManager == nullptr) {
+            throw std::invalid_argument("SceneManager cannot be nullptr");
+        }
+
+        this->sceneManagers.insert(sceneManager);
+    }
+
     std::shared_ptr<Window> getWindow() {
         return this->window;
     }
 
-    std::shared_ptr<SceneManager> getSceneManager() {
-        return this->sceneManager;
-    }
-
-    void setMouseEventHandler(const std::function<void(const SDL_Event*)>& handler) {
-        this->window->onMouseEvent.connect(handler);
-    }
-
-    void setKeyEventHandler(const std::function<void(const SDL_Event*)>& handler) {
-        this->window->onKeyEvent.connect(handler);
-    }
-
-    void setQuitEventHandler(const std::function<void(const SDL_Event*)>& handler) {
-        this->window->onQuitEvent.connect(handler);
-    }
-
-    void dispatchEvents() {
+    void update() {
         this->window->dispatchEvents();
-    }
 
-    void render() {
         for (auto& frameBuffer: this->frameBuffers) {
             if (frameBuffer->isAutoUpdate()) {
                 frameBuffer->update();
@@ -90,8 +85,9 @@ public:
 
 private:
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
+    std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
+
     std::shared_ptr<Window> window;
-    std::shared_ptr<SceneManager> sceneManager;
 };
 
 }  // namespace Graphene

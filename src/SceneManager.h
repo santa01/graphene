@@ -30,10 +30,15 @@
 
 namespace Graphene {
 
-class Graphene;
-
-class SceneManager: public NonCopyable {
+class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
 public:
+    SceneManager() {
+        this->lightPass = false;
+        this->shadowPass = false;
+
+        this->rootNode = std::make_shared<SceneNode>(this->shared_from_this());
+    }
+
     std::shared_ptr<SceneNode> getRootNode() {
         return this->rootNode;
     }
@@ -59,17 +64,10 @@ public:
     }
 
 private:
-    friend class Graphene;
-    SceneManager():
-            rootNode(new SceneNode()) {
-        this->lightPass = false;
-        this->shadowPass = false;
-    }
+    std::shared_ptr<SceneNode> rootNode;
 
     bool lightPass;
     bool shadowPass;
-
-    std::shared_ptr<SceneNode> rootNode;
 };
 
 }  // namespace Graphene

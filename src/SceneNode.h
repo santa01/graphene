@@ -38,6 +38,10 @@ class SceneManager;
 class SceneNode: public std::enable_shared_from_this<SceneNode>,
         public Rotatable, public Scalable, public Movable, public NonCopyable {
 public:
+    SceneNode(const std::shared_ptr<SceneManager> sceneManager):
+        sceneManager(sceneManager) {
+    }
+
     /* Rotatable */
 
     void roll(float angle) {}
@@ -78,12 +82,11 @@ public:
         return this->nodes;
     }
 
-    std::shared_ptr<SceneNode> createNode() {
-        // NOTE: SceneNode() is private, std::make_shared will fail
-        auto node = std::shared_ptr<SceneNode>(new SceneNode());
-        node->sceneManager = this->sceneManager;
-        this->nodes.insert(node);
-        return node;
+    void attachNode(std::shared_ptr<SceneNode> node) {
+        auto inserted = this->nodes.insert(node);
+        if (inserted.second) {
+            node->parent = this->shared_from_this();
+        }
     }
 
     const std::unordered_set<std::shared_ptr<Object>>& getObjects() {
@@ -106,9 +109,6 @@ public:
     }
 
 private:
-    friend class SceneManager;
-    SceneNode() = default;
-
     std::unordered_set<std::shared_ptr<SceneNode>> nodes;
     std::unordered_set<std::shared_ptr<Object>> objects;
 
