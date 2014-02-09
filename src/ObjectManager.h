@@ -20,64 +20,38 @@
  * SOFTWARE.
  */
 
-#ifndef SCENEMANAGER_H
-#define SCENEMANAGER_H
+#ifndef OBJECTMANAGER_H
+#define OBJECTMANAGER_H
 
-#include <NonCopyable.h>
-#include <SceneNode.h>
 #include <Camera.h>
+#include <Light.h>
+#include <Entity.h>
+#include <Mesh.h>
+#include <ImageTexture.h>
+#include <Shader.h>
+#include <unordered_map>
 #include <memory>
 
 namespace Graphene {
 
-class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
+class ObjectManager: public NonCopyable {
 public:
-    SceneManager() {
-        this->lightPass = false;
-        this->shadowPass = false;
-        this->rootNode = this->createNode();
+    std::shared_ptr<Camera> createCamera() const {
+        return std::make_shared<Camera>();
     }
 
-    /* const version of shared_from_this() is selected otherwise */
-    std::shared_ptr<SceneNode> createNode() {
-        return std::make_shared<SceneNode>(this->shared_from_this());
+    std::shared_ptr<Light> createLight() const {
+        return std::make_shared<Light>();
     }
 
-    std::shared_ptr<SceneNode> getRootNode() const {
-        return this->rootNode;
-    }
-
-    void setLightPass(bool lightPass) {
-        this->lightPass = lightPass;
-    }
-
-    bool isLightPass() const {
-        return this->lightPass;
-    }
-
-    void setShadowPass(bool shadowPass) {
-        this->shadowPass = shadowPass;
-    }
-
-    bool isShadowPass() const {
-        return this->shadowPass;
-    }
-
-    void render(const std::shared_ptr<Camera> camera) {
-        if (camera == nullptr) {
-            throw std::invalid_argument("Camera cannot be nullptr");
-        }
-
-        // TODO
-    }
+    std::shared_ptr<Entity> createEntity(const std::string& name);
 
 private:
-    std::shared_ptr<SceneNode> rootNode;
-
-    bool lightPass;
-    bool shadowPass;
+    std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;
+    std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
+    std::unordered_map<std::string, std::shared_ptr<Mesh>> meshCache;
 };
 
 }  // namespace Graphene
 
-#endif  // SCENEMANAGER_H
+#endif  // OBJECTMANAGER_H

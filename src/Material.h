@@ -20,64 +20,52 @@
  * SOFTWARE.
  */
 
-#ifndef SCENEMANAGER_H
-#define SCENEMANAGER_H
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
-#include <NonCopyable.h>
-#include <SceneNode.h>
-#include <Camera.h>
+#include <Shader.h>
+#include <Texture.h>
+#include <unordered_set>
+#include <stdexcept>
 #include <memory>
 
 namespace Graphene {
 
-class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
+class Material {
 public:
-    SceneManager() {
-        this->lightPass = false;
-        this->shadowPass = false;
-        this->rootNode = this->createNode();
+    Material(const std::shared_ptr<Shader> shader) {
+        this->setShader(shader);
     }
 
-    /* const version of shared_from_this() is selected otherwise */
-    std::shared_ptr<SceneNode> createNode() {
-        return std::make_shared<SceneNode>(this->shared_from_this());
+    const std::unordered_set<std::shared_ptr<Texture>>& getTextures() {
+        return this->textures;
     }
 
-    std::shared_ptr<SceneNode> getRootNode() const {
-        return this->rootNode;
-    }
-
-    void setLightPass(bool lightPass) {
-        this->lightPass = lightPass;
-    }
-
-    bool isLightPass() const {
-        return this->lightPass;
-    }
-
-    void setShadowPass(bool shadowPass) {
-        this->shadowPass = shadowPass;
-    }
-
-    bool isShadowPass() const {
-        return this->shadowPass;
-    }
-
-    void render(const std::shared_ptr<Camera> camera) {
-        if (camera == nullptr) {
-            throw std::invalid_argument("Camera cannot be nullptr");
+    void addTexture(const std::shared_ptr<Texture> texture) {
+        if (texture == nullptr) {
+            throw std::invalid_argument("Texture cannot be nullptr");
         }
 
-        // TODO
+        this->textures.insert(texture);
+    }
+
+    std::shared_ptr<Shader> getShader() {
+        return this->shader;
+    }
+
+    void setShader(const std::shared_ptr<Shader> shader) {
+        if (shader == nullptr) {
+            throw std::invalid_argument("Shader cannot be nullptr");
+        }
+
+        this->shader = shader;
     }
 
 private:
-    std::shared_ptr<SceneNode> rootNode;
-
-    bool lightPass;
-    bool shadowPass;
+    std::unordered_set<std::shared_ptr<Texture>> textures;
+    std::shared_ptr<Shader> shader;
 };
 
 }  // namespace Graphene
 
-#endif  // SCENEMANAGER_H
+#endif  // MATERIAL_H

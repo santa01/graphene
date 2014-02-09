@@ -41,7 +41,7 @@ public:
         this->autoUpdate = true;
 
         auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
-        this->addViewport(viewport);
+        this->viewports.insert(viewport);
     }
 
     virtual ~RenderTarget() {}

@@ -27,9 +27,9 @@
 #include <FrameBuffer.h>
 #include <Window.h>
 #include <SceneManager.h>
+#include <ObjectManager.h>
 #include <SDL2/SDL_events.h>
 #include <unordered_set>
-#include <functional>
 #include <stdexcept>
 #include <memory>
 
@@ -39,8 +39,8 @@ class Graphene: public NonCopyable {
 public:
     Graphene(int width, int height):
             window(new Window(width, height)) {
-        auto sceneManager = std::make_shared<SceneManager>();
-        this->addSceneManager(sceneManager);
+        this->sceneManagers.insert(std::make_shared<SceneManager>());
+        this->objectManagers.insert(std::make_shared<ObjectManager>());
     }
 
     const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() {
@@ -67,6 +67,18 @@ public:
         this->sceneManagers.insert(sceneManager);
     }
 
+    const std::unordered_set<std::shared_ptr<ObjectManager>>& getObjectManagers() {
+        return this->objectManagers;
+    }
+
+    void addObjectManager(const std::shared_ptr<ObjectManager> objectManager) {
+        if (objectManager == nullptr) {
+            throw std::invalid_argument("ObjectManager cannot be nullptr");
+        }
+
+        this->objectManagers.insert(objectManager);
+    }
+
     std::shared_ptr<Window> getWindow() {
         return this->window;
     }
@@ -86,6 +98,7 @@ public:
 private:
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
+    std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
 
     std::shared_ptr<Window> window;
 };

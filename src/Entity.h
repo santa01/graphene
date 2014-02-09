@@ -24,14 +24,20 @@
 #define ENTITY_H
 
 #include <Scalable.h>
+#include <Material.h>
+#include <Mesh.h>
 #include <Object.h>
+#include <stdexcept>
+#include <memory>
 
 namespace Graphene {
 
 class Entity: public Object, public Scalable {
 public:
-    Entity() {}
-    ~Entity() {}
+    Entity(const std::shared_ptr<Material> material, const std::shared_ptr<Mesh> mesh) {
+        this->setMaterial(material);
+        this->setMesh(mesh);
+    }
 
     /* Rotatable */
 
@@ -69,7 +75,33 @@ public:
 
     /* Entity */
 
-    // TODO
+    std::shared_ptr<Material> getMaterial() {
+        return this->material;
+    }
+
+    void setMaterial(const std::shared_ptr<Material> material) {
+        if (material == nullptr) {
+            throw std::invalid_argument("Material cannot be nullptr");
+        }
+
+        this->material = material;
+    }
+
+    std::shared_ptr<Mesh> getMesh() {
+        return this->mesh;
+    }
+
+    void setMesh(const std::shared_ptr<Mesh> mesh) {
+        if (mesh == nullptr) {
+            throw std::invalid_argument("Mesh cannot be nullptr");
+        }
+
+        this->mesh = mesh;
+    }
+
+private:
+    std::shared_ptr<Material> material;
+    std::shared_ptr<Mesh> mesh;
 };
 
 }  // namespace Graphene
