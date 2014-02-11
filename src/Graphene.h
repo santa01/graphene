@@ -28,7 +28,6 @@
 #include <Window.h>
 #include <SceneManager.h>
 #include <ObjectManager.h>
-#include <SDL2/SDL_events.h>
 #include <unordered_set>
 #include <stdexcept>
 #include <memory>
