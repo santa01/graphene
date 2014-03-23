@@ -35,7 +35,6 @@ public:
     SceneManager() {
         this->lightPass = false;
         this->shadowPass = false;
-        this->rootNode = this->createNode();
     }
 
     /* const version of shared_from_this() is selected otherwise */
@@ -43,7 +42,12 @@ public:
         return std::make_shared<SceneNode>(this->shared_from_this());
     }
 
-    std::shared_ptr<SceneNode> getRootNode() const {
+    /* shared_from_this() cannot be called from constructor */
+    std::shared_ptr<SceneNode> getRootNode() {
+        if (this->rootNode == nullptr) {
+            this->rootNode = this->createNode();
+        }
+
         return this->rootNode;
     }
 
