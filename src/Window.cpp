@@ -64,6 +64,7 @@ Window::Window(int width, int height):
     }
 
     glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Window::dispatchEvents() {

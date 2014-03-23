@@ -48,6 +48,11 @@ public:
         SDL_Quit();
     }
 
+    void update() {
+        RenderTarget::update();
+        SDL_GL_SwapWindow(this->window);
+    }
+
     void dispatchEvents();
 
     Signals::Signal<const SDL_Event*> onMouseEvent;  // Mouse event

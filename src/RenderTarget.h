@@ -76,6 +76,7 @@ public:
 
     void update() {
         glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& viewport: this->viewports) {
             viewport->update();
