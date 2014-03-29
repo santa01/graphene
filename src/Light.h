@@ -26,13 +26,22 @@
 #include <Quaternion.h>
 #include <Vec3.h>
 #include <Object.h>
+#include <stdexcept>
 
 namespace Graphene {
 
 class Light: public Object {
 public:
-    Light() {}
-    ~Light() {}
+    enum LightType {
+        TYPE_POINT,
+        TYPE_SPOT,
+        TYPE_DIRECTED
+    };
+
+    Light():
+            direction(Math::Vec3::UNIT_X) {
+        this->lightType = TYPE_POINT;
+    }
 
     /* Rotatable */
 
@@ -88,10 +97,94 @@ public:
 
     /* Light */
 
-    // TODO
+    LightType getLightType() const {
+        return this->lightType;
+    }
+
+    void setLightType(LightType type) {
+        this->lightType = type;
+    }
+
+    void setColor(float red, float green, float blue) {
+        this->setColor(Math::Vec3(red, green, blue));
+    }
+
+    void setColor(const Math::Vec3& color) {
+        this->color = color;
+    }
+
+    const Math::Vec3& getColor() const {
+        return this->color;
+    }
+
+    void setDirection(float x, float y, float z) {
+        this->setDirection(Math::Vec3(x, y, z));
+    }
+
+    void setDirection(const Math::Vec3& direction) {
+        if (direction == Math::Vec3::ZERO) {
+            throw std::invalid_argument("Vector cannot be of zero length");
+        }
+
+        this->direction = direction;
+    }
+
+    const Math::Vec3& getDirection() const {
+        return this->direction;
+    }
+
+    void setEnergy(float energy) {
+        this->energy = energy;
+    }
+
+    float getEnergy() const {
+        return this->energy;
+    }
+
+    void setFalloff(float falloff) {
+        this->falloff = falloff;
+    }
+
+    float getFalloff() const {
+        return this->falloff;
+    }
+
+    void setInnerAngle(float angle) {
+        if (angle < 0.0f || angle > this->outerAngle) {
+            throw std::invalid_argument("Angle should be in [0.0; OuterAngle] range");
+        }
+
+        this->innerAngle = angle;
+    }
+
+    float getInnerAngle() const {
+        return this->innerAngle;
+    }
+
+    void setOuterAngle(float angle) {
+        if (angle < 0.0f || angle >= 180.0f) {
+            throw std::invalid_argument("Angle should be in [0.0; 180.0) range");
+        }
+
+        this->outerAngle = angle;
+    }
+
+    float getOuterAngle() const {
+        return this->outerAngle;
+    }
 
 private:
-    Math::Vec3 position;
+    LightType lightType;
+
+    Math::Vec3 color;
+    Math::Vec3 position;   // TYPE_POINT, TYPE_SPOT
+    Math::Vec3 direction;  // TYPE_SPOT, TYPE_DIRECTED
+
+    float energy;
+    float falloff;
+    float innerAngle;      // TYPE_SPOT
+    float outerAngle;      // TYPE_SPOT
+
     Math::Vec3 rotationAngles;
 };
 
