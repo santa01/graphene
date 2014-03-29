@@ -25,6 +25,7 @@
 
 #include <Object.h>
 #include <Mat4.h>
+#include <Vec3.h>
 
 namespace Graphene {
 
@@ -69,19 +70,11 @@ public:
         this->rotate(Math::Vec3::UNIT_Z, angle);
     }
 
-    float getXAngle() const {
-        return this->xAngle;
-    }
-
-    float getYAngle() const {
-        return this->yAngle;
-    }
-
-    float getZAngle() const {
-        return this->zAngle;
-    }
-
     void rotate(const Math::Vec3& vector, float angle);
+
+    Math::Vec3 getRotationAngles() const {
+        return this->rotationAngles;
+    }
 
     /* Movable */
 
@@ -181,19 +174,17 @@ private:
     void updateProjection(ProjectionType projectionType);
     void updateRotation(const Math::Vec3& right, const Math::Vec3& up, const Math::Vec3& target);
 
-    ProjectionType projectionType;
     Math::Mat4 projection;
     Math::Mat4 translation;
     Math::Mat4 rotation;
+
+    ProjectionType projectionType;
+    Math::Vec3 rotationAngles;
 
     float aspectRatio;
     float nearPlane;
     float farPlane;
     float fov;
-
-    float xAngle;
-    float yAngle;
-    float zAngle;
 };
 
 }  // namespace Graphene

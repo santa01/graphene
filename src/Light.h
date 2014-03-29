@@ -23,6 +23,8 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include <Quaternion.h>
+#include <Vec3.h>
 #include <Object.h>
 
 namespace Graphene {
@@ -34,29 +36,63 @@ public:
 
     /* Rotatable */
 
-    void roll(float angle) {}
-    void yaw(float angle) {}
-    void pitch(float angle) {}
+    void roll(float angle) {
+        this->rotate(Math::Vec3::UNIT_X, angle);
+    }
 
-    float getXAngle() const {}
-    float getYAngle() const {}
-    float getZAngle() const {}
+    void yaw(float angle) {
+        this->rotate(Math::Vec3::UNIT_Y, angle);
+    }
 
-    void rotate(const Math::Vec3& vector, float angle) {}
+    void pitch(float angle) {
+        this->rotate(Math::Vec3::UNIT_Z, angle);
+    }
+
+    void rotate(const Math::Vec3& vector, float angle) {
+        Math::Vec3 axis(vector);
+        Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+        q.normalize();
+
+        float xAngle, yAngle, zAngle;
+        q.extractEulerAngles(xAngle, yAngle, zAngle);
+
+        this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+        this->direction = q.extractMat4().extractMat3() * this->direction;
+    }
+
+    Math::Vec3 getRotationAngles() const {
+        return this->rotationAngles;
+    }
 
     /* Movable */
 
-    void translate(float x, float y, float z) {}
-    void translate(const Math::Vec3& position) {}
+    void translate(float x, float y, float z) {
+        this->translate(Math::Vec3(x, y, z));
+    }
 
-    void move(float x, float y, float z) {}
-    void move(const Math::Vec3& position) {}
+    void translate(const Math::Vec3& position) {
+        this->position = position;
+    }
 
-    Math::Vec3 getPosition() const {}
+    void move(float x, float y, float z) {
+        this->move(Math::Vec3(x, y, z));
+    }
+
+    void move(const Math::Vec3& position) {
+        this->position += position;
+    }
+
+    Math::Vec3 getPosition() const {
+        return this->position;
+    }
 
     /* Light */
 
     // TODO
+
+private:
+    Math::Vec3 position;
+    Math::Vec3 rotationAngles;
 };
 
 }  // namespace Graphene

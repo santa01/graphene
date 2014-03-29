@@ -28,6 +28,8 @@
 #include <Movable.h>
 #include <NonCopyable.h>
 #include <Object.h>
+#include <Entity.h>
+#include <Vec3.h>
 #include <unordered_set>
 #include <stdexcept>
 #include <memory>
@@ -49,37 +51,77 @@ public:
 
     /* Rotatable */
 
-    void roll(float angle) {}
-    void yaw(float angle) {}
-    void pitch(float angle) {}
+    void roll(float angle) {
+        this->rotate(Math::Vec3::UNIT_X, angle);
+    }
 
-    float getXAngle() const {}
-    float getYAngle() const {}
-    float getZAngle() const {}
+    void yaw(float angle) {
+        this->rotate(Math::Vec3::UNIT_Y, angle);
+    }
 
-    void rotate(const Math::Vec3& vector, float angle) {}
+    void pitch(float angle) {
+        this->rotate(Math::Vec3::UNIT_Z, angle);
+    }
+
+    void rotate(const Math::Vec3& vector, float angle);
+
+    Math::Vec3 getRotationAngles() const {
+        return this->rotationAngles;
+    }
 
     /* Scalable */
 
-    void scaleX(float factor) {}
-    void scaleY(float factor) {}
-    void scaleZ(float factor) {}
+    void scaleX(float factor) {
+        this->scale(factor, 1.0f, 1.0f);
+    }
 
-    float getXFactor() const {}
-    float getYFactor() const {}
-    float getZFactor() const {}
+    void scaleY(float factor) {
+        this->scale(1.0f, factor, 1.0f);
+    }
 
-    void scale(float factor) {}
+    void scaleZ(float factor) {
+        this->scale(1.0f, 1.0f, factor);
+    }
+
+    void scale(float xFactor, float yFactor, float zFactor) {
+        this->scale(Math::Vec3(xFactor, yFactor, zFactor));
+    }
+
+    void scale(const Math::Vec3& factors);
+
+    Math::Vec3 getScalingFactors() const {
+        return this->scalingFactors;
+    }
 
     /* Movable */
 
-    void translate(float x, float y, float z) {}
-    void translate(const Math::Vec3& position) {}
+    void translate(float x, float y, float z) {
+        this->translate(Math::Vec3(x, y, z));
+    }
 
-    void move(float x, float y, float z) {}
-    void move(const Math::Vec3& position) {}
+    void translate(const Math::Vec3& position) {
+        this->move(position - this->position);
+    }
 
-    Math::Vec3 getPosition() const {}
+    void move(float x, float y, float z) {
+        this->move(Math::Vec3(x, y, z));
+    }
+
+    void move(const Math::Vec3& position) {
+        this->position += position;
+
+        for (auto& node: this->nodes) {
+            node->move(position);
+        }
+
+        for (auto& object: this->objects) {
+            object->move(position);
+        }
+    }
+
+    Math::Vec3 getPosition() const {
+        return this->position;
+    }
 
     /* SceneNode */
 
@@ -110,6 +152,11 @@ public:
         auto inserted = this->objects.insert(object);
         if (inserted.second) {
             object->parent = this->shared_from_this();
+
+            auto entity = std::dynamic_pointer_cast<Entity>(object);
+            if (entity != nullptr) {
+                this->entities.insert(entity);
+            }
         }
     }
 
@@ -124,9 +171,14 @@ public:
 private:
     std::unordered_set<std::shared_ptr<SceneNode>> nodes;
     std::unordered_set<std::shared_ptr<Object>> objects;
+    std::unordered_set<std::shared_ptr<Entity>> entities;
 
     std::weak_ptr<SceneManager> sceneManager;
     std::weak_ptr<SceneNode> parent;
+
+    Math::Vec3 position;
+    Math::Vec3 rotationAngles;
+    Math::Vec3 scalingFactors;
 };
 
 }  // namespace Graphene

@@ -47,12 +47,9 @@ void Camera::rotate(const Math::Vec3& vector, float angle) {
     Math::Vec3 right = target.cross(up);
     right.normalize();
 
-    float xAngleNew, yAngleNew, zAngleNew;
-    q.extractEulerAngles(xAngleNew, yAngleNew, zAngleNew);
-
-    this->xAngle = xAngleNew * 180.f / M_PI;
-    this->yAngle = yAngleNew * 180.f / M_PI;
-    this->zAngle = zAngleNew * 180.f / M_PI;
+    float xAngle, yAngle, zAngle;
+    q.extractEulerAngles(xAngle, yAngle, zAngle);
+    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
 
     this->updateRotation(right, up, target);
 }

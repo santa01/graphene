@@ -35,11 +35,9 @@ public:
     virtual void yaw(float angle) = 0;
     virtual void pitch(float angle) = 0;
 
-    virtual float getXAngle() const = 0;
-    virtual float getYAngle() const = 0;
-    virtual float getZAngle() const = 0;
-
     virtual void rotate(const Math::Vec3& vector, float angle) = 0;
+
+    virtual Math::Vec3 getRotationAngles() const = 0;
 };
 
 }  // namespace Graphene

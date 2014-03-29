@@ -23,6 +23,8 @@
 #ifndef SCALABLE_H
 #define SCALABLE_H
 
+#include <Vec3.h>
+
 namespace Graphene {
 
 class Scalable {
@@ -33,11 +35,10 @@ public:
     virtual void scaleY(float factor) = 0;
     virtual void scaleZ(float factor) = 0;
 
-    virtual float getXFactor() const = 0;
-    virtual float getYFactor() const = 0;
-    virtual float getZFactor() const = 0;
+    virtual void scale(float xFactor, float yFactor, float zFactor) = 0;
+    virtual void scale(const Math::Vec3& factors) = 0;
 
-    virtual void scale(float factor) = 0;
+    virtual Math::Vec3 getScalingFactors() const = 0;
 };
 
 }  // namespace Graphene

@@ -27,6 +27,8 @@
 #include <Material.h>
 #include <Mesh.h>
 #include <Object.h>
+#include <Quaternion.h>
+#include <Vec3.h>
 #include <stdexcept>
 #include <memory>
 
@@ -41,37 +43,85 @@ public:
 
     /* Rotatable */
 
-    void roll(float angle) {}
-    void yaw(float angle) {}
-    void pitch(float angle) {}
+    void roll(float angle) {
+        this->rotate(Math::Vec3::UNIT_X, angle);
+    }
 
-    float getXAngle() const {}
-    float getYAngle() const {}
-    float getZAngle() const {}
+    void yaw(float angle) {
+        this->rotate(Math::Vec3::UNIT_Y, angle);
+    }
 
-    void rotate(const Math::Vec3& vector, float angle) {}
+    void pitch(float angle) {
+        this->rotate(Math::Vec3::UNIT_Z, angle);
+    }
+
+    void rotate(const Math::Vec3& vector, float angle) {
+        Math::Vec3 axis(vector);
+        Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+        q.normalize();
+
+        float xAngle, yAngle, zAngle;
+        q.extractEulerAngles(xAngle, yAngle, zAngle);
+
+        this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+        this->rotation = this->rotation * q.extractMat4();
+    }
+
+    Math::Vec3 getRotationAngles() const {
+        return this->rotationAngles;
+    }
 
     /* Scalable */
 
-    void scaleX(float factor) {}
-    void scaleY(float factor) {}
-    void scaleZ(float factor) {}
+    void scaleX(float factor) {
+        this->scale(factor, 1.0f, 1.0f);
+    }
 
-    float getXFactor() const {}
-    float getYFactor() const {}
-    float getZFactor() const {}
+    void scaleY(float factor) {
+        this->scale(1.0f, factor, 1.0f);
+    }
 
-    void scale(float factor) {}
+    void scaleZ(float factor) {
+        this->scale(1.0f, 1.0f, factor);
+    }
+
+    void scale(float xFactor, float yFactor, float zFactor) {
+        this->scale(Math::Vec3(xFactor, yFactor, zFactor));
+    }
+
+    void scale(const Math::Vec3& factors) {
+        this->scaling.set(0, 0, this->scaling.get(0, 0) * factors.get(Math::Vec3::X));
+        this->scaling.set(1, 1, this->scaling.get(1, 1) * factors.get(Math::Vec3::Y));
+        this->scaling.set(2, 2, this->scaling.get(2, 2) * factors.get(Math::Vec3::Z));
+    }
+
+    Math::Vec3 getScalingFactors() const {
+        return Math::Vec3(this->scaling.get(0, 0), this->scaling.get(1, 1), this->scaling.get(2, 2));
+    }
 
     /* Movable */
 
-    void translate(float x, float y, float z) {}
-    void translate(const Math::Vec3& position) {}
+    void translate(float x, float y, float z) {
+        this->translate(Math::Vec3(x, y, z));
+    }
 
-    void move(float x, float y, float z) {}
-    void move(const Math::Vec3& position) {}
+    void translate(const Math::Vec3& position) {
+        this->move(position - this->getPosition());
+    }
 
-    Math::Vec3 getPosition() const {}
+    void move(float x, float y, float z) {
+        this->move(Math::Vec3(x, y, z));
+    }
+
+    void move(const Math::Vec3& position) {
+        this->translation.set(0, 3, this->translation.get(0, 3) + position.get(Math::Vec3::X));
+        this->translation.set(1, 3, this->translation.get(1, 3) + position.get(Math::Vec3::Y));
+        this->translation.set(2, 3, this->translation.get(2, 3) + position.get(Math::Vec3::Z));
+    }
+
+    Math::Vec3 getPosition() const {
+        return Math::Vec3(this->translation.get(0, 3), this->translation.get(1, 3), this->translation.get(2, 3));
+    }
 
     /* Entity */
 
@@ -102,6 +152,12 @@ public:
 private:
     std::shared_ptr<Material> material;
     std::shared_ptr<Mesh> mesh;
+
+    Math::Mat4 translation;
+    Math::Mat4 rotation;
+    Math::Mat4 scaling;
+
+    Math::Vec3 rotationAngles;
 };
 
 }  // namespace Graphene
