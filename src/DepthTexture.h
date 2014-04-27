@@ -31,12 +31,12 @@ namespace Graphene {
 class DepthTexture: public Texture {
 public:
     DepthTexture(int width, int height) {
-        glBindTexture(GL_TEXTURE_2D, this->texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, this->width, this->height,
-                0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         this->width = width;
         this->height = height;
 
+        glBindTexture(GL_TEXTURE_2D, this->texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, this->width, this->height,
+                0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 };
