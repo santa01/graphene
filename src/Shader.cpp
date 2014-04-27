@@ -31,8 +31,6 @@
 namespace Graphene {
 
 Shader::Shader(const std::string& name) {
-    this->program = 0;
-
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
         throw std::runtime_error("Failed to open `" + name + "'");
@@ -42,11 +40,15 @@ Shader::Shader(const std::string& name) {
     int sourceLength = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    std::unique_ptr<char[]> source(new char[sourceLength + 1]);
-    source[sourceLength] = '\0';
+    std::unique_ptr<char[]> source(new char[sourceLength]);
     file.read(source.get(), sourceLength);
     file.close();
 
+    this->source = std::string(source.get(), sourceLength);
+    this->buildShader();
+}
+
+void Shader::buildShader() {
     std::vector<GLuint> shaders;
     std::unordered_map<std::string, GLenum> shaderTypes = {
         { "#define TYPE_VERTEX\n", GL_VERTEX_SHADER },
@@ -56,7 +58,7 @@ Shader::Shader(const std::string& name) {
     for (auto& shaderType: shaderTypes) {
         std::stringstream modifiedSource;
         modifiedSource << shaderType.first;
-        modifiedSource << source.get();
+        modifiedSource << this->source;
         shaders.push_back(this->compile(modifiedSource.str(), shaderType.second));
     }
 

@@ -39,6 +39,11 @@ class Shader: public NonCopyable {
 public:
     Shader(const std::string& name);
 
+    Shader(const char* source, int sourceLength) {
+        this->source = std::string(source, sourceLength);
+        this->buildShader();
+    }
+
     ~Shader() {
         if (this->program != 0) {
             glDeleteProgram(this->program);
@@ -87,6 +92,10 @@ public:
         }
     }
 
+    const std::string& getSource() const {
+        return this->source;
+    }
+
     void enable() {
         if (this->program != 0) {
             glUseProgram(this->program);
@@ -104,10 +113,13 @@ private:
         return this->uniforms.at(name);
     }
 
+    void buildShader();
     GLuint compile(const std::string& source, GLenum type);
     GLuint link(const std::vector<GLuint>& shaders);
 
     std::unordered_map<std::string, GLint> uniforms;
+    std::string source;
+
     GLuint program;
 };
 
