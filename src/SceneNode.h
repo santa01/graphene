@@ -29,6 +29,7 @@
 #include <NonCopyable.h>
 #include <Object.h>
 #include <Entity.h>
+#include <Light.h>
 #include <Vec3.h>
 #include <unordered_set>
 #include <stdexcept>
@@ -144,21 +145,7 @@ public:
         return this->objects;
     }
 
-    void attachObject(std::shared_ptr<Object> object) {
-        if (object == nullptr) {
-            throw std::invalid_argument("Object cannot be nullptr");
-        }
-
-        auto inserted = this->objects.insert(object);
-        if (inserted.second) {
-            object->parent = this->shared_from_this();
-
-            auto entity = std::dynamic_pointer_cast<Entity>(object);
-            if (entity != nullptr) {
-                this->entities.insert(entity);
-            }
-        }
-    }
+    void attachObject(std::shared_ptr<Object> object);
 
     std::shared_ptr<class SceneManager> getSceneManager() {
         return this->sceneManager.lock();
@@ -171,7 +158,9 @@ public:
 private:
     std::unordered_set<std::shared_ptr<SceneNode>> nodes;
     std::unordered_set<std::shared_ptr<Object>> objects;
+
     std::unordered_set<std::shared_ptr<Entity>> entities;
+    std::unordered_set<std::shared_ptr<Light>> lights;
 
     std::weak_ptr<SceneManager> sceneManager;
     std::weak_ptr<SceneNode> parent;

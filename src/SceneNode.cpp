@@ -63,4 +63,28 @@ void SceneNode::scale(const Math::Vec3& factors) {
     }
 }
 
+void SceneNode::attachObject(std::shared_ptr<Object> object) {
+    if (object == nullptr) {
+        throw std::invalid_argument("Object cannot be nullptr");
+    }
+
+    auto inserted = this->objects.insert(object);
+    if (inserted.second) {
+        object->parent = this->shared_from_this();
+    }
+
+    switch (object->getObjectType()) {
+        case Object::ObjectType::TYPE_ENTITY:
+            this->entities.insert(std::dynamic_pointer_cast<Entity>(object));
+            break;
+
+        case Object::ObjectType::TYPE_LIGHT:
+            this->lights.insert(std::dynamic_pointer_cast<Light>(object));
+            break;
+
+        default:
+            break;
+    }
+}
+
 }  // namespace Graphene
