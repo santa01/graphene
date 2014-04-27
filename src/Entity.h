@@ -31,7 +31,6 @@
 #include <unordered_set>
 #include <stdexcept>
 #include <memory>
-#include <cstdint>
 
 namespace Graphene {
 

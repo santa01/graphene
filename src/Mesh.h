@@ -27,7 +27,6 @@
 #include <GL/glew.h>
 #include <stdexcept>
 #include <memory>
-#include <cstdint>
 
 namespace Graphene {
 
