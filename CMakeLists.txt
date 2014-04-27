@@ -39,6 +39,11 @@ set (GRAPHENE_LIBRARY "graphene")
 set (GRAPHENE_STATIC ${GRAPHENE_LIBRARY}-static)
 set (GRAPHENE_SHARED ${GRAPHENE_LIBRARY}-shared)
 
+set (GRAPHENE_EXAMPLE OFF CACHE BOOL "Build example")
+if (GRAPHENE_EXAMPLE)
+    add_subdirectory ("example")
+endif ()
+
 configure_file (graphene.pc.in graphene.pc @ONLY)
 install (FILES ${PROJECT_BINARY_DIR}/graphene.pc DESTINATION lib/pkgconfig)
 
