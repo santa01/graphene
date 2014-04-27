@@ -49,13 +49,16 @@ public:
         return this->height;
     }
 
+    GLuint getHandle() const {
+        return this->texture;
+    }
+
     void bind(int textureUnit) {
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, this->texture);
     }
 
 protected:
-    friend class FrameBuffer;
     GLuint texture;
 
     int width;
