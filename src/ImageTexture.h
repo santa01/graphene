@@ -32,7 +32,20 @@ namespace Graphene {
 class ImageTexture: public Texture {
 public:
     ImageTexture(const std::string& name);
-    ImageTexture(int width, int height);
+
+    ImageTexture(int width, int height) {
+        this->width = width;
+        this->height = height;
+
+        glBindTexture(GL_TEXTURE_2D, this->texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, this->width, this->height,
+                0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 };
 
 }  // namespace Graphene
