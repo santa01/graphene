@@ -165,6 +165,18 @@ public:
         return right.normalize();
     }
 
+    const Math::Mat4& getTranslation() const {
+        return this->translation;
+    }
+
+    const Math::Mat4& getRotation() const {
+        return this->rotation;
+    }
+
+    const Math::Mat4& getProjection() const {
+        return this->projection;
+    }
+
     void lookAt(float x, float y, float z) {
         this->lookAt(Math::Vec3(x, y, z));
     }

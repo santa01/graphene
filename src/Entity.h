@@ -24,22 +24,21 @@
 #define ENTITY_H
 
 #include <Scalable.h>
-#include <Material.h>
 #include <Mesh.h>
 #include <Object.h>
 #include <Quaternion.h>
 #include <Vec3.h>
+#include <unordered_set>
 #include <stdexcept>
 #include <memory>
+#include <cstdint>
 
 namespace Graphene {
 
 class Entity: public Object, public Scalable {
 public:
-    Entity(const std::shared_ptr<Material> material, const std::shared_ptr<Mesh> mesh) {
+    Entity() {
         this->objectType = ObjectType::TYPE_ENTITY;
-        this->setMaterial(material);
-        this->setMesh(mesh);
     }
 
     /* Rotatable */
@@ -126,33 +125,32 @@ public:
 
     /* Entity */
 
-    std::shared_ptr<Material> getMaterial() {
-        return this->material;
+    const Math::Mat4& getTranslation() const {
+        return this->translation;
     }
 
-    void setMaterial(const std::shared_ptr<Material> material) {
-        if (material == nullptr) {
-            throw std::invalid_argument("Material cannot be nullptr");
-        }
-
-        this->material = material;
+    const Math::Mat4& getRotation() const {
+        return this->rotation;
     }
 
-    std::shared_ptr<Mesh> getMesh() {
-        return this->mesh;
+    const Math::Mat4& getScaling() const {
+        return this->scaling;
     }
 
-    void setMesh(const std::shared_ptr<Mesh> mesh) {
+    const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes() {
+        return this->meshes;
+    }
+
+    void addMesh(const std::shared_ptr<Mesh> mesh) {
         if (mesh == nullptr) {
             throw std::invalid_argument("Mesh cannot be nullptr");
         }
 
-        this->mesh = mesh;
+        this->meshes.insert(mesh);
     }
 
 private:
-    std::shared_ptr<Material> material;
-    std::shared_ptr<Mesh> mesh;
+    std::unordered_set<std::shared_ptr<Mesh>> meshes;
 
     Math::Mat4 translation;
     Math::Mat4 rotation;
