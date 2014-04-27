@@ -102,6 +102,12 @@ def write_entity(context, filepath, global_matrix):
                     uv = uv_loops[face_index].uv
                     uvs[face_index] = (uv[0], 1.0 - uv[1])
 
+            materials = mesh.materials[:]  # TODO: Write more than one material
+
+            diffuse_texture = materials[0].active_texture.image.filepath[2:257]
+            diffuse_texture += '\0' * (255 - len(diffuse_texture))
+            f.write(struct.pack("<255s1b", bytearray(diffuse_texture, 'ASCII'), 0))
+
             f.write(struct.pack("<1i1i", len(vertices), len(faces)))
 
             for vertex in vertices:
