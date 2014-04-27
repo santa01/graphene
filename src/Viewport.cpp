@@ -24,4 +24,34 @@
 
 namespace Graphene {
 
+void Viewport::update() {
+    if (this->camera == nullptr) {
+        return;
+    }
+
+    auto parent = this->camera->getParent();
+    if (parent == nullptr) {
+        return;
+    }
+
+    if (this->geometryBuffer == nullptr) {  // Defer construction till OpenGL context is ready
+        this->geometryBuffer = std::make_shared<GeometryBuffer>(this->width, this->height);
+    }
+
+    RenderStack::push([this]() {
+        this->geometryBuffer->getDiffuseTexture()->bind(0);
+        this->geometryBuffer->getPositionTexture()->bind(1);
+        this->geometryBuffer->getNormalTexture()->bind(2);
+        this->geometryBuffer->getDepthTexture()->bind(3);
+    });
+
+    RenderStack::push([this]() {
+        this->geometryBuffer->bind();
+        glDisable(GL_BLEND);
+    });
+
+    glViewport(this->left, this->top, this->width, this->height);
+    parent->getSceneManager()->render(this->camera);
+}
+
 }  // namespace Graphene

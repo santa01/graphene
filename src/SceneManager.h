@@ -26,16 +26,28 @@
 #include <NonCopyable.h>
 #include <SceneNode.h>
 #include <Camera.h>
+#include <Shader.h>
+#include <Mesh.h>
+#include <stdexcept>
+#include <algorithm>
 #include <memory>
 
 namespace Graphene {
 
+template<typename Function>
+void traverseScene(std::shared_ptr<SceneNode> node, Function function) {
+    auto objects = node->getObjects();
+    std::for_each(objects.begin(), objects.end(), function);
+
+    auto nodes = node->getNodes();
+    std::for_each(nodes.begin(), nodes.end(), [&function](std::shared_ptr<SceneNode> node) {
+        traverseScene(node, function);
+    });
+}
+
 class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
 public:
-    SceneManager() {
-        this->lightPass = false;
-        this->shadowPass = false;
-    }
+    SceneManager();
 
     /* const version of shared_from_this() is selected otherwise */
     std::shared_ptr<SceneNode> createNode() {
@@ -51,14 +63,6 @@ public:
         return this->rootNode;
     }
 
-    void setLightPass(bool lightPass) {
-        this->lightPass = lightPass;
-    }
-
-    bool isLightPass() const {
-        return this->lightPass;
-    }
-
     void setShadowPass(bool shadowPass) {
         this->shadowPass = shadowPass;
     }
@@ -67,19 +71,34 @@ public:
         return this->shadowPass;
     }
 
-    void render(const std::shared_ptr<Camera> camera) {
-        if (camera == nullptr) {
-            throw std::invalid_argument("Camera cannot be nullptr");
-        }
-
-        // TODO
+    void setLightPass(bool lightPass) {
+        this->lightPass = lightPass;
     }
 
-private:
-    std::shared_ptr<SceneNode> rootNode;
+    bool isLightPass() const {
+        return this->lightPass;
+    }
 
-    bool lightPass;
+    void render(const std::shared_ptr<Camera> camera);
+
+private:
+    void renderShadows();
+    void renderLights();
+
+    static const float vertexData[];
+    static const int faceData[];
+
+    static const char geometrySource[];
+    static const char frameSource[];
+
+    std::shared_ptr<SceneNode> rootNode;
+    std::shared_ptr<Mesh> frame;
+
+    std::shared_ptr<Shader> geometryShader;
+    std::shared_ptr<Shader> frameShader;
+
     bool shadowPass;
+    bool lightPass;
 };
 
 }  // namespace Graphene

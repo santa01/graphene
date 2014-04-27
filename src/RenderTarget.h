@@ -24,6 +24,7 @@
 #define RENDERTARGET_H
 
 #include <NonCopyable.h>
+#include <RenderStack.h>
 #include <Viewport.h>
 #include <GL/glew.h>
 #include <unordered_set>
@@ -35,7 +36,9 @@ namespace Graphene {
 class RenderTarget: public NonCopyable {
 public:
     RenderTarget(int width, int height) {
+        this->buffer = GL_FRONT;
         this->fbo = 0;
+
         this->width = width;
         this->height = height;
         this->autoUpdate = true;
@@ -75,16 +78,25 @@ public:
     }
 
     void update() {
-        glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+        glDrawBuffer(this->buffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& viewport: this->viewports) {
+            RenderStack::push([this]() {
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+                glDrawBuffer(this->buffer);
+                glEnable(GL_BLEND);
+            });
+
             viewport->update();
         }
     }
 
 protected:
     std::unordered_set<std::shared_ptr<Viewport>> viewports;
+
+    GLenum buffer;
     GLuint fbo;
 
     int width;

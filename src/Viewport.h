@@ -24,14 +24,16 @@
 #define VIEWPORT_H
 
 #include <NonCopyable.h>
-#include <Camera.h>
-#include <SceneNode.h>
+#include <GeometryBuffer.h>
 #include <SceneManager.h>
-#include <GL/glew.h>
-#include <stdexcept>
+#include <RenderStack.h>
+#include <SceneNode.h>
+#include <Camera.h>
 #include <memory>
 
 namespace Graphene {
+
+class RenderTarget;
 
 class Viewport: public NonCopyable {
 public:
@@ -52,6 +54,7 @@ public:
         }
 
         this->camera = camera;
+        this->camera->setAspectRatio(this->width / (this->height / 1.0f));
     }
 
     int getLeft() const {
@@ -86,22 +89,11 @@ public:
         this->height = height;
     }
 
-    void update() {
-        if (this->camera == nullptr) {
-            return;
-        }
-
-        auto parent = this->camera->getParent();
-        if (parent == nullptr) {
-            return;
-        }
-
-        glViewport(this->left, this->top, this->width, this->height);
-        parent->getSceneManager()->render(this->camera);
-    }
+    void update();
 
 private:
     std::shared_ptr<Camera> camera;
+    std::shared_ptr<GeometryBuffer> geometryBuffer;
 
     int left;
     int top;

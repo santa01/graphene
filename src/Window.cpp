@@ -29,6 +29,8 @@ Window::Window(int width, int height):
         RenderTarget(width, height) {
     this->width = width;
     this->height = height;
+    this->buffer = GL_BACK;
+
     this->window = nullptr;
     this->context = nullptr;
 
@@ -63,6 +65,7 @@ Window::Window(int width, int height):
         throw std::runtime_error("Failed to initialize GLEW");
     }
 
+    glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 }
