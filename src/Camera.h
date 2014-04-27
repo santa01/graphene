@@ -37,6 +37,7 @@ public:
     };
 
     Camera() {
+        this->objectType = ObjectType::TYPE_CAMERA;
         this->aspectRatio = 1.3333f;
         this->nearPlane = 0.1f;
         this->farPlane = 100.0f;

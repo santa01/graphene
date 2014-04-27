@@ -33,9 +33,22 @@ class SceneNode;
 
 class Object: public Rotatable, public Movable {
 public:
+    enum ObjectType {
+        TYPE_ENTITY,
+        TYPE_LIGHT,
+        TYPE_CAMERA
+    };
+
+    ObjectType getObjectType() const {
+        return this->objectType;
+    }
+
     std::shared_ptr<class SceneNode> getParent() {
         return this->parent.lock();
     }
+
+protected:
+    ObjectType objectType;
 
 private:
     friend class SceneNode;

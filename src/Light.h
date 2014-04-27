@@ -40,6 +40,7 @@ public:
 
     Light():
             direction(Math::Vec3::UNIT_X) {
+        this->objectType = ObjectType::TYPE_LIGHT;
         this->lightType = TYPE_POINT;
     }
 
