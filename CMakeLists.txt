@@ -32,7 +32,7 @@ file (GLOB_RECURSE GRAPHENE_HEADERS "src/*.h")
 include_directories ("src" ${MATH_INCLUDE_DIRS})
 
 set (GRAPHENE_NAME "Graphene")
-set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
+set (GRAPHENE_DESCRIPTION "OpenGL-based graphics engine")
 set (GRAPHENE_VERSION 0.0.1)
 
 set (GRAPHENE_LIBRARY "graphene")
@@ -42,6 +42,19 @@ set (GRAPHENE_SHARED ${GRAPHENE_LIBRARY}-shared)
 set (GRAPHENE_EXAMPLE OFF CACHE BOOL "Build example")
 if (GRAPHENE_EXAMPLE)
     add_subdirectory ("example")
+endif ()
+
+set (GRAPHENE_DOCUMENTATION OFF CACHE BOOL "Build documentation")
+if (GRAPHENE_DOCUMENTATION)
+    find_package (Doxygen)
+    if (DOXYGEN_FOUND)
+        configure_file (doc/Doxyfile.in Doxyfile @ONLY)
+        install (DIRECTORY ${PROJECT_BINARY_DIR}/html
+                 DESTINATION share/doc/${GRAPHENE_LIBRARY}-${GRAPHENE_VERSION})
+        add_custom_target ("doxygen" ALL "doxygen")
+    else ()
+        message(FATAL_ERROR "Failed to locate doxygen!")
+    endif ()
 endif ()
 
 configure_file (graphene.pc.in graphene.pc @ONLY)
