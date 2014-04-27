@@ -21,11 +21,57 @@
  */
 
 #include <ObjectManager.h>
+#include <Mesh.h>
+#include <Material.h>
+#include <stdexcept>
+#include <utility>
+#include <fstream>
+#include <cstring>
 
 namespace Graphene {
 
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string &name) {
-    // TODO
+    if (this->entityCache.find(name) != this->entityCache.end()) {
+        return this->entityCache.at(name);
+    }
+
+    std::ifstream file(name, std::ios::binary);
+    if (!file.good()) {
+        throw std::runtime_error("Failed to open `" + name + "'");
+    }
+
+    EntityHeader entityHeader;
+    ObjectGeometry objectGeometry;
+    ObjectMaterial objectMaterial;
+
+    file.read(reinterpret_cast<char*>(&entityHeader), sizeof(entityHeader));
+    if (memcmp(entityHeader.magic, "GPHN", 4) != 0) {
+        throw std::runtime_error("Invalid magic number");
+    }
+
+    auto entity = std::make_shared<Entity>();
+    for (int i = 0; i < entityHeader.objects; i++) {
+        auto material = std::make_shared<Material>();
+
+        file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
+        std::string diffuseTexture(objectMaterial.diffuseTexture);
+        std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
+        material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
+
+        file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
+        int meshDataSize = sizeof(float) * objectGeometry.vertices * (3 + 3 + 2) +
+                           sizeof(int) * objectGeometry.faces * 3;
+
+        std::unique_ptr<char[]> meshData(new char[meshDataSize]);
+        file.read(meshData.get(), meshDataSize);
+
+        auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.faces, objectGeometry.vertices);
+        mesh->setMaterial(material);
+        entity->addMesh(mesh);
+    }
+
+    this->entityCache.insert(std::make_pair(name, entity));
+    return entity;
 }
 
 }  // namespace Graphene

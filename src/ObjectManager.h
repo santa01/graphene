@@ -26,13 +26,32 @@
 #include <Camera.h>
 #include <Light.h>
 #include <Entity.h>
-#include <Mesh.h>
 #include <ImageTexture.h>
-#include <Shader.h>
 #include <unordered_map>
 #include <memory>
 
 namespace Graphene {
+
+#pragma pack(push, 1)
+
+typedef struct {
+    char magic[4];
+    char major;
+    char minor;
+    char patch;
+    char objects;
+} EntityHeader;
+
+typedef struct {
+    int vertices;
+    int faces;
+} ObjectGeometry;
+
+typedef struct {
+    char diffuseTexture[256];
+} ObjectMaterial;
+
+#pragma pack(pop)
 
 class ObjectManager: public NonCopyable {
 public:
@@ -47,9 +66,18 @@ public:
     std::shared_ptr<Entity> createEntity(const std::string& name);
 
 private:
+    std::shared_ptr<ImageTexture> createTexture(const std::string& name) {
+        if (this->textureCache.find(name) != this->textureCache.end()) {
+            return this->textureCache.at(name);
+        }
+
+        auto texture = std::make_shared<ImageTexture>(name);
+        this->textureCache.insert(std::make_pair(name, texture));
+        return texture;
+    }
+
     std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;
-    std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
-    std::unordered_map<std::string, std::shared_ptr<Mesh>> meshCache;
+    std::unordered_map<std::string, std::shared_ptr<Entity>> entityCache;
 };
 
 }  // namespace Graphene
