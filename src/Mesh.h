@@ -23,12 +23,62 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <Material.h>
+#include <GL/glew.h>
+#include <stdexcept>
+#include <memory>
+#include <cstdint>
+
 namespace Graphene {
 
 class Mesh {
 public:
-    Mesh();
-    ~Mesh();
+    Mesh(const char* data, int faces, int vertices);
+
+    ~Mesh() {
+        glDeleteVertexArrays(1, &this->vao);
+        glDeleteBuffers(2, this->buffers);
+    }
+
+    std::shared_ptr<Material> getMaterial() {
+        return this->material;
+    }
+
+    void setMaterial(const std::shared_ptr<Material> material) {
+        if (material == nullptr) {
+            throw std::invalid_argument("Material cannot be nullptr");
+        }
+
+        this->material = material;
+    }
+
+    int getFaces() const {
+        return this->faces;
+    }
+
+    int getVertices() const {
+        return this->vertices;
+    }
+
+    void render() {
+        glBindVertexArray(this->vao);
+        glDrawElements(GL_TRIANGLES, this->faces * 3, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+private:
+    enum DataBuffer {
+        BUFFER_VERTICES,
+        BUFFER_ELEMENTS
+    };
+
+    std::shared_ptr<Material> material;
+
+    GLuint buffers[2];
+    GLuint vao;
+
+    int faces;
+    int vertices;
 };
 
 }  // namespace Graphene
