@@ -27,8 +27,6 @@
 #include <ImageTexture.h>
 #include <DepthTexture.h>
 #include <GL/glew.h>
-#include <unordered_set>
-#include <stdexcept>
 #include <memory>
 
 namespace Graphene {
@@ -37,40 +35,32 @@ class FrameBuffer: public RenderTarget {
 public:
     FrameBuffer(int width, int height):
             RenderTarget(width, height),
-            depthAttachement(new DepthTexture(width, height)) {
+            colorTexture(new ImageTexture(width, height)),
+            depthTexture(new DepthTexture(width, height)) {
         glGenFramebuffers(1, &this->fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthAttachement->texture, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+
+        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->colorTexture->getHandle(), 0);
+        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthTexture->getHandle(), 0);
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
 
     ~FrameBuffer() {
         glDeleteFramebuffers(1, &this->fbo);
     }
 
-    const std::unordered_set<std::shared_ptr<ImageTexture>>& getColorAttachements() {
-        return this->colorAttachements;
+    std::shared_ptr<ImageTexture> getColorTexture() {
+        return this->colorTexture;
     }
 
-    void addColorAttachement(const std::shared_ptr<ImageTexture> colorAttachement) {
-        if (colorAttachement == nullptr) {
-           throw std::invalid_argument("ImageTexture cannot be nullptr");
-        }
-
-        if (this->colorAttachements.find(colorAttachement) == this->colorAttachements.end()) {
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + this->colorAttachements.size(),
-                    colorAttachement->texture, 0);
-            this->colorAttachements.insert(colorAttachement);
-        }
-    }
-
-    std::shared_ptr<DepthTexture> getDepthAttachement() {
-        return this->depthAttachement;
+    std::shared_ptr<DepthTexture> getDepthTexture() {
+        return this->depthTexture;
     }
 
 private:
-    std::unordered_set<std::shared_ptr<ImageTexture>> colorAttachements;
-    std::shared_ptr<DepthTexture> depthAttachement;
+    std::shared_ptr<ImageTexture> colorTexture;
+    std::shared_ptr<DepthTexture> depthTexture;
 };
 
 }  // namespace Graphene
