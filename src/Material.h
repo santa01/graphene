@@ -23,9 +23,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <Shader.h>
-#include <Texture.h>
-#include <unordered_set>
+#include <ImageTexture.h>
 #include <stdexcept>
 #include <memory>
 
@@ -33,37 +31,24 @@ namespace Graphene {
 
 class Material {
 public:
-    Material(const std::shared_ptr<Shader> shader) {
-        this->setShader(shader);
+    Material() {}
+
+    std::shared_ptr<ImageTexture> getDiffuseTexture() {
+        return this->diffuseTexture;
     }
 
-    const std::unordered_set<std::shared_ptr<Texture>>& getTextures() {
-        return this->textures;
-    }
-
-    void addTexture(const std::shared_ptr<Texture> texture) {
-        if (texture == nullptr) {
-            throw std::invalid_argument("Texture cannot be nullptr");
+    void setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture) {
+        if (diffuseTexture == nullptr) {
+            throw std::invalid_argument("ImageTexture cannot be nullptr");
         }
 
-        this->textures.insert(texture);
-    }
-
-    std::shared_ptr<Shader> getShader() {
-        return this->shader;
-    }
-
-    void setShader(const std::shared_ptr<Shader> shader) {
-        if (shader == nullptr) {
-            throw std::invalid_argument("Shader cannot be nullptr");
-        }
-
-        this->shader = shader;
+        this->diffuseTexture = diffuseTexture;
     }
 
 private:
-    std::unordered_set<std::shared_ptr<Texture>> textures;
-    std::shared_ptr<Shader> shader;
+    std::shared_ptr<ImageTexture> diffuseTexture;
+
+    // TODO: Material parameters
 };
 
 }  // namespace Graphene
