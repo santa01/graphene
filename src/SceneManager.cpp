@@ -60,11 +60,15 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     traverseScene(this->rootNode, [this](std::shared_ptr<Object> object) {
         if (object->getObjectType() == Object::ObjectType::TYPE_ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
-
             this->geometryShader->setUniform("localWorld",
                     entity->getScaling() * entity->getRotation() * entity->getTranslation());
+
             for (auto& mesh: entity->getMeshes()) {
-                mesh->getMaterial()->getDiffuseTexture()->bind(0);
+                auto diffuseTexture = mesh->getMaterial()->getDiffuseTexture();
+                if (diffuseTexture != nullptr) {
+                    diffuseTexture->bind(0);  // TODO: Do not sample inside shader
+                }
+
                 mesh->render();
             }
         }

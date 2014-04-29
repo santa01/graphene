@@ -55,8 +55,11 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string &name) {
 
         file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
         std::string diffuseTexture(objectMaterial.diffuseTexture);
-        std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
-        material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
+
+        if (!diffuseTexture.empty()) {
+            std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
+            material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
+        }
 
         file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
         int meshDataSize = sizeof(float) * objectGeometry.vertices * (3 + 3 + 2) +
