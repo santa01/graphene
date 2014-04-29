@@ -34,6 +34,17 @@
 
 namespace Graphene {
 
+#pragma pack(push, 1)
+
+typedef struct {
+    float positons[12];
+    float normals[12];
+    float uvs[8];
+    int faces[6];
+} FrameGeometry;
+
+#pragma pack(pop)
+
 template<typename Function>
 void traverseScene(std::shared_ptr<SceneNode> node, Function function) {
     auto objects = node->getObjects();
@@ -63,20 +74,44 @@ public:
         return this->rootNode;
     }
 
-    void setShadowPass(bool shadowPass) {
-        this->shadowPass = shadowPass;
+    std::shared_ptr<Shader> getGeometryShader() {
+        return this->geometryShader;
+    }
+
+    void setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
+        if (geometryShader == nullptr) {
+            throw std::invalid_argument("Shader cannot be nullptr");
+        }
+
+        this->geometryShader = geometryShader;
+    }
+
+    std::shared_ptr<Shader> getAmbientShader() {
+        return this->ambientShader;
+    }
+
+    void setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
+        if (ambientShader == nullptr) {
+            throw std::invalid_argument("Shader cannot be nullptr");
+        }
+
+        this->ambientShader = ambientShader;
     }
 
     bool isShadowPass() const {
         return this->shadowPass;
     }
 
-    void setLightPass(bool lightPass) {
-        this->lightPass = lightPass;
+    void setShadowPass(bool shadowPass) {
+        this->shadowPass = shadowPass;
     }
 
     bool isLightPass() const {
         return this->lightPass;
+    }
+
+    void setLightPass(bool lightPass) {
+        this->lightPass = lightPass;
     }
 
     void render(const std::shared_ptr<Camera> camera);
@@ -85,17 +120,11 @@ private:
     void renderShadows();
     void renderLights();
 
-    static const float vertexData[];
-    static const int faceData[];
-
-    static const char geometrySource[];
-    static const char frameSource[];
-
     std::shared_ptr<SceneNode> rootNode;
     std::shared_ptr<Mesh> frame;
 
     std::shared_ptr<Shader> geometryShader;
-    std::shared_ptr<Shader> frameShader;
+    std::shared_ptr<Shader> ambientShader;
 
     bool shadowPass;
     bool lightPass;
