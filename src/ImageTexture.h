@@ -41,7 +41,7 @@ public:
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, this->width, this->height,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height,
                 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
         glBindTexture(GL_TEXTURE_2D, 0);
