@@ -45,8 +45,7 @@ Window::Window(int width, int height):
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    this->window = SDL_CreateWindow("Graphene", 0, 0, this->width, this->height,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    this->window = SDL_CreateWindow("Graphene", 0, 0, this->width, this->height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (this->window == nullptr) {
         throw std::runtime_error("Failed to create SDL window");
     }

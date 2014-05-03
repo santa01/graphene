@@ -53,7 +53,7 @@ Shader::Shader(const std::string& name) {
 void Shader::buildShader() {
     std::vector<GLuint> shaders;
     std::unordered_map<std::string, GLenum> shaderTypes = {
-        { "#define TYPE_VERTEX\n", GL_VERTEX_SHADER },
+        { "#define TYPE_VERTEX\n",   GL_VERTEX_SHADER },
         { "#define TYPE_FRAGMENT\n", GL_FRAGMENT_SHADER }
     };
 
