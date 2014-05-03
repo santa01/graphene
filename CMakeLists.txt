@@ -90,6 +90,11 @@ if (GRAPHENE_DOCUMENTATION)
     endif ()
 endif ()
 
+set (GRAPHENE_DEBUG OFF CACHE BOOL "Enable debug and profiling")
+if (GRAPHENE_DEBUG)
+    add_definitions(-DGRAPHENE_DEBUG)
+endif ()
+
 configure_file (graphene.pc.in graphene.pc @ONLY)
 install (FILES ${PROJECT_BINARY_DIR}/graphene.pc DESTINATION lib/pkgconfig)
 
