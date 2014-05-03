@@ -54,6 +54,16 @@ const char geometryShader[] = R"(
     #endif
 
     #ifdef TYPE_FRAGMENT
+        layout(std140) uniform Material {
+            float ambientIntensity;
+            float diffuseIntensity;
+            float specularIntensity;
+            int specularHardness;
+            vec3 diffuseColor;
+            bool diffuseTexture;
+            vec3 specularColor;
+        } material;
+
         uniform sampler2D diffuseSampler;
 
         smooth in vec3 fragmentPosition;
@@ -61,11 +71,14 @@ const char geometryShader[] = R"(
         smooth in vec2 fragmentUV;
 
         layout(location = 0) out vec4 outputDiffuse;
-        layout(location = 1) out vec4 outputPosition;
-        layout(location = 2) out vec4 outputNormal;
+        layout(location = 1) out vec4 outputSpecular;
+        layout(location = 2) out vec4 outputPosition;
+        layout(location = 3) out vec4 outputNormal;
 
         void main() {
-            outputDiffuse = texture(diffuseSampler, fragmentUV);
+            vec4 diffuseColor = vec4(material.diffuseColor, 0.0f);
+            outputDiffuse = material.diffuseTexture ? texture(diffuseSampler, fragmentUV) : diffuseColor;
+            outputSpecular = vec4(material.specularColor, 0.0f);
             outputPosition = vec4(fragmentPosition, 0.0f);
             outputNormal = vec4(fragmentNormal, 0.0f);
         }
@@ -89,20 +102,21 @@ const char ambientShader[] = R"(
     #endif
 
     #ifdef TYPE_FRAGMENT
+        uniform vec3 ambientColor;
+        uniform float ambientEnergy;
+
         uniform sampler2D diffuseSampler;
+        uniform sampler2D specularSampler;
         uniform sampler2D positionSampler;
         uniform sampler2D normalSampler;
         uniform sampler1D depthSampler;
 
         smooth in vec2 fragmentUV;
-
-        out vec4 finalColor;
+        out vec4 outputColor;
 
         void main() {
-            finalColor = texture(diffuseSampler, fragmentUV);
-            //finalColor = texture(positionSampler, fragmentUV);
-            //finalColor = texture(normalSampler, fragmentUV);
-            //finalColor = texture(depthSampler, fragmentUV);
+            vec4 diffuseColor = texture(diffuseSampler, fragmentUV);
+            outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy;
         }
     #endif
 )";

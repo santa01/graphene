@@ -92,6 +92,13 @@ public:
         }
     }
 
+    void setUniformBlock(const std::string& name, int bindPoint) {
+        GLint uniformBlock = this->checkoutUniformBlock(name);
+        if (uniformBlock != GL_INVALID_INDEX) {
+            glUniformBlockBinding(this->program, uniformBlock, bindPoint);
+        }
+    }
+
     const std::string& getSource() const {
         return this->source;
     }
@@ -113,11 +120,22 @@ private:
         return this->uniforms.at(name);
     }
 
+    GLint checkoutUniformBlock(const std::string& name) {
+        this->enable();
+
+        if (this->uniformBlocks.find(name) == this->uniformBlocks.end()) {
+            this->uniformBlocks.insert(std::make_pair(name, glGetUniformBlockIndex(this->program, name.c_str())));
+        }
+
+        return this->uniformBlocks.at(name);
+    }
+
     void buildShader();
     GLuint compile(const std::string& source, GLenum type);
     GLuint link(const std::vector<GLuint>& shaders);
 
     std::unordered_map<std::string, GLint> uniforms;
+    std::unordered_map<std::string, GLint> uniformBlocks;
     std::string source;
 
     GLuint program;
