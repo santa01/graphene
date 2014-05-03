@@ -31,26 +31,19 @@
 
 namespace Graphene {
 
+/*
+ * Geometry buffer layout
+ *
+ * Tex0 (RGBA8): | diffuse R  | diffuse G  | diffuse B  | diffuse intensity  |
+ * Tex1 (RGBA8): | specular R | specular G | specular B | specular intensity |
+ * Tex2 (RGBA8): | position X | position Y | position Z | specular hardness  |
+ * Tex3 (RGBA8): | normal X   | normal Y   | normal Z   | <unused>           |
+ * Tex4 (D16):   | depth                   |
+ */
+
 class GeometryBuffer: public NonCopyable {
 public:
-    GeometryBuffer(int width, int height):
-            diffuseTexture(new ImageTexture(width, height)),
-            positionTexture(new ImageTexture(width, height)),
-            normalTexture(new ImageTexture(width, height)),
-            depthTexture(new DepthTexture(width, height)) {
-        this->width = width;
-        this->height = height;
-
-        glGenFramebuffers(1, &this->fbo);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-
-        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->diffuseTexture->getHandle(), 0);
-        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, this->positionTexture->getHandle(), 0);
-        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, this->normalTexture->getHandle(), 0);
-        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthTexture->getHandle(), 0);
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    }
+    GeometryBuffer(int width, int height);
 
     ~GeometryBuffer() {
         glDeleteFramebuffers(1, &this->fbo);
@@ -68,6 +61,10 @@ public:
         return this->diffuseTexture;
     }
 
+    std::shared_ptr<ImageTexture> getSpecularTexture() {
+        return this->specularTexture;
+    }
+
     std::shared_ptr<ImageTexture> getPositionTexture() {
         return this->positionTexture;
     }
@@ -82,17 +79,18 @@ public:
 
     void bind() {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-        glDrawBuffers(3, this->buffers);
+        glDrawBuffers(4, this->buffers);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
 private:
     std::shared_ptr<ImageTexture> diffuseTexture;
+    std::shared_ptr<ImageTexture> specularTexture;
     std::shared_ptr<ImageTexture> positionTexture;
     std::shared_ptr<ImageTexture> normalTexture;
     std::shared_ptr<DepthTexture> depthTexture;
 
-    GLenum buffers[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+    GLenum buffers[4];
     GLuint fbo;
 
     int width;

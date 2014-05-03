@@ -40,9 +40,10 @@ void Viewport::update() {
 
     RenderStack::push([this]() {
         this->geometryBuffer->getDiffuseTexture()->bind(0);
-        this->geometryBuffer->getPositionTexture()->bind(1);
-        this->geometryBuffer->getNormalTexture()->bind(2);
-        this->geometryBuffer->getDepthTexture()->bind(3);
+        this->geometryBuffer->getSpecularTexture()->bind(1);
+        this->geometryBuffer->getPositionTexture()->bind(2);
+        this->geometryBuffer->getNormalTexture()->bind(3);
+        this->geometryBuffer->getDepthTexture()->bind(4);
     });
 
     RenderStack::push([this]() {
