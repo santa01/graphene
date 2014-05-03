@@ -24,4 +24,29 @@
 
 namespace Graphene {
 
+Material::Material():
+        diffuseColor(1.0f, 1.0f, 1.0f),
+        specularColor(1.0f, 1.0f, 1.0f) {
+    this->ambientIntensity = 1.0f;
+    this->diffuseIntensity = 1.0f;
+    this->specularIntensity = 0.5f;
+    this->specularHardness = 50;
+
+    MaterialBuffer material = {
+        this->ambientIntensity,
+        this->diffuseIntensity,
+        this->specularIntensity,
+        this->specularHardness,
+        { 0.0f, 0.0f, 0.0f }, 0,
+        { 0.0f, 0.0f, 0.0f }
+    };
+    std::copy(this->diffuseColor.data(), this->diffuseColor.data() + 3, material.diffuseColor);
+    std::copy(this->specularColor.data(), this->specularColor.data() + 3, material.specularColor);
+
+    glGenBuffers(1, &this->ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(material), &material, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 }  // namespace Graphene
