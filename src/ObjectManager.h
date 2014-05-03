@@ -28,6 +28,7 @@
 #include <Entity.h>
 #include <ImageTexture.h>
 #include <unordered_map>
+#include <string>
 #include <memory>
 
 namespace Graphene {
@@ -48,6 +49,12 @@ typedef struct {
 } ObjectGeometry;
 
 typedef struct {
+    float ambientIntensity;
+    float diffuseIntensity;
+    float diffuseColor[3];
+    float specularIntensity;
+    int specularHardness;
+    float specularColor[3];
     char diffuseTexture[256];
 } ObjectMaterial;
 

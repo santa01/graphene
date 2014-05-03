@@ -23,14 +23,14 @@
 #include <ObjectManager.h>
 #include <Mesh.h>
 #include <Material.h>
+#include <Vec3.h>
 #include <stdexcept>
 #include <utility>
 #include <fstream>
-#include <cstring>
 
 namespace Graphene {
 
-std::shared_ptr<Entity> ObjectManager::createEntity(const std::string &name) {
+std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     if (this->entityCache.find(name) != this->entityCache.end()) {
         return this->entityCache.at(name);
     }
@@ -45,7 +45,9 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string &name) {
     ObjectMaterial objectMaterial;
 
     file.read(reinterpret_cast<char*>(&entityHeader), sizeof(entityHeader));
-    if (memcmp(entityHeader.magic, "GPHN", 4) != 0) {
+    std::string magic(entityHeader.magic, 4);
+
+    if (magic != "GPHN") {
         throw std::runtime_error("Invalid magic number");
     }
 
@@ -54,8 +56,19 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string &name) {
         auto material = std::make_shared<Material>();
 
         file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
-        std::string diffuseTexture(objectMaterial.diffuseTexture);
+        material->setAmbientIntensity(objectMaterial.ambientIntensity);
+        material->setDiffuseIntensity(objectMaterial.diffuseIntensity);
+        material->setDiffuseColor(Math::Vec3(objectMaterial.diffuseColor[0],
+                                             objectMaterial.diffuseColor[1],
+                                             objectMaterial.diffuseColor[2]));
 
+        material->setSpecularIntensity(objectMaterial.specularIntensity);
+        material->setSpecularHardness(objectMaterial.specularHardness);
+        material->setSpecularColor(Math::Vec3(objectMaterial.specularColor[0],
+                                              objectMaterial.specularColor[1],
+                                              objectMaterial.specularColor[2]));
+
+        std::string diffuseTexture(objectMaterial.diffuseTexture);
         if (!diffuseTexture.empty()) {
             std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
             material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));

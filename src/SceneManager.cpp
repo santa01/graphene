@@ -30,7 +30,10 @@ namespace Graphene {
 
 SceneManager::SceneManager():
         geometryShader(new Shader(Sources::geometryShader, sizeof(Sources::geometryShader))),
-        ambientShader(new Shader(Sources::ambientShader, sizeof(Sources::ambientShader))) {
+        ambientShader(new Shader(Sources::ambientShader, sizeof(Sources::ambientShader))),
+        ambientColor(1.0f, 1.0f, 1.0f) {
+    this->ambientEnergy = 1.0f;
+
     this->lightPass = false;
     this->shadowPass = false;
 
@@ -53,7 +56,8 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
 
     RenderStack::pop();  // Geometry buffer
     this->geometryShader->enable();
-    this->geometryShader->setUniform("diffuseSampler", 0);
+    this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
+    this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->geometryShader->setUniform("modelViewProjection",
             camera->getProjection() * camera->getRotation() * camera->getTranslation());
 
@@ -64,9 +68,12 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
                     entity->getScaling() * entity->getRotation() * entity->getTranslation());
 
             for (auto& mesh: entity->getMeshes()) {
-                auto diffuseTexture = mesh->getMaterial()->getDiffuseTexture();
+                auto material = mesh->getMaterial();
+                material->bind(BIND_MATERIAL);
+
+                auto diffuseTexture = material->getDiffuseTexture();
                 if (diffuseTexture != nullptr) {
-                    diffuseTexture->bind(0);  // TODO: Do not sample inside shader
+                    diffuseTexture->bind(TEXTURE_DIFFUSE);
                 }
 
                 mesh->render();
@@ -76,10 +83,14 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
 
     RenderStack::pop();  // Geometry textures
     this->ambientShader->enable();
-    this->ambientShader->setUniform("diffuseSampler", 0);
-    this->ambientShader->setUniform("positionSampler", 1);
-    this->ambientShader->setUniform("normalSampler", 2);
-    this->ambientShader->setUniform("depthSampler", 3);
+    this->ambientShader->setUniform("ambientColor", this->ambientColor);
+    this->ambientShader->setUniform("ambientEnergy", this->ambientEnergy);
+
+    this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->ambientShader->setUniform("specularSampler", TEXTURE_SPECULAR);
+    this->ambientShader->setUniform("positionSampler", TEXTURE_POSITION);
+    this->ambientShader->setUniform("normalSampler", TEXTURE_NORMAL);
+    this->ambientShader->setUniform("depthSampler", TEXTURE_DEPTH);
 
     RenderStack::pop();  // Output buffer
     this->frame->render();

@@ -28,6 +28,7 @@
 #include <Camera.h>
 #include <Shader.h>
 #include <Mesh.h>
+#include <Vec3.h>
 #include <stdexcept>
 #include <algorithm>
 #include <memory>
@@ -98,7 +99,27 @@ public:
         this->ambientShader = ambientShader;
     }
 
-    bool isShadowPass() const {
+    const Math::Vec3& getAmbientColor() const {
+        return this->ambientColor;
+    }
+
+    void setAmbientColor(const Math::Vec3& ambientColor) {
+        this->ambientColor = ambientColor;
+    }
+
+    float getAmbientEnergy() const {
+        return this->ambientEnergy;
+    }
+
+    void setAmbientEnergy(float ambientEnergy) {
+        if (ambientEnergy < 0.0f) {
+            throw std::runtime_error("Ambient energy is less than 0.0f");
+        }
+
+        this->ambientEnergy = ambientEnergy;
+    }
+
+    bool hasShadowPass() const {
         return this->shadowPass;
     }
 
@@ -106,7 +127,7 @@ public:
         this->shadowPass = shadowPass;
     }
 
-    bool isLightPass() const {
+    bool hasLightPass() const {
         return this->lightPass;
     }
 
@@ -117,14 +138,28 @@ public:
     void render(const std::shared_ptr<Camera> camera);
 
 private:
+    enum BindPoints {
+        BIND_MATERIAL
+    };
+
+    enum TextureUnits {
+        TEXTURE_DIFFUSE,
+        TEXTURE_SPECULAR,
+        TEXTURE_POSITION,
+        TEXTURE_NORMAL,
+        TEXTURE_DEPTH
+    };
+
     void renderShadows();
     void renderLights();
 
     std::shared_ptr<SceneNode> rootNode;
     std::shared_ptr<Mesh> frame;
-
     std::shared_ptr<Shader> geometryShader;
     std::shared_ptr<Shader> ambientShader;
+
+    Math::Vec3 ambientColor;
+    float ambientEnergy;
 
     bool shadowPass;
     bool lightPass;
