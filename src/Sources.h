@@ -30,95 +30,108 @@ namespace Sources {
 const char geometryShader[] = R"(
     #version 330
 
-    #ifdef TYPE_VERTEX
-        uniform mat4 modelViewProjection;
-        uniform mat4 localWorld;
+#ifdef TYPE_VERTEX
 
-        layout(location = 0) in vec3 vertexPosition;
-        layout(location = 1) in vec3 vertexNormal;
-        layout(location = 2) in vec2 vertexUV;
+    uniform mat4 modelViewProjection;
+    uniform mat4 localWorld;
 
-        smooth out vec3 fragmentPosition;
-        smooth out vec3 fragmentNormal;
-        smooth out vec2 fragmentUV;
+    layout(location = 0) in vec3 vertexPosition;
+    layout(location = 1) in vec3 vertexNormal;
+    layout(location = 2) in vec2 vertexUV;
 
-        void main () {
-            vec4 vertexWorldPosition = localWorld * vec4(vertexPosition, 1.0f);
-            vec4 vertexWorldNormal = localWorld * vec4(vertexNormal, 1.0f);
-            gl_Position = modelViewProjection * vertexWorldPosition;
+    smooth out vec3 fragmentPosition;
+    smooth out vec3 fragmentNormal;
+    smooth out vec2 fragmentUV;
 
-            fragmentPosition = vec3(vertexWorldPosition);
-            fragmentNormal = vec3(vertexWorldNormal);
-            fragmentUV = vertexUV;
+    void main () {
+        vec4 vertexWorldPosition = localWorld * vec4(vertexPosition, 1.0f);
+        vec4 vertexWorldNormal = localWorld * vec4(vertexNormal, 1.0f);
+        gl_Position = modelViewProjection * vertexWorldPosition;
+
+        fragmentPosition = vec3(vertexWorldPosition);
+        fragmentNormal = vec3(vertexWorldNormal);
+        fragmentUV = vertexUV;
+    }
+
+#endif
+
+#ifdef TYPE_FRAGMENT
+
+    layout(std140) uniform Material {
+        float ambientIntensity;
+        float diffuseIntensity;
+        float specularIntensity;
+        int specularHardness;
+        vec3 diffuseColor;
+        bool diffuseTexture;
+        vec3 specularColor;
+    } material;
+
+    uniform sampler2D diffuseSampler;
+
+    smooth in vec3 fragmentPosition;
+    smooth in vec3 fragmentNormal;
+    smooth in vec2 fragmentUV;
+
+    layout(location = 0) out vec4 outputDiffuse;
+    layout(location = 1) out vec4 outputSpecular;
+    layout(location = 2) out vec4 outputPosition;
+    layout(location = 3) out vec4 outputNormal;
+
+    void main() {
+        if (material.diffuseTexture) {
+            outputDiffuse = vec4(texture(diffuseSampler, fragmentUV).rgb, material.diffuseIntensity);
+        } else {
+            outputDiffuse = vec4(material.diffuseColor, material.diffuseIntensity);
         }
-    #endif
 
-    #ifdef TYPE_FRAGMENT
-        layout(std140) uniform Material {
-            float ambientIntensity;
-            float diffuseIntensity;
-            float specularIntensity;
-            int specularHardness;
-            vec3 diffuseColor;
-            bool diffuseTexture;
-            vec3 specularColor;
-        } material;
+        outputSpecular = vec4(material.specularColor, material.specularIntensity);
+        outputPosition = vec4(fragmentPosition, material.specularHardness);
+        outputNormal = vec4(fragmentNormal, 0.0f);
+    }
 
-        uniform sampler2D diffuseSampler;
-
-        smooth in vec3 fragmentPosition;
-        smooth in vec3 fragmentNormal;
-        smooth in vec2 fragmentUV;
-
-        layout(location = 0) out vec4 outputDiffuse;
-        layout(location = 1) out vec4 outputSpecular;
-        layout(location = 2) out vec4 outputPosition;
-        layout(location = 3) out vec4 outputNormal;
-
-        void main() {
-            vec4 diffuseColor = vec4(material.diffuseColor, 0.0f);
-            outputDiffuse = material.diffuseTexture ? texture(diffuseSampler, fragmentUV) : diffuseColor;
-            outputSpecular = vec4(material.specularColor, 0.0f);
-            outputPosition = vec4(fragmentPosition, 0.0f);
-            outputNormal = vec4(fragmentNormal, 0.0f);
-        }
-    #endif
+#endif
 )";
 
 const char ambientShader[] = R"(
     #version 330
 
-    #ifdef TYPE_VERTEX
-        layout(location = 0) in vec3 vertexPosition;
-        layout(location = 1) in vec3 vertexNormal;
-        layout(location = 2) in vec2 vertexUV;
+#ifdef TYPE_VERTEX
 
-        smooth out vec2 fragmentUV;
+    layout(location = 0) in vec3 vertexPosition;
+    layout(location = 1) in vec3 vertexNormal;
+    layout(location = 2) in vec2 vertexUV;
 
-        void main () {
-            gl_Position = vec4(vertexPosition, 1.0f);
-            fragmentUV = vertexUV;
-        }
-    #endif
+    smooth out vec2 fragmentUV;
 
-    #ifdef TYPE_FRAGMENT
-        uniform vec3 ambientColor;
-        uniform float ambientEnergy;
+    void main () {
+        gl_Position = vec4(vertexPosition, 1.0f);
+        fragmentUV = vertexUV;
+    }
 
-        uniform sampler2D diffuseSampler;
-        uniform sampler2D specularSampler;
-        uniform sampler2D positionSampler;
-        uniform sampler2D normalSampler;
-        uniform sampler1D depthSampler;
+#endif
 
-        smooth in vec2 fragmentUV;
-        out vec4 outputColor;
+#ifdef TYPE_FRAGMENT
 
-        void main() {
-            vec4 diffuseColor = texture(diffuseSampler, fragmentUV);
-            outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy;
-        }
-    #endif
+    uniform vec3 ambientColor;
+    uniform float ambientEnergy;
+
+    uniform sampler2D diffuseSampler;
+    uniform sampler2D specularSampler;
+    uniform sampler2D positionSampler;
+    uniform sampler2D normalSampler;
+    uniform sampler2D depthSampler;
+
+    smooth in vec2 fragmentUV;
+
+    layout(location = 0) out vec4 outputColor;
+
+    void main() {
+        vec4 diffuseColor = vec4(texture(diffuseSampler, fragmentUV).rgb, 0.0f);
+        outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy;
+    }
+
+#endif
 )";
 
 }  // namespace Sources
