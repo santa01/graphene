@@ -30,6 +30,8 @@
 
 namespace Graphene {
 
+GLuint Shader::activeProgram = 0;
+
 Shader::Shader(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {

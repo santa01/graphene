@@ -104,7 +104,8 @@ public:
     }
 
     void enable() {
-        if (this->program != 0) {
+        if (this->program != Shader::activeProgram) {
+            Shader::activeProgram = this->program;
             glUseProgram(this->program);
         }
     }
@@ -138,6 +139,7 @@ private:
     std::unordered_map<std::string, GLint> uniformBlocks;
     std::string source;
 
+    static GLuint activeProgram;
     GLuint program;
 };
 

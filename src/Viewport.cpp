@@ -49,6 +49,7 @@ void Viewport::update() {
     RenderStack::push([this]() {
         this->geometryBuffer->bind();
         glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
     });
 
     glViewport(this->left, this->top, this->width, this->height);

@@ -77,21 +77,7 @@ public:
         this->viewports.insert(viewport);
     }
 
-    void update() {
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-        glDrawBuffer(this->buffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        for (auto& viewport: this->viewports) {
-            RenderStack::push([this]() {
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-                glDrawBuffer(this->buffer);
-                glEnable(GL_BLEND);
-            });
-
-            viewport->update();
-        }
-    }
+    void update();
 
 protected:
     std::unordered_set<std::shared_ptr<Viewport>> viewports;
