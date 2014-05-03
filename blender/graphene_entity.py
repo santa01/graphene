@@ -95,7 +95,7 @@ def write_entity(context, filepath, global_matrix):
 
             try:
                 uv_loops = mesh.uv_layers.active.data[:]
-            except:
+            except AttributeError:
                 uv_loops = None
 
             for face_index in [i for face in faces for i in face]:
@@ -107,25 +107,26 @@ def write_entity(context, filepath, global_matrix):
                     uv = uv_loops[face_index].uv
                     uvs[face_index] = (uv[0], 1.0 - uv[1])
 
+            f.write(struct.pack("<2f", materials[0].ambient, materials[0].diffuse_intensity))
+            f.write(struct.pack("<3f", *materials[0].diffuse_color[:]))
+            f.write(struct.pack("<1f1i", materials[0].specular_intensity, materials[0].specular_hardness))
+            f.write(struct.pack("<3f", *materials[0].specular_color[:]))
+
             try:
                 diffuse_texture = materials[0].active_texture.image.filepath[2:257]
-            except:
+            except AttributeError:
                 diffuse_texture = ''
 
             diffuse_texture += '\0' * (255 - len(diffuse_texture))
             f.write(struct.pack("<255s1b", bytearray(diffuse_texture, 'ASCII'), 0))
 
             f.write(struct.pack("<1i1i", len(vertices), len(faces)))
-
             for vertex in vertices:
                 f.write(struct.pack("<3f", vertex[0], vertex[1], vertex[2]))
-
             for normal in normals:
                 f.write(struct.pack("<3f", normal[0], normal[1], normal[2]))
-
             for uv in uvs:
                 f.write(struct.pack("<2f", uv[0], uv[1]))
-
             for face in faces:
                 f.write(struct.pack("<3i", face[0], face[1], face[2]))
 
