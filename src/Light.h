@@ -152,7 +152,7 @@ public:
 
     void setInnerAngle(float angle) {
         if (angle < 0.0f || angle > this->outerAngle) {
-            throw std::invalid_argument("Angle should be in [0.0; OuterAngle] range");
+            throw std::invalid_argument("Angle is not in [0.0; outerAngle] range");
         }
 
         this->innerAngle = angle;
@@ -164,7 +164,7 @@ public:
 
     void setOuterAngle(float angle) {
         if (angle < 0.0f || angle >= 180.0f) {
-            throw std::invalid_argument("Angle should be in [0.0; 180.0) range");
+            throw std::invalid_argument("Angle is not in [0.0; 180.0) range");
         }
 
         this->outerAngle = angle;
