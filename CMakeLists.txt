@@ -32,7 +32,7 @@ file (GLOB_RECURSE GRAPHENE_HEADERS "src/*.h")
 include_directories ("src" ${MATH_INCLUDE_DIRS})
 
 set (GRAPHENE_NAME "Graphene")
-set (GRAPHENE_DESCRIPTION "OpenGL-based graphics engine")
+set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
 set (GRAPHENE_VERSION 0.0.1)
 
 set (GRAPHENE_LIBRARY "graphene")
