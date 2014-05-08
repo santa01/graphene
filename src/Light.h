@@ -23,12 +23,29 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include <UniformBuffer.h>
 #include <Quaternion.h>
 #include <Vec3.h>
 #include <Object.h>
 #include <stdexcept>
 
 namespace Graphene {
+
+#pragma pack(push, 1)
+
+/* std140 layout */
+typedef struct {
+    float color[3];
+    float energy;
+    float position[3];
+    float falloff;
+    float direction[3];
+    float innerAngle;
+    float outerAngle;
+    int lightType;
+} LightBuffer;
+
+#pragma pack(pop)
 
 class Light: public Object {
 public:
@@ -38,11 +55,7 @@ public:
         TYPE_DIRECTED
     };
 
-    Light():
-            direction(Math::Vec3::UNIT_X) {
-        this->objectType = ObjectType::TYPE_LIGHT;
-        this->lightType = TYPE_POINT;
-    }
+    Light();
 
     /* Rotatable */
 
@@ -68,6 +81,7 @@ public:
 
         this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
         this->direction = q.extractMat4().extractMat3() * this->direction;
+        updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
     }
 
     Math::Vec3 getRotationAngles() const {
@@ -81,7 +95,7 @@ public:
     }
 
     void translate(const Math::Vec3& position) {
-        this->position = position;
+        this->move(position - this->position);
     }
 
     void move(float x, float y, float z) {
@@ -90,6 +104,7 @@ public:
 
     void move(const Math::Vec3& position) {
         this->position += position;
+        updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
     }
 
     Math::Vec3 getPosition() const {
@@ -104,6 +119,11 @@ public:
 
     void setLightType(LightType type) {
         this->lightType = type;
+        updateBuffer(this->lightBuffer, LightBuffer, lightType, &this->lightType);
+    }
+
+    const Math::Vec3& getColor() const {
+        return this->color;
     }
 
     void setColor(float red, float green, float blue) {
@@ -112,10 +132,11 @@ public:
 
     void setColor(const Math::Vec3& color) {
         this->color = color;
+        updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
     }
 
-    const Math::Vec3& getColor() const {
-        return this->color;
+    const Math::Vec3& getDirection() const {
+        return this->direction;
     }
 
     void setDirection(float x, float y, float z) {
@@ -128,26 +149,29 @@ public:
         }
 
         this->direction = direction;
-    }
-
-    const Math::Vec3& getDirection() const {
-        return this->direction;
-    }
-
-    void setEnergy(float energy) {
-        this->energy = energy;
+        updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
     }
 
     float getEnergy() const {
         return this->energy;
     }
 
-    void setFalloff(float falloff) {
-        this->falloff = falloff;
+    void setEnergy(float energy) {
+        this->energy = energy;
+        updateBuffer(this->lightBuffer, LightBuffer, energy, &this->energy);
     }
 
     float getFalloff() const {
         return this->falloff;
+    }
+
+    void setFalloff(float falloff) {
+        this->falloff = falloff;
+        updateBuffer(this->lightBuffer, LightBuffer, falloff, &this->falloff);
+    }
+
+    float getInnerAngle() const {
+        return this->innerAngle;
     }
 
     void setInnerAngle(float angle) {
@@ -156,10 +180,11 @@ public:
         }
 
         this->innerAngle = angle;
+        updateBuffer(this->lightBuffer, LightBuffer, innerAngle, &this->innerAngle);
     }
 
-    float getInnerAngle() const {
-        return this->innerAngle;
+    float getOuterAngle() const {
+        return this->outerAngle;
     }
 
     void setOuterAngle(float angle) {
@@ -168,14 +193,16 @@ public:
         }
 
         this->outerAngle = angle;
+        updateBuffer(this->lightBuffer, LightBuffer, outerAngle, &this->outerAngle);
     }
 
-    float getOuterAngle() const {
-        return this->outerAngle;
+    std::shared_ptr<UniformBuffer> getLightBuffer() {
+        return this->lightBuffer;
     }
 
 private:
     LightType lightType;
+    std::shared_ptr<UniformBuffer> lightBuffer;
 
     Math::Vec3 color;
     Math::Vec3 position;   // TYPE_POINT, TYPE_SPOT

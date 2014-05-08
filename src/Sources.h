@@ -99,7 +99,6 @@ const char ambientShader[] = R"(
 #ifdef TYPE_VERTEX
 
     layout(location = 0) in vec3 vertexPosition;
-    layout(location = 1) in vec3 vertexNormal;
     layout(location = 2) in vec2 vertexUV;
 
     smooth out vec2 fragmentUV;
@@ -115,6 +114,53 @@ const char ambientShader[] = R"(
 
     uniform vec3 ambientColor;
     uniform float ambientEnergy;
+    uniform sampler2D diffuseSampler;
+
+    smooth in vec2 fragmentUV;
+
+    layout(location = 0) out vec4 outputColor;
+
+    void main() {
+        vec4 diffuseColor = vec4(texture(diffuseSampler, fragmentUV).rgb, 0.0f);
+        outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy;
+    }
+
+#endif
+)";
+
+const char lightingShader[] = R"(
+    #version 330
+
+#ifdef TYPE_VERTEX
+
+    layout(location = 0) in vec3 vertexPosition;
+    layout(location = 2) in vec2 vertexUV;
+
+    smooth out vec2 fragmentUV;
+
+    void main () {
+        gl_Position = vec4(vertexPosition, 1.0f);
+        fragmentUV = vertexUV;
+    }
+
+#endif
+
+#ifdef TYPE_FRAGMENT
+
+    #define TYPE_POINT    0
+    #define TYPE_SPOT     1
+    #define TYPE_DIRECTED 2
+
+    layout(std140) uniform Light {
+        vec3 color;
+        float energy;
+        vec3 position;
+        float falloff;
+        vec3 direction;
+        float innerAngle;
+        float outerAngle;
+        int lightType;
+    } light;
 
     uniform sampler2D diffuseSampler;
     uniform sampler2D specularSampler;
@@ -127,8 +173,22 @@ const char ambientShader[] = R"(
     layout(location = 0) out vec4 outputColor;
 
     void main() {
-        vec4 diffuseColor = vec4(texture(diffuseSampler, fragmentUV).rgb, 0.0f);
-        outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy;
+        vec4 diffuseSample = texture(diffuseSampler, fragmentUV);
+        vec4 specularSample = texture(specularSampler, fragmentUV);
+        vec4 positionSample = texture(positionSampler, fragmentUV);
+        vec4 normalSample = texture(normalSampler, fragmentUV);
+
+        vec3 normal = normalize(normalSample.xyz);
+        vec3 position = positionSample.xyz;
+
+        vec3 lightDirection = (light.lightType == TYPE_POINT) ? position - light.position : light.direction;
+        lightDirection = normalize(lightDirection);
+
+        float luminance = dot(normal, -lightDirection);
+        vec3 diffuseColor = light.color * (luminance > 0.0f ? luminance : 0.0f);
+
+        float diffuseIntensity = diffuseSample.w;
+        outputColor = texture(diffuseSampler, fragmentUV) + vec4(diffuseColor * diffuseIntensity, 0.0f);
     }
 
 #endif

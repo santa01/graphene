@@ -65,6 +65,7 @@ Window::Window(int width, int height):
     }
 
     glFrontFace(GL_CW);
+    glBlendFunc(GL_ONE, GL_ONE);
     glEnable(GL_CULL_FACE);
 }
 

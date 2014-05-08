@@ -24,6 +24,7 @@
 #define MATERIAL_H
 
 #include <ImageTexture.h>
+#include <UniformBuffer.h>
 #include <Vec3.h>
 #include <GL/glew.h>
 #include <stdexcept>
@@ -32,11 +33,6 @@
 #include <cstddef>
 
 namespace Graphene {
-
-#define updateBuffer(type, member, data) \
-    glBindBuffer(GL_UNIFORM_BUFFER, this->ubo); \
-    glBufferSubData(GL_UNIFORM_BUFFER, offsetof(type, member), sizeof(type::member), data); \
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 #pragma pack(push, 1)
 
@@ -72,7 +68,7 @@ public:
 
         this->diffuseTexture = diffuseTexture;
         bool diffuseTextureAvailable = true;
-        updateBuffer(MaterialBuffer, diffuseTexture, &diffuseTextureAvailable);
+        updateBuffer(this->materialBuffer, MaterialBuffer, diffuseTexture, &diffuseTextureAvailable);
     }
 
     float getAmbientIntensity() const {
@@ -85,7 +81,7 @@ public:
         }
 
         this->ambientIntensity = ambientIntensity;
-        updateBuffer(MaterialBuffer, ambientIntensity, &this->ambientIntensity);
+        updateBuffer(this->materialBuffer, MaterialBuffer, ambientIntensity, &this->ambientIntensity);
     }
 
     float getDiffuseIntensity() const {
@@ -98,7 +94,7 @@ public:
         }
 
         this->diffuseIntensity = diffuseIntensity;
-        updateBuffer(MaterialBuffer, diffuseIntensity, &this->diffuseIntensity);
+        updateBuffer(this->materialBuffer, MaterialBuffer, diffuseIntensity, &this->diffuseIntensity);
     }
 
     float getSpecularIntensity() const {
@@ -111,7 +107,7 @@ public:
         }
 
         this->specularIntensity = specularIntensity;
-        updateBuffer(MaterialBuffer, specularIntensity, &this->specularIntensity);
+        updateBuffer(this->materialBuffer, MaterialBuffer, specularIntensity, &this->specularIntensity);
     }
 
     int getSpecularHardness() const {
@@ -124,7 +120,7 @@ public:
         }
 
         this->specularHardness = specularHardness;
-        updateBuffer(MaterialBuffer, specularHardness, &this->specularHardness);
+        updateBuffer(this->materialBuffer, MaterialBuffer, specularHardness, &this->specularHardness);
     }
 
     const Math::Vec3& getDiffuseColor() const {
@@ -133,7 +129,7 @@ public:
 
     void setDiffuseColor(const Math::Vec3& diffuseColor) {
         this->diffuseColor = diffuseColor;
-        updateBuffer(MaterialBuffer, diffuseColor, this->diffuseColor.data());
+        updateBuffer(this->materialBuffer, MaterialBuffer, diffuseColor, this->diffuseColor.data());
     }
 
     const Math::Vec3& getSpecularColor() const {
@@ -142,7 +138,11 @@ public:
 
     void setSpecularColor(const Math::Vec3& specularColor) {
         this->specularColor = specularColor;
-        updateBuffer(MaterialBuffer, specularColor, this->specularColor.data());
+        updateBuffer(this->materialBuffer, MaterialBuffer, specularColor, this->specularColor.data());
+    }
+
+    std::shared_ptr<UniformBuffer> getMaterialBuffer() {
+        return this->materialBuffer;
     }
 
     void bind(int bindPoint) {
@@ -151,6 +151,7 @@ public:
 
 private:
     std::shared_ptr<ImageTexture> diffuseTexture;
+    std::shared_ptr<UniformBuffer> materialBuffer;
 
     float ambientIntensity;
     float diffuseIntensity;

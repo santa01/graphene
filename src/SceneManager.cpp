@@ -23,6 +23,7 @@
 #include <SceneManager.h>
 #include <RenderStack.h>
 #include <Object.h>
+#include <Light.h>
 #include <Entity.h>
 #include <Sources.h>
 
@@ -31,6 +32,7 @@ namespace Graphene {
 SceneManager::SceneManager():
         geometryShader(new Shader(Sources::geometryShader, sizeof(Sources::geometryShader))),
         ambientShader(new Shader(Sources::ambientShader, sizeof(Sources::ambientShader))),
+        lightingShader(new Shader(Sources::lightingShader, sizeof(Sources::lightingShader))),
         ambientColor(1.0f, 1.0f, 1.0f) {
     this->ambientEnergy = 1.0f;
 
@@ -57,11 +59,12 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     RenderStack::pop();  // Geometry buffer
     this->geometryShader->enable();
     this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
+
     this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->geometryShader->setUniform("modelViewProjection",
             camera->getProjection() * camera->getRotation() * camera->getTranslation());
 
-    traverseScene(this->rootNode, [this](std::shared_ptr<Object> object) {
+    traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
         if (object->getObjectType() == Object::ObjectType::TYPE_ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
             this->geometryShader->setUniform("localWorld",
@@ -69,7 +72,7 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
 
             for (auto& mesh: entity->getMeshes()) {
                 auto material = mesh->getMaterial();
-                material->bind(BIND_MATERIAL);
+                material->getMaterialBuffer()->bind(BIND_MATERIAL);
 
                 auto diffuseTexture = material->getDiffuseTexture();
                 if (diffuseTexture != nullptr) {
@@ -83,14 +86,9 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
 
     RenderStack::pop();  // Geometry textures
     this->ambientShader->enable();
+    this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->ambientShader->setUniform("ambientColor", this->ambientColor);
     this->ambientShader->setUniform("ambientEnergy", this->ambientEnergy);
-
-    this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
-    this->ambientShader->setUniform("specularSampler", TEXTURE_SPECULAR);
-    this->ambientShader->setUniform("positionSampler", TEXTURE_POSITION);
-    this->ambientShader->setUniform("normalSampler", TEXTURE_NORMAL);
-    this->ambientShader->setUniform("depthSampler", TEXTURE_DEPTH);
 
     RenderStack::pop();  // Output buffer
     this->frame->render();
@@ -109,7 +107,23 @@ void SceneManager::renderShadows() {
 }
 
 void SceneManager::renderLights() {
-    // TODO
+    this->lightingShader->enable();
+    this->lightingShader->setUniformBlock("Light", BIND_LIGHT);
+
+    this->lightingShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->lightingShader->setUniform("specularSampler", TEXTURE_SPECULAR);
+    this->lightingShader->setUniform("positionSampler", TEXTURE_POSITION);
+    this->lightingShader->setUniform("normalSampler", TEXTURE_NORMAL);
+    this->lightingShader->setUniform("depthSampler", TEXTURE_DEPTH);
+
+    traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
+        if (object->getObjectType() == Object::ObjectType::TYPE_LIGHT) {
+            auto light = std::dynamic_pointer_cast<Light>(object);
+            light->getLightBuffer()->bind(BIND_LIGHT);
+
+            this->frame->render();
+        }
+    });
 }
 
 }  // namespace Graphene

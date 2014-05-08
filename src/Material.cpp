@@ -43,10 +43,7 @@ Material::Material():
     std::copy(this->diffuseColor.data(), this->diffuseColor.data() + 3, material.diffuseColor);
     std::copy(this->specularColor.data(), this->specularColor.data() + 3, material.specularColor);
 
-    glGenBuffers(1, &this->ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(material), &material, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    this->materialBuffer = std::make_shared<UniformBuffer>(reinterpret_cast<const char*>(&material), sizeof(material));
 }
 
 }  // namespace Graphene

@@ -99,6 +99,18 @@ public:
         this->ambientShader = ambientShader;
     }
 
+    std::shared_ptr<Shader> getLightingShader() {
+        return this->lightingShader;
+    }
+
+    void setLightingShader(const std::shared_ptr<Shader> lightingShader) {
+        if (lightingShader == nullptr) {
+            throw std::invalid_argument("Shader cannot be nullptr");
+        }
+
+        this->lightingShader = lightingShader;
+    }
+
     const Math::Vec3& getAmbientColor() const {
         return this->ambientColor;
     }
@@ -139,7 +151,8 @@ public:
 
 private:
     enum BindPoints {
-        BIND_MATERIAL
+        BIND_MATERIAL = 0,
+        BIND_LIGHT    = 0
     };
 
     enum TextureUnits {
@@ -155,8 +168,10 @@ private:
 
     std::shared_ptr<SceneNode> rootNode;
     std::shared_ptr<Mesh> frame;
+
     std::shared_ptr<Shader> geometryShader;
     std::shared_ptr<Shader> ambientShader;
+    std::shared_ptr<Shader> lightingShader;
 
     Math::Vec3 ambientColor;
     float ambientEnergy;
