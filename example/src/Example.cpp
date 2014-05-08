@@ -25,6 +25,8 @@ int main() {
     /* Setup scene */
 
     auto sceneManager = *engine.getSceneManagers().begin();
+    sceneManager->setAmbientEnergy(0.2f);
+    sceneManager->setLightPass(true);
 
     auto node1 = sceneManager->createNode();
     sceneManager->getRootNode()->attachNode(node1);
@@ -39,6 +41,9 @@ int main() {
     auto camera = objectManager->createCamera();
     node1->attachObject(camera);
 
+    auto light = objectManager->createLight();
+    node2->attachObject(light);
+
     auto entity = objectManager->createEntity("assets/example.entity");
     node2->attachObject(entity);
 
@@ -50,6 +55,7 @@ int main() {
     /* Update scene */
 
     node1->translate(2.0f, 2.0f, 3.0f);
+    light->translate(0.0f, 0.0f, 2.0f);
     camera->lookAt(-2.0f, -2.0f, -3.0f);
 
     /* Run renderer */
