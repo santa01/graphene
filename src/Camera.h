@@ -44,17 +44,7 @@ public:
         this->fov = 70.0f;
 
         this->updateProjection(TYPE_PERSPECTIVE);
-        this->lookAt(Math::Vec3::UNIT_Z);
-    }
-
-    Camera(float x, float y, float z):
-            Camera() {
-        this->translate(x, y, z);
-    }
-
-    Camera(const Math::Vec3& position):
-            Camera() {
-        this->translate(position);
+        this->rotation.set(2, 2, -1.0f);  // Look at Z
     }
 
     /* Rotatable */
@@ -94,9 +84,9 @@ public:
     }
 
     void move(const Math::Vec3& position) {
-        this->translation.set(0, 3, -this->translation.get(0, 3) - position.get(Math::Vec3::X));
-        this->translation.set(1, 3, -this->translation.get(1, 3) - position.get(Math::Vec3::Y));
-        this->translation.set(2, 3, -this->translation.get(2, 3) - position.get(Math::Vec3::Z));
+        this->translation.set(0, 3, this->translation.get(0, 3) - position.get(Math::Vec3::X));
+        this->translation.set(1, 3, this->translation.get(1, 3) - position.get(Math::Vec3::Y));
+        this->translation.set(2, 3, this->translation.get(2, 3) - position.get(Math::Vec3::Z));
     }
 
     Math::Vec3 getPosition() const {
@@ -149,20 +139,16 @@ public:
         this->updateProjection(this->projectionType);
     }
 
+    Math::Vec3 getRight() const {
+        return Math::Vec3(this->rotation.get(0, 0), this->rotation.get(0, 1), this->rotation.get(0, 2));
+    }
+
     Math::Vec3 getUp() const {
         return Math::Vec3(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
     }
 
     Math::Vec3 getTarget() const {
         return -Math::Vec3(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
-    }
-
-    Math::Vec3 getRight() const {
-        Math::Vec3 up(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
-        Math::Vec3 target(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
-        Math::Vec3 right = target.cross(up);
-
-        return right.normalize();
     }
 
     const Math::Mat4& getTranslation() const {

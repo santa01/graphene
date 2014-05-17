@@ -23,10 +23,15 @@
 #include <SceneNode.h>
 #include <Quaternion.h>
 #include <Mat3.h>
+#include <algorithm>
 
 namespace Graphene {
 
 void SceneNode::rotate(const Math::Vec3& vector, float angle) {
+    if (vector == Math::Vec3::ZERO) {
+        throw std::invalid_argument("Vector cannot be of zero length");
+    }
+
     Math::Vec3 axis(vector);
     Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
     float xAngle, yAngle, zAngle;
@@ -43,8 +48,11 @@ void SceneNode::rotate(const Math::Vec3& vector, float angle) {
     }
 }
 
-
 void SceneNode::scale(const Math::Vec3& factors) {
+    if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
+        throw std::invalid_argument("Factor is less or equals zero");
+    }
+
     Math::Mat3 scalingMatrix;
     scalingMatrix.set(0, 0, factors.get(Math::Vec3::X));
     scalingMatrix.set(1, 1, factors.get(Math::Vec3::Y));

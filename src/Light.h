@@ -28,6 +28,7 @@
 #include <Vec3.h>
 #include <Object.h>
 #include <stdexcept>
+#include <memory>
 
 namespace Graphene {
 
@@ -71,18 +72,7 @@ public:
         this->rotate(Math::Vec3::UNIT_Z, angle);
     }
 
-    void rotate(const Math::Vec3& vector, float angle) {
-        Math::Vec3 axis(vector);
-        Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
-        q.normalize();
-
-        float xAngle, yAngle, zAngle;
-        q.extractEulerAngles(xAngle, yAngle, zAngle);
-
-        this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
-        this->direction = q.extractMat4().extractMat3() * this->direction;
-        updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
-    }
+    void rotate(const Math::Vec3& vector, float angle);
 
     Math::Vec3 getRotationAngles() const {
         return this->rotationAngles;
@@ -95,7 +85,8 @@ public:
     }
 
     void translate(const Math::Vec3& position) {
-        this->move(position - this->position);
+        this->position = position;
+        updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
     }
 
     void move(float x, float y, float z) {

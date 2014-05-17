@@ -39,7 +39,7 @@ void Camera::rotate(const Math::Vec3& vector, float angle) {
 
     Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
     Math::Vec3 up = this->getUp();
-    Math::Vec3 target = this->getTarget();
+    Math::Vec3 target = -this->getTarget();
 
     up = rotationMatrix * up;
     target = rotationMatrix * target;
@@ -71,6 +71,22 @@ void Camera::lookAt(const Math::Vec3& vector) {
     Math::Vec3 up = right.cross(target);
     up.normalize();
 
+    float angle = acosf(target.dot(this->getTarget()));
+    Math::Vec3 axis = target.cross(this->getTarget());
+    axis.normalize();
+
+    float xAngle = atan2f(axis.get(Math::Vec3::X) * sinf(angle) -
+                          axis.get(Math::Vec3::Y) * axis.get(Math::Vec3::Z) * (1 - cosf(angle)),
+                          1 - (axis.get(Math::Vec3::X) * axis.get(Math::Vec3::X) +
+                               axis.get(Math::Vec3::Z) * axis.get(Math::Vec3::Z)) * (1 - cosf(angle)));
+    float yAngle = atan2f(axis.get(Math::Vec3::Y) * sinf(angle) -
+                          axis.get(Math::Vec3::X) * axis.get(Math::Vec3::Z) * (1 - cosf(angle)),
+                          1 - (axis.get(Math::Vec3::Y) * axis.get(Math::Vec3::Y) +
+                               axis.get(Math::Vec3::Z) * axis.get(Math::Vec3::Z)) * (1 - cosf(angle)));
+    float zAngle = asinf(axis.get(Math::Vec3::X) * axis.get(Math::Vec3::Y) * (1 - cosf(angle)) +
+                         axis.get(Math::Vec3::Z) * sinf(angle));
+
+    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
     this->updateRotation(right, up, target);
 }
 

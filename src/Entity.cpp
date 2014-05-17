@@ -24,4 +24,20 @@
 
 namespace Graphene {
 
+void Entity::rotate(const Math::Vec3& vector, float angle) {
+    if (vector == Math::Vec3::ZERO) {
+        throw std::invalid_argument("Vector cannot be of zero length");
+    }
+
+    Math::Vec3 axis(vector);
+    Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+    q.normalize();
+
+    float xAngle, yAngle, zAngle;
+    q.extractEulerAngles(xAngle, yAngle, zAngle);
+
+    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+    this->rotation = this->rotation * q.extractMat4();
+}
+
 }  // namespace Graphene

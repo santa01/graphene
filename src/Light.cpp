@@ -45,4 +45,21 @@ Light::Light():
     this->lightBuffer = std::make_shared<UniformBuffer>(reinterpret_cast<const char*>(&light), sizeof(light));
 }
 
+void Light::rotate(const Math::Vec3& vector, float angle) {
+    if (vector == Math::Vec3::ZERO) {
+        throw std::invalid_argument("Vector cannot be of zero length");
+    }
+
+    Math::Vec3 axis(vector);
+    Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+    q.normalize();
+
+    float xAngle, yAngle, zAngle;
+    q.extractEulerAngles(xAngle, yAngle, zAngle);
+
+    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+    this->direction = q.extractMat4().extractMat3() * this->direction;
+    updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
+}
+
 }  // namespace Graphene

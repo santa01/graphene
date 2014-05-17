@@ -30,6 +30,7 @@
 #include <Vec3.h>
 #include <unordered_set>
 #include <stdexcept>
+#include <algorithm>
 #include <memory>
 
 namespace Graphene {
@@ -54,17 +55,7 @@ public:
         this->rotate(Math::Vec3::UNIT_Z, angle);
     }
 
-    void rotate(const Math::Vec3& vector, float angle) {
-        Math::Vec3 axis(vector);
-        Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
-        q.normalize();
-
-        float xAngle, yAngle, zAngle;
-        q.extractEulerAngles(xAngle, yAngle, zAngle);
-
-        this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
-        this->rotation = this->rotation * q.extractMat4();
-    }
+    void rotate(const Math::Vec3& vector, float angle);
 
     Math::Vec3 getRotationAngles() const {
         return this->rotationAngles;
@@ -89,6 +80,10 @@ public:
     }
 
     void scale(const Math::Vec3& factors) {
+        if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
+            throw std::invalid_argument("Factor is less or equals zero");
+        }
+
         this->scaling.set(0, 0, this->scaling.get(0, 0) * factors.get(Math::Vec3::X));
         this->scaling.set(1, 1, this->scaling.get(1, 1) * factors.get(Math::Vec3::Y));
         this->scaling.set(2, 2, this->scaling.get(2, 2) * factors.get(Math::Vec3::Z));
@@ -105,7 +100,9 @@ public:
     }
 
     void translate(const Math::Vec3& position) {
-        this->move(position - this->getPosition());
+        this->translation.set(0, 3, position.get(Math::Vec3::X));
+        this->translation.set(1, 3, position.get(Math::Vec3::Y));
+        this->translation.set(2, 3, position.get(Math::Vec3::Z));
     }
 
     void move(float x, float y, float z) {

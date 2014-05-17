@@ -42,7 +42,8 @@ class SceneManager;
 class SceneNode: public std::enable_shared_from_this<SceneNode>,
         public Rotatable, public Scalable, public Movable, public NonCopyable {
 public:
-    SceneNode(const std::shared_ptr<SceneManager> sceneManager) {
+    SceneNode(const std::shared_ptr<SceneManager> sceneManager):
+            scalingFactors(1.0f, 1.0f, 1.0f) {
         if (sceneManager == nullptr) {
             throw std::invalid_argument("SceneManager cannot be nullptr");
         }
