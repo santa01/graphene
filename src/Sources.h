@@ -33,6 +33,7 @@ const char geometryShader[] = R"(
 #ifdef TYPE_VERTEX
 
     uniform mat4 modelViewProjection;
+    uniform mat4 normalRotation;
     uniform mat4 localWorld;
 
     layout(location = 0) in vec3 vertexPosition;
@@ -45,7 +46,7 @@ const char geometryShader[] = R"(
 
     void main () {
         vec4 vertexWorldPosition = localWorld * vec4(vertexPosition, 1.0f);
-        vec4 vertexWorldNormal = localWorld * vec4(vertexNormal, 1.0f);
+        vec4 vertexWorldNormal = normalRotation * vec4(vertexNormal, 1.0f);
         gl_Position = modelViewProjection * vertexWorldPosition;
 
         fragmentPosition = vec3(vertexWorldPosition);

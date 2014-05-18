@@ -67,6 +67,8 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
         if (object->getObjectType() == Object::ObjectType::TYPE_ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
+
+            this->geometryShader->setUniform("normalRotation", entity->getRotation());
             this->geometryShader->setUniform("localWorld",
                     entity->getScaling() * entity->getRotation() * entity->getTranslation());
 
