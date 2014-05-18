@@ -78,20 +78,20 @@ void SceneNode::attachObject(std::shared_ptr<Object> object) {
 
     auto inserted = this->objects.insert(object);
     if (inserted.second) {
+        switch (object->getObjectType()) {
+            case Object::ObjectType::TYPE_ENTITY:
+                this->entities.insert(std::dynamic_pointer_cast<Entity>(object));
+                break;
+
+            case Object::ObjectType::TYPE_LIGHT:
+                this->lights.insert(std::dynamic_pointer_cast<Light>(object));
+                break;
+
+            default:
+                break;
+        }
+
         object->parent = this->shared_from_this();
-    }
-
-    switch (object->getObjectType()) {
-        case Object::ObjectType::TYPE_ENTITY:
-            this->entities.insert(std::dynamic_pointer_cast<Entity>(object));
-            break;
-
-        case Object::ObjectType::TYPE_LIGHT:
-            this->lights.insert(std::dynamic_pointer_cast<Light>(object));
-            break;
-
-        default:
-            break;
     }
 }
 
