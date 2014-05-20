@@ -26,7 +26,7 @@ get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTO
 get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
 
 file (GLOB_RECURSE EXAMPLE_SOURCES "src/*.cpp")
-include_directories (${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS})
+include_directories ("src" ${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS})
 
 set (EXAMPLE_EXECUTABLE "example")
 add_executable (${EXAMPLE_EXECUTABLE} ${EXAMPLE_SOURCES})
