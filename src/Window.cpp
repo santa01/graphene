@@ -22,6 +22,8 @@
 
 #include <Window.h>
 #include <stdexcept>
+#include <algorithm>
+#include <iterator>
 
 namespace Graphene {
 
@@ -75,22 +77,26 @@ void Window::dispatchEvents() {
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
-                this->onQuitEvent(&event);
+                this->onQuit();
                 break;
 
             case SDL_MOUSEMOTION:
-            case SDL_MOUSEWHEEL:
+                this->onMouseMotion(event.motion.xrel, event.motion.yrel);
+                break;
+
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
-                this->onMouseEvent(&event);
+                this->onMouseButton(event.button.button, event.button.state);
                 break;
 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                this->onKeyEvent(&event);
+                this->onKeyboardButton(event.key.keysym.scancode, event.key.state);
                 break;
         }
     }
+
+    this->onIdle();
 }
 
 }  // namespace Graphene

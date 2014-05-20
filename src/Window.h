@@ -25,9 +25,13 @@
 
 #include <RenderTarget.h>
 #include <Signals.h>
+#include <utility>
+#include <algorithm>
+#include <vector>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
+#include <iostream>
 
 namespace Graphene {
 
@@ -48,6 +52,39 @@ public:
         SDL_Quit();
     }
 
+    std::vector<bool> getKeyboardState() const {
+        int keysCount;
+        const Uint8* state = SDL_GetKeyboardState(&keysCount);
+
+        std::vector<bool> keyboardState;
+        std::copy(state, state + keysCount, std::back_inserter(keyboardState));
+
+        return keyboardState;  // RVO on assignment
+    }
+
+    std::vector<bool> getMouseState() const {
+        Uint32 state = SDL_GetMouseState(nullptr, nullptr);
+
+        std::vector<bool> mouseState(SDL_BUTTON_X2);
+        std::generate(mouseState.begin(), mouseState.end(), [state]() {
+            static int button = 1;
+            return state & SDL_BUTTON(button++);
+        });
+
+        return mouseState;
+    }
+
+    std::pair<int, int> getMousePosition() const {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        return std::make_pair(x, y);
+    }
+
+    void captureMouse(bool capture) {
+        SDL_WarpMouseInWindow(this->window, this->width / 2, this->height / 2);
+        SDL_SetRelativeMouseMode(capture ? SDL_TRUE : SDL_FALSE);
+    }
+
     void update() {
         RenderTarget::update();
         SDL_GL_SwapWindow(this->window);
@@ -55,13 +92,15 @@ public:
 
     void dispatchEvents();
 
-    Signals::Signal<const SDL_Event*> onMouseEvent;  // Mouse event
-    Signals::Signal<const SDL_Event*> onKeyEvent;    // Keyboard event
-    Signals::Signal<const SDL_Event*> onQuitEvent;   // User-requested quit
-
 private:
-    friend class Graphene;
+    friend class Engine;
     Window(int width, int height);
+
+    Signals::Signal<int, int> onMouseMotion;
+    Signals::Signal<int, bool> onMouseButton;
+    Signals::Signal<int, bool> onKeyboardButton;
+    Signals::Signal<> onQuit;  // User-requested quit
+    Signals::Signal<> onIdle;  // Empty event queue
 
     SDL_Window* window;
     SDL_GLContext context;

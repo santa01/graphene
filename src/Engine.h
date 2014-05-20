@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#ifndef GRAPHENE_H
-#define GRAPHENE_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include <NonCopyable.h>
 #include <FrameBuffer.h>
@@ -34,13 +34,10 @@
 
 namespace Graphene {
 
-class Graphene: public NonCopyable {
+class Engine: public NonCopyable {
 public:
-    Graphene(int width, int height):
-            window(new Window(width, height)) {
-        this->sceneManagers.insert(std::make_shared<SceneManager>());
-        this->objectManagers.insert(std::make_shared<ObjectManager>());
-    }
+    Engine(int width, int height);
+    virtual ~Engine() {}
 
     const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() {
         return this->frameBuffers;
@@ -82,26 +79,35 @@ public:
         return this->window;
     }
 
-    void update() {
-        this->window->dispatchEvents();
-
-        for (auto& frameBuffer: this->frameBuffers) {
-            if (frameBuffer->isAutoUpdate()) {
-                frameBuffer->update();
-            }
-        }
-
-        this->window->update();
+    float getFrameTime() const {
+        return this->frameTime;
     }
+
+    void exit(int result) {
+        this->result = result;
+        this->running = false;
+    }
+
+    int exec();
+
+protected:
+    virtual void onMouseMotion(int x, int y) {}
+    virtual void onMouseButton(int button, bool state) {}
+    virtual void onKeyboardButton(int button, bool state) {}
+    virtual void onQuit() { this->exit(0); }
+    virtual void onIdle() {}
 
 private:
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
     std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
-
     std::shared_ptr<Window> window;
+
+    float frameTime;
+    bool running;
+    int result;
 };
 
 }  // namespace Graphene
 
-#endif  // GRAPHENE_H
+#endif  // ENGINE_H
