@@ -80,12 +80,9 @@ const char geometryShader[] = R"(
     layout(location = 3) out vec4 outputNormal;
 
     void main() {
-        if (material.diffuseTexture) {
-            outputDiffuse = vec4(texture(diffuseSampler, fragmentUV).rgb, material.diffuseIntensity);
-        } else {
-            outputDiffuse = vec4(material.diffuseColor, material.diffuseIntensity);
-        }
+        vec3 diffuseColor = material.diffuseTexture ? texture(diffuseSampler, fragmentUV).rgb : material.diffuseColor;
 
+        outputDiffuse = vec4(diffuseColor, material.diffuseIntensity);
         outputSpecular = vec4(material.specularColor, material.specularIntensity);
         outputPosition = vec4(fragmentPosition, material.specularHardness);
         outputNormal = vec4(fragmentNormal, material.ambientIntensity);
@@ -208,7 +205,13 @@ const char lightingShader[] = R"(
         float distance = pow(distance(light.position, position), 2);
         float attenuation = (light.lightType == TYPE_DIRECTED) ? 1.0f : (falloff / (falloff + distance));
 
-        outputColor = vec4(diffuseColor + specularColor, 0.0f) * light.energy * attenuation;
+        float softBorder = cos(radians(light.angle));
+        float hardBorder = cos(radians(90.0f - light.angle * light.blend));
+        float lightAngle = dot(lightDirection, normalize(position - light.position));
+        float borderIntensity = clamp((lightAngle - softBorder) / hardBorder - 1.0f, 0.0f, 1.0f);
+        float lightClip = (light.lightType == TYPE_SPOT) ? borderIntensity : 1.0f;
+
+        outputColor = vec4(diffuseColor + specularColor, 0.0f) * light.energy * attenuation * lightClip;
     }
 
 #endif
