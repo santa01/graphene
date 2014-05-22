@@ -21,6 +21,7 @@
  */
 
 #include <Example.h>
+#include <Light.h>
 #include <Vec3.h>
 
 Example::Example(int width, int height):
@@ -45,8 +46,17 @@ Example::Example(int width, int height):
     this->camera = objectManager->createCamera();
     this->player->attachObject(this->camera);
 
+    auto flashlight = objectManager->createLight();
+    flashlight->setLightType(Graphene::Light::LightType::TYPE_SPOT);
+    flashlight->setDirection(this->camera->getTarget());
+    flashlight->setBlend(0.05f);
+    flashlight->setAngle(20.0f);
+    flashlight->setEnergy(0.5f);
+    flashlight->setFalloff(8.0f);
+    this->player->attachObject(flashlight);
+
     auto light = objectManager->createLight();
-    light->setEnergy(0.5f);
+    light->setEnergy(0.8f);
     node->attachObject(light);
 
     auto entity = objectManager->createEntity("assets/example.entity");
@@ -60,7 +70,7 @@ Example::Example(int width, int height):
     /* Update scene */
 
     this->player->translate(0.0f, 0.0f, -3.0f);
-    light->translate(0.0f, 2.0f, 0.0f);
+    light->translate(0.0f, 20.0f, 0.0f);
 
     /* Keep mouse inside the window */
 
