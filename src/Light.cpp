@@ -32,6 +32,11 @@ Light::Light():
     this->objectType = ObjectType::TYPE_LIGHT;
     this->lightType = TYPE_POINT;
 
+    this->energy = 1.0f;
+    this->falloff = 25.0f;
+    this->angle = 45.0f;
+    this->blend = 0.15f;
+
     LightBuffer light = {
         { 0.0f, 0.0f, 0.0f }, this->energy,
         { 0.0f, 0.0f, 0.0f }, this->falloff,

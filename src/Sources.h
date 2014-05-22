@@ -88,7 +88,7 @@ const char geometryShader[] = R"(
 
         outputSpecular = vec4(material.specularColor, material.specularIntensity);
         outputPosition = vec4(fragmentPosition, material.specularHardness);
-        outputNormal = vec4(fragmentNormal, 0.0f);
+        outputNormal = vec4(fragmentNormal, material.ambientIntensity);
     }
 
 #endif
@@ -115,15 +115,22 @@ const char ambientShader[] = R"(
 
     uniform vec3 ambientColor;
     uniform float ambientEnergy;
+
     uniform sampler2D diffuseSampler;
+    uniform sampler2D normalSampler;
 
     smooth in vec2 fragmentUV;
 
     layout(location = 0) out vec4 outputColor;
 
     void main() {
-        vec4 diffuseColor = vec4(texture(diffuseSampler, fragmentUV).rgb, 0.0f);
-        outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy;
+        vec4 diffuseSample = texture(diffuseSampler, fragmentUV);
+        vec4 normalSample = texture(normalSampler, fragmentUV);
+
+        vec4 diffuseColor = vec4(diffuseSample.rgb, 0.0f);
+        float ambientIntensity = normalSample.a;
+
+        outputColor = diffuseColor * vec4(ambientColor, 0.0f) * ambientEnergy * ambientIntensity;
     }
 
 #endif
@@ -158,10 +165,12 @@ const char lightingShader[] = R"(
         vec3 position;
         float falloff;
         vec3 direction;
-        float innerAngle;
-        float outerAngle;
+        float angle;
+        float blend;
         int lightType;
     } light;
+
+    uniform vec3 cameraPosition;
 
     uniform sampler2D diffuseSampler;
     uniform sampler2D specularSampler;
@@ -179,17 +188,27 @@ const char lightingShader[] = R"(
         vec4 positionSample = texture(positionSampler, fragmentUV);
         vec4 normalSample = texture(normalSampler, fragmentUV);
 
-        vec3 normal = normalize(normalSample.xyz);
         vec3 position = positionSample.xyz;
+        vec3 normal = normalize(normalSample.xyz);
 
         vec3 lightDirection = (light.lightType == TYPE_POINT) ? position - light.position : light.direction;
         lightDirection = normalize(lightDirection);
 
         float luminance = dot(normal, -lightDirection);
-        vec3 diffuseColor = light.color * (luminance > 0.0f ? luminance : 0.0f);
+        float diffuseIntensity = diffuseSample.a;
+        vec3 diffuseColor = light.color * (luminance > 0.0f ? luminance : 0.0f) * diffuseIntensity;
 
-        float diffuseIntensity = diffuseSample.w;
-        outputColor = texture(diffuseSampler, fragmentUV) + vec4(diffuseColor * diffuseIntensity, 0.0f);
+        vec3 cameraDirection = normalize(position - cameraPosition);
+        vec3 reflection = normalize(reflect(lightDirection, normal));
+        float specularHardness = positionSample.a;
+        float specularIntensity = specularSample.a * pow(dot(-cameraDirection, reflection), specularHardness);
+        vec3 specularColor = specularSample.rgb * (specularIntensity > 0.0f ? specularIntensity : 0.0f);
+
+        float falloff = pow(light.falloff, 2);
+        float distance = pow(distance(light.position, position), 2);
+        float attenuation = (light.lightType == TYPE_DIRECTED) ? 1.0f : (falloff / (falloff + distance));
+
+        outputColor = vec4(diffuseColor + specularColor, 0.0f) * light.energy * attenuation;
     }
 
 #endif

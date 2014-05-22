@@ -89,6 +89,7 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     RenderStack::pop();  // Geometry textures
     this->ambientShader->enable();
     this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->ambientShader->setUniform("normalSampler", TEXTURE_NORMAL);
     this->ambientShader->setUniform("ambientColor", this->ambientColor);
     this->ambientShader->setUniform("ambientEnergy", this->ambientEnergy);
 
@@ -96,19 +97,19 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     this->frame->render();
 
     if (this->shadowPass) {
-        renderShadows();
+        renderShadows(camera);
     }
 
     if (this->lightPass) {
-        renderLights();
+        renderLights(camera);
     }
 }
 
-void SceneManager::renderShadows() {
+void SceneManager::renderShadows(const std::shared_ptr<Camera> camera) {
     // TODO
 }
 
-void SceneManager::renderLights() {
+void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->lightingShader->enable();
     this->lightingShader->setUniformBlock("Light", BIND_LIGHT);
 
@@ -117,6 +118,7 @@ void SceneManager::renderLights() {
     this->lightingShader->setUniform("positionSampler", TEXTURE_POSITION);
     this->lightingShader->setUniform("normalSampler", TEXTURE_NORMAL);
     this->lightingShader->setUniform("depthSampler", TEXTURE_DEPTH);
+    this->lightingShader->setUniform("cameraPosition", camera->getPosition());
 
     traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
         if (object->getObjectType() == Object::ObjectType::TYPE_LIGHT) {

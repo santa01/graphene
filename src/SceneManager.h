@@ -163,8 +163,8 @@ private:
         TEXTURE_DEPTH
     };
 
-    void renderShadows();
-    void renderLights();
+    void renderShadows(const std::shared_ptr<Camera> camera);
+    void renderLights(const std::shared_ptr<Camera> camera);
 
     std::shared_ptr<SceneNode> rootNode;
     std::shared_ptr<Mesh> frame;
