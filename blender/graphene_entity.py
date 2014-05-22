@@ -31,11 +31,20 @@ bl_info = {
 }
 
 import struct
+from collections import namedtuple
 import bmesh
 import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty, EnumProperty
 from bpy_extras.io_utils import ExportHelper, axis_conversion
+
+Material = namedtuple("Material", """
+    ambient
+    diffuse_intensity
+    diffuse_color
+    specular_intensity
+    specular_hardness
+    specular_color""")
 
 
 def triangulate(mesh):
@@ -68,8 +77,9 @@ def write_entity(context, filepath, global_matrix):
             except RuntimeError:
                 pass
             else:
-                triangulate(mesh)
                 mesh.transform(global_matrix * matrix)
+                triangulate(mesh)
+                mesh.calc_normals_split()
                 meshes.append(mesh)
 
         if obj.dupli_type != 'NONE':
@@ -107,13 +117,18 @@ def write_entity(context, filepath, global_matrix):
                     uv = uv_loops[face_index].uv
                     uvs[face_index] = (uv[0], 1.0 - uv[1])
 
-            f.write(struct.pack("<2f", materials[0].ambient, materials[0].diffuse_intensity))
-            f.write(struct.pack("<3f", *materials[0].diffuse_color[:]))
-            f.write(struct.pack("<1f1i", materials[0].specular_intensity, materials[0].specular_hardness))
-            f.write(struct.pack("<3f", *materials[0].specular_color[:]))
+            try:
+                material = materials[0]
+            except IndexError:  # Create default material
+                material = Material(1.0, 0.8, (0.8, 0.8, 0.8), 0.5, 50, (1.0, 1.0, 1.0))
+
+            f.write(struct.pack("<2f", material.ambient, material.diffuse_intensity))
+            f.write(struct.pack("<3f", *material.diffuse_color[:]))
+            f.write(struct.pack("<1f1i", material.specular_intensity, material.specular_hardness))
+            f.write(struct.pack("<3f", *material.specular_color[:]))
 
             try:
-                diffuse_texture = materials[0].active_texture.image.filepath[2:257]
+                diffuse_texture = material.active_texture.image.filepath[2:257]
             except AttributeError:
                 diffuse_texture = ''
 
