@@ -46,6 +46,7 @@ Example::Example(int width, int height):
     this->player->attachObject(this->camera);
 
     auto light = objectManager->createLight();
+    light->setEnergy(0.5f);
     node->attachObject(light);
 
     auto entity = objectManager->createEntity("assets/example.entity");

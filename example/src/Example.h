@@ -34,7 +34,7 @@
 #define KEY_A   4
 #define KEY_D   7
 
-#define MOVE_SPEED  2.0f
+#define MOVE_SPEED  8.0f
 #define MOUSE_SPEED 0.1f
 
 class Example: public Graphene::Engine {
