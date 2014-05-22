@@ -41,8 +41,8 @@ typedef struct {
     float position[3];
     float falloff;
     float direction[3];
-    float innerAngle;
-    float outerAngle;
+    float angle;
+    float blend;
     int lightType;
 } LightBuffer;
 
@@ -161,30 +161,26 @@ public:
         updateBuffer(this->lightBuffer, LightBuffer, falloff, &this->falloff);
     }
 
-    float getInnerAngle() const {
-        return this->innerAngle;
+    float getAngle() const {
+        return this->angle;
     }
 
-    void setInnerAngle(float angle) {
-        if (angle < 0.0f || angle > this->outerAngle) {
-            throw std::invalid_argument("Angle is not in [0.0; outerAngle] range");
+    void setAngle(float angle) {
+        this->angle = angle;
+        updateBuffer(this->lightBuffer, LightBuffer, angle, &this->angle);
+    }
+
+    float getBlend() const {
+        return this->blend;
+    }
+
+    void setBlend(float blend) {
+        if (blend < 0.0f || blend > 1.0f) {
+            throw std::invalid_argument("Blend is not in [0.0; 1.0] range");
         }
 
-        this->innerAngle = angle;
-        updateBuffer(this->lightBuffer, LightBuffer, innerAngle, &this->innerAngle);
-    }
-
-    float getOuterAngle() const {
-        return this->outerAngle;
-    }
-
-    void setOuterAngle(float angle) {
-        if (angle < 0.0f || angle >= 180.0f) {
-            throw std::invalid_argument("Angle is not in [0.0; 180.0) range");
-        }
-
-        this->outerAngle = angle;
-        updateBuffer(this->lightBuffer, LightBuffer, outerAngle, &this->outerAngle);
+        this->blend = blend;
+        updateBuffer(this->lightBuffer, LightBuffer, blend, &this->blend);
     }
 
     std::shared_ptr<UniformBuffer> getLightBuffer() {
@@ -201,8 +197,8 @@ private:
 
     float energy;
     float falloff;
-    float innerAngle;      // TYPE_SPOT
-    float outerAngle;      // TYPE_SPOT
+    float angle;  // TYPE_SPOT
+    float blend;  // TYPE_SPOT
 
     Math::Vec3 rotationAngles;
 };

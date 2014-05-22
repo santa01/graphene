@@ -35,8 +35,8 @@ Light::Light():
     LightBuffer light = {
         { 0.0f, 0.0f, 0.0f }, this->energy,
         { 0.0f, 0.0f, 0.0f }, this->falloff,
-        { 0.0f, 0.0f, 0.0f }, this->innerAngle,
-        this->outerAngle, this->lightType
+        { 0.0f, 0.0f, 0.0f }, this->angle,
+        this->blend, this->lightType
     };
     std::copy(this->color.data(), this->color.data() + 3, light.color);
     std::copy(this->position.data(), this->position.data() + 3, light.position);
