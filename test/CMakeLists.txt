@@ -61,22 +61,22 @@ include_directories ("src" ${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS} ${CP
 set (TEST_LINK_LIBRARIES ${MATH_LIBRARIES} ${CPPUNIT_LIBRARIES})
 set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)
 
-set (TEST_CAMERA_EXECUTABLE "TestCamera")
+set (TEST_CAMERA_EXECUTABLE "test-camera")
 add_test (${TEST_CAMERA_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_CAMERA_EXECUTABLE})
 add_executable (${TEST_CAMERA_EXECUTABLE} "src/TestCamera.cpp" "../src/Camera.cpp")
 target_link_libraries (${TEST_CAMERA_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
-set (TEST_ENTITY_EXECUTABLE "TestEntity")
+set (TEST_ENTITY_EXECUTABLE "test-entity")
 add_test (${TEST_ENTITY_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_ENTITY_EXECUTABLE})
 add_executable (${TEST_ENTITY_EXECUTABLE} "src/TestEntity.cpp" "../src/Entity.cpp")
 target_link_libraries (${TEST_ENTITY_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
-set (TEST_LIGHT_EXECUTABLE "TestLight")
+set (TEST_LIGHT_EXECUTABLE "test-light")
 add_test (${TEST_LIGHT_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_LIGHT_EXECUTABLE})
 add_executable (${TEST_LIGHT_EXECUTABLE} "src/TestLight.cpp" "../src/Light.cpp")
 target_link_libraries (${TEST_LIGHT_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
-set (TEST_SCENE_NODE_EXECUTABLE "TestSceneNode")
+set (TEST_SCENE_NODE_EXECUTABLE "test-scenenode")
 add_test (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_SCENE_NODE_EXECUTABLE})
 add_executable (${TEST_SCENE_NODE_EXECUTABLE} "src/TestSceneNode.cpp"
                 "../src/SceneNode.cpp" "../src/Entity.cpp" "../src/Light.cpp")
