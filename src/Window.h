@@ -80,6 +80,10 @@ public:
         return std::make_pair(x, y);
     }
 
+    bool isMouseCaptured() const {
+        return SDL_GetRelativeMouseMode();
+    }
+
     void captureMouse(bool capture) {
         SDL_WarpMouseInWindow(this->window, this->width / 2, this->height / 2);
         SDL_SetRelativeMouseMode(capture ? SDL_TRUE : SDL_FALSE);
