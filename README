@@ -8,6 +8,7 @@ Available build options:
  * GRAPHENE_EXAMPLE       - Build example application (default OFF)
  * GRAPHENE_DOCUMENTATION - Build doxygen documentation (default OFF)
  * GRAPHENE_TEST          - Build library unit tests (default OFF)
+ * GRAPHENE_DEBUG         - Enable OpenGL debug if supported (default OFF)
 
 If you are interested in the library, you can contact me via santa.ssh@gmail.com
 
