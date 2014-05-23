@@ -23,6 +23,7 @@
 #include <Example.h>
 #include <Light.h>
 #include <Vec3.h>
+#include <iostream>
 
 Example::Example(int width, int height):
         Graphene::Engine(width, height) {
@@ -120,5 +121,17 @@ void Example::onIdle() {
 
     if (keyStates[KEY_A]) {
         this->player->move(-right);
+    }
+
+    static float renderTime = 0;
+    static int iterations = 0;
+
+    renderTime += this->getFrameTime();
+    iterations++;
+
+    if (renderTime >= 1.0f) {
+        std::cout << "fps: " << iterations / renderTime << std::endl;
+        renderTime = 0.0f;
+        iterations = 0;
     }
 }
