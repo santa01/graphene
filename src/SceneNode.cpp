@@ -34,16 +34,22 @@ void SceneNode::rotate(const Math::Vec3& vector, float angle) {
 
     Math::Vec3 axis(vector);
     Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
-    float xAngle, yAngle, zAngle;
+    q.normalize();
 
-    q.normalize().extractEulerAngles(xAngle, yAngle, zAngle);
+    float xAngle, yAngle, zAngle;
+    q.extractEulerAngles(xAngle, yAngle, zAngle);
     this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
 
+    Math::Vec3 position = this->getPosition();
+    Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
+
     for (auto& node: this->nodes) {
+        node->translate(position + rotationMatrix * (node->getPosition() - position));
         node->rotate(vector, angle);
     }
 
     for (auto& object: this->objects) {
+        object->translate(position + rotationMatrix * (object->getPosition() - position));
         object->rotate(vector, angle);
     }
 }
@@ -57,16 +63,17 @@ void SceneNode::scale(const Math::Vec3& factors) {
     scalingMatrix.set(0, 0, factors.get(Math::Vec3::X));
     scalingMatrix.set(1, 1, factors.get(Math::Vec3::Y));
     scalingMatrix.set(2, 2, factors.get(Math::Vec3::Z));
-
     this->scalingFactors = scalingMatrix * this->scalingFactors;
 
+    Math::Vec3 position = this->getPosition();
+
     for (auto& node: this->nodes) {
-        node->translate(scalingMatrix * node->getPosition());
+        node->translate(position + scalingMatrix * (node->getPosition() - position));
         node->scale(factors);
     }
 
     for (auto& entity: this->entities) {
-        entity->translate(scalingMatrix * entity->getPosition());
+        entity->translate(position + scalingMatrix * (entity->getPosition() - position));
         entity->scale(factors);
     }
 }

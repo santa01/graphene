@@ -53,6 +53,7 @@ Example::Example(int width, int height):
     flashlight->setAngle(20.0f);
     flashlight->setEnergy(0.5f);
     flashlight->setFalloff(8.0f);
+    flashlight->move((this->camera->getRight() - this->camera->getUp()) * 0.2f);
     this->player->attachObject(flashlight);
 
     auto light = objectManager->createLight();
