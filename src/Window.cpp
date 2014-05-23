@@ -101,6 +101,9 @@ Window::Window(int width, int height):
     }
 
 #ifdef GRAPHENE_DEBUG
+    std::cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+
     if (glewIsSupported("GL_ARB_debug_output")) {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
         glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
