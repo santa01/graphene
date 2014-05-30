@@ -43,12 +43,12 @@ ImageTexture::ImageTexture(const std::string& name) {
     this->height = image->h;
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexStorage2D(GL_TEXTURE_2D, 8, GL_SRGB8_ALPHA8, this->width, this->height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height,
+            (image->format->Rmask > image->format->Bmask) ? GL_BGRA : GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, this->width, this->height,
-            0, (image->format->Rmask > image->format->Bmask) ? GL_BGRA : GL_RGBA,
-            GL_UNSIGNED_BYTE, image->pixels);
-    glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     if (image != source) {

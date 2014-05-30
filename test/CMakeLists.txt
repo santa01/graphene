@@ -53,7 +53,7 @@ add_definitions ("-D'glDrawElements(x,y,z,w)=(void)0'")
 add_definitions ("-D'glBindTexture(x,y)=(void)0'")
 add_definitions ("-D'glTexParameteri(x,y,z)=(void)0'")
 add_definitions ("-D'glGenerateMipmap(x)=(void)0'")
-add_definitions ("-D'glTexImage2D(a,b,c,d,e,x,y,z,w)=(void)0'")
+add_definitions ("-D'glTexStorage2D(a,x,y,z,w)=(void)0'")
 
 get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)

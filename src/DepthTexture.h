@@ -35,8 +35,7 @@ public:
         this->height = height;
 
         glBindTexture(GL_TEXTURE_2D, this->texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, this->width, this->height,
-                0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, this->width, this->height);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 };
