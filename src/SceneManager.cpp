@@ -89,7 +89,6 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     RenderStack::pop();  // Geometry textures
     this->ambientShader->enable();
     this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
-    this->ambientShader->setUniform("normalSampler", TEXTURE_NORMAL);
     this->ambientShader->setUniform("ambientColor", this->ambientColor);
     this->ambientShader->setUniform("ambientEnergy", this->ambientEnergy);
 
@@ -113,7 +112,6 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->lightingShader->enable();
     this->lightingShader->setUniformBlock("Light", BIND_LIGHT);
 
-    this->lightingShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->lightingShader->setUniform("specularSampler", TEXTURE_SPECULAR);
     this->lightingShader->setUniform("positionSampler", TEXTURE_POSITION);
     this->lightingShader->setUniform("normalSampler", TEXTURE_NORMAL);

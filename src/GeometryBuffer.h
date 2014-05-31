@@ -34,10 +34,10 @@ namespace Graphene {
 /*
  * Geometry buffer layout
  *
- * Tex0 (RGBA16F): | diffuse R  | diffuse G  | diffuse B  | diffuse intensity  |
- * Tex1 (RGBA16F): | specular R | specular G | specular B | specular intensity |
- * Tex2 (RGBA16F): | position X | position Y | position Z | specular hardness  |
- * Tex3 (RGBA16F): | normal X   | normal Y   | normal Z   | ambient intensity  |
+ * Tex0 (RGBA16F): | diffuse R  | diffuse G  | diffuse B  | ambient intensity  |
+ * Tex1 (RGBA16F): | specular R | specular G | specular B | diffuse intensity  |
+ * Tex2 (RGBA16F): | position X | position Y | position Z | specular intensity |
+ * Tex3 (RGBA16F): | normal X   | normal Y   | normal Z   | specular hardness  |
  * Tex4 (D16):     | depth      |
  */
 
