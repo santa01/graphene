@@ -81,9 +81,12 @@ GLuint Shader::compile(const std::string& source, GLenum type) {
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
     std::unique_ptr<GLchar[]> infoLog;
-    if (infoLogLength > 0) {  // ATI workaround, successful compilation
+    if (infoLogLength > 1) {
         infoLog.reset(new GLchar[infoLogLength]);
         glGetShaderInfoLog(shader, infoLogLength, nullptr, infoLog.get());
+#ifdef GRAPHENE_DEBUG
+        std::cout << "Shader compiled\n" << infoLog.get() << std::endl;
+#endif
     }
 
     GLint compileStatus;
@@ -96,12 +99,6 @@ GLuint Shader::compile(const std::string& source, GLenum type) {
         errorMessage << "Failed to compile shader\n" << infoLog.get();
         throw std::runtime_error(errorMessage.str());
     }
-
-#ifdef GRAPHENE_DEBUG
-    if (infoLogLength > 0) {
-        std::cout << "Shader compiled\n" << infoLog.get() << std::endl;
-    }
-#endif
 
     return shader;
 }
@@ -120,9 +117,12 @@ GLuint Shader::link(const std::vector<GLuint>& shaders) {
     glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
 
     std::unique_ptr<GLchar[]> infoLog;
-    if (infoLogLength > 0) {  // ATI workaround, successful linking
+    if (infoLogLength > 1) {
         infoLog.reset(new GLchar[infoLogLength]);
         glGetProgramInfoLog(program, infoLogLength, nullptr, infoLog.get());
+#ifdef GRAPHENE_DEBUG
+        std::cout << "Shader linked\n" << infoLog.get() << std::endl;
+#endif
     }
 
     GLint linkStatus;
@@ -135,12 +135,6 @@ GLuint Shader::link(const std::vector<GLuint>& shaders) {
         errorMessage << "Failed to link shader\n" << infoLog.get();
         throw std::runtime_error(errorMessage.str());
     }
-
-#ifdef GRAPHENE_DEBUG
-    if (infoLogLength > 0) {
-        std::cout << "Shader linked\n" << infoLog.get() << std::endl;
-    }
-#endif
 
     return program;
 }
