@@ -91,9 +91,9 @@ public:
     int exec();
 
 protected:
-    virtual void onMouseMotion(int x, int y) {}
-    virtual void onMouseButton(int button, bool state) {}
-    virtual void onKeyboardButton(int button, bool state) {}
+    virtual void onMouseMotion(int /*x*/, int /*y*/) {}
+    virtual void onMouseButton(int /*button*/, bool /*state*/) {}
+    virtual void onKeyboardButton(int /*button*/, bool /*state*/) {}
     virtual void onQuit() { this->exit(0); }
     virtual void onIdle() {}
 

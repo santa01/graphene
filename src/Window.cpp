@@ -51,8 +51,8 @@ std::unordered_map<GLenum, std::string> typeMap = {
     { GL_DEBUG_TYPE_OTHER_ARB,               "Other" }
 };
 
-extern "C" void debugHandler(GLenum source, GLenum type, GLuint id, GLenum severity,
-        GLsizei length, const GLchar* message, GLvoid* userParam) {
+extern "C" void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /*severity*/,
+        GLsizei /*length*/, const GLchar* message, const GLvoid* /*userParam*/) {
     std::cout << typeMap[type] << " [" << sourceMap[source] << "]: "<< message << std::endl;
 }
 #endif

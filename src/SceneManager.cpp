@@ -104,7 +104,7 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     }
 }
 
-void SceneManager::renderShadows(const std::shared_ptr<Camera> camera) {
+void SceneManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
     // TODO
 }
 
