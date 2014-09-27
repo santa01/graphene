@@ -39,7 +39,10 @@ else ()
     message (FATAL_ERROR "GCC 4.7.0 or higher is required!")
 endif ()
 
+find_package (GLEW REQUIRED)
+
 include (FindPkgConfig)
+pkg_search_module (SDL2 REQUIRED sdl2)
 pkg_search_module (MATH REQUIRED math)
 
 file (GLOB_RECURSE EXAMPLE_SOURCES src/*.cpp)
@@ -48,16 +51,19 @@ include_directories (src ${MATH_INCLUDE_DIRS})
 set (EXAMPLE_EXECUTABLE example)
 add_executable (${EXAMPLE_EXECUTABLE} ${EXAMPLE_SOURCES})
 
+target_link_libraries (${EXAMPLE_EXECUTABLE} ${MATH_LIBRARIES})
+target_link_libraries (${EXAMPLE_EXECUTABLE} ${GLEW_LIBRARIES})
+target_link_libraries (${EXAMPLE_EXECUTABLE} ${SDL2_LIBRARIES})
+
 if (DEFINED GRAPHENE_LIBRARY)  # In-source build
     get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
     get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
 
-    include_directories (${GRAPHENE_PROJECT_DIR}/src)
     link_directories (${GRAPHENE_BINARY_DIR})
+    include_directories (${GRAPHENE_PROJECT_DIR}/src)
     target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_SHARED})
 else ()  # Normal build
     pkg_search_module (GRAPHENE REQUIRED graphene)
-
     include_directories (${GRAPHENE_INCLUDE_DIRS})
     target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_LIBRARIES})
 endif ()
