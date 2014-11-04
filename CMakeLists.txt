@@ -68,7 +68,6 @@ set (GRAPHENE_SHARED ${GRAPHENE_LIBRARY}-shared)
 set (GRAPHENE_EXAMPLE OFF CACHE BOOL "Build example")
 set (GRAPHENE_DOCUMENTATION OFF CACHE BOOL "Build documentation")
 set (GRAPHENE_TEST OFF CACHE BOOL "Build unit tests")
-set (GRAPHENE_DEBUG OFF CACHE BOOL "Enable debug and profiling")
 
 if (GRAPHENE_EXAMPLE)
     add_subdirectory (example)
@@ -90,10 +89,6 @@ endif ()
 if (GRAPHENE_TEST)
     enable_testing ()
     add_subdirectory (test)
-endif ()
-
-if (GRAPHENE_DEBUG)
-    add_definitions(-DGRAPHENE_DEBUG)
 endif ()
 
 configure_file (graphene.pc.in graphene.pc @ONLY)

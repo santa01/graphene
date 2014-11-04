@@ -24,15 +24,13 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iterator>
-#ifdef GRAPHENE_DEBUG
 #include <iostream>
 #include <string>
 #include <unordered_map>
-#endif
+#include <cstdlib>
 
 namespace Graphene {
 
-#ifdef GRAPHENE_DEBUG
 std::unordered_map<GLenum, std::string> sourceMap = {
     { GL_DEBUG_SOURCE_API_ARB,             "OpenGL" },
     { GL_DEBUG_SOURCE_SHADER_COMPILER_ARB, "GLSL" },
@@ -55,7 +53,6 @@ extern "C" void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /
         GLsizei /*length*/, const GLchar* message, const GLvoid* /*userParam*/) {
     std::cout << typeMap[type] << " [" << sourceMap[source] << "]: "<< message << std::endl;
 }
-#endif
 
 Window::Window(int width, int height):
         RenderTarget(width, height) {
@@ -70,13 +67,13 @@ Window::Window(int width, int height):
         throw std::runtime_error("Failed to initialize SDL");
     }
 
+    bool debugEnabled = (std::getenv("GRAPHENE_DEBUG") != nullptr);
+
+    int contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG | (debugEnabled ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags);
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#ifdef GRAPHENE_DEBUG
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG | SDL_GL_CONTEXT_DEBUG_FLAG);
-#else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-#endif
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -100,18 +97,18 @@ Window::Window(int width, int height):
         throw std::runtime_error("Failed to initialize GLEW");
     }
 
-#ifdef GRAPHENE_DEBUG
-    std::cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+    if (debugEnabled) {
+        std::cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
+        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    if (glewIsSupported("GL_ARB_debug_output")) {
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-        glDebugMessageCallbackARB(debugHandler, nullptr);
-    } else {
-        std::cout << "GL_ARB_debug_output unavailable, debug disabled" << std::endl;
+        if (glewIsSupported("GL_ARB_debug_output")) {
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+            glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+            glDebugMessageCallbackARB(debugHandler, nullptr);
+        } else {
+            std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
+        }
     }
-#endif
 
     glFrontFace(GL_CW);
     glBlendFunc(GL_ONE, GL_ONE);

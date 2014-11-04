@@ -30,7 +30,6 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
-#include <cstddef>
 
 namespace Graphene {
 

@@ -27,9 +27,6 @@
 #include <fstream>
 #include <vector>
 #include <memory>
-#ifdef GRAPHENE_DEBUG
-#include <iostream>
-#endif
 
 namespace Graphene {
 
@@ -77,27 +74,18 @@ GLuint Shader::compile(const std::string& source, GLenum type) {
     glShaderSource(shader, 1, &sourceStrings, nullptr);
     glCompileShader(shader);
 
-    GLint infoLogLength;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-    std::unique_ptr<GLchar[]> infoLog;
-    if (infoLogLength > 1) {
-        infoLog.reset(new GLchar[infoLogLength]);
-        glGetShaderInfoLog(shader, infoLogLength, nullptr, infoLog.get());
-#ifdef GRAPHENE_DEBUG
-        std::cout << "Shader compiled\n" << infoLog.get() << std::endl;
-#endif
-    }
-
     GLint compileStatus;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
 
     if (compileStatus == GL_FALSE) {
+        GLint infoLogLength;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogLength]);
+        glGetShaderInfoLog(shader, infoLogLength, nullptr, infoLog.get());
         glDeleteShader(shader);
 
-        std::stringstream errorMessage;
-        errorMessage << "Failed to compile shader\n" << infoLog.get();
-        throw std::runtime_error(errorMessage.str());
+        throw std::runtime_error(infoLog.get());
     }
 
     return shader;
@@ -113,27 +101,18 @@ GLuint Shader::link(const std::vector<GLuint>& shaders) {
 
     glLinkProgram(program);
 
-    GLint infoLogLength;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-    std::unique_ptr<GLchar[]> infoLog;
-    if (infoLogLength > 1) {
-        infoLog.reset(new GLchar[infoLogLength]);
-        glGetProgramInfoLog(program, infoLogLength, nullptr, infoLog.get());
-#ifdef GRAPHENE_DEBUG
-        std::cout << "Shader linked\n" << infoLog.get() << std::endl;
-#endif
-    }
-
     GLint linkStatus;
     glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
 
     if (linkStatus == GL_FALSE) {
+        GLint infoLogLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogLength]);
+        glGetProgramInfoLog(program, infoLogLength, nullptr, infoLog.get());
         glDeleteProgram(program);
 
-        std::stringstream errorMessage;
-        errorMessage << "Failed to link shader\n" << infoLog.get();
-        throw std::runtime_error(errorMessage.str());
+        throw std::runtime_error(infoLog.get());
     }
 
     return program;
