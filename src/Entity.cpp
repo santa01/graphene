@@ -36,7 +36,7 @@ void Entity::rotate(const Math::Vec3& vector, float angle) {
     float xAngle, yAngle, zAngle;
     q.extractEulerAngles(xAngle, yAngle, zAngle);
 
-    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
     this->rotation = this->rotation * q.extractMat4();
 }
 

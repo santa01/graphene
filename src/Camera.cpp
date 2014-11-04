@@ -49,7 +49,7 @@ void Camera::rotate(const Math::Vec3& vector, float angle) {
 
     float xAngle, yAngle, zAngle;
     q.extractEulerAngles(xAngle, yAngle, zAngle);
-    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
 
     this->updateRotation(right, up, target);
 }
@@ -86,7 +86,7 @@ void Camera::lookAt(const Math::Vec3& vector) {
     float zAngle = asinf(axis.get(Math::Vec3::X) * axis.get(Math::Vec3::Y) * (1 - cosf(angle)) +
                          axis.get(Math::Vec3::Z) * sinf(angle));
 
-    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
     this->updateRotation(right, up, target);
 }
 

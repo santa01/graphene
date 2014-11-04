@@ -38,7 +38,7 @@ void SceneNode::rotate(const Math::Vec3& vector, float angle) {
 
     float xAngle, yAngle, zAngle;
     q.extractEulerAngles(xAngle, yAngle, zAngle);
-    this->rotationAngles += Math::Vec3(xAngle * 180.f / M_PI, yAngle * 180.f / M_PI, zAngle * 180.f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
 
     Math::Vec3 position = this->getPosition();
     Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
