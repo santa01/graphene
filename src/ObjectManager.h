@@ -26,8 +26,10 @@
 #include <Camera.h>
 #include <Light.h>
 #include <Entity.h>
+#include <Mesh.h>
 #include <ImageTexture.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <memory>
 
@@ -83,8 +85,10 @@ private:
         return texture;
     }
 
+    std::unordered_set<std::shared_ptr<Mesh>> createMeshes(const std::string& name);
+
     std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;
-    std::unordered_map<std::string, std::shared_ptr<Entity>> entityCache;
+    std::unordered_map<std::string, std::unordered_set<std::shared_ptr<Mesh>>> meshCache;
 };
 
 }  // namespace Graphene

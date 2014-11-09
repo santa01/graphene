@@ -21,7 +21,6 @@
  */
 
 #include <ObjectManager.h>
-#include <Mesh.h>
 #include <Material.h>
 #include <Vec3.h>
 #include <stdexcept>
@@ -31,27 +30,41 @@
 namespace Graphene {
 
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
-    if (this->entityCache.find(name) != this->entityCache.end()) {
-        return this->entityCache.at(name);
+    std::unordered_set<std::shared_ptr<Mesh>> meshes;
+
+    if (this->meshCache.find(name) != this->meshCache.end()) {
+        meshes = this->meshCache.at(name);
+    } else {
+        meshes = this->createMeshes(name);
+        this->meshCache.insert(std::make_pair(name, meshes));
     }
 
+    auto entity = std::make_shared<Entity>();
+    for (auto& mesh: meshes) {
+        entity->addMesh(mesh);
+    }
+
+    return entity;
+}
+
+std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
         throw std::runtime_error("Failed to open `" + name + "'");
     }
 
     EntityHeader entityHeader;
-    ObjectGeometry objectGeometry;
-    ObjectMaterial objectMaterial;
-
     file.read(reinterpret_cast<char*>(&entityHeader), sizeof(entityHeader));
-    std::string magic(entityHeader.magic, 4);
 
+    std::string magic(entityHeader.magic, 4);
     if (magic != "GPHN") {
         throw std::runtime_error("Invalid magic number");
     }
 
-    auto entity = std::make_shared<Entity>();
+    ObjectGeometry objectGeometry;
+    ObjectMaterial objectMaterial;
+    std::unordered_set<std::shared_ptr<Mesh>> meshes;
+
     for (int i = 0; i < entityHeader.objects; i++) {
         auto material = std::make_shared<Material>();
 
@@ -83,11 +96,10 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
 
         auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.faces, objectGeometry.vertices);
         mesh->setMaterial(material);
-        entity->addMesh(mesh);
+        meshes.insert(mesh);
     }
 
-    this->entityCache.insert(std::make_pair(name, entity));
-    return entity;
+    return meshes;
 }
 
 }  // namespace Graphene
