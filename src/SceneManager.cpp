@@ -52,10 +52,6 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
         throw std::invalid_argument("Camera cannot be nullptr");
     }
 
-    if (RenderStack::depth() < 3) {
-        throw std::runtime_error("RenderStack is not populated");
-    }
-
     RenderStack::pop();  // Geometry buffer
     this->geometryShader->enable();
     this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
