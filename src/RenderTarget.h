@@ -27,7 +27,7 @@
 #include <RenderStack.h>
 #include <Viewport.h>
 #include <GL/glew.h>
-#include <vector>
+#include <unordered_set>
 #include <stdexcept>
 #include <memory>
 
@@ -44,7 +44,7 @@ public:
         this->autoUpdate = true;
 
         auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
-        this->viewports.push_back(viewport);
+        this->viewports.insert(viewport);
     }
 
     virtual ~RenderTarget() {}
@@ -65,7 +65,7 @@ public:
         this->autoUpdate = autoUpdate;
     }
 
-    const std::vector<std::shared_ptr<Viewport>>& getViewports() {
+    const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() {
         return this->viewports;
     }
 
@@ -74,13 +74,26 @@ public:
             throw std::invalid_argument("Viewport cannot be nullptr");
         }
 
-        this->viewports.push_back(viewport);
+        this->viewports.insert(viewport);
+    }
+
+    const std::unordered_set<std::shared_ptr<Viewport>>& getOverlays() {
+        return this->overlays;
+    }
+
+    void addOverlay(const std::shared_ptr<Viewport> overlay) {
+        if (overlay == nullptr) {
+            throw std::invalid_argument("Viewport cannot be nullptr");
+        }
+
+        this->overlays.insert(overlay);
     }
 
     void update();
 
 protected:
-    std::vector<std::shared_ptr<Viewport>> viewports;
+    std::unordered_set<std::shared_ptr<Viewport>> viewports;
+    std::unordered_set<std::shared_ptr<Viewport>> overlays;
 
     GLenum buffer;
     GLuint fbo;

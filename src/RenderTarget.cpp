@@ -29,15 +29,21 @@ void RenderTarget::update() {
     glDrawBuffer(this->buffer);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for (auto& viewport: this->viewports) {
-        RenderStack::push([this]() {
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-            glDrawBuffer(this->buffer);
-            glEnable(GL_BLEND);
-            glDisable(GL_DEPTH_TEST);
-        });
+    auto renderState = [this]() {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+        glDrawBuffer(this->buffer);
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+    };
 
+    for (auto& viewport: this->viewports) {
+        RenderStack::push(renderState);
         viewport->update();
+    }
+
+    for (auto& overlay: this->overlays) {
+        RenderStack::push(renderState);
+        overlay->update();
     }
 }
 
