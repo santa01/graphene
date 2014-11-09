@@ -27,7 +27,7 @@
 #include <RenderStack.h>
 #include <Viewport.h>
 #include <GL/glew.h>
-#include <unordered_set>
+#include <vector>
 #include <stdexcept>
 #include <memory>
 
@@ -44,7 +44,7 @@ public:
         this->autoUpdate = true;
 
         auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
-        this->viewports.insert(viewport);
+        this->viewports.push_back(viewport);
     }
 
     virtual ~RenderTarget() {}
@@ -65,7 +65,7 @@ public:
         this->autoUpdate = autoUpdate;
     }
 
-    const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() {
+    const std::vector<std::shared_ptr<Viewport>>& getViewports() {
         return this->viewports;
     }
 
@@ -74,13 +74,13 @@ public:
             throw std::invalid_argument("Viewport cannot be nullptr");
         }
 
-        this->viewports.insert(viewport);
+        this->viewports.push_back(viewport);
     }
 
     void update();
 
 protected:
-    std::unordered_set<std::shared_ptr<Viewport>> viewports;
+    std::vector<std::shared_ptr<Viewport>> viewports;
 
     GLenum buffer;
     GLuint fbo;
