@@ -59,7 +59,7 @@ include_directories (src ${MATH_INCLUDE_DIRS})
 
 set (GRAPHENE_NAME Graphene)
 set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
-set (GRAPHENE_VERSION 0.1.3)
+set (GRAPHENE_VERSION 0.1.4)
 
 set (GRAPHENE_LIBRARY graphene)
 set (GRAPHENE_STATIC ${GRAPHENE_LIBRARY}-static)
