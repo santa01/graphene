@@ -33,6 +33,9 @@
 #include <utility>
 #include <string>
 
+#define TOKEN_VERSION "{SHADER_VERSION}"
+#define TOKEN_TYPE    "{SHADER_TYPE}"
+
 namespace Graphene {
 
 class Shader: public NonCopyable {
@@ -41,6 +44,7 @@ public:
 
     Shader(const char* source, int sourceLength) {
         this->source = std::string(source, sourceLength);
+        this->version = 330;
         this->buildShader();
     }
 
@@ -103,6 +107,10 @@ public:
         return this->source;
     }
 
+    GLuint getVersion() const {
+        return this->version;
+    }
+
     void enable() {
         if (this->program != Shader::activeProgram) {
             Shader::activeProgram = this->program;
@@ -141,6 +149,7 @@ private:
 
     static GLuint activeProgram;
     GLuint program;
+    GLuint version;
 };
 
 }  // namespace Graphene

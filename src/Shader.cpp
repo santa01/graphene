@@ -47,6 +47,7 @@ Shader::Shader(const std::string& name) {
     file.close();
 
     this->source = std::string(source.get(), sourceLength);
+    this->version = 330;
     this->buildShader();
 }
 
@@ -57,11 +58,15 @@ void Shader::buildShader() {
         { "#define TYPE_FRAGMENT\n", GL_FRAGMENT_SHADER }
     };
 
+    std::stringstream version;
+    version << "#version " << this->version << "\n";
+
     for (auto& shaderType: shaderTypes) {
-        std::stringstream modifiedSource;
-        modifiedSource << shaderType.first;
-        modifiedSource << this->source;
-        shaders.push_back(this->compile(modifiedSource.str(), shaderType.second));
+        std::string modifiedSource(this->source);
+        modifiedSource.replace(modifiedSource.find(TOKEN_VERSION), sizeof(TOKEN_VERSION), version.str());
+        modifiedSource.replace(modifiedSource.find(TOKEN_TYPE), sizeof(TOKEN_TYPE), shaderType.first);
+
+        shaders.push_back(this->compile(modifiedSource, shaderType.second));
     }
 
     this->program = this->link(shaders);

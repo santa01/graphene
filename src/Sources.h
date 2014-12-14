@@ -28,7 +28,8 @@ namespace Graphene {
 namespace Sources {
 
 const char geometryShader[] = R"(
-    #version 330
+    {SHADER_VERSION}
+    {SHADER_TYPE}
 
 #ifdef TYPE_VERTEX
 
@@ -92,7 +93,8 @@ const char geometryShader[] = R"(
 )";
 
 const char ambientShader[] = R"(
-    #version 330
+    {SHADER_VERSION}
+    {SHADER_TYPE}
 
 #ifdef TYPE_VERTEX
 
@@ -133,7 +135,8 @@ const char ambientShader[] = R"(
 )";
 
 const char lightingShader[] = R"(
-    #version 330
+    {SHADER_VERSION}
+    {SHADER_TYPE}
 
 #ifdef TYPE_VERTEX
 
