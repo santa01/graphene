@@ -30,15 +30,15 @@ Engine::Engine(int width, int height):
     this->sceneManagers.insert(std::make_shared<SceneManager>());
     this->objectManagers.insert(std::make_shared<ObjectManager>());
 
-    this->window->onMouseMotion.connect(std::bind(&Engine::onMouseMotion,
-            this, std::placeholders::_1, std::placeholders::_2));
-    this->window->onMouseButton.connect(std::bind(&Engine::onMouseButton,
-            this, std::placeholders::_1, std::placeholders::_2));
-    this->window->onKeyboardButton.connect(std::bind(&Engine::onKeyboardButton,
-            this, std::placeholders::_1, std::placeholders::_2));
+    this->window->onMouseMotion.connect(
+            Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));
+    this->window->onMouseButton.connect(
+            Signals::Slot<int, bool>(&Engine::onMouseButton, this, std::placeholders::_1, std::placeholders::_2));
+    this->window->onKeyboardButton.connect(
+            Signals::Slot<int, bool>(&Engine::onKeyboardButton, this, std::placeholders::_1, std::placeholders::_2));
 
-    this->window->onQuit.connect(std::bind(&Engine::onQuit, this));
-    this->window->onIdle.connect(std::bind(&Engine::onIdle, this));
+    this->window->onQuit.connect(Signals::Slot<>(&Engine::onQuit, this));
+    this->window->onIdle.connect(Signals::Slot<>(&Engine::onIdle, this));
 
     this->frameTime = 0.0f;
     this->running = true;
