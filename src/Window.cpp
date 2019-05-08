@@ -1,35 +1,31 @@
+#include <Window.h>
+#include <OpenGL.h>
 #include <stdexcept>
 
-#include "Window.h"
-#include "OpenGL.h"
+namespace Graphene {
 
-LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
+LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
     }
 
     return DefWindowProc(window, message, wParam, lParam);
 }
 
-Window::Window(int width, int height, HINSTANCE instance) :
-    mWidth(width),
-    mHeight(height),
-    mInstance(instance)
-{
+Window::Window(int width, int height, HINSTANCE instance):
+        width(width),
+        height(height),
+        instance(instance) {
     createConsole();
 }
 
-Window::~Window()
-{
+Window::~Window() {
     destroyConsole();
 }
 
-void Window::createRenderingContext()
-{
+void Window::createRenderingContext() {
     createWindow();
 
     PIXELFORMATDESCRIPTOR pfd = {};
@@ -41,35 +37,29 @@ void Window::createRenderingContext()
     pfd.cDepthBits = 24;
     pfd.cStencilBits = 8;
 
-    int pixelFormat = ChoosePixelFormat(mDeviceContext, &pfd);
-    if (pixelFormat == 0)
-    {
+    int pixelFormat = ChoosePixelFormat(this->deviceContext, &pfd);
+    if (pixelFormat == 0) {
         throw std::runtime_error("ChoosePixelFormat()");
     }
 
-    if (!SetPixelFormat(mDeviceContext, pixelFormat, &pfd))
-    {
+    if (!SetPixelFormat(this->deviceContext, pixelFormat, &pfd)) {
         throw std::runtime_error("SetPixelFormat()");
     }
 
-    mRenderingContext = wglCreateContext(mDeviceContext);
-    if (mRenderingContext == nullptr)
-    {
+    this->renderingContext = wglCreateContext(this->deviceContext);
+    if (this->renderingContext == nullptr) {
         throw std::runtime_error("wglCreateContext()");
     }
 
-    if (!wglMakeCurrent(mDeviceContext, mRenderingContext))
-    {
+    if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
         throw std::runtime_error("wglMakeCurrent()");
     }
 }
 
-void Window::createRenderingContextARB()
-{
+void Window::createRenderingContextARB() {
     createWindow();
 
-    const int pixelAttribList[] =
-    {
+    const int pixelAttribList[] = {
         WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
         WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
         WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
@@ -84,65 +74,54 @@ void Window::createRenderingContextARB()
     UINT numberFormats;
     PIXELFORMATDESCRIPTOR pfd;
 
-    if (!OpenGL::wglChoosePixelFormatARB(mDeviceContext, pixelAttribList, nullptr, 1, &pixelFormat, &numberFormats))
-    {
+    if (!OpenGL::wglChoosePixelFormatARB(this->deviceContext, pixelAttribList, nullptr, 1, &pixelFormat, &numberFormats)) {
         throw std::runtime_error("wglChoosePixelFormatARB()");
     }
 
-    if (!SetPixelFormat(mDeviceContext, pixelFormat, &pfd))
-    {
+    if (!SetPixelFormat(this->deviceContext, pixelFormat, &pfd)) {
         throw std::runtime_error("SetPixelFormat()");
     }
 
-    const int contextAttribList[] =
-    {
+    const int contextAttribList[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
         WGL_CONTEXT_MINOR_VERSION_ARB, 0,
         WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
         0
     };
 
-    mRenderingContext = OpenGL::wglCreateContextAttribsARB(mDeviceContext, nullptr, contextAttribList);
-    if (mRenderingContext == nullptr)
-    {
+    this->renderingContext = OpenGL::wglCreateContextAttribsARB(this->deviceContext, nullptr, contextAttribList);
+    if (this->renderingContext == nullptr) {
         throw std::runtime_error("wglCreateContextAttribsARB()");
     }
 
-    if (!wglMakeCurrent(mDeviceContext, mRenderingContext))
-    {
+    if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
         throw std::runtime_error("wglMakeCurrent()");
     }
 }
 
-void Window::destroyRenderingContext()
-{
-    if (mDeviceContext != nullptr)
-    {
-        wglMakeCurrent(mDeviceContext, nullptr);
+void Window::destroyRenderingContext() {
+    if (this->deviceContext != nullptr) {
+        wglMakeCurrent(this->deviceContext, nullptr);
     }
 
-    if (mRenderingContext != nullptr)
-    {
-        wglDeleteContext(mRenderingContext);
-        mRenderingContext = nullptr;
+    if (this->renderingContext != nullptr) {
+        wglDeleteContext(this->renderingContext);
+        this->renderingContext = nullptr;
     }
 
     destroyWindow();
 }
 
-void Window::show()
-{
-    ShowWindow(mWindow, SW_SHOWDEFAULT);
-    UpdateWindow(mWindow);
+void Window::show() {
+    ShowWindow(this->window, SW_SHOWDEFAULT);
+    UpdateWindow(this->window);
 }
 
-void Window::processEvents(bool oneShot)
-{
+void Window::processEvents(bool oneShot) {
     MSG message;
     bool breakOrbit = false;
 
-    while (!breakOrbit && GetMessage(&message, mWindow, 0, 0) > 0)
-    {
+    while (!breakOrbit && GetMessage(&message, this->window, 0, 0) > 0) {
         TranslateMessage(&message);
         DispatchMessage(&message);
 
@@ -150,8 +129,7 @@ void Window::processEvents(bool oneShot)
     }
 }
 
-void Window::createConsole()
-{
+void Window::createConsole() {
     AllocConsole();
     AttachConsole(GetCurrentProcessId());
 
@@ -160,55 +138,49 @@ void Window::createConsole()
     freopen_s(&stream, "CONOUT$", "w", stderr);
 }
 
-void Window::destroyConsole()
-{
+void Window::destroyConsole() {
     FreeConsole();
 }
 
-void Window::createWindow()
-{
+void Window::createWindow() {
     WNDCLASSEX wcex = {};
     wcex.cbSize = sizeof(wcex);
     wcex.style = CS_OWNDC;
     wcex.lpfnWndProc = windowProc;
-    wcex.hInstance = mInstance;
+    wcex.hInstance = this->instance;
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = HBRUSH(COLOR_WINDOW);
-    wcex.lpszClassName = mWindowClassName;
+    wcex.lpszClassName = this->windowClassName;
 
-    if (!RegisterClassEx(&wcex))
-    {
+    if (!RegisterClassEx(&wcex)) {
         throw std::runtime_error("RegisterClassEx()");
     }
 
-    mWindow = CreateWindow(
-        mWindowClassName, mWindowName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, CW_USEDEFAULT, mWidth, mHeight, nullptr, nullptr, mInstance, nullptr);
-    if (mWindow == nullptr)
-    {
+    this->window = CreateWindow(
+        this->windowClassName, this->windowName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+        CW_USEDEFAULT, CW_USEDEFAULT, this->width, this->height, nullptr, nullptr, this->instance, nullptr);
+    if (this->window == nullptr) {
         throw std::runtime_error("CreateWindow()");
     }
 
-    mDeviceContext = GetDC(mWindow);
-    if (mDeviceContext == nullptr)
-    {
+    this->deviceContext = GetDC(this->window);
+    if (this->deviceContext == nullptr) {
         throw std::runtime_error("GetDC()");
     }
 }
 
-void Window::destroyWindow()
-{
-    if (mWindow != nullptr)
-    {
-        if (mDeviceContext != nullptr)
-        {
-            ReleaseDC(mWindow, mDeviceContext);
-            mDeviceContext = nullptr;
+void Window::destroyWindow() {
+    if (this->window != nullptr) {
+        if (this->deviceContext != nullptr) {
+            ReleaseDC(this->window, this->deviceContext);
+            this->deviceContext = nullptr;
         }
 
-        DestroyWindow(mWindow);
-        mWindow = nullptr;
+        DestroyWindow(this->window);
+        this->window = nullptr;
     }
 
-    UnregisterClass(mWindowClassName, mInstance);
+    UnregisterClass(this->windowClassName, this->instance);
 }
+
+}  // namespace Graphene

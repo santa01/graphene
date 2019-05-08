@@ -1,9 +1,10 @@
 #pragma once
 
-#include "stdafx.h"
+#include <stdafx.h>
 
-class Window
-{
+namespace Graphene {
+
+class Window {
 public:
     Window(int width, int height, HINSTANCE instance);
     ~Window();
@@ -22,14 +23,16 @@ private:
     void createWindow();
     void destroyWindow();
 
-    const LPCWSTR mWindowClassName = L"OpenGL Window Class";
-    const LPCWSTR mWindowName = L"OpenGL Window";
+    const LPCWSTR windowClassName = L"OpenGL Window Class";
+    const LPCWSTR windowName = L"OpenGL Window";
 
-    int mWidth = 0;
-    int mHeight = 0;
+    int width = 0;
+    int height = 0;
 
-    HINSTANCE mInstance = nullptr;
-    HWND mWindow = nullptr;
-    HDC mDeviceContext = nullptr;
-    HGLRC mRenderingContext = nullptr;
+    HINSTANCE instance = nullptr;
+    HWND window = nullptr;
+    HDC deviceContext = nullptr;
+    HGLRC renderingContext = nullptr;
 };
+
+}  // namespace Graphene

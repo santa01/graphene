@@ -1,19 +1,23 @@
-#include "OpenGL.h"
+#include <OpenGL.h>
 
-namespace OpenGL
-{
-    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
-    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
+namespace Graphene {
 
-    PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB = nullptr;
-    PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB = nullptr;
+namespace OpenGL {
 
-    void loadExtensions()
-    {
-        wglChoosePixelFormatARB = reinterpret_cast<PFNWGLCHOOSEPIXELFORMATARBPROC>(wglGetProcAddress("wglChoosePixelFormatARB"));
-        wglCreateContextAttribsARB = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(wglGetProcAddress("wglCreateContextAttribsARB"));
+PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
+PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
 
-        glDebugMessageControlARB = reinterpret_cast<PFNGLDEBUGMESSAGECONTROLARBPROC>(wglGetProcAddress("glDebugMessageControlARB"));
-        glDebugMessageCallbackARB = reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKARBPROC>(wglGetProcAddress("glDebugMessageCallbackARB"));
-    }
+PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB = nullptr;
+PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB = nullptr;
+
+void loadExtensions() {
+    wglChoosePixelFormatARB = reinterpret_cast<PFNWGLCHOOSEPIXELFORMATARBPROC>(wglGetProcAddress("wglChoosePixelFormatARB"));
+    wglCreateContextAttribsARB = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(wglGetProcAddress("wglCreateContextAttribsARB"));
+
+    glDebugMessageControlARB = reinterpret_cast<PFNGLDEBUGMESSAGECONTROLARBPROC>(wglGetProcAddress("glDebugMessageControlARB"));
+    glDebugMessageCallbackARB = reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKARBPROC>(wglGetProcAddress("glDebugMessageCallbackARB"));
 }
+
+}  // namespace OpenGL
+
+}  // namespace Graphene

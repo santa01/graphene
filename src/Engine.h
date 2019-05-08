@@ -1,13 +1,16 @@
 #pragma once
 
-#include "Window.h"
+#include <Window.h>
 
-class Engine
-{
+namespace Graphene {
+
+class Engine {
 public:
     Engine(int width, int height, HINSTANCE instance);
     int run();
 
 private:
-    Window mWindow;
+    Window window;
 };
+
+}  // namespace Graphene

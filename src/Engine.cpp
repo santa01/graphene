@@ -1,9 +1,10 @@
+#include <Engine.h>
+#include <OpenGL.h>
 #include <iostream>
 #include <string>
 #include <unordered_map>
 
-#include "Engine.h"
-#include "OpenGL.h"
+namespace Graphene {
 
 const std::unordered_map<GLenum, std::string> debugSource = {
     { GL_DEBUG_SOURCE_API_ARB,             "OpenGL" },
@@ -24,19 +25,17 @@ const std::unordered_map<GLenum, std::string> debugType = {
 };
 
 extern "C" void debugHandler(
-    GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam)
-{
+        GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
     std::cout << debugType.at(type) << " [" << debugSource.at(source) << "]: " << message << std::endl;
 }
 
-Engine::Engine(int width, int height, HINSTANCE instance) :
-    mWindow(width, height, instance)
-{
-    mWindow.createRenderingContext();
+Engine::Engine(int width, int height, HINSTANCE instance):
+        window(width, height, instance) {
+    this->window.createRenderingContext();
     OpenGL::loadExtensions();
-    mWindow.destroyRenderingContext();
+    this->window.destroyRenderingContext();
 
-    mWindow.createRenderingContextARB();
+    this->window.createRenderingContextARB();
 
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
     OpenGL::glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
@@ -48,13 +47,14 @@ Engine::Engine(int width, int height, HINSTANCE instance) :
         << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
         << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
-    mWindow.show();
+    this->window.show();
 }
 
-int Engine::run()
-{
-    mWindow.processEvents(false);
-    mWindow.destroyRenderingContext();
+int Engine::run() {
+    this->window.processEvents(false);
+    this->window.destroyRenderingContext();
 
     return EXIT_SUCCESS;
 }
+
+}  // namespace Graphene
