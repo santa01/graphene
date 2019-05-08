@@ -35,7 +35,10 @@ Engine::Engine(int width, int height, HINSTANCE instance):
     OpenGL::loadExtensions();
     this->window.destroyRenderingContext();
 
-    this->window.createRenderingContextARB();
+    // Exhaust event queue until WM_QUIT message
+    while (this->window.processEvents()) {}
+
+    this->window.createRenderingContextExt();
 
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
     OpenGL::glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
@@ -50,11 +53,12 @@ Engine::Engine(int width, int height, HINSTANCE instance):
     this->window.show();
 }
 
-int Engine::run() {
-    this->window.processEvents(false);
+Engine::~Engine() {
     this->window.destroyRenderingContext();
+}
 
-    return EXIT_SUCCESS;
+void Engine::run() {
+    while (this->window.processEvents()) {}
 }
 
 }  // namespace Graphene

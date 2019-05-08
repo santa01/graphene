@@ -18,15 +18,20 @@ Window::Window(int width, int height, HINSTANCE instance):
         width(width),
         height(height),
         instance(instance) {
-    createConsole();
+    AllocConsole();
+    AttachConsole(GetCurrentProcessId());
+
+    FILE* stream;
+    freopen_s(&stream, "CONOUT$", "w", stdout);
+    freopen_s(&stream, "CONOUT$", "w", stderr);
 }
 
 Window::~Window() {
-    destroyConsole();
+    FreeConsole();
 }
 
 void Window::createRenderingContext() {
-    createWindow();
+    this->createWindow();
 
     PIXELFORMATDESCRIPTOR pfd = {};
     pfd.nSize = sizeof(pfd);
@@ -56,8 +61,8 @@ void Window::createRenderingContext() {
     }
 }
 
-void Window::createRenderingContextARB() {
-    createWindow();
+void Window::createRenderingContextExt() {
+    this->createWindow();
 
     const int pixelAttribList[] = {
         WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
@@ -72,20 +77,19 @@ void Window::createRenderingContextARB() {
 
     int pixelFormat;
     UINT numberFormats;
-    PIXELFORMATDESCRIPTOR pfd;
-
     if (!OpenGL::wglChoosePixelFormatARB(this->deviceContext, pixelAttribList, nullptr, 1, &pixelFormat, &numberFormats)) {
         throw std::runtime_error("wglChoosePixelFormatARB()");
     }
 
+    PIXELFORMATDESCRIPTOR pfd;
     if (!SetPixelFormat(this->deviceContext, pixelFormat, &pfd)) {
         throw std::runtime_error("SetPixelFormat()");
     }
 
     const int contextAttribList[] = {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | WGL_CONTEXT_DEBUG_BIT_ARB,
         0
     };
 
@@ -109,7 +113,7 @@ void Window::destroyRenderingContext() {
         this->renderingContext = nullptr;
     }
 
-    destroyWindow();
+    this->destroyWindow();
 }
 
 void Window::show() {
@@ -117,29 +121,18 @@ void Window::show() {
     UpdateWindow(this->window);
 }
 
-void Window::processEvents(bool oneShot) {
+bool Window::processEvents() {
     MSG message;
-    bool breakOrbit = false;
+    bool keepRunning = true;
 
-    while (!breakOrbit && GetMessage(&message, this->window, 0, 0) > 0) {
+    while (keepRunning && PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&message);
         DispatchMessage(&message);
 
-        breakOrbit = oneShot;
+        keepRunning = (message.message != WM_QUIT);
     }
-}
 
-void Window::createConsole() {
-    AllocConsole();
-    AttachConsole(GetCurrentProcessId());
-
-    FILE* stream;
-    freopen_s(&stream, "CONOUT$", "w", stdout);
-    freopen_s(&stream, "CONOUT$", "w", stderr);
-}
-
-void Window::destroyConsole() {
-    FreeConsole();
+    return keepRunning;
 }
 
 void Window::createWindow() {

@@ -10,16 +10,13 @@ public:
     ~Window();
 
     void createRenderingContext();
-    void createRenderingContextARB();
+    void createRenderingContextExt();
     void destroyRenderingContext();
 
     void show();
-    void processEvents(bool oneShot);
+    bool processEvents();
 
 private:
-    void createConsole();
-    void destroyConsole();
-
     void createWindow();
     void destroyWindow();
 
