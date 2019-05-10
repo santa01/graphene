@@ -32,17 +32,19 @@ extern "C" void debugHandler(
 Engine::Engine(int width, int height):
         window(width, height) {
     this->window.createRenderingContext();
-    OpenGL::loadExtensions();
+    loadWglExt();
     this->window.destroyRenderingContext();
 
     // Exhaust event queue until WM_QUIT message
     while (this->window.processEvents()) {}
 
     this->window.createRenderingContextExt();
+    loadOpenGL();
+    loadOpenGLExt();
 
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-    OpenGL::glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-    OpenGL::glDebugMessageCallbackARB(debugHandler, nullptr);
+    glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+    glDebugMessageCallbackARB(debugHandler, nullptr);
 
     std::cout
         << "Vendor: " << glGetString(GL_VENDOR) << std::endl

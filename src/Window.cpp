@@ -77,7 +77,7 @@ void Window::createRenderingContextExt() {
 
     int pixelFormat;
     UINT numberFormats;
-    if (!OpenGL::wglChoosePixelFormatARB(this->deviceContext, pixelAttribList, nullptr, 1, &pixelFormat, &numberFormats)) {
+    if (!wglChoosePixelFormatARB(this->deviceContext, pixelAttribList, nullptr, 1, &pixelFormat, &numberFormats)) {
         throw std::runtime_error("wglChoosePixelFormatARB()");
     }
 
@@ -93,7 +93,7 @@ void Window::createRenderingContextExt() {
         0
     };
 
-    this->renderingContext = OpenGL::wglCreateContextAttribsARB(this->deviceContext, nullptr, contextAttribList);
+    this->renderingContext = wglCreateContextAttribsARB(this->deviceContext, nullptr, contextAttribList);
     if (this->renderingContext == nullptr) {
         throw std::runtime_error("wglCreateContextAttribsARB()");
     }
