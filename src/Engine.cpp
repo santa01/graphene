@@ -29,8 +29,8 @@ extern "C" void debugHandler(
     std::cout << debugType.at(type) << " [" << debugSource.at(source) << "]: " << message << std::endl;
 }
 
-Engine::Engine(int width, int height, HINSTANCE instance):
-        window(width, height, instance) {
+Engine::Engine(int width, int height):
+        window(width, height) {
     this->window.createRenderingContext();
     OpenGL::loadExtensions();
     this->window.destroyRenderingContext();

@@ -6,7 +6,7 @@ namespace Graphene {
 
 class Engine {
 public:
-    Engine(int width, int height, HINSTANCE instance);
+    Engine(int width, int height);
     ~Engine();
 
     void run();

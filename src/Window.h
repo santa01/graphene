@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdafx.h>
+#include <windows.h>
 
 namespace Graphene {
 
 class Window {
 public:
-    Window(int width, int height, HINSTANCE instance);
+    Window(int width, int height);
     ~Window();
 
     void createRenderingContext();

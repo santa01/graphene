@@ -14,10 +14,10 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     return DefWindowProc(window, message, wParam, lParam);
 }
 
-Window::Window(int width, int height, HINSTANCE instance):
+Window::Window(int width, int height):
         width(width),
         height(height),
-        instance(instance) {
+        instance(GetModuleHandle(nullptr)) {
     AllocConsole();
     AttachConsole(GetCurrentProcessId());
 
