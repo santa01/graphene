@@ -29,6 +29,7 @@ pkg_search_module (CPPUNIT REQUIRED cppunit)
 get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
 
+include_directories (BEFORE src\mock)  # Allow to override standard headers
 include_directories (src ${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS} ${CPPUNIT_INCLUDE_DIRS})
 set (TEST_LINK_LIBRARIES ${MATH_LIBRARIES} ${CPPUNIT_LIBRARIES})
 set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)

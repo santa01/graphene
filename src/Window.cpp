@@ -21,6 +21,7 @@
  */
 
 #include <Window.h>
+#include <OpenGL.h>
 #include <stdexcept>
 #include <algorithm>
 #include <iterator>
@@ -92,22 +93,19 @@ Window::Window(int width, int height):
         throw std::runtime_error("Failed to initialize SDL_image");
     }
 
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        throw std::runtime_error("Failed to initialize GLEW");
-    }
+    loadOpenGL();
+    loadOpenGLExt();
 
     if (debugEnabled) {
-        std::cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
-        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+        std::cout
+                << "Vendor: " << glGetString(GL_VENDOR) << std::endl
+                << "Renderer: " << glGetString(GL_RENDERER) << std::endl
+                << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
+                << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
-        if (glewIsSupported("GL_ARB_debug_output")) {
-            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-            glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-            glDebugMessageCallbackARB(debugHandler, nullptr);
-        } else {
-            std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
-        }
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+        glDebugMessageCallbackARB(debugHandler, nullptr);
     }
 
     glFrontFace(GL_CW);

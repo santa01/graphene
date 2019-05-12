@@ -24,7 +24,7 @@
 #define DEPTHTEXTURE_H
 
 #include <Texture.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 

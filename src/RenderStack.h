@@ -24,7 +24,7 @@
 #define RENDERSTACK_H
 
 #include <NonCopyable.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 #include <functional>
 #include <stack>
 

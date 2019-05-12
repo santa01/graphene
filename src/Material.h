@@ -25,8 +25,8 @@
 
 #include <ImageTexture.h>
 #include <UniformBuffer.h>
+#include <OpenGL.h>
 #include <Vec3.h>
-#include <GL/glew.h>
 #include <stdexcept>
 #include <memory>
 #include <algorithm>

@@ -40,7 +40,6 @@ else ()
 endif ()
 
 find_package (OpenGL REQUIRED)
-find_package (GLEW REQUIRED)
 
 include (FindPkgConfig)
 pkg_search_module (SDL2 REQUIRED sdl2)
@@ -100,13 +99,11 @@ add_library (${GRAPHENE_SHARED} SHARED $<TARGET_OBJECTS:${GRAPHENE_LIBRARY}>)
 
 target_link_libraries (${GRAPHENE_STATIC} ${MATH_LIBRARIES})
 target_link_libraries (${GRAPHENE_STATIC} ${OPENGL_LIBRARIES})
-target_link_libraries (${GRAPHENE_STATIC} ${GLEW_LIBRARIES})
 target_link_libraries (${GRAPHENE_STATIC} ${SDL2_LIBRARIES})
 target_link_libraries (${GRAPHENE_STATIC} ${SDL2_IMAGE_LIBRARIES})
 
 target_link_libraries (${GRAPHENE_SHARED} ${MATH_LIBRARIES})
 target_link_libraries (${GRAPHENE_SHARED} ${OPENGL_LIBRARIES})
-target_link_libraries (${GRAPHENE_SHARED} ${GLEW_LIBRARIES})
 target_link_libraries (${GRAPHENE_SHARED} ${SDL2_LIBRARIES})
 target_link_libraries (${GRAPHENE_SHARED} ${SDL2_IMAGE_LIBRARIES})
 

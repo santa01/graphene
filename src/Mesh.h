@@ -24,7 +24,7 @@
 #define MESH_H
 
 #include <Material.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 #include <stdexcept>
 #include <memory>
 

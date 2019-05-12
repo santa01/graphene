@@ -24,11 +24,11 @@
 #define SHADER_H
 
 #include <NonCopyable.h>
+#include <OpenGL.h>
 #include <Mat4.h>
 #include <Mat3.h>
 #include <Vec4.h>
 #include <Vec3.h>
-#include <GL/glew.h>
 #include <unordered_map>
 #include <utility>
 #include <string>

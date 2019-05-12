@@ -26,7 +26,7 @@
 #include <NonCopyable.h>
 #include <ImageTexture.h>
 #include <DepthTexture.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 #include <memory>
 
 namespace Graphene {

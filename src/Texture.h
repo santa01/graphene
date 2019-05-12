@@ -24,7 +24,7 @@
 #define TEXTURE_H
 
 #include <NonCopyable.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 

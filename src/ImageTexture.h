@@ -24,7 +24,7 @@
 #define IMAGETEXTURE_H
 
 #include <Texture.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 #include <string>
 
 namespace Graphene {

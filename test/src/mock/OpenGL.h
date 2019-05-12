@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#ifndef GLEW_H
-#define GLEW_H
+#ifndef OPENGL_H
+#define OPENGL_H
 
 #define GLuint                      unsigned int
 
@@ -62,4 +62,4 @@ void mock(T arg) { (void)arg; }
 template <typename T, typename... Args>
 void mock(T arg, Args... args) { mock(arg); mock(args...); }
 
-#endif  // GLEW_H
+#endif  // OPENGL_H

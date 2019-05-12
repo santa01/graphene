@@ -25,7 +25,7 @@
 
 #include <RenderTarget.h>
 #include <ImageTexture.h>
-#include <GL/glew.h>
+#include <OpenGL.h>
 #include <memory>
 
 namespace Graphene {

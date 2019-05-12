@@ -23,8 +23,8 @@
 #ifndef UNIFORMBUFFER_H
 #define UNIFORMBUFFER_H
 
+#include <OpenGL.h>
 #include <cstddef>
-#include <GL/glew.h>
 
 namespace Graphene {
 
