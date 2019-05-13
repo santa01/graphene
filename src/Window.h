@@ -1,6 +1,8 @@
 #pragma once
 
 #include <windows.h>
+#include <vector>
+#include <utility>
 
 namespace Graphene {
 
@@ -9,22 +11,32 @@ public:
     Window(int width, int height);
     ~Window();
 
-    void createRenderingContext();
-    void createRenderingContextExt();
-    void destroyRenderingContext();
+    int getWidth() const;
+    int getHeight() const;
 
-    void show();
-    bool processEvents();
+    void createContext();
+    void destroyContext();
+
+    std::vector<bool> getKeyboardState() const;
+    std::vector<bool> getMouseState() const;
+    std::pair<int, int> getMousePosition() const;
+
+    bool isMouseCaptured() const;
+    void captureMouse(bool capture);
+
+    void update();
+    bool dispatchEvents();
 
 private:
-    void createWindow();
-    void destroyWindow();
+    HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
+    void destroyWindow(HWND window);
 
-    const LPCWSTR windowClassName = L"OpenGL Window Class";
-    const LPCWSTR windowName = L"OpenGL Window";
+    void createBaseContext(HWND window);
+    void createExtContext(HWND window);
 
     int width = 0;
     int height = 0;
+    bool mouseCaptured = false;
 
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
