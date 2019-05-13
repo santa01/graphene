@@ -32,15 +32,15 @@ extern "C" void debugHandler(
 Engine::Engine(int width, int height):
         window(width, height) {
     this->window.createRenderingContext();
-    loadWglExt();
+    OpenGL::loadWglExt();
     this->window.destroyRenderingContext();
 
     // Exhaust event queue until WM_QUIT message
     while (this->window.processEvents()) {}
 
     this->window.createRenderingContextExt();
-    loadOpenGL();
-    loadOpenGLExt();
+    OpenGL::loadCore();
+    OpenGL::loadExt();
 
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
     glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);

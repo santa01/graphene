@@ -65,6 +65,8 @@ PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 
+namespace OpenGL {
+
 PROC glGetProcAddress(LPCSTR name) {
     PROC procAddress = wglGetProcAddress(name);
     if (procAddress == nullptr) {
@@ -75,7 +77,7 @@ PROC glGetProcAddress(LPCSTR name) {
     return procAddress;
 }
 
-void loadOpenGL() {
+void loadCore() {
     glActiveTexture = reinterpret_cast<PFNGLACTIVETEXTUREPROC>(glGetProcAddress("glActiveTexture"));
     glAttachShader = reinterpret_cast<PFNGLATTACHSHADERPROC>(glGetProcAddress("glAttachShader"));
     glBindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(glGetProcAddress("glBindBuffer"));
@@ -189,7 +191,7 @@ void loadOpenGL() {
     assert(glViewport != nullptr);
 }
 
-void loadOpenGLExt() {
+void loadExt() {
     glDebugMessageCallbackARB = reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKARBPROC>(glGetProcAddress("glDebugMessageCallbackARB"));
     glDebugMessageControlARB = reinterpret_cast<PFNGLDEBUGMESSAGECONTROLARBPROC>(glGetProcAddress("glDebugMessageControlARB"));
 
@@ -204,5 +206,7 @@ void loadWglExt() {
     assert(wglChoosePixelFormatARB != nullptr);
     assert(wglCreateContextAttribsARB != nullptr);
 }
+
+}  // namespace OpenGL
 
 }  // namespace Graphene

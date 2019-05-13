@@ -70,9 +70,13 @@ extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // ARB_debug_o
 extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;  // WGL_ARB_pixel_format
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;  // WGL_ARB_create_context
 
-void loadOpenGL();
-void loadOpenGLExt();
+namespace OpenGL {
+
+void loadCore();
+void loadExt();
 
 void loadWglExt();
+
+}  // namespace OpenGL
 
 }  // namespace Graphene
