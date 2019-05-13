@@ -88,8 +88,12 @@ extern PFNGLVIEWPORTPROC glViewport;
 extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // ARB_debug_output
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // ARB_debug_output
 
-void loadOpenGL();
-void loadOpenGLExt();
+namespace OpenGL {
+
+void loadCore();
+void loadExt();
+
+}  // namespace OpenGL
 
 }  // namespace Graphene
 

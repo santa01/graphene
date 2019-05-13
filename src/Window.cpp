@@ -93,8 +93,8 @@ Window::Window(int width, int height):
         throw std::runtime_error("Failed to initialize SDL_image");
     }
 
-    loadOpenGL();
-    loadOpenGLExt();
+    OpenGL::loadCore();
+    OpenGL::loadExt();
 
     if (debugEnabled) {
         std::cout

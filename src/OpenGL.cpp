@@ -86,7 +86,9 @@ PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 
 #define glGetProcAddress(name) glXGetProcAddress(reinterpret_cast<const GLubyte*>((name)))
 
-void loadOpenGL() {
+namespace OpenGL {
+
+void loadCore() {
     glActiveTexture = reinterpret_cast<PFNGLACTIVETEXTUREPROC>(glGetProcAddress("glActiveTexture"));
     glAttachShader = reinterpret_cast<PFNGLATTACHSHADERPROC>(glGetProcAddress("glAttachShader"));
     glBindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(glGetProcAddress("glBindBuffer"));
@@ -200,12 +202,14 @@ void loadOpenGL() {
     assert(glViewport != nullptr);
 }
 
-void loadOpenGLExt() {
+void loadExt() {
     glDebugMessageCallbackARB = reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKARBPROC>(glGetProcAddress("glDebugMessageCallbackARB"));
     glDebugMessageControlARB = reinterpret_cast<PFNGLDEBUGMESSAGECONTROLARBPROC>(glGetProcAddress("glDebugMessageControlARB"));
 
     assert(glDebugMessageCallbackARB != nullptr);
     assert(glDebugMessageControlARB != nullptr);
 }
+
+}  // namespace OpenGL
 
 }  // namespace Graphene
