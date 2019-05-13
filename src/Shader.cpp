@@ -25,7 +25,6 @@
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
-#include <vector>
 #include <memory>
 
 namespace Graphene {

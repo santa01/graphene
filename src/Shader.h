@@ -32,6 +32,7 @@
 #include <unordered_map>
 #include <utility>
 #include <string>
+#include <vector>
 
 #define TOKEN_VERSION "{SHADER_VERSION}"
 #define TOKEN_TYPE    "{SHADER_TYPE}"
