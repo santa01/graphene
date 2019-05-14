@@ -34,6 +34,8 @@ private:
     void createBaseContext(HWND window);
     void createExtContext(HWND window);
 
+    std::vector<bool> getVirtualKeysState(int startKey, int endKey) const;
+
     int width = 0;
     int height = 0;
     bool mouseCaptured = false;

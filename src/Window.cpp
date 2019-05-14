@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <algorithm>
 
 namespace Graphene {
 
@@ -138,13 +139,11 @@ void Window::destroyContext() {
 }
 
 std::vector<bool> Window::getKeyboardState() const {
-    std::vector<bool> keyboardState;
-    return keyboardState;
+    return this->getVirtualKeysState(VK_BACK, VK_OEM_CLEAR);
 }
 
 std::vector<bool> Window::getMouseState() const {
-    std::vector<bool> mouseState;
-    return mouseState;
+    return this->getVirtualKeysState(VK_LBUTTON, VK_XBUTTON2);
 }
 
 std::pair<int, int> Window::getMousePosition() const {
@@ -302,6 +301,17 @@ void Window::createExtContext(HWND window) {
     if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
         throw std::runtime_error("wglMakeCurrent()");
     }
+}
+
+std::vector<bool> Window::getVirtualKeysState(int startKey, int endKey) const {
+    std::vector<bool> virtualKeysState(endKey);
+    int virtualKey = startKey;
+
+    std::generate(virtualKeysState.begin(), virtualKeysState.end(), [&virtualKey]() {
+        return GetAsyncKeyState(virtualKey++) & (1 << 15);  // Check MSB
+    });
+
+    return virtualKeysState;
 }
 
 }  // namespace Graphene
