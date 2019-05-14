@@ -32,7 +32,12 @@ extern "C" void debugHandler(
     std::cout << debugType.at(type) << " [" << debugSource.at(source) << "]: " << message << std::endl;
 }
 
+#define SetWindowObject(window, object) SetWindowLongPtr((window), GWLP_USERDATA, reinterpret_cast<LONG_PTR>((object)))
+#define GetWindowObject(window) reinterpret_cast<Window*>(GetWindowLongPtr((window), GWLP_USERDATA))
+
 LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    Window* self = GetWindowObject(window);
+
     switch (message) {
         case WM_DESTROY:
             PostQuitMessage(0);
@@ -41,7 +46,6 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         case WM_MOUSEMOVE: {
             int xPosition = GET_X_LPARAM(lParam);
             int yPosition = GET_Y_LPARAM(lParam);
-            Window* self = reinterpret_cast<Window*>(GetWindowLongPtr(window, GWLP_USERDATA));
 
             if (self->isMouseCaptured()) {
                 POINT windowCenter = { self->getWidth() >> 1, self->getHeight() >> 1 };
@@ -74,7 +78,7 @@ Window::Window(int width, int height):
     this->instance = GetModuleHandle(nullptr);
     this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", WindowProc);
 
-    SetWindowLongPtr(this->window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    SetWindowObject(this->window, this);
     ShowWindow(this->window, SW_SHOWDEFAULT);
     UpdateWindow(this->window);
 }
