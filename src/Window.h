@@ -1,25 +1,31 @@
 #pragma once
 
 #include <windows.h>
-#include <vector>
+#include <array>
 #include <utility>
 
 namespace Graphene {
+
+enum MouseButton { LEFT, MIDDLE, RIGHT, X1, X2 };
+
+constexpr int KeyboardScancodes = 256;
+constexpr int MouseButtons = 5;
+
+using KeyboardState = std::array<bool, KeyboardScancodes>;
+using MouseState = std::array<bool, MouseButtons>;
+using MousePosition = std::pair<int, int>;
 
 class Window {
 public:
     Window(int width, int height);
     ~Window();
 
-    int getWidth() const;
-    int getHeight() const;
-
     void createContext();
     void destroyContext();
 
-    std::vector<bool> getKeyboardState() const;
-    std::vector<bool> getMouseState() const;
-    std::pair<int, int> getMousePosition() const;
+    const KeyboardState& getKeyboardState() const;
+    const MouseState& getMouseState() const;
+    const MousePosition& getMousePosition() const;
 
     bool isMouseCaptured() const;
     void captureMouse(bool capture);
@@ -28,22 +34,31 @@ public:
     bool dispatchEvents();
 
 private:
+    friend LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+
+    void setKeyboardState(int scancode, bool state);
+    void setMouseState(MouseButton button, bool state);
+    void setMousePosition(int x, int y);
+
     HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
     void destroyWindow(HWND window);
 
     void createBaseContext(HWND window);
     void createExtContext(HWND window);
 
-    std::vector<bool> getVirtualKeysState(int startKey, int endKey) const;
-
     int width = 0;
     int height = 0;
-    bool mouseCaptured = false;
 
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
     HDC deviceContext = nullptr;
     HGLRC renderingContext = nullptr;
+
+    bool mouseCaptured = false;
+
+    KeyboardState keyboardState = { };
+    MouseState mouseState = { };
+    MousePosition mousePosition = { };
 };
 
 }  // namespace Graphene

@@ -39,27 +39,57 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     Window* self = GetWindowObject(window);
 
     switch (message) {
-        case WM_DESTROY:
-            PostQuitMessage(0);
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+            // lParam 16-23 bits is the keyboard scancode
+            self->setKeyboardState(HIWORD(lParam) & 0xFF, (message == WM_KEYDOWN));
             return 0;
+
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONUP:
+            self->setMouseState(MouseButton::LEFT, (message == WM_LBUTTONDOWN));
+            return 0;
+
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONUP:
+            self->setMouseState(MouseButton::MIDDLE, (message == WM_MBUTTONDOWN));
+            return 0;
+
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONUP:
+            self->setMouseState(MouseButton::RIGHT, (message == WM_RBUTTONDOWN));
+            return 0;
+
+        case WM_XBUTTONDOWN:
+        case WM_XBUTTONUP: {
+            MouseButton mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? MouseButton::X1 : MouseButton::X2;
+            self->setMouseState(mouseButton, (message == WM_XBUTTONDOWN));
+            return 0;
+        }
 
         case WM_MOUSEMOVE: {
             int xPosition = GET_X_LPARAM(lParam);
             int yPosition = GET_Y_LPARAM(lParam);
 
             if (self->isMouseCaptured()) {
-                POINT windowCenter = { self->getWidth() >> 1, self->getHeight() >> 1 };
+                POINT windowCenter = { self->width >> 1, self->height >> 1 };
                 xPosition -= windowCenter.x;
                 yPosition -= windowCenter.y;
 
                 if (xPosition != 0 || yPosition != 0) {
-                    ClientToScreen(window, &windowCenter);
-                    SetCursorPos(windowCenter.x, windowCenter.y);
+                    self->setMousePosition(windowCenter.x, windowCenter.y);
                 }
+            } else {
+                self->mousePosition.first = xPosition;
+                self->mousePosition.second = yPosition;
             }
 
             return 0;
         }
+
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
     }
 
     return DefWindowProc(window, message, wParam, lParam);
@@ -81,20 +111,14 @@ Window::Window(int width, int height):
     SetWindowObject(this->window, this);
     ShowWindow(this->window, SW_SHOWDEFAULT);
     UpdateWindow(this->window);
+
+    this->setMousePosition(this->width >> 1, this->height >> 1);
 }
 
 Window::~Window() {
     this->destroyWindow(this->window);
 
     FreeConsole();
-}
-
-int Window::getWidth() const {
-    return this->width;
-}
-
-int Window::getHeight() const {
-    return this->height;
 }
 
 void Window::createContext() {
@@ -142,20 +166,16 @@ void Window::destroyContext() {
     }
 }
 
-std::vector<bool> Window::getKeyboardState() const {
-    return this->getVirtualKeysState(VK_BACK, VK_OEM_CLEAR);
+const KeyboardState& Window::getKeyboardState() const {
+    return this->keyboardState;
 }
 
-std::vector<bool> Window::getMouseState() const {
-    return this->getVirtualKeysState(VK_LBUTTON, VK_XBUTTON2);
+const MouseState& Window::getMouseState() const {
+    return this->mouseState;
 }
 
-std::pair<int, int> Window::getMousePosition() const {
-    POINT cursorPosition;
-    GetCursorPos(&cursorPosition);
-    ScreenToClient(this->window, &cursorPosition);
-
-    return std::make_pair(cursorPosition.x, cursorPosition.y);
+const MousePosition& Window::getMousePosition() const {
+    return this->mousePosition;
 }
 
 bool Window::isMouseCaptured() const {
@@ -165,13 +185,12 @@ bool Window::isMouseCaptured() const {
 void Window::captureMouse(bool capture) {
     this->mouseCaptured = capture;
 
-    if (this->isMouseCaptured()) {
-        POINT windowCenter = { this->getWidth() >> 1, this->getHeight() >> 1 };
-        ClientToScreen(this->window, &windowCenter);
-        SetCursorPos(windowCenter.x, windowCenter.y);
+    if (this->mouseCaptured) {
+        POINT windowCenter = { this->width >> 1, this->height >> 1 };
+        this->setMousePosition(windowCenter.x, windowCenter.y);
     }
 
-    ShowCursor(this->isMouseCaptured() ? FALSE : TRUE);
+    ShowCursor(this->mouseCaptured ? FALSE : TRUE);
 }
 
 void Window::update() {
@@ -183,13 +202,28 @@ bool Window::dispatchEvents() {
     bool keepRunning = true;
 
     while (keepRunning && PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&message);
         DispatchMessage(&message);
-
         keepRunning = (message.message != WM_QUIT);
     }
 
     return keepRunning;
+}
+
+void Window::setKeyboardState(int scancode, bool state) {
+    this->keyboardState[scancode] = state;
+}
+
+void Window::setMouseState(MouseButton button, bool state) {
+    this->mouseState[button] = state;
+}
+
+void Window::setMousePosition(int x, int y) {
+    this->mousePosition.first = x;
+    this->mousePosition.second = y;
+
+    POINT position = { x, y };
+    ClientToScreen(this->window, &position);
+    SetCursorPos(position.x, position.y);
 }
 
 HWND Window::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc) {
@@ -208,7 +242,7 @@ HWND Window::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowP
 
     HWND window = CreateWindow(
         className, windowName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, CW_USEDEFAULT, this->getWidth(), this->getHeight(),
+        CW_USEDEFAULT, CW_USEDEFAULT, this->width, this->height,
         nullptr, nullptr, this->instance, nullptr);
     if (window == nullptr) {
         throw std::runtime_error("CreateWindow()");
@@ -305,17 +339,6 @@ void Window::createExtContext(HWND window) {
     if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
         throw std::runtime_error("wglMakeCurrent()");
     }
-}
-
-std::vector<bool> Window::getVirtualKeysState(int startKey, int endKey) const {
-    std::vector<bool> virtualKeysState(endKey);
-    int virtualKey = startKey;
-
-    std::generate(virtualKeysState.begin(), virtualKeysState.end(), [&virtualKey]() {
-        return GetAsyncKeyState(virtualKey++) & (1 << 15);  // Check MSB
-    });
-
-    return virtualKeysState;
 }
 
 }  // namespace Graphene
