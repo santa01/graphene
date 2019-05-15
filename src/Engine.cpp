@@ -34,11 +34,15 @@ Engine::Engine(int width, int height):
     this->window.createContext();
 
     OpenGL::loadCore();
-    OpenGL::loadExt();
+    OpenGL::loadExtensions();
 
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-    glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-    glDebugMessageCallbackARB(debugHandler, nullptr);
+    if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+        glDebugMessageCallbackARB(debugHandler, nullptr);
+    } else {
+        std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
+    }
 
     std::cout
         << "Vendor: " << glGetString(GL_VENDOR) << std::endl

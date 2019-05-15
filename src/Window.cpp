@@ -99,7 +99,7 @@ void Window::createContext() {
     HWND dummyWindow = this->createWindow(L"Dummy Class", L"Dummy Window", DefWindowProc);
     this->createBaseContext(dummyWindow);
 
-    OpenGL::loadWglExt();
+    OpenGL::loadWglExtensions();
 
     this->destroyContext();
     this->destroyWindow(dummyWindow);

@@ -1,5 +1,6 @@
 #include <OpenGL.h>
-#include <cassert>
+#include <stdexcept>
+#include <unordered_set>
 
 namespace Graphene {
 
@@ -36,11 +37,13 @@ PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLGENTEXTURESPROC glGenTextures;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+PFNGLGETINTEGERVPROC glGetIntegerv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETSTRINGPROC glGetString;
+PFNGLGETSTRINGIPROC glGetStringi;
 PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
@@ -67,6 +70,8 @@ PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 
 namespace OpenGL {
 
+std::unordered_set<std::string> availableExtensions;
+
 PROC glGetProcAddress(LPCSTR name) {
     PROC procAddress = wglGetProcAddress(name);
     if (procAddress == nullptr) {
@@ -77,134 +82,102 @@ PROC glGetProcAddress(LPCSTR name) {
     return procAddress;
 }
 
+#define LOAD_PROC_ADDR(proc)                                            \
+do {                                                                    \
+    proc = reinterpret_cast<decltype(proc)>(glGetProcAddress(#proc));   \
+} while (0)
+
+#define LOAD_MANDATORY(proc)                                \
+do {                                                        \
+    LOAD_PROC_ADDR(proc);                                   \
+    if (proc == nullptr) {                                  \
+        throw std::runtime_error(#proc ## " == nullptr");   \
+    }                                                       \
+} while(0)
+
+#define LOAD_OPTIONAL LOAD_PROC_ADDR
+
 void loadCore() {
-    glActiveTexture = reinterpret_cast<PFNGLACTIVETEXTUREPROC>(glGetProcAddress("glActiveTexture"));
-    glAttachShader = reinterpret_cast<PFNGLATTACHSHADERPROC>(glGetProcAddress("glAttachShader"));
-    glBindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(glGetProcAddress("glBindBuffer"));
-    glBindBufferBase = reinterpret_cast<PFNGLBINDBUFFERBASEPROC>(glGetProcAddress("glBindBufferBase"));
-    glBindFramebuffer = reinterpret_cast<PFNGLBINDFRAMEBUFFERPROC>(glGetProcAddress("glBindFramebuffer"));
-    glBindTexture = reinterpret_cast<PFNGLBINDTEXTUREPROC>(glGetProcAddress("glBindTexture"));
-    glBindVertexArray = reinterpret_cast<PFNGLBINDVERTEXARRAYPROC>(glGetProcAddress("glBindVertexArray"));
-    glBlendFunc = reinterpret_cast<PFNGLBLENDFUNCPROC>(glGetProcAddress("glBlendFunc"));
-    glBufferData = reinterpret_cast<PFNGLBUFFERDATAPROC>(glGetProcAddress("glBufferData"));
-    glBufferSubData = reinterpret_cast<PFNGLBUFFERSUBDATAPROC>(glGetProcAddress("glBufferSubData"));
-    glClear = reinterpret_cast<PFNGLCLEARPROC>(glGetProcAddress("glClear"));
-    glCompileShader = reinterpret_cast<PFNGLCOMPILESHADERPROC>(glGetProcAddress("glCompileShader"));
-    glCreateProgram = reinterpret_cast<PFNGLCREATEPROGRAMPROC>(glGetProcAddress("glCreateProgram"));
-    glCreateShader = reinterpret_cast<PFNGLCREATESHADERPROC>(glGetProcAddress("glCreateShader"));
-    glDeleteBuffers = reinterpret_cast<PFNGLDELETEBUFFERSPROC>(glGetProcAddress("glDeleteBuffers"));
-    glDeleteFramebuffers = reinterpret_cast<PFNGLDELETEFRAMEBUFFERSPROC>(glGetProcAddress("glDeleteFramebuffers"));
-    glDeleteProgram = reinterpret_cast<PFNGLDELETEPROGRAMPROC>(glGetProcAddress("glDeleteProgram"));
-    glDeleteShader = reinterpret_cast<PFNGLDELETESHADERPROC>(glGetProcAddress("glDeleteShader"));
-    glDeleteTextures = reinterpret_cast<PFNGLDELETETEXTURESPROC>(glGetProcAddress("glDeleteTextures"));
-    glDeleteVertexArrays = reinterpret_cast<PFNGLDELETEVERTEXARRAYSPROC>(glGetProcAddress("glDeleteVertexArrays"));
-    glDisable = reinterpret_cast<PFNGLDISABLEPROC>(glGetProcAddress("glDisable"));
-    glDrawBuffer = reinterpret_cast<PFNGLDRAWBUFFERPROC>(glGetProcAddress("glDrawBuffer"));
-    glDrawBuffers = reinterpret_cast<PFNGLDRAWBUFFERSPROC>(glGetProcAddress("glDrawBuffers"));
-    glDrawElements = reinterpret_cast<PFNGLDRAWELEMENTSPROC>(glGetProcAddress("glDrawElements"));
-    glEnable = reinterpret_cast<PFNGLENABLEPROC>(glGetProcAddress("glEnable"));
-    glEnableVertexAttribArray = reinterpret_cast<PFNGLENABLEVERTEXATTRIBARRAYPROC>(glGetProcAddress("glEnableVertexAttribArray"));
-    glFramebufferTexture = reinterpret_cast<PFNGLFRAMEBUFFERTEXTUREPROC>(glGetProcAddress("glFramebufferTexture"));
-    glFrontFace = reinterpret_cast<PFNGLFRONTFACEPROC>(glGetProcAddress("glFrontFace"));
-    glGenBuffers = reinterpret_cast<PFNGLGENBUFFERSPROC>(glGetProcAddress("glGenBuffers"));
-    glGenerateMipmap = reinterpret_cast<PFNGLGENERATEMIPMAPPROC>(glGetProcAddress("glGenerateMipmap"));
-    glGenFramebuffers = reinterpret_cast<PFNGLGENFRAMEBUFFERSPROC>(glGetProcAddress("glGenFramebuffers"));
-    glGenTextures = reinterpret_cast<PFNGLGENTEXTURESPROC>(glGetProcAddress("glGenTextures"));
-    glGenVertexArrays = reinterpret_cast<PFNGLGENVERTEXARRAYSPROC>(glGetProcAddress("glGenVertexArrays"));
-    glGetProgramInfoLog = reinterpret_cast<PFNGLGETPROGRAMINFOLOGPROC>(glGetProcAddress("glGetProgramInfoLog"));
-    glGetProgramiv = reinterpret_cast<PFNGLGETPROGRAMIVPROC>(glGetProcAddress("glGetProgramiv"));
-    glGetShaderInfoLog = reinterpret_cast<PFNGLGETSHADERINFOLOGPROC>(glGetProcAddress("glGetShaderInfoLog"));
-    glGetShaderiv = reinterpret_cast<PFNGLGETSHADERIVPROC>(glGetProcAddress("glGetShaderiv"));
-    glGetString = reinterpret_cast<PFNGLGETSTRINGPROC>(glGetProcAddress("glGetString"));
-    glGetUniformBlockIndex = reinterpret_cast<PFNGLGETUNIFORMBLOCKINDEXPROC>(glGetProcAddress("glGetUniformBlockIndex"));
-    glGetUniformLocation = reinterpret_cast<PFNGLGETUNIFORMLOCATIONPROC>(glGetProcAddress("glGetUniformLocation"));
-    glLinkProgram = reinterpret_cast<PFNGLLINKPROGRAMPROC>(glGetProcAddress("glLinkProgram"));
-    glShaderSource = reinterpret_cast<PFNGLSHADERSOURCEPROC>(glGetProcAddress("glShaderSource"));
-    glTexParameteri = reinterpret_cast<PFNGLTEXPARAMETERIPROC>(glGetProcAddress("glTexParameteri"));
-    glTexStorage2D = reinterpret_cast<PFNGLTEXSTORAGE2DPROC>(glGetProcAddress("glTexStorage2D"));
-    glTexSubImage2D = reinterpret_cast<PFNGLTEXSUBIMAGE2DPROC>(glGetProcAddress("glTexSubImage2D"));
-    glUniform1f = reinterpret_cast<PFNGLUNIFORM1FPROC>(glGetProcAddress("glUniform1f"));
-    glUniform1i = reinterpret_cast<PFNGLUNIFORM1IPROC>(glGetProcAddress("glUniform1i"));
-    glUniform3fv = reinterpret_cast<PFNGLUNIFORM3FVPROC>(glGetProcAddress("glUniform3fv"));
-    glUniform4fv = reinterpret_cast<PFNGLUNIFORM4FVPROC>(glGetProcAddress("glUniform4fv"));
-    glUniformBlockBinding = reinterpret_cast<PFNGLUNIFORMBLOCKBINDINGPROC>(glGetProcAddress("glUniformBlockBinding"));
-    glUniformMatrix3fv = reinterpret_cast<PFNGLUNIFORMMATRIX3FVPROC>(glGetProcAddress("glUniformMatrix3fv"));
-    glUniformMatrix4fv = reinterpret_cast<PFNGLUNIFORMMATRIX4FVPROC>(glGetProcAddress("glUniformMatrix4fv"));
-    glUseProgram = reinterpret_cast<PFNGLUSEPROGRAMPROC>(glGetProcAddress("glUseProgram"));
-    glVertexAttribPointer = reinterpret_cast<PFNGLVERTEXATTRIBPOINTERPROC>(glGetProcAddress("glVertexAttribPointer"));
-    glViewport = reinterpret_cast<PFNGLVIEWPORTPROC>(glGetProcAddress("glViewport"));
-
-    assert(glActiveTexture != nullptr);
-    assert(glAttachShader != nullptr);
-    assert(glBindBuffer != nullptr);
-    assert(glBindBufferBase != nullptr);
-    assert(glBindFramebuffer != nullptr);
-    assert(glBindTexture != nullptr);
-    assert(glBindVertexArray != nullptr);
-    assert(glBlendFunc != nullptr);
-    assert(glBufferData != nullptr);
-    assert(glBufferSubData != nullptr);
-    assert(glClear != nullptr);
-    assert(glCompileShader != nullptr);
-    assert(glCreateProgram != nullptr);
-    assert(glCreateShader != nullptr);
-    assert(glDeleteBuffers != nullptr);
-    assert(glDeleteFramebuffers != nullptr);
-    assert(glDeleteProgram != nullptr);
-    assert(glDeleteShader != nullptr);
-    assert(glDeleteTextures != nullptr);
-    assert(glDeleteVertexArrays != nullptr);
-    assert(glDisable != nullptr);
-    assert(glDrawBuffer != nullptr);
-    assert(glDrawBuffers != nullptr);
-    assert(glDrawElements != nullptr);
-    assert(glEnable != nullptr);
-    assert(glEnableVertexAttribArray != nullptr);
-    assert(glFramebufferTexture != nullptr);
-    assert(glFrontFace != nullptr);
-    assert(glGenBuffers != nullptr);
-    assert(glGenerateMipmap != nullptr);
-    assert(glGenFramebuffers != nullptr);
-    assert(glGenTextures != nullptr);
-    assert(glGenVertexArrays != nullptr);
-    assert(glGetProgramInfoLog != nullptr);
-    assert(glGetProgramiv != nullptr);
-    assert(glGetShaderInfoLog != nullptr);
-    assert(glGetShaderiv != nullptr);
-    assert(glGetString != nullptr);
-    assert(glGetUniformBlockIndex != nullptr);
-    assert(glGetUniformLocation != nullptr);
-    assert(glLinkProgram != nullptr);
-    assert(glShaderSource != nullptr);
-    assert(glTexParameteri != nullptr);
-    assert(glTexStorage2D != nullptr);
-    assert(glTexSubImage2D != nullptr);
-    assert(glUniform1f != nullptr);
-    assert(glUniform1i != nullptr);
-    assert(glUniform3fv != nullptr);
-    assert(glUniform4fv != nullptr);
-    assert(glUniformBlockBinding != nullptr);
-    assert(glUniformMatrix3fv != nullptr);
-    assert(glUniformMatrix4fv != nullptr);
-    assert(glUseProgram != nullptr);
-    assert(glVertexAttribPointer != nullptr);
-    assert(glViewport != nullptr);
+    LOAD_MANDATORY(glActiveTexture);
+    LOAD_MANDATORY(glAttachShader);
+    LOAD_MANDATORY(glBindBuffer);
+    LOAD_MANDATORY(glBindBufferBase);
+    LOAD_MANDATORY(glBindFramebuffer);
+    LOAD_MANDATORY(glBindTexture);
+    LOAD_MANDATORY(glBindVertexArray);
+    LOAD_MANDATORY(glBlendFunc);
+    LOAD_MANDATORY(glBufferData);
+    LOAD_MANDATORY(glBufferSubData);
+    LOAD_MANDATORY(glClear);
+    LOAD_MANDATORY(glCompileShader);
+    LOAD_MANDATORY(glCreateProgram);
+    LOAD_MANDATORY(glCreateShader);
+    LOAD_MANDATORY(glDeleteBuffers);
+    LOAD_MANDATORY(glDeleteFramebuffers);
+    LOAD_MANDATORY(glDeleteProgram);
+    LOAD_MANDATORY(glDeleteShader);
+    LOAD_MANDATORY(glDeleteTextures);
+    LOAD_MANDATORY(glDeleteVertexArrays);
+    LOAD_MANDATORY(glDisable);
+    LOAD_MANDATORY(glDrawBuffer);
+    LOAD_MANDATORY(glDrawBuffers);
+    LOAD_MANDATORY(glDrawElements);
+    LOAD_MANDATORY(glEnable);
+    LOAD_MANDATORY(glEnableVertexAttribArray);
+    LOAD_MANDATORY(glFramebufferTexture);
+    LOAD_MANDATORY(glFrontFace);
+    LOAD_MANDATORY(glGenBuffers);
+    LOAD_MANDATORY(glGenerateMipmap);
+    LOAD_MANDATORY(glGenFramebuffers);
+    LOAD_MANDATORY(glGenTextures);
+    LOAD_MANDATORY(glGenVertexArrays);
+    LOAD_MANDATORY(glGetIntegerv);
+    LOAD_MANDATORY(glGetProgramInfoLog);
+    LOAD_MANDATORY(glGetProgramiv);
+    LOAD_MANDATORY(glGetShaderInfoLog);
+    LOAD_MANDATORY(glGetShaderiv);
+    LOAD_MANDATORY(glGetString);
+    LOAD_MANDATORY(glGetStringi);
+    LOAD_MANDATORY(glGetUniformBlockIndex);
+    LOAD_MANDATORY(glGetUniformLocation);
+    LOAD_MANDATORY(glLinkProgram);
+    LOAD_MANDATORY(glShaderSource);
+    LOAD_MANDATORY(glTexParameteri);
+    LOAD_MANDATORY(glTexStorage2D);
+    LOAD_MANDATORY(glTexSubImage2D);
+    LOAD_MANDATORY(glUniform1f);
+    LOAD_MANDATORY(glUniform1i);
+    LOAD_MANDATORY(glUniform3fv);
+    LOAD_MANDATORY(glUniform4fv);
+    LOAD_MANDATORY(glUniformBlockBinding);
+    LOAD_MANDATORY(glUniformMatrix3fv);
+    LOAD_MANDATORY(glUniformMatrix4fv);
+    LOAD_MANDATORY(glUseProgram);
+    LOAD_MANDATORY(glVertexAttribPointer);
+    LOAD_MANDATORY(glViewport);
 }
 
-void loadExt() {
-    glDebugMessageCallbackARB = reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKARBPROC>(glGetProcAddress("glDebugMessageCallbackARB"));
-    glDebugMessageControlARB = reinterpret_cast<PFNGLDEBUGMESSAGECONTROLARBPROC>(glGetProcAddress("glDebugMessageControlARB"));
-
-    assert(glDebugMessageCallbackARB != nullptr);
-    assert(glDebugMessageControlARB != nullptr);
+void loadExtensions() {
+    LOAD_OPTIONAL(glDebugMessageCallbackARB);
+    LOAD_OPTIONAL(glDebugMessageControlARB);
 }
 
-void loadWglExt() {
-    wglChoosePixelFormatARB = reinterpret_cast<PFNWGLCHOOSEPIXELFORMATARBPROC>(glGetProcAddress("wglChoosePixelFormatARB"));
-    wglCreateContextAttribsARB = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(glGetProcAddress("wglCreateContextAttribsARB"));
+bool isExtensionSupported(const std::string& extension) {
+    if (availableExtensions.empty()) {
+        int numExtensions;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
 
-    assert(wglChoosePixelFormatARB != nullptr);
-    assert(wglCreateContextAttribsARB != nullptr);
+        for (int i = 0; i < numExtensions; i++) {
+            availableExtensions.insert(reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i)));
+        }
+    }
+
+    return availableExtensions.find(extension) != availableExtensions.end();
+}
+
+void loadWglExtensions() {
+    LOAD_MANDATORY(wglChoosePixelFormatARB);
+    LOAD_MANDATORY(wglCreateContextAttribsARB);
 }
 
 }  // namespace OpenGL
