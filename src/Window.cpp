@@ -94,7 +94,7 @@ Window::Window(int width, int height):
     }
 
     OpenGL::loadCore();
-    OpenGL::loadExt();
+    OpenGL::loadExtensions();
 
     if (debugEnabled) {
         std::cout
@@ -103,9 +103,13 @@ Window::Window(int width, int height):
                 << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
                 << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-        glDebugMessageCallbackARB(debugHandler, nullptr);
+        if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+            glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+            glDebugMessageCallbackARB(debugHandler, nullptr);
+        } else {
+            std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
+        }
     }
 
     glFrontFace(GL_CW);
