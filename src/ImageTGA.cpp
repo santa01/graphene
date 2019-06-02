@@ -43,13 +43,13 @@ enum class ImageType: uint8_t {
 };
 
 enum class ColumnOrdering: uint8_t {
-    TGA_ROW_LEFT_TO_RIGHT = 0,
-    TGA_ROW_RIGHT_TO_LEFT = 1
+    TGA_COLUMN_LEFT_TO_RIGHT = 0,
+    TGA_COLUMN_RIGHT_TO_LEFT = 1
 };
 
 enum class RowOrdering: uint8_t {
-    TGA_COLUMN_BOTTOM_TO_TOP = 0,
-    TGA_COLUMN_TOP_TO_BOTTOM = 1
+    TGA_ROW_BOTTOM_TO_TOP = 0,
+    TGA_ROW_TOP_TO_BOTTOM = 1
 };
 
 #pragma pack(push, 1)
@@ -120,8 +120,8 @@ ImageTGA::ImageTGA(const std::string& filename):
 
     this->pixels.reset(new char[pixelsSize]);
 
-    bool flipRows = (header.imageSpec.imageDescr.topToBottomOrdering == RowOrdering::TGA_COLUMN_BOTTOM_TO_TOP);
-    bool flipColumns = (header.imageSpec.imageDescr.leftToRightOrdering == ColumnOrdering::TGA_ROW_RIGHT_TO_LEFT);
+    bool flipRows = (header.imageSpec.imageDescr.topToBottomOrdering == RowOrdering::TGA_ROW_BOTTOM_TO_TOP);
+    bool flipColumns = (header.imageSpec.imageDescr.leftToRightOrdering == ColumnOrdering::TGA_COLUMN_RIGHT_TO_LEFT);
 
     std::ifstream::pos_type pixelsOffset = sizeof(header) + header.idLength +
         (header.colorMapSpec.colorMapLength * header.colorMapSpec.colorMapEntrySize);
