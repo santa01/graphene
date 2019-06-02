@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+#if defined(__linux__)
+
 #include <WindowLinux.h>
 #include <stdexcept>
 #include <iostream>
@@ -315,3 +317,5 @@ void WindowLinux::destroyContext() {
 }
 
 }  // namespace Graphene
+
+#endif  // defined(__linux__)

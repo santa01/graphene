@@ -87,9 +87,11 @@ PFNGLVIEWPORTPROC glViewport;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 
+#if defined(__linux__)
 PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
 
 #define glGetProcAddress(name) glXGetProcAddress(reinterpret_cast<const GLubyte*>((name)))
+#endif
 
 #define LOAD_PROC_ADDR(proc)                                            \
 do {                                                                    \
@@ -173,9 +175,11 @@ void loadExtensions() {
     LOAD_OPTIONAL(glDebugMessageCallbackARB);
 }
 
+#if defined(__linux__)
 void loadGlxExtensions() {
     LOAD_MANDATORY(glXCreateContextAttribsARB);
 }
+#endif
 
 std::unordered_set<std::string> availableExtensions;
 

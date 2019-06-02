@@ -23,6 +23,8 @@
 #ifndef WINDOWLINUX_H
 #define WINDOWLINUX_H
 
+#if defined(__linux__)
+
 #include <RenderTarget.h>
 #include <OpenGL.h>
 #include <Signals.h>
@@ -87,5 +89,7 @@ private:
 };
 
 }  // namespace Graphene
+
+#endif  // defined(__linux__)
 
 #endif  // WINDOWLINUX_H
