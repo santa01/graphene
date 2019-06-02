@@ -25,7 +25,7 @@
 
 #include <NonCopyable.h>
 #include <FrameBuffer.h>
-#include <Window.h>
+#include <WindowLinux.h>
 #include <SceneManager.h>
 #include <ObjectManager.h>
 #include <unordered_set>
@@ -75,7 +75,7 @@ public:
         this->objectManagers.insert(objectManager);
     }
 
-    std::shared_ptr<Window> getWindow() {
+    std::shared_ptr<WindowLinux> getWindow() {
         return this->window;
     }
 
@@ -101,7 +101,7 @@ private:
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
     std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
-    std::shared_ptr<Window> window;
+    std::shared_ptr<WindowLinux> window;
 
     float frameTime;
     bool running;

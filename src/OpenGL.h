@@ -26,6 +26,7 @@
 // Override vendor provided gl.h
 #include <GL/gl.h>  // Renamed glcorearb.h
 #include <GL/glx.h>
+#include <GL/glxext.h>
 #include <string>
 
 namespace Graphene {
@@ -91,10 +92,14 @@ extern PFNGLVIEWPORTPROC glViewport;
 extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // ARB_debug_output
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // ARB_debug_output
 
+extern PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;  // GLX_ARB_create_context
+
 namespace OpenGL {
 
 void loadCore();
 void loadExtensions();
+
+void loadGlxExtensions();
 
 bool isExtensionSupported(const std::string& extension);
 

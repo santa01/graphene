@@ -40,7 +40,6 @@ else ()
 endif ()
 
 include (FindPkgConfig)
-pkg_search_module (SDL2 REQUIRED sdl2)
 pkg_search_module (MATH REQUIRED math)
 
 file (GLOB_RECURSE EXAMPLE_SOURCES src/*.cpp)
@@ -50,7 +49,6 @@ set (EXAMPLE_EXECUTABLE example)
 add_executable (${EXAMPLE_EXECUTABLE} ${EXAMPLE_SOURCES})
 
 target_link_libraries (${EXAMPLE_EXECUTABLE} ${MATH_LIBRARIES})
-target_link_libraries (${EXAMPLE_EXECUTABLE} ${SDL2_LIBRARIES})
 
 if (DEFINED GRAPHENE_LIBRARY)  # In-source build
     get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)

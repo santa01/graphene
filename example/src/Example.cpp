@@ -98,7 +98,7 @@ void Example::onMouseMotion(int x, int y) {
 }
 
 void Example::onIdle() {
-    std::vector<bool> keyStates = this->getWindow()->getKeyboardState();
+    Graphene::KeyboardState keyStates = this->getWindow()->getKeyboardState();
 
     if (keyStates[KEY_ESC]) {
         this->exit(0);

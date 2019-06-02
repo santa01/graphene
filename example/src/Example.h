@@ -28,11 +28,11 @@
 #include <Camera.h>
 #include <memory>
 
-#define KEY_ESC 41
-#define KEY_W   26
-#define KEY_S   22
-#define KEY_A   4
-#define KEY_D   7
+#define KEY_ESC 9
+#define KEY_W   25
+#define KEY_S   39
+#define KEY_A   38
+#define KEY_D   40
 
 #define MOVE_SPEED  6.0f
 #define MOUSE_SPEED 0.1f

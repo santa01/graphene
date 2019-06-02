@@ -26,7 +26,7 @@
 namespace Graphene {
 
 Engine::Engine(int width, int height):
-        window(new Window(width, height)) {
+        window(new WindowLinux(width, height)) {
     this->sceneManagers.insert(std::make_shared<SceneManager>());
     this->objectManagers.insert(std::make_shared<ObjectManager>());
 

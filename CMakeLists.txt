@@ -42,7 +42,6 @@ endif ()
 find_package (OpenGL REQUIRED)
 
 include (FindPkgConfig)
-pkg_search_module (SDL2 REQUIRED sdl2)
 pkg_search_module (MATH REQUIRED math)
 
 include (CheckIncludeFileCXX)
@@ -98,11 +97,9 @@ add_library (${GRAPHENE_SHARED} SHARED $<TARGET_OBJECTS:${GRAPHENE_LIBRARY}>)
 
 target_link_libraries (${GRAPHENE_STATIC} ${MATH_LIBRARIES})
 target_link_libraries (${GRAPHENE_STATIC} ${OPENGL_LIBRARIES})
-target_link_libraries (${GRAPHENE_STATIC} ${SDL2_LIBRARIES})
 
 target_link_libraries (${GRAPHENE_SHARED} ${MATH_LIBRARIES})
 target_link_libraries (${GRAPHENE_SHARED} ${OPENGL_LIBRARIES})
-target_link_libraries (${GRAPHENE_SHARED} ${SDL2_LIBRARIES})
 
 # Required to reuse OBJECT for SHARED target, cmake version 2.8.9
 set_property (TARGET ${GRAPHENE_LIBRARY} PROPERTY POSITION_INDEPENDENT_CODE 1)
