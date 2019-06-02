@@ -21,39 +21,36 @@
  */
 
 #include <ImageTexture.h>
-#include <SDL2/SDL_image.h>
+#include <ImageTGA.h>
+#include <OpenGL.h>
 #include <stdexcept>
 
 namespace Graphene {
 
 ImageTexture::ImageTexture(const std::string& name) {
-    SDL_Surface* source = IMG_Load(name.c_str());
-    if (source == nullptr) {
-        throw std::runtime_error("Failed to open `" + name + "'");
-    }
+    ImageTGA image(name);
+    this->width = image.getWidth();
+    this->height = image.getHeights();
 
-    SDL_Surface* image = source;
-    if (source->format->BytesPerPixel != 4) {
-        image = SDL_CreateRGBSurface(0, source->w, source->h, 32,
-                0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-        SDL_BlitSurface(source, nullptr, image, nullptr);
-    }
-
-    this->width = image->w;
-    this->height = image->h;
+    // Little-endian ARGB or RGB format
+    GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
     glTexStorage2D(GL_TEXTURE_2D, 8, GL_SRGB8_ALPHA8, this->width, this->height);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height,
-            (image->format->Rmask > image->format->Bmask) ? GL_BGRA : GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
 
-    if (image != source) {
-        SDL_FreeSurface(image);
-    }
+ImageTexture::ImageTexture(int width, int height) {
+    this->width = width;
+    this->height = height;
+
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16F, this->width, this->height);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 }  // namespace Graphene

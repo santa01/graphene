@@ -24,7 +24,6 @@
 #define IMAGETEXTURE_H
 
 #include <Texture.h>
-#include <OpenGL.h>
 #include <string>
 
 namespace Graphene {
@@ -32,15 +31,7 @@ namespace Graphene {
 class ImageTexture: public Texture {
 public:
     ImageTexture(const std::string& name);
-
-    ImageTexture(int width, int height) {
-        this->width = width;
-        this->height = height;
-
-        glBindTexture(GL_TEXTURE_2D, this->texture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16F, this->width, this->height);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+    ImageTexture(int width, int height);
 };
 
 }  // namespace Graphene
