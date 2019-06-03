@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(_WIN32)
+
 #include <Signals.h>
 #include <windows.h>
 #include <array>
@@ -69,3 +71,5 @@ private:
 };
 
 }  // namespace Graphene
+
+#endif  // defined(_WIN32)

@@ -65,12 +65,9 @@ PFNGLVIEWPORTPROC glViewport;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 
+#if defined(_WIN32)
 PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-
-namespace OpenGL {
-
-std::unordered_set<std::string> availableExtensions;
 
 PROC glGetProcAddress(LPCSTR name) {
     PROC procAddress = wglGetProcAddress(name);
@@ -81,21 +78,24 @@ PROC glGetProcAddress(LPCSTR name) {
     }
     return procAddress;
 }
+#endif
 
 #define LOAD_PROC_ADDR(proc)                                            \
 do {                                                                    \
     proc = reinterpret_cast<decltype(proc)>(glGetProcAddress(#proc));   \
 } while (0)
 
-#define LOAD_MANDATORY(proc)                                \
-do {                                                        \
-    LOAD_PROC_ADDR(proc);                                   \
-    if (proc == nullptr) {                                  \
-        throw std::runtime_error(#proc ## " == nullptr");   \
-    }                                                       \
+#define LOAD_MANDATORY(proc)                            \
+do {                                                    \
+    LOAD_PROC_ADDR(proc);                               \
+    if (proc == nullptr) {                              \
+        throw std::runtime_error(#proc " == nullptr");  \
+    }                                                   \
 } while(0)
 
 #define LOAD_OPTIONAL LOAD_PROC_ADDR
+
+namespace OpenGL {
 
 void loadCore() {
     LOAD_MANDATORY(glActiveTexture);
@@ -158,9 +158,18 @@ void loadCore() {
 }
 
 void loadExtensions() {
-    LOAD_OPTIONAL(glDebugMessageCallbackARB);
     LOAD_OPTIONAL(glDebugMessageControlARB);
+    LOAD_OPTIONAL(glDebugMessageCallbackARB);
 }
+
+#if defined(_WIN32)
+void loadWglExtensions() {
+    LOAD_MANDATORY(wglChoosePixelFormatARB);
+    LOAD_MANDATORY(wglCreateContextAttribsARB);
+}
+#endif
+
+std::unordered_set<std::string> availableExtensions;
 
 bool isExtensionSupported(const std::string& extension) {
     if (availableExtensions.empty()) {
@@ -173,11 +182,6 @@ bool isExtensionSupported(const std::string& extension) {
     }
 
     return availableExtensions.find(extension) != availableExtensions.end();
-}
-
-void loadWglExtensions() {
-    LOAD_MANDATORY(wglChoosePixelFormatARB);
-    LOAD_MANDATORY(wglCreateContextAttribsARB);
 }
 
 }  // namespace OpenGL

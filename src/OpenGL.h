@@ -3,8 +3,10 @@
 #include <GL/glcorearb.h>
 #include <string>
 
+#if defined(_WIN32)
 #include <windows.h>
 #include <GL/wglext.h>
+#endif
 
 namespace Graphene {
 
@@ -66,18 +68,22 @@ extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 extern PFNGLVIEWPORTPROC glViewport;
 
-extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // GL_ARB_debug_output
-extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // GL_ARB_debug_output
+extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // ARB_debug_output
+extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // ARB_debug_output
 
+#if defined(_WIN32)
 extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;  // WGL_ARB_pixel_format
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;  // WGL_ARB_create_context
+#endif
 
 namespace OpenGL {
 
 void loadCore();
 void loadExtensions();
 
+#if defined(_WIN32)
 void loadWglExtensions();
+#endif
 
 bool isExtensionSupported(const std::string& extension);
 

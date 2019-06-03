@@ -1,3 +1,5 @@
+#if defined(_WIN32)
+
 #include <Window.h>
 #include <OpenGL.h>
 #include <windowsx.h>
@@ -374,3 +376,5 @@ void Window::destroyContext() {
 }
 
 }  // namespace Graphene
+
+#endif  // defined(_WIN32)
