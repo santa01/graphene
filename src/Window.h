@@ -20,9 +20,6 @@ public:
     Window(int width, int height);
     ~Window();
 
-    void createContext();
-    void destroyContext();
-
     const KeyboardState& getKeyboardState() const;
     const MouseState& getMouseState() const;
     const MousePosition& getMousePosition() const;
@@ -31,7 +28,7 @@ public:
     void captureMouse(bool capture);
 
     void update();
-    bool dispatchEvents();
+    void dispatchEvents();
 
 private:
     friend LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
@@ -43,8 +40,10 @@ private:
     HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
     void destroyWindow(HWND window);
 
+    void createContext();
     void createBaseContext(HWND window);
     void createExtContext(HWND window);
+    void destroyContext();
 
     int width = 0;
     int height = 0;

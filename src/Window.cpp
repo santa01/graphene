@@ -3,8 +3,34 @@
 #include <windowsx.h>
 #include <stdexcept>
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <unordered_map>
 
 namespace Graphene {
+
+const std::unordered_map<GLenum, std::string> debugSource = {
+    { GL_DEBUG_SOURCE_API_ARB,             "OpenGL" },
+    { GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB,   "Window System" },
+    { GL_DEBUG_SOURCE_SHADER_COMPILER_ARB, "GLSL" },
+    { GL_DEBUG_SOURCE_THIRD_PARTY_ARB,     "3rd Party" },
+    { GL_DEBUG_SOURCE_APPLICATION_ARB,     "Application" },
+    { GL_DEBUG_SOURCE_OTHER_ARB,           "Other" }
+};
+
+const std::unordered_map<GLenum, std::string> debugType = {
+    { GL_DEBUG_TYPE_ERROR_ARB,               "Error" },
+    { GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB, "Deprecated" },
+    { GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB,  "Undefined" },
+    { GL_DEBUG_TYPE_PORTABILITY_ARB,         "Portability" },
+    { GL_DEBUG_TYPE_PERFORMANCE_ARB,         "Performance" },
+    { GL_DEBUG_TYPE_OTHER_ARB,               "Other" }
+};
+
+extern "C" void debugHandler(
+        GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
+    std::cout << debugType.at(type) << " [" << debugSource.at(source) << "]: " << message << std::endl;
+}
 
 #define SetWindowObject(window, object) SetWindowLongPtr((window), GWLP_USERDATA, reinterpret_cast<LONG_PTR>((object)))
 #define GetWindowObject(window) reinterpret_cast<Window*>(GetWindowLongPtr((window), GWLP_USERDATA))
@@ -81,6 +107,7 @@ Window::Window(int width, int height):
 
     this->instance = GetModuleHandle(nullptr);
     this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", WindowProc);
+    this->createContext();
 
     SetWindowObject(this->window, this);
     ShowWindow(this->window, SW_SHOWDEFAULT);
@@ -90,37 +117,10 @@ Window::Window(int width, int height):
 }
 
 Window::~Window() {
+    this->destroyContext();
     this->destroyWindow(this->window);
 
     FreeConsole();
-}
-
-void Window::createContext() {
-    HWND dummyWindow = this->createWindow(L"Dummy Class", L"Dummy Window", DefWindowProc);
-    this->createBaseContext(dummyWindow);
-
-    OpenGL::loadWglExtensions();
-
-    this->destroyContext();
-    this->destroyWindow(dummyWindow);
-
-    this->createExtContext(this->window);
-}
-
-void Window::destroyContext() {
-    if (this->deviceContext != nullptr) {
-        wglMakeCurrent(this->deviceContext, nullptr);
-    }
-
-    if (this->renderingContext != nullptr) {
-        wglDeleteContext(this->renderingContext);
-        this->renderingContext = nullptr;
-    }
-
-    if (this->deviceContext != nullptr) {
-        ReleaseDC(this->window, this->deviceContext);
-        this->deviceContext = nullptr;
-    }
 }
 
 const KeyboardState& Window::getKeyboardState() const {
@@ -154,16 +154,16 @@ void Window::update() {
     SwapBuffers(this->deviceContext);
 }
 
-bool Window::dispatchEvents() {
+void Window::dispatchEvents() {
     MSG message;
-    bool keepRunning = true;
 
-    while (keepRunning && PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
+    while (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
         DispatchMessage(&message);
-        keepRunning = (message.message != WM_QUIT);
-    }
 
-    return keepRunning;
+        if (message.message == WM_QUIT) {
+            break;
+        }
+    }
 }
 
 void Window::setKeyboardState(int scancode, bool state) {
@@ -217,6 +217,40 @@ void Window::destroyWindow(HWND window) {
     }
 
     UnregisterClass(className, this->instance);
+}
+
+void Window::createContext() {
+    HWND dummyWindow = this->createWindow(L"Dummy Class", L"Dummy Window", DefWindowProc);
+    this->createBaseContext(dummyWindow);
+
+    OpenGL::loadWglExtensions();
+
+    this->destroyContext();
+    this->destroyWindow(dummyWindow);
+
+    this->createExtContext(this->window);
+
+    OpenGL::loadCore();
+    OpenGL::loadExtensions();
+
+    if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+        glDebugMessageCallbackARB(debugHandler, nullptr);
+    }
+    else {
+        std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
+    }
+
+    std::cout
+        << "Vendor: " << glGetString(GL_VENDOR) << std::endl
+        << "Renderer: " << glGetString(GL_RENDERER) << std::endl
+        << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
+        << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+
+    glFrontFace(GL_CW);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_CULL_FACE);
 }
 
 void Window::createBaseContext(HWND window) {
@@ -295,6 +329,22 @@ void Window::createExtContext(HWND window) {
 
     if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
         throw std::runtime_error("wglMakeCurrent()");
+    }
+}
+
+void Window::destroyContext() {
+    if (this->deviceContext != nullptr) {
+        wglMakeCurrent(this->deviceContext, nullptr);
+    }
+
+    if (this->renderingContext != nullptr) {
+        wglDeleteContext(this->renderingContext);
+        this->renderingContext = nullptr;
+    }
+
+    if (this->deviceContext != nullptr) {
+        ReleaseDC(this->window, this->deviceContext);
+        this->deviceContext = nullptr;
     }
 }
 
