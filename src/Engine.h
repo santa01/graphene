@@ -7,10 +7,17 @@ namespace Graphene {
 class Engine {
 public:
     Engine(int width, int height);
-    void run();
+
+    void exit(int result);
+    int exec();
 
 private:
+    void onQuit();
+
     Window window;
+
+    bool running = true;
+    int result = 0;
 };
 
 }  // namespace Graphene

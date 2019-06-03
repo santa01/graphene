@@ -40,36 +40,51 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 
     switch (message) {
         case WM_KEYDOWN:
-        case WM_KEYUP:
-            // lParam 16-23 bits is the keyboard scancode
-            self->setKeyboardState(HIWORD(lParam) & 0xFF, (message == WM_KEYDOWN));
+        case WM_KEYUP: {
+            int scancode = HIWORD(lParam) & 0xFF;  // lParam 16-23 bits is the keyboard scancode
+            bool keyState = (message == WM_KEYDOWN);
+            self->setKeyboardState(scancode, keyState);
+            self->onKeyboardButton(scancode, keyState);
             return 0;
+        }
 
         case WM_LBUTTONDOWN:
-        case WM_LBUTTONUP:
-            self->setMouseState(MouseButton::LEFT, (message == WM_LBUTTONDOWN));
+        case WM_LBUTTONUP: {
+            bool mouseButtonState = (message == WM_LBUTTONDOWN);
+            self->setMouseState(MouseButton::LEFT, mouseButtonState);
+            self->onMouseButton(MouseButton::LEFT, mouseButtonState);
             return 0;
+        }
 
         case WM_MBUTTONDOWN:
-        case WM_MBUTTONUP:
-            self->setMouseState(MouseButton::MIDDLE, (message == WM_MBUTTONDOWN));
+        case WM_MBUTTONUP: {
+            bool mouseButtonState = (message == WM_MBUTTONDOWN);
+            self->setMouseState(MouseButton::MIDDLE, mouseButtonState);
+            self->onMouseButton(MouseButton::MIDDLE, mouseButtonState);
             return 0;
+        }
 
         case WM_RBUTTONDOWN:
-        case WM_RBUTTONUP:
-            self->setMouseState(MouseButton::RIGHT, (message == WM_RBUTTONDOWN));
+        case WM_RBUTTONUP: {
+            bool mouseButtonState = (message == WM_RBUTTONDOWN);
+            self->setMouseState(MouseButton::RIGHT, mouseButtonState);
+            self->onMouseButton(MouseButton::RIGHT, mouseButtonState);
             return 0;
+        }
 
         case WM_XBUTTONDOWN:
         case WM_XBUTTONUP: {
             MouseButton mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? MouseButton::X1 : MouseButton::X2;
-            self->setMouseState(mouseButton, (message == WM_XBUTTONDOWN));
+            bool mouseButtonState = (message == WM_XBUTTONDOWN);
+            self->setMouseState(mouseButton, mouseButtonState);
+            self->onMouseButton(mouseButton, mouseButtonState);
             return 0;
         }
 
         case WM_MOUSEMOVE: {
             int xPosition = GET_X_LPARAM(lParam);
             int yPosition = GET_Y_LPARAM(lParam);
+            bool mouseMoved = true;
 
             if (self->isMouseCaptured()) {
                 POINT windowCenter = { self->width >> 1, self->height >> 1 };
@@ -77,11 +92,15 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
                 yPosition -= windowCenter.y;
 
                 if (xPosition != 0 || yPosition != 0) {
-                    self->setMousePosition(windowCenter.x, windowCenter.y);
+                    self->warpMousePointer(windowCenter.x, windowCenter.y);
+                } else {
+                    mouseMoved = false; // WM_MOUSEMOVE after SetCursorPos() to window center
                 }
-            } else {
-                self->mousePosition.first = xPosition;
-                self->mousePosition.second = yPosition;
+            }
+
+            if (mouseMoved) {
+                self->setMousePosition(xPosition, yPosition);
+                self->onMouseMotion(xPosition, yPosition);
             }
 
             return 0;
@@ -144,6 +163,7 @@ void Window::captureMouse(bool capture) {
 
     if (this->mouseCaptured) {
         POINT windowCenter = { this->width >> 1, this->height >> 1 };
+        this->warpMousePointer(windowCenter.x, windowCenter.y);
         this->setMousePosition(windowCenter.x, windowCenter.y);
     }
 
@@ -161,9 +181,12 @@ void Window::dispatchEvents() {
         DispatchMessage(&message);
 
         if (message.message == WM_QUIT) {
+            this->onQuit();
             break;
         }
     }
+
+    this->onIdle();
 }
 
 void Window::setKeyboardState(int scancode, bool state) {
@@ -177,7 +200,9 @@ void Window::setMouseState(MouseButton button, bool state) {
 void Window::setMousePosition(int x, int y) {
     this->mousePosition.first = x;
     this->mousePosition.second = y;
+}
 
+void Window::warpMousePointer(int x, int y) {
     POINT position = { x, y };
     ClientToScreen(this->window, &position);
     SetCursorPos(position.x, position.y);

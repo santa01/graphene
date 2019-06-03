@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Signals.h>
 #include <windows.h>
 #include <array>
 #include <utility>
@@ -30,12 +31,19 @@ public:
     void update();
     void dispatchEvents();
 
+    Signals::Signal<int, int> onMouseMotion;
+    Signals::Signal<int, bool> onMouseButton;
+    Signals::Signal<int, bool> onKeyboardButton;
+    Signals::Signal<> onQuit;  // User-requested quit
+    Signals::Signal<> onIdle; // Empty event queue
+
 private:
     friend LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
     void setKeyboardState(int scancode, bool state);
     void setMouseState(MouseButton button, bool state);
     void setMousePosition(int x, int y);
+    void warpMousePointer(int x, int y);
 
     HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
     void destroyWindow(HWND window);
