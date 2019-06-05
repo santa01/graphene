@@ -72,8 +72,8 @@ const std::string& Font::getFilename() const {
     return this->filename;
 }
 
-std::shared_ptr<TextBitmap> Font::renderChar(char ch) {
-    std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(ch);
+std::shared_ptr<TextBitmap> Font::renderChar(wchar_t charCode) {
+    std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(charCode);
     if (charGlyph == nullptr) {
         return nullptr;
     }
@@ -90,12 +90,12 @@ std::shared_ptr<TextBitmap> Font::renderChar(char ch) {
     return textBitmap;
 }
 
-std::shared_ptr<TextBitmap> Font::renderString(const std::string& text) {
+std::shared_ptr<TextBitmap> Font::renderString(const std::wstring& stringText) {
     FT_BBox stringBox = { };
     std::vector<std::shared_ptr<CharGlyph>> stringGlyphs;
 
-    for (auto ch: text) {
-        std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(ch);
+    for (auto charCode: stringText) {
+        std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(charCode);
         if (charGlyph == nullptr) {
             continue;
         }
@@ -118,8 +118,8 @@ std::shared_ptr<TextBitmap> Font::renderString(const std::string& text) {
     stringBitmap->pixels.reset(new char[pixelsSize]);
     char* pixels = stringBitmap->pixels.get();
 
-    memset(pixels, 0, pixelsSize);
     int stringAdvance = 0;
+    memset(pixels, 0, pixelsSize);
 
     for (auto charGlyph: stringGlyphs) {
         FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
@@ -141,17 +141,13 @@ std::shared_ptr<TextBitmap> Font::renderString(const std::string& text) {
     return stringBitmap;
 }
 
-std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(char ch) {
-    auto charGlyphIt = this->charGlyphs.find(ch);
+std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(FT_ULong charCode) {
+    auto charGlyphIt = this->charGlyphs.find(charCode);
     if (charGlyphIt != this->charGlyphs.end()) {
         return charGlyphIt->second;
     }
 
-    FT_UInt charIndex;
-    if ((charIndex = FT_Get_Char_Index(this->face.get(), ch)) == 0) {
-        return nullptr;
-    }
-
+    FT_UInt charIndex = FT_Get_Char_Index(this->face.get(), charCode);
     if (FT_Load_Glyph(this->face.get(), charIndex, FT_LOAD_RENDER) != FT_Err_Ok) {
         return nullptr;
     }
@@ -167,7 +163,7 @@ std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(char ch) {
     }
 
     std::shared_ptr<CharGlyph> charGlyph(new CharGlyph());
-    this->charGlyphs.emplace(ch, charGlyph);
+    this->charGlyphs.emplace(charCode, charGlyph);
 
     charGlyph->record = std::shared_ptr<FT_GlyphRec>(glyph, FT_Done_Glyph);
     FT_Glyph_Get_CBox(glyph, FT_GLYPH_BBOX_PIXELS, &charGlyph->box);

@@ -47,8 +47,8 @@ public:
     int getSize() const;
     const std::string& getFilename() const;
 
-    std::shared_ptr<TextBitmap> renderChar(char ch);
-    std::shared_ptr<TextBitmap> renderString(const std::string& text);
+    std::shared_ptr<TextBitmap> renderChar(wchar_t charCode);
+    std::shared_ptr<TextBitmap> renderString(const std::wstring& stringText);
 
 private:
     typedef struct {
@@ -57,14 +57,14 @@ private:
         std::shared_ptr<char[]> pixels = nullptr;
     } CharGlyph;
 
-    std::shared_ptr<CharGlyph> getCharGlyph(char ch);
+    std::shared_ptr<CharGlyph> getCharGlyph(FT_ULong charCode);
 
     int dpi;
     int size;
     std::string filename;
 
     std::shared_ptr<FT_FaceRec> face;
-    std::unordered_map<char, std::shared_ptr<CharGlyph>> charGlyphs;
+    std::unordered_map<FT_ULong, std::shared_ptr<CharGlyph>> charGlyphs;
 
 private:
     static void initFreeType();
