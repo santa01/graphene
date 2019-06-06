@@ -20,39 +20,22 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required (VERSION 2.8.9)
+cmake_minimum_required (VERSION 3.3)
 project (GRAPHENE)
 
-if (CMAKE_COMPILER_IS_GNUCC)
-    execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-                     OUTPUT_VARIABLE GCC_VERSION)
-    string (STRIP ${GCC_VERSION} GCC_VERSION)
-endif ()
-
-if (DEFINED GCC_VERSION AND GCC_VERSION VERSION_GREATER 4.7.0)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=gnu++11")
-    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-    set (CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os")
-    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g -O3")
-else ()
-    message (FATAL_ERROR "GCC 4.7.0 or higher is required!")
-endif ()
-
 find_package (OpenGL REQUIRED)
+find_package (Freetype REQUIRED)
 
-include (FindPkgConfig)
-pkg_search_module (MATH REQUIRED math)
-
-include (CheckIncludeFileCXX)
-CHECK_INCLUDE_FILE_CXX (Signals.h HAVE_SIGNALS_H)
-if (NOT HAVE_SIGNALS_H)
-    message (FATAL_ERROR "Header Signals.h not found!")
+find_path (MATH_INCLUDE_DIRS NAMES MathApi.h HINTS ENV MATH_DIR PATH_SUFFIXES include)
+find_library (MATH_LIBRARIES NAMES math math-shared HINTS ENV MATH_DIR PATH_SUFFIXES lib)
+if (NOT MATH_INCLUDE_DIRS OR NOT MATH_LIBRARIES)
+    message (FATAL_ERROR "Could NOT find Math")
 endif ()
 
-file (GLOB_RECURSE GRAPHENE_SOURCES src/*.cpp)
-file (GLOB_RECURSE GRAPHENE_HEADERS src/*.h)
-include_directories (src ${MATH_INCLUDE_DIRS})
+find_path (SIGNALS_INCLUDE_DIRS NAMES Signals.h HINTS ENV SIGNALS_DIR PATH_SUFFIXES include)
+if (NOT SIGNALS_INCLUDE_DIRS)
+    message (FATAL_ERROR "Could NOT find Signals")
+endif ()
 
 set (GRAPHENE_NAME Graphene)
 set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
@@ -62,25 +45,17 @@ set (GRAPHENE_LIBRARY graphene)
 set (GRAPHENE_STATIC ${GRAPHENE_LIBRARY}-static)
 set (GRAPHENE_SHARED ${GRAPHENE_LIBRARY}-shared)
 
-set (GRAPHENE_EXAMPLE OFF CACHE BOOL "Build example")
 set (GRAPHENE_DOCUMENTATION OFF CACHE BOOL "Build documentation")
+set (GRAPHENE_EXAMPLE OFF CACHE BOOL "Build example")
 set (GRAPHENE_TEST OFF CACHE BOOL "Build unit tests")
+
+if (GRAPHENE_DOCUMENTATION)
+    find_package (Doxygen REQUIRED dot)
+    add_custom_target (${GRAPHENE_LIBRARY}-docs ALL ${DOXYGEN_EXECUTABLE})
+endif ()
 
 if (GRAPHENE_EXAMPLE)
     add_subdirectory (example)
-    install (DIRECTORY example DESTINATION share/${GRAPHENE_LIBRARY})
-endif ()
-
-if (GRAPHENE_DOCUMENTATION)
-    find_package (Doxygen)
-    if (DOXYGEN_FOUND)
-        add_custom_target (doxygen ALL doxygen)
-        configure_file (doc/Doxyfile.in Doxyfile @ONLY)
-        install (DIRECTORY ${PROJECT_BINARY_DIR}/html
-                 DESTINATION share/doc/${GRAPHENE_LIBRARY}-${GRAPHENE_VERSION})
-    else ()
-        message (FATAL_ERROR "Failed to locate doxygen!")
-    endif ()
 endif ()
 
 if (GRAPHENE_TEST)
@@ -88,26 +63,48 @@ if (GRAPHENE_TEST)
     add_subdirectory (test)
 endif ()
 
-configure_file (graphene.pc.in graphene.pc @ONLY)
-install (FILES ${PROJECT_BINARY_DIR}/graphene.pc DESTINATION lib/pkgconfig)
+file (GLOB_RECURSE GRAPHENE_SOURCES src/*.cpp)
+file (GLOB_RECURSE GRAPHENE_HEADERS src/*.h)
+include_directories (src ${FREETYPE_INCLUDE_DIRS} ${MATH_INCLUDE_DIRS} ${SIGNALS_INCLUDE_DIRS})
 
 add_library (${GRAPHENE_LIBRARY} OBJECT ${GRAPHENE_SOURCES})
+set_target_properties (${GRAPHENE_LIBRARY} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+    POSITION_INDEPENDENT_CODE YES
+)
+target_compile_options (${GRAPHENE_LIBRARY} PUBLIC
+    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/WX>
+)
+target_compile_definitions (${GRAPHENE_LIBRARY} PUBLIC GRAPHENE_EXPORT UNICODE _USE_MATH_DEFINES)
+
 add_library (${GRAPHENE_STATIC} STATIC $<TARGET_OBJECTS:${GRAPHENE_LIBRARY}>)
 add_library (${GRAPHENE_SHARED} SHARED $<TARGET_OBJECTS:${GRAPHENE_LIBRARY}>)
+set_target_properties (${GRAPHENE_SHARED} PROPERTIES VERSION ${GRAPHENE_VERSION} SOVERSION ${GRAPHENE_VERSION})
 
-target_link_libraries (${GRAPHENE_STATIC} ${MATH_LIBRARIES})
-target_link_libraries (${GRAPHENE_STATIC} ${OPENGL_LIBRARIES})
+if (WIN32)
+    # Dedicated library names for Win32 platform (dynamic library target outputs .lib as well)
+    set_target_properties (${GRAPHENE_STATIC} PROPERTIES OUTPUT_NAME ${GRAPHENE_STATIC})
+    set_target_properties (${GRAPHENE_SHARED} PROPERTIES OUTPUT_NAME ${GRAPHENE_SHARED})
+elseif (UNIX)
+    set_target_properties (${GRAPHENE_STATIC} ${GRAPHENE_SHARED} PROPERTIES OUTPUT_NAME ${GRAPHENE_LIBRARY})
+endif ()
 
-target_link_libraries (${GRAPHENE_SHARED} ${MATH_LIBRARIES})
-target_link_libraries (${GRAPHENE_SHARED} ${OPENGL_LIBRARIES})
-
-# Required to reuse OBJECT for SHARED target, cmake version 2.8.9
-set_property (TARGET ${GRAPHENE_LIBRARY} PROPERTY POSITION_INDEPENDENT_CODE 1)
-set_target_properties (${GRAPHENE_STATIC} ${GRAPHENE_SHARED} PROPERTIES
-                       OUTPUT_NAME ${GRAPHENE_LIBRARY})
-set_target_properties (${GRAPHENE_SHARED} PROPERTIES
-                       VERSION ${GRAPHENE_VERSION}
-                       SOVERSION ${GRAPHENE_VERSION})
+target_link_libraries (${GRAPHENE_STATIC} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES} ${MATH_LIBRARIES})
+target_link_libraries (${GRAPHENE_SHARED} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES} ${MATH_LIBRARIES})
 
 install (TARGETS ${GRAPHENE_STATIC} ${GRAPHENE_SHARED} DESTINATION lib)
 install (FILES ${GRAPHENE_HEADERS} DESTINATION include/${GRAPHENE_LIBRARY})
+
+if (UNIX)
+    configure_file (graphene.pc.in graphene.pc @ONLY)
+    install (FILES ${PROJECT_BINARY_DIR}/graphene.pc DESTINATION lib/pkgconfig)
+endif ()
+
+if (DOXYGEN_FOUND)
+    configure_file (doc/Doxyfile.in Doxyfile @ONLY)
+    install (DIRECTORY ${PROJECT_BINARY_DIR}/html
+             DESTINATION $<IF:$<BOOL:UNIX>,share/doc/${GRAPHENE_LIBRARY}-${GRAPHENE_VERSION},docs>)
+endif ()

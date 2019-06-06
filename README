@@ -5,8 +5,8 @@ https://github.com/santa01/graphene
 
 Available build options:
 
- * GRAPHENE_EXAMPLE       - Build example application (default OFF)
  * GRAPHENE_DOCUMENTATION - Build doxygen documentation (default OFF)
+ * GRAPHENE_EXAMPLE       - Build example application (default OFF)
  * GRAPHENE_TEST          - Build library unit tests (default OFF)
 
 Environment variables

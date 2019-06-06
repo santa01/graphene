@@ -20,17 +20,22 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.3)
 project (TEST)
 
-include (FindPkgConfig)
-pkg_search_module (CPPUNIT REQUIRED cppunit)
+find_path (CPPUNIT_INCLUDE_DIRS NAMES cppunit/TestSuite.h HINTS ENV CPPUNIT_DIR PATH_SUFFIXES include)
+find_library (CPPUNIT_LIBRARIES NAMES cppunit cppunit_dll HINTS ENV CPPUNIT_DIR PATH_SUFFIXES lib)
+if (NOT CPPUNIT_INCLUDE_DIRS OR NOT CPPUNIT_LIBRARIES)
+    message (FATAL_ERROR "Could NOT find CppUnit")
+endif ()
 
 get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
 
-include_directories (BEFORE src\mock)  # Allow to override standard headers
+include_directories (BEFORE src/mock)  # Allow to override standard headers
 include_directories (src ${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS} ${CPPUNIT_INCLUDE_DIRS})
+add_compile_definitions (_USE_MATH_DEFINES)
+
 set (TEST_LINK_LIBRARIES ${MATH_LIBRARIES} ${CPPUNIT_LIBRARIES})
 set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)
 
@@ -51,6 +56,5 @@ target_link_libraries (${TEST_LIGHT_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
 set (TEST_SCENE_NODE_EXECUTABLE test-scenenode)
 add_test (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_SCENE_NODE_EXECUTABLE})
-add_executable (${TEST_SCENE_NODE_EXECUTABLE} src/TestSceneNode.cpp
-                ../src/SceneNode.cpp ../src/Entity.cpp ../src/Light.cpp)
+add_executable (${TEST_SCENE_NODE_EXECUTABLE} src/TestSceneNode.cpp ../src/SceneNode.cpp ../src/Entity.cpp ../src/Light.cpp)
 target_link_libraries (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_LINK_LIBRARIES})

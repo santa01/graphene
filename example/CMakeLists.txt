@@ -20,45 +20,28 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.3)
 project (EXAMPLE)
 
-if (CMAKE_COMPILER_IS_GNUCC)
-    execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-                     OUTPUT_VARIABLE GCC_VERSION)
-    string (STRIP ${GCC_VERSION} GCC_VERSION)
-endif ()
+set (EXAMPLE_EXECUTABLE example)
 
-if (DEFINED GCC_VERSION AND GCC_VERSION VERSION_GREATER 4.7.0)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=gnu++11")
-    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-    set (CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os")
-    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g -O3")
-else ()
-    message (FATAL_ERROR "GCC 4.7.0 or higher is required!")
-endif ()
-
-include (FindPkgConfig)
-pkg_search_module (MATH REQUIRED math)
+get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
 
 file (GLOB_RECURSE EXAMPLE_SOURCES src/*.cpp)
-include_directories (src ${MATH_INCLUDE_DIRS})
+include_directories (src ${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS} ${SIGNALS_INCLUDE_DIRS})
+link_directories (${GRAPHENE_BINARY_DIR})
 
-set (EXAMPLE_EXECUTABLE example)
 add_executable (${EXAMPLE_EXECUTABLE} ${EXAMPLE_SOURCES})
+set_target_properties (${EXAMPLE_EXECUTABLE} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)
+target_compile_options (${EXAMPLE_EXECUTABLE} PUBLIC
+    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/WX>
+)
+target_compile_definitions (${EXAMPLE_EXECUTABLE} PUBLIC _USE_MATH_DEFINES)
 
-target_link_libraries (${EXAMPLE_EXECUTABLE} ${MATH_LIBRARIES})
-
-if (DEFINED GRAPHENE_LIBRARY)  # In-source build
-    get_filename_component (GRAPHENE_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
-    get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
-
-    link_directories (${GRAPHENE_BINARY_DIR})
-    include_directories (${GRAPHENE_PROJECT_DIR}/src)
-    target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_SHARED})
-else ()  # Normal build
-    pkg_search_module (GRAPHENE REQUIRED graphene)
-    include_directories (${GRAPHENE_INCLUDE_DIRS})
-    target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_LIBRARIES})
-endif ()
+target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_STATIC} ${MATH_LIBRARIES})
