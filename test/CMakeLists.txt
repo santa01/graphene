@@ -20,7 +20,7 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required (VERSION 3.3)
+cmake_minimum_required (VERSION 3.12)
 project (TEST)
 
 find_path (CPPUNIT_INCLUDE_DIRS NAMES cppunit/TestSuite.h HINTS ENV CPPUNIT_DIR PATH_SUFFIXES include)
