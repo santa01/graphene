@@ -34,7 +34,9 @@ void Camera::rotate(const Math::Vec3& vector, float angle) {
     }
 
     Math::Vec3 axis(vector);
-    Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+    float pi = static_cast<float>(M_PI);
+
+    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
     q.normalize();
 
     Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
@@ -49,7 +51,7 @@ void Camera::rotate(const Math::Vec3& vector, float angle) {
 
     float xAngle, yAngle, zAngle;
     q.extractEulerAngles(xAngle, yAngle, zAngle);
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
 
     this->updateRotation(right, up, target);
 }
@@ -86,19 +88,21 @@ void Camera::lookAt(const Math::Vec3& vector) {
     float zAngle = asinf(axis.get(Math::Vec3::X) * axis.get(Math::Vec3::Y) * (1 - cosf(angle)) +
                          axis.get(Math::Vec3::Z) * sinf(angle));
 
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
+    float pi = static_cast<float>(M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
     this->updateRotation(right, up, target);
 }
 
 void Camera::updateProjection(ProjectionType projectionType) {
     this->projection = Math::Mat4();
     this->projectionType = projectionType;
+    float pi = static_cast<float>(M_PI);
 
     switch (this->projectionType) {
         case TYPE_PERSPECTIVE:
-            this->projection.set(0, 0, 1.0f / (tanf(this->fov * M_PI / 180.0f / 2.0f) *
+            this->projection.set(0, 0, 1.0f / (tanf(this->fov * pi / 180.0f / 2.0f) *
                                        this->aspectRatio));
-            this->projection.set(1, 1, 1.0f / (tanf(this->fov * M_PI / 180.0f / 2.0f)));
+            this->projection.set(1, 1, 1.0f / (tanf(this->fov * pi / 180.0f / 2.0f)));
             this->projection.set(2, 2, (-this->farPlane - this->nearPlane) /
                                        (this->farPlane - this->nearPlane));
             this->projection.set(2, 3, (-2.0f * this->farPlane * this->nearPlane) /

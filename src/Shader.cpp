@@ -38,7 +38,7 @@ Shader::Shader(const std::string& name) {
     }
 
     file.seekg(0, std::ios::end);
-    int sourceLength = file.tellg();
+    std::ifstream::pos_type sourceLength = file.tellg();
     file.seekg(0, std::ios::beg);
 
     std::unique_ptr<char[]> source(new char[sourceLength]);

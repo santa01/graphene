@@ -45,7 +45,7 @@ public:
     }
 
     static int depth() {
-        return stack.size();
+        return static_cast<int>(stack.size());
     }
 
 private:

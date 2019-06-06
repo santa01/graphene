@@ -43,7 +43,7 @@ Material::Material():
     std::copy(this->diffuseColor.data(), this->diffuseColor.data() + 3, material.diffuseColor);
     std::copy(this->specularColor.data(), this->specularColor.data() + 3, material.specularColor);
 
-    this->materialBuffer = std::make_shared<UniformBuffer>(reinterpret_cast<const char*>(&material), sizeof(material));
+    this->materialBuffer = std::make_shared<UniformBuffer>(&material, sizeof(material));
 }
 
 }  // namespace Graphene

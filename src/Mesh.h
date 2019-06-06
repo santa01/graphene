@@ -32,7 +32,7 @@ namespace Graphene {
 
 class Mesh {
 public:
-    Mesh(const char* data, int faces, int vertices);
+    Mesh(const void* data, int faces, int vertices);
 
     ~Mesh() {
         glDeleteVertexArrays(1, &this->vao);

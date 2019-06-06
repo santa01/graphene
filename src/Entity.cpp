@@ -30,13 +30,15 @@ void Entity::rotate(const Math::Vec3& vector, float angle) {
     }
 
     Math::Vec3 axis(vector);
-    Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+    float pi = static_cast<float>(M_PI);
+
+    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
     q.normalize();
 
     float xAngle, yAngle, zAngle;
     q.extractEulerAngles(xAngle, yAngle, zAngle);
 
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
     this->rotation = this->rotation * q.extractMat4();
 }
 

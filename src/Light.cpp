@@ -21,6 +21,8 @@
  */
 
 #include <Light.h>
+#include <Mat3.h>
+#include <Mat4.h>
 #include <algorithm>
 
 namespace Graphene {
@@ -47,7 +49,7 @@ Light::Light():
     std::copy(this->position.data(), this->position.data() + 3, light.position);
     std::copy(this->direction.data(), this->direction.data() + 3, light.direction);
 
-    this->lightBuffer = std::make_shared<UniformBuffer>(reinterpret_cast<const char*>(&light), sizeof(light));
+    this->lightBuffer = std::make_shared<UniformBuffer>(&light, sizeof(light));
 }
 
 void Light::rotate(const Math::Vec3& vector, float angle) {
@@ -56,13 +58,15 @@ void Light::rotate(const Math::Vec3& vector, float angle) {
     }
 
     Math::Vec3 axis(vector);
-    Math::Quaternion q(axis.normalize(), angle * M_PI / 180.0f);
+    float pi = static_cast<float>(M_PI);
+
+    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
     q.normalize();
 
     float xAngle, yAngle, zAngle;
     q.extractEulerAngles(xAngle, yAngle, zAngle);
 
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / M_PI, yAngle * 180.0f / M_PI, zAngle * 180.0f / M_PI);
+    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
     this->direction = q.extractMat4().extractMat3() * this->direction;
     updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
 }

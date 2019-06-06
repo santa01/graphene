@@ -24,16 +24,17 @@
 
 namespace Graphene {
 
-Mesh::Mesh(const char* data, int faces, int vertices):
+Mesh::Mesh(const void* data, int faces, int vertices):
         material(new Material()) {
+    const char* meshData = reinterpret_cast<const char*>(data);
     this->faces = faces;
     this->vertices = vertices;
 
-    const char* vertexData = data;
-    int vertexDataSize = sizeof(float) * this->vertices * (3 + 3 + 2);
+    const void* vertexData = meshData;
+    size_t vertexDataSize = sizeof(float) * this->vertices * (3 + 3 + 2);
 
-    const char* faceData = data + vertexDataSize;
-    int faceDataSize = sizeof(int) * this->faces * 3;
+    const void* faceData = meshData + vertexDataSize;
+    size_t faceDataSize = sizeof(int) * this->faces * 3;
 
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
@@ -46,12 +47,12 @@ Mesh::Mesh(const char* data, int faces, int vertices):
     glEnableVertexAttribArray(1);  // Vertex normal
     glEnableVertexAttribArray(2);  // UV coordinate
 
-    int normalDataOffset = sizeof(float) * this->vertices * 3;
-    int uvDataOffset = normalDataOffset * 2;
+    ptrdiff_t normalDataOffset = sizeof(float) * this->vertices * 3;
+    ptrdiff_t uvDataOffset = normalDataOffset * 2;
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(normalDataOffset));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(uvDataOffset));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void*>(normalDataOffset));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void*>(uvDataOffset));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[BUFFER_ELEMENTS]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceDataSize, faceData, GL_STATIC_DRAW);

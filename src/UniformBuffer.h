@@ -29,11 +29,11 @@
 namespace Graphene {
 
 #define updateBuffer(buffer, type, member, data) \
-        buffer->update(reinterpret_cast<const char*>(data), sizeof(type::member), offsetof(type, member))
+        buffer->update(data, sizeof(type::member), offsetof(type, member))
 
 class UniformBuffer {
 public:
-    UniformBuffer(const char* data, int dataSize) {
+    UniformBuffer(const void* data, size_t dataSize) {
         glGenBuffers(1, &this->ubo);
         glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
         glBufferData(GL_UNIFORM_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
@@ -44,7 +44,7 @@ public:
         glDeleteBuffers(1, &this->ubo);
     }
 
-    void update(const char* data, int dataSize, int dataOffset) {
+    void update(const void* data, size_t dataSize, size_t dataOffset) {
         glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
         glBufferSubData(GL_UNIFORM_BUFFER, dataOffset, dataSize, data);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);

@@ -28,6 +28,7 @@
 #include <Object.h>
 #include <Quaternion.h>
 #include <Vec3.h>
+#include <Mat4.h>
 #include <unordered_set>
 #include <stdexcept>
 #include <algorithm>
