@@ -27,7 +27,10 @@
 #include <GL/gl.h>  // Renamed glcorearb.h
 #include <string>
 
-#if defined(__linux__)
+#if defined(_WIN32)
+#include <windows.h>
+#include <GL/wglext.h>
+#elif defined(__linux__)
 #include <GL/glx.h>
 #include <GL/glxext.h>
 #endif
@@ -95,7 +98,10 @@ extern PFNGLVIEWPORTPROC glViewport;
 extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // ARB_debug_output
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // ARB_debug_output
 
-#if defined(__linux__)
+#if defined(_WIN32)
+extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;  // WGL_ARB_pixel_format
+extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;  // WGL_ARB_create_context
+#elif defined(__linux__)
 extern PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;  // GLX_ARB_create_context
 #endif
 
@@ -104,7 +110,9 @@ namespace OpenGL {
 void loadCore();
 void loadExtensions();
 
-#if defined(__linux__)
+#if defined(_WIN32)
+void loadWglExtensions();
+#elif defined(__linux__)
 void loadGlxExtensions();
 #endif
 

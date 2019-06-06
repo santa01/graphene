@@ -87,9 +87,25 @@ PFNGLVIEWPORTPROC glViewport;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 
-#if defined(__linux__)
+#if defined(_WIN32)
+PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
+PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+#elif defined(__linux__)
 PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
+#endif
 
+#if defined(_WIN32)
+PROC glGetProcAddress(LPCSTR name) {
+    PROC procAddress = wglGetProcAddress(name);
+    if (procAddress == nullptr) {
+        // OpenGL 1.1 functions are exported from opengl32.dll
+        HMODULE opengl32 = GetModuleHandle(L"opengl32.dll");
+        procAddress = GetProcAddress(opengl32, name);
+    }
+
+    return procAddress;
+}
+#elif defined(__linux__)
 #define glGetProcAddress(name) glXGetProcAddress(reinterpret_cast<const GLubyte*>((name)))
 #endif
 
@@ -175,7 +191,12 @@ void loadExtensions() {
     LOAD_OPTIONAL(glDebugMessageCallbackARB);
 }
 
-#if defined(__linux__)
+#if defined(_WIN32)
+void loadWglExtensions() {
+    LOAD_MANDATORY(wglChoosePixelFormatARB);
+    LOAD_MANDATORY(wglCreateContextAttribsARB);
+}
+#elif defined(__linux__)
 void loadGlxExtensions() {
     LOAD_MANDATORY(glXCreateContextAttribsARB);
 }

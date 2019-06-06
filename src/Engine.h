@@ -25,7 +25,13 @@
 
 #include <NonCopyable.h>
 #include <FrameBuffer.h>
+#if defined(_WIN32)
+#include <WindowWin32.h>
+typedef Graphene::WindowWin32 Window;
+#elif defined(__linux__)
 #include <WindowLinux.h>
+typedef Graphene::WindowLinux Window;
+#endif
 #include <SceneManager.h>
 #include <ObjectManager.h>
 #include <unordered_set>
@@ -75,7 +81,7 @@ public:
         this->objectManagers.insert(objectManager);
     }
 
-    std::shared_ptr<WindowLinux> getWindow() {
+    std::shared_ptr<Window> getWindow() {
         return this->window;
     }
 
@@ -101,7 +107,7 @@ private:
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
     std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
-    std::shared_ptr<WindowLinux> window;
+    std::shared_ptr<Window> window;
 
     float frameTime;
     bool running;
