@@ -62,8 +62,8 @@ typedef struct {
 
 typedef struct {
     uint8_t attributeBitsPerPixel: 4;
-    ColumnOrdering leftToRightOrdering: 1;
-    RowOrdering topToBottomOrdering: 1;
+    uint8_t leftToRightOrdering: 1;
+    uint8_t topToBottomOrdering: 1;
     uint8_t compatibility: 2;
 } ImageDescr;
 
@@ -120,8 +120,10 @@ ImageTGA::ImageTGA(const std::string& filename):
 
     this->pixels.reset(new char[pixelsSize]);
 
-    bool flipRows = (header.imageSpec.imageDescr.topToBottomOrdering == RowOrdering::TGA_ROW_BOTTOM_TO_TOP);
-    bool flipColumns = (header.imageSpec.imageDescr.leftToRightOrdering == ColumnOrdering::TGA_COLUMN_RIGHT_TO_LEFT);
+    uint8_t rowOrdering = header.imageSpec.imageDescr.topToBottomOrdering;
+    uint8_t columnOrdering = header.imageSpec.imageDescr.leftToRightOrdering;
+    bool flipRows = (static_cast<RowOrdering>(rowOrdering) == RowOrdering::TGA_ROW_BOTTOM_TO_TOP);
+    bool flipColumns = (static_cast<ColumnOrdering>(columnOrdering) == ColumnOrdering::TGA_COLUMN_RIGHT_TO_LEFT);
 
     std::ifstream::pos_type pixelsOffset = sizeof(header) + header.idLength +
         (header.colorMapSpec.colorMapLength * header.colorMapSpec.colorMapEntrySize);
