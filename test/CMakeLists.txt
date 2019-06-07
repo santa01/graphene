@@ -34,6 +34,17 @@ get_filename_component (GRAPHENE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTOR
 
 include_directories (BEFORE src/mock)  # Allow to override standard headers
 include_directories (src ${GRAPHENE_PROJECT_DIR}/src ${MATH_INCLUDE_DIRS} ${CPPUNIT_INCLUDE_DIRS})
+
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD_REQUIRED YES)
+set (CMAKE_CXX_EXTENSIONS NO)
+
+if (UNIX)
+    add_compile_options (-Wall -Wextra -Werror -pedantic)
+elseif (WIN32)
+    add_compile_options (/WX)
+endif ()
+
 add_compile_definitions (_USE_MATH_DEFINES)
 
 set (TEST_LINK_LIBRARIES ${MATH_LIBRARIES} ${CPPUNIT_LIBRARIES})

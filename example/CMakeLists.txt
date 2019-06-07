@@ -39,7 +39,7 @@ set_target_properties (${EXAMPLE_EXECUTABLE} PROPERTIES
     CXX_EXTENSIONS NO
 )
 target_compile_options (${EXAMPLE_EXECUTABLE} PUBLIC
-    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
+    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror -pedantic>
     $<$<CXX_COMPILER_ID:MSVC>:/WX>
 )
 target_compile_definitions (${EXAMPLE_EXECUTABLE} PUBLIC _USE_MATH_DEFINES)

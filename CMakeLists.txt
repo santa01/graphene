@@ -75,7 +75,7 @@ set_target_properties (${GRAPHENE_LIBRARY} PROPERTIES
     POSITION_INDEPENDENT_CODE YES
 )
 target_compile_options (${GRAPHENE_LIBRARY} PUBLIC
-    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
+    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror -pedantic>
     $<$<CXX_COMPILER_ID:MSVC>:/WX>
 )
 target_compile_definitions (${GRAPHENE_LIBRARY} PUBLIC GRAPHENE_EXPORT UNICODE _USE_MATH_DEFINES)
