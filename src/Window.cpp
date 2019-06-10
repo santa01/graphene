@@ -20,42 +20,45 @@
  * SOFTWARE.
  */
 
-#ifndef WINDOWLINUX_H
-#define WINDOWLINUX_H
-
-#if defined(__linux__)
-
 #include <Window.h>
-#include <OpenGL.h>
 
 namespace Graphene {
 
-class WindowLinux: public Window {
-public:
-    WindowLinux(int width, int height);
-    ~WindowLinux();
+Window::Window(int width, int height):
+        RenderTarget(width, height) {
+}
 
-    void captureMouse(bool captured) override;
-    void update() override;
-    void dispatchEvents() override;
+const KeyboardState& Window::getKeyboardState() const {
+    return this->keyboardState;
+}
 
-private:
-    void createWindow(const char* windowName);
-    void destroyWindow();
+const MouseState& Window::getMouseState() const {
+    return this->mouseState;
+}
 
-    void createContext();
-    void destroyContext();
+const MousePosition& Window::getMousePosition() const {
+    return this->mousePosition;
+}
 
-    Display* display = nullptr;
-    GLXFBConfig fbConfig = nullptr;
-    Colormap colormap = None;
-    XID window = None;
-    Atom wmDeleteWindow = None;
-    GLXContext renderingContext = nullptr;
-};
+bool Window::isMouseCaptured() const {
+    return this->mouseCaptured;
+}
+
+void Window::setKeyboardState(int scancode, bool state) {
+    this->keyboardState[scancode] = state;
+}
+
+void Window::setMouseState(MouseButton button, bool state) {
+    this->mouseState[button] = state;
+}
+
+void Window::setMousePosition(int x, int y) {
+    this->mousePosition.first = x;
+    this->mousePosition.second = y;
+}
+
+void Window::setMouseCaptured(bool captured) {
+    this->mouseCaptured = captured;
+}
 
 }  // namespace Graphene
-
-#endif  // defined(__linux__)
-
-#endif  // WINDOWLINUX_H

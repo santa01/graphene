@@ -23,43 +23,16 @@
 #if defined(_WIN32)
 
 #include <WindowWin32.h>
-#include <OpenGL.h>
+#include <RenderTarget.h>
 #include <windowsx.h>
 #include <stdexcept>
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <unordered_map>
 
 namespace Graphene {
-
-const std::unordered_map<GLenum, std::string> debugSource = {
-    { GL_DEBUG_SOURCE_API_ARB,             "OpenGL" },
-    { GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB,   "Window System" },
-    { GL_DEBUG_SOURCE_SHADER_COMPILER_ARB, "GLSL" },
-    { GL_DEBUG_SOURCE_THIRD_PARTY_ARB,     "3rd Party" },
-    { GL_DEBUG_SOURCE_APPLICATION_ARB,     "Application" },
-    { GL_DEBUG_SOURCE_OTHER_ARB,           "Other" }
-};
-
-const std::unordered_map<GLenum, std::string> debugType = {
-    { GL_DEBUG_TYPE_ERROR_ARB,               "Error" },
-    { GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB, "Deprecated" },
-    { GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB,  "Undefined" },
-    { GL_DEBUG_TYPE_PORTABILITY_ARB,         "Portability" },
-    { GL_DEBUG_TYPE_PERFORMANCE_ARB,         "Performance" },
-    { GL_DEBUG_TYPE_OTHER_ARB,               "Other" }
-};
-
-extern "C" void debugHandler(
-        GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam) {
-    std::cout << debugType.at(type) << " [" << debugSource.at(source) << "]: " << message << std::endl;
-}
 
 #define SetWindowObject(window, object) SetWindowLongPtr((window), GWLP_USERDATA, reinterpret_cast<LONG_PTR>((object)))
 #define GetWindowObject(window) reinterpret_cast<WindowWin32*>(GetWindowLongPtr((window), GWLP_USERDATA))
 
-LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     WindowWin32* self = GetWindowObject(window);
 
     switch (message) {
@@ -139,7 +112,7 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 }
 
 WindowWin32::WindowWin32(int width, int height):
-        RenderTarget(width, height) {
+        Window(width, height) {
     AllocConsole();
     AttachConsole(GetCurrentProcessId());
 
@@ -148,7 +121,7 @@ WindowWin32::WindowWin32(int width, int height):
     freopen_s(&stream, "CONOUT$", "w", stderr);
 
     this->instance = GetModuleHandle(nullptr);
-    this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", WindowProc);
+    this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", windowProc);
     this->createContext();
 
     SetWindowObject(this->window, this);
@@ -165,26 +138,10 @@ WindowWin32::~WindowWin32() {
     FreeConsole();
 }
 
-const KeyboardState& WindowWin32::getKeyboardState() const {
-    return this->keyboardState;
-}
+void WindowWin32::captureMouse(bool captured) {
+    this->setMouseCaptured(captured);
 
-const MouseState& WindowWin32::getMouseState() const {
-    return this->mouseState;
-}
-
-const MousePosition& WindowWin32::getMousePosition() const {
-    return this->mousePosition;
-}
-
-bool WindowWin32::isMouseCaptured() const {
-    return this->mouseCaptured;
-}
-
-void WindowWin32::captureMouse(bool capture) {
-    this->mouseCaptured = capture;
-
-    if (this->mouseCaptured) {
+    if (this->isMouseCaptured()) {
         POINT windowCenter = { this->width >> 1, this->height >> 1 };
         this->warpMousePointer(windowCenter.x, windowCenter.y);
         this->setMousePosition(windowCenter.x, windowCenter.y);
@@ -213,25 +170,6 @@ void WindowWin32::dispatchEvents() {
     this->onIdle();
 }
 
-void WindowWin32::setKeyboardState(int scancode, bool state) {
-    this->keyboardState[scancode] = state;
-}
-
-void WindowWin32::setMouseState(MouseButton button, bool state) {
-    this->mouseState[button] = state;
-}
-
-void WindowWin32::setMousePosition(int x, int y) {
-    this->mousePosition.first = x;
-    this->mousePosition.second = y;
-}
-
-void WindowWin32::warpMousePointer(int x, int y) {
-    POINT position = { x, y };
-    ClientToScreen(this->window, &position);
-    SetCursorPos(position.x, position.y);
-}
-
 HWND WindowWin32::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc) {
     WNDCLASSEX wcex = { };
     wcex.cbSize = sizeof(wcex);
@@ -247,9 +185,9 @@ HWND WindowWin32::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC wi
     }
 
     HWND window = CreateWindow(
-        className, windowName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, CW_USEDEFAULT, this->width, this->height,
-        nullptr, nullptr, this->instance, nullptr);
+            className, windowName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+            CW_USEDEFAULT, CW_USEDEFAULT, this->width, this->height,
+            nullptr, nullptr, this->instance, nullptr);
     if (window == nullptr) {
         throw std::runtime_error("CreateWindow()");
     }
@@ -278,28 +216,6 @@ void WindowWin32::createContext() {
     this->destroyWindow(dummyWindow);
 
     this->createExtContext(this->window);
-
-    OpenGL::loadCore();
-    OpenGL::loadExtensions();
-
-    if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-        glDebugMessageCallbackARB(debugHandler, nullptr);
-    }
-    else {
-        std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
-    }
-
-    std::cout
-        << "Vendor: " << glGetString(GL_VENDOR) << std::endl
-        << "Renderer: " << glGetString(GL_RENDERER) << std::endl
-        << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
-        << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-
-    glFrontFace(GL_CW);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glEnable(GL_CULL_FACE);
 }
 
 void WindowWin32::createBaseContext(HWND window) {
@@ -395,6 +311,12 @@ void WindowWin32::destroyContext() {
         ReleaseDC(this->window, this->deviceContext);
         this->deviceContext = nullptr;
     }
+}
+
+void WindowWin32::warpMousePointer(int x, int y) {
+    POINT position = { x, y };
+    ClientToScreen(this->window, &position);
+    SetCursorPos(position.x, position.y);
 }
 
 }  // namespace Graphene

@@ -25,11 +25,7 @@
 
 #include <NonCopyable.h>
 #include <FrameBuffer.h>
-#if defined(_WIN32)
-#include <WindowWin32.h>
-#elif defined(__linux__)
-#include <WindowLinux.h>
-#endif
+#include <Window.h>
 #include <SceneManager.h>
 #include <ObjectManager.h>
 #include <unordered_set>
@@ -37,12 +33,6 @@
 #include <memory>
 
 namespace Graphene {
-
-#if defined(_WIN32)
-typedef WindowWin32 Window;
-#elif defined(__linux__)
-typedef WindowLinux Window;
-#endif
 
 class Engine: public NonCopyable {
 public:

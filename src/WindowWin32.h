@@ -25,51 +25,22 @@
 
 #if defined(_WIN32)
 
-#include <RenderTarget.h>
+#include <Window.h>
 #include <OpenGL.h>
-#include <Signals.h>
-#include <array>
-#include <utility>
 
 namespace Graphene {
 
-enum MouseButton { LEFT, MIDDLE, RIGHT, X1, X2 };
-
-constexpr int KeyboardScancodes = 256;
-constexpr int MouseButtons = 5;
-
-using KeyboardState = std::array<bool, KeyboardScancodes>;
-using MouseState = std::array<bool, MouseButtons>;
-using MousePosition = std::pair<int, int>;
-
-class WindowWin32: public RenderTarget {
+class WindowWin32: public Window {
 public:
     WindowWin32(int width, int height);
     ~WindowWin32();
 
-    const KeyboardState& getKeyboardState() const;
-    const MouseState& getMouseState() const;
-    const MousePosition& getMousePosition() const;
-
-    bool isMouseCaptured() const;
-    void captureMouse(bool capture);
-
-    void update();
-    void dispatchEvents();
-
-    Signals::Signal<int, int> onMouseMotion;
-    Signals::Signal<int, bool> onMouseButton;
-    Signals::Signal<int, bool> onKeyboardButton;
-    Signals::Signal<> onQuit;  // User-requested quit
-    Signals::Signal<> onIdle;  // Empty event queue
+    void captureMouse(bool captured) override;
+    void update() override;
+    void dispatchEvents() override;
 
 private:
-    friend LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
-
-    void setKeyboardState(int scancode, bool state);
-    void setMouseState(MouseButton button, bool state);
-    void setMousePosition(int x, int y);
-    void warpMousePointer(int x, int y);
+    friend LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
     HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
     void destroyWindow(HWND window);
@@ -79,16 +50,12 @@ private:
     void createExtContext(HWND window);
     void destroyContext();
 
+    void warpMousePointer(int x, int y);
+
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
     HDC deviceContext = nullptr;
     HGLRC renderingContext = nullptr;
-
-    bool mouseCaptured = false;
-
-    KeyboardState keyboardState = { };
-    MouseState mouseState = { };
-    MousePosition mousePosition = { };
 };
 
 }  // namespace Graphene
