@@ -24,6 +24,7 @@
 #include <Mat3.h>
 #include <Mat4.h>
 #include <algorithm>
+#include <cmath>
 
 namespace Graphene {
 

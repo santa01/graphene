@@ -59,9 +59,9 @@ private:
 
     std::shared_ptr<CharGlyph> getCharGlyph(FT_ULong charCode);
 
-    int dpi;
-    int size;
     std::string filename;
+    int size;
+    int dpi;
 
     std::shared_ptr<FT_FaceRec> face;
     std::unordered_map<FT_ULong, std::shared_ptr<CharGlyph>> charGlyphs;

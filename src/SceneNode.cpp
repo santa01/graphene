@@ -24,6 +24,7 @@
 #include <Quaternion.h>
 #include <Mat3.h>
 #include <algorithm>
+#include <cmath>
 
 namespace Graphene {
 

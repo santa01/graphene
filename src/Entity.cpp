@@ -21,6 +21,7 @@
  */
 
 #include <Entity.h>
+#include <cmath>
 
 namespace Graphene {
 
