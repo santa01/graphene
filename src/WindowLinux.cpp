@@ -259,12 +259,10 @@ void WindowLinux::destroyWindow() {
 void WindowLinux::createContext() {
     OpenGL::loadGlxExtensions();
 
-    bool debugEnabled = (std::getenv("GRAPHENE_DEBUG") != nullptr);
-
     const int contextAttribList[] = {
         GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
         GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | (debugEnabled ? GLX_CONTEXT_DEBUG_BIT_ARB : 0),
+        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | GLX_CONTEXT_DEBUG_BIT_ARB,
         None
     };
 
@@ -284,20 +282,18 @@ void WindowLinux::createContext() {
     OpenGL::loadCore();
     OpenGL::loadExtensions();
 
-    if (debugEnabled) {
-        std::cout
-                << "Vendor: " << glGetString(GL_VENDOR) << std::endl
-                << "Renderer: " << glGetString(GL_RENDERER) << std::endl
-                << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
-                << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    std::cout
+            << "Vendor: " << glGetString(GL_VENDOR) << std::endl
+            << "Renderer: " << glGetString(GL_RENDERER) << std::endl
+            << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
+            << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
-        if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
-            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-            glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-            glDebugMessageCallbackARB(debugHandler, nullptr);
-        } else {
-            std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
-        }
+    if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+        glDebugMessageCallbackARB(debugHandler, nullptr);
+    } else {
+        std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
     }
 
     glFrontFace(GL_CW);
