@@ -29,7 +29,7 @@ namespace Graphene {
 
 class Movable {
 public:
-    virtual ~Movable() {}
+    virtual ~Movable() = default;
 
     virtual void translate(float x, float y, float z) = 0;
     virtual void translate(const Math::Vec3& position) = 0;

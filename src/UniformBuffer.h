@@ -41,7 +41,7 @@ public:
     GRAPHENE_API void bind(int bindPoint);
 
 private:
-    GLuint ubo;
+    GLuint ubo = 0;
 };
 
 }  // namespace Graphene

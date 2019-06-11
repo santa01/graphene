@@ -37,7 +37,7 @@ typedef struct {
     int width = 0;
     int height = 0;
     int pixelDepth = 0;
-    std::shared_ptr<char[]> pixels = nullptr;
+    std::shared_ptr<char[]> pixels;
 } TextBitmap;
 
 class Font {
@@ -54,8 +54,8 @@ public:
 private:
     typedef struct {
         FT_BBox box = { };
-        std::shared_ptr<FT_GlyphRec> record = nullptr;
-        std::shared_ptr<char[]> pixels = nullptr;
+        std::shared_ptr<FT_GlyphRec> record;
+        std::shared_ptr<char[]> pixels;
     } CharGlyph;
 
     std::shared_ptr<CharGlyph> getCharGlyph(FT_ULong charCode);

@@ -71,8 +71,8 @@ private:
     std::string source;
 
     static GLuint activeProgram;
-    GLuint program;
-    GLuint version;
+    GLuint program = 0;
+    GLuint version = 0;
 };
 
 }  // namespace Graphene

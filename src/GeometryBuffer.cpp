@@ -30,10 +30,9 @@ GeometryBuffer::GeometryBuffer(int width, int height):
         positionTexture(new ImageTexture(width, height)),
         normalTexture(new ImageTexture(width, height)),
         depthTexture(new DepthTexture(width, height)),
-        buffers{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 } {
-    this->width = width;
-    this->height = height;
-
+        buffers{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 },
+        width(width),
+        height(height) {
     glGenFramebuffers(1, &this->fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
 

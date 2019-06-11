@@ -30,12 +30,8 @@ namespace Graphene {
 
 Camera::Camera() {
     this->objectType = ObjectType::TYPE_CAMERA;
-    this->aspectRatio = 1.3333f;
-    this->nearPlane = 0.1f;
-    this->farPlane = 100.0f;
-    this->fov = 70.0f;
 
-    this->updateProjection(TYPE_PERSPECTIVE);
+    this->updateProjection(ProjectionType::TYPE_PERSPECTIVE);
     this->rotation.set(2, 2, -1.0f);  // Look at Z
 }
 
@@ -222,7 +218,7 @@ void Camera::updateProjection(ProjectionType projectionType) {
     float pi = static_cast<float>(M_PI);
 
     switch (this->projectionType) {
-        case TYPE_PERSPECTIVE:
+        case ProjectionType::TYPE_PERSPECTIVE:
             this->projection.set(0, 0, 1.0f / (tanf(this->fov * pi / 180.0f / 2.0f) *
                                        this->aspectRatio));
             this->projection.set(1, 1, 1.0f / (tanf(this->fov * pi / 180.0f / 2.0f)));
@@ -233,7 +229,7 @@ void Camera::updateProjection(ProjectionType projectionType) {
             this->projection.set(3, 2, -1.0f);
             this->projection.set(3, 3, 0.0f);
             break;
-        case TYPE_ORTHOGRAPHIC:
+        case ProjectionType::TYPE_ORTHOGRAPHIC:
             this->projection.set(0, 0, 1.0f / ((this->farPlane - this->nearPlane) *
                                        this->aspectRatio));
             this->projection.set(1, 1, 1.0f / (this->farPlane - this->nearPlane));

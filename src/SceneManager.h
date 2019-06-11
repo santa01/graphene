@@ -93,7 +93,7 @@ public:
 private:
     enum BindPoints {
         BIND_MATERIAL = 0,
-        BIND_LIGHT    = 0
+        BIND_LIGHT = 0
     };
 
     enum TextureUnits {
@@ -115,10 +115,10 @@ private:
     std::shared_ptr<Shader> lightingShader;
 
     Math::Vec3 ambientColor;
-    float ambientEnergy;
+    float ambientEnergy = 1.0f;
 
-    bool shadowPass;
-    bool lightPass;
+    bool shadowPass = false;
+    bool lightPass = false;
 };
 
 }  // namespace Graphene

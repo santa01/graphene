@@ -37,7 +37,7 @@ namespace Graphene {
 class Engine: public NonCopyable {
 public:
     GRAPHENE_API Engine(int width, int height);
-    GRAPHENE_API virtual ~Engine() {}
+    GRAPHENE_API virtual ~Engine() = default;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers();
     GRAPHENE_API void addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer);
@@ -67,9 +67,9 @@ private:
     std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
     std::shared_ptr<Window> window;
 
-    float frameTime;
-    bool running;
-    int result;
+    float frameTime = 0.0f;
+    bool running = true;
+    int result = 0;
 };
 
 }  // namespace Graphene

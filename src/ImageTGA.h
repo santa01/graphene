@@ -46,7 +46,7 @@ private:
     int pixelDepth = 0;
 
     std::string filename;
-    std::unique_ptr<char[]> pixels = nullptr;
+    std::unique_ptr<char[]> pixels;
 };
 
 }  // namespace Graphene

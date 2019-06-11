@@ -28,28 +28,28 @@
 namespace Graphene {
 
 enum class ColorMapType: uint8_t {
-    TGA_COLORMAP_NOT_INCLUDED = 0,
-    TGA_COLORMAP_INCLUDED = 1       // Unsupported
+    TGA_COLORMAP_NOT_INCLUDED,
+    TGA_COLORMAP_INCLUDED       // Unsupported
 };
 
 enum class ImageType: uint8_t {
-    TGA_IMAGE_NODATA = 0,                    // Unsupported
-    TGA_IMAGE_UNCOMPRESSED_COLORMAPPED = 1,  // Unsupported
-    TGA_IMAGE_UNCOMPRESSED_TRUECOLOR = 2,
-    TGA_IMAGE_UNCOMPRESSED_BLACKWHITE = 3,   // Unsupported
-    TGA_RLE_COLORMAPPED = 9,                 // Unsupported
-    TGA_RLE_TRUECOLOR = 10,                  // Unsupported
-    TGA_RLE_BLACKWHITE = 11                  // Unsupported
+    TGA_IMAGE_NODATA,                    // Unsupported
+    TGA_IMAGE_UNCOMPRESSED_COLORMAPPED,  // Unsupported
+    TGA_IMAGE_UNCOMPRESSED_TRUECOLOR,
+    TGA_IMAGE_UNCOMPRESSED_BLACKWHITE,   // Unsupported
+    TGA_RLE_COLORMAPPED = 9,             // Unsupported
+    TGA_RLE_TRUECOLOR,                   // Unsupported
+    TGA_RLE_BLACKWHITE                   // Unsupported
 };
 
-enum class ColumnOrdering: uint8_t {
-    TGA_COLUMN_LEFT_TO_RIGHT = 0,
-    TGA_COLUMN_RIGHT_TO_LEFT = 1
+enum class ColumnOrdering {
+    TGA_COLUMN_LEFT_TO_RIGHT,
+    TGA_COLUMN_RIGHT_TO_LEFT
 };
 
-enum class RowOrdering: uint8_t {
-    TGA_ROW_BOTTOM_TO_TOP = 0,
-    TGA_ROW_TOP_TO_BOTTOM = 1
+enum class RowOrdering {
+    TGA_ROW_BOTTOM_TO_TOP,
+    TGA_ROW_TOP_TO_BOTTOM
 };
 
 #pragma pack(push, 1)

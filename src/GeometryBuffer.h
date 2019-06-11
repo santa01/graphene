@@ -65,11 +65,11 @@ private:
     std::shared_ptr<ImageTexture> normalTexture;
     std::shared_ptr<DepthTexture> depthTexture;
 
-    GLenum buffers[4];
-    GLuint fbo;
+    GLenum buffers[4] = { };
+    GLuint fbo = 0;
 
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 };
 
 }  // namespace Graphene

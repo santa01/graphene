@@ -26,14 +26,7 @@
 
 namespace Graphene {
 
-Material::Material():
-        diffuseColor(1.0f, 1.0f, 1.0f),
-        specularColor(1.0f, 1.0f, 1.0f) {
-    this->ambientIntensity = 1.0f;
-    this->diffuseIntensity = 1.0f;
-    this->specularIntensity = 0.5f;
-    this->specularHardness = 50;
-
+Material::Material() {
     MaterialBuffer material = {
         this->ambientIntensity,
         this->diffuseIntensity,

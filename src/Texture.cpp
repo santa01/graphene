@@ -25,9 +25,6 @@
 namespace Graphene {
 
 Texture::Texture() {
-    this->width = 0;
-    this->height = 0;
-
     glGenTextures(1, &this->texture);
 }
 

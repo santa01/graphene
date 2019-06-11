@@ -26,14 +26,9 @@
 
 namespace Graphene {
 
-RenderTarget::RenderTarget(int width, int height) {
-    this->buffer = GL_FRONT;
-    this->fbo = 0;
-
-    this->width = width;
-    this->height = height;
-    this->autoUpdate = true;
-
+RenderTarget::RenderTarget(int width, int height):
+        width(width),
+        height(height) {
     auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
     this->viewports.insert(viewport);
 }

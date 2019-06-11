@@ -35,11 +35,6 @@ SceneManager::SceneManager():
         ambientShader(new Shader(Sources::ambientShader, sizeof(Sources::ambientShader))),
         lightingShader(new Shader(Sources::lightingShader, sizeof(Sources::lightingShader))),
         ambientColor(1.0f, 1.0f, 1.0f) {
-    this->ambientEnergy = 1.0f;
-
-    this->lightPass = false;
-    this->shadowPass = false;
-
     FrameGeometry geometry = {
         { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f },
         {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },

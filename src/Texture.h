@@ -41,10 +41,10 @@ public:
     GRAPHENE_API void bind(int textureUnit);
 
 protected:
-    GLuint texture;
+    GLuint texture = 0;
 
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 };
 
 }  // namespace Graphene

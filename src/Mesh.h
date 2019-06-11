@@ -51,11 +51,11 @@ private:
 
     std::shared_ptr<Material> material;
 
-    GLuint buffers[2];
-    GLuint vao;
+    GLuint buffers[2] = { };
+    GLuint vao = 0;
 
-    int faces;
-    int vertices;
+    int faces = 0;
+    int vertices = 0;
 };
 
 }  // namespace Graphene

@@ -27,7 +27,7 @@ namespace Graphene {
 
 namespace Sources {
 
-const char geometryShader[] = R"(
+constexpr char geometryShader[] = R"(
     {SHADER_VERSION}
     {SHADER_TYPE}
 
@@ -92,7 +92,7 @@ const char geometryShader[] = R"(
 #endif
 )";
 
-const char ambientShader[] = R"(
+constexpr char ambientShader[] = R"(
     {SHADER_VERSION}
     {SHADER_TYPE}
 
@@ -134,7 +134,7 @@ const char ambientShader[] = R"(
 #endif
 )";
 
-const char lightingShader[] = R"(
+constexpr char lightingShader[] = R"(
     {SHADER_VERSION}
     {SHADER_TYPE}
 

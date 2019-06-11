@@ -32,7 +32,7 @@ namespace Graphene {
 
 class Camera: public Object {
 public:
-    enum ProjectionType {
+    enum class ProjectionType {
         TYPE_PERSPECTIVE,
         TYPE_ORTHOGRAPHIC
     };
@@ -94,13 +94,13 @@ private:
     Math::Mat4 translation;
     Math::Mat4 rotation;
 
-    ProjectionType projectionType;
+    ProjectionType projectionType = ProjectionType::TYPE_PERSPECTIVE;
     Math::Vec3 rotationAngles;
 
-    float aspectRatio;
-    float nearPlane;
-    float farPlane;
-    float fov;
+    float aspectRatio = 1.3333f;
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    float fov = 70.0f;
 };
 
 }  // namespace Graphene

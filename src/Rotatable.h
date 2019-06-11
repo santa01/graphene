@@ -29,7 +29,7 @@ namespace Graphene {
 
 class Rotatable {
 public:
-    virtual ~Rotatable() {}
+    virtual ~Rotatable() = default;
 
     virtual void roll(float angle) = 0;
     virtual void yaw(float angle) = 0;

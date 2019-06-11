@@ -27,11 +27,11 @@
 
 namespace Graphene {
 
-Viewport::Viewport(int left, int top, int width, int height) {
-    this->left = left;
-    this->top = top;
-    this->width = width;
-    this->height = height;
+Viewport::Viewport(int left, int top, int width, int height):
+        left(left),
+        top(top),
+        width(width),
+        height(height) {
 }
 
 std::shared_ptr<Camera> Viewport::getCamera() {

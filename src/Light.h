@@ -104,17 +104,17 @@ public:
     GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer();
 
 private:
-    LightType lightType;
+    LightType lightType = LightType::TYPE_POINT;
     std::shared_ptr<UniformBuffer> lightBuffer;
 
-    Math::Vec3 color;
-    Math::Vec3 position;   // TYPE_POINT, TYPE_SPOT
-    Math::Vec3 direction;  // TYPE_SPOT, TYPE_DIRECTED
+    Math::Vec3 color = { 1.0f, 1.0f, 1.0f };
+    Math::Vec3 position = Math::Vec3::ZERO;  // TYPE_POINT, TYPE_SPOT
+    Math::Vec3 direction = Math::Vec3::UNIT_X;  // TYPE_SPOT, TYPE_DIRECTED
 
-    float energy;
-    float falloff;
-    float angle;  // TYPE_SPOT
-    float blend;  // TYPE_SPOT
+    float energy = 1.0f;
+    float falloff = 25.0f;
+    float angle = 45.0f;  // TYPE_SPOT
+    float blend = 0.15f;  // TYPE_SPOT
 
     Math::Vec3 rotationAngles;
 };

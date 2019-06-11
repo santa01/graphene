@@ -55,12 +55,12 @@ protected:
     std::unordered_set<std::shared_ptr<Viewport>> viewports;
     std::unordered_set<std::shared_ptr<Viewport>> overlays;
 
-    GLenum buffer;
-    GLuint fbo;
+    GLenum buffer = GL_FRONT;
+    GLuint fbo = 0;
 
-    int width;
-    int height;
-    bool autoUpdate;
+    int width = 0;
+    int height = 0;
+    bool autoUpdate = true;
 };
 
 }  // namespace Graphene

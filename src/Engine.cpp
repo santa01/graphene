@@ -99,10 +99,6 @@ Engine::Engine(int width, int height):
 
     this->window->onQuit.connect(Signals::Slot<>(&Engine::onQuit, this));
     this->window->onIdle.connect(Signals::Slot<>(&Engine::onIdle, this));
-
-    this->frameTime = 0.0f;
-    this->running = true;
-    this->result = 0;
 }
 
 const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers() {

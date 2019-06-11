@@ -26,10 +26,10 @@
 namespace Graphene {
 
 Mesh::Mesh(const void* data, int faces, int vertices):
-        material(new Material()) {
+        material(new Material()),
+        faces(faces),
+        vertices(vertices) {
     const char* meshData = reinterpret_cast<const char*>(data);
-    this->faces = faces;
-    this->vertices = vertices;
 
     const void* vertexData = meshData;
     size_t vertexDataSize = sizeof(float) * this->vertices * (3 + 3 + 2);

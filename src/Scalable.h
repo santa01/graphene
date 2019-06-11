@@ -29,7 +29,7 @@ namespace Graphene {
 
 class Scalable {
 public:
-    virtual ~Scalable() {}
+    virtual ~Scalable() = default;
 
     virtual void scaleX(float factor) = 0;
     virtual void scaleY(float factor) = 0;

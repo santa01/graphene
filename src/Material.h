@@ -81,15 +81,15 @@ private:
     std::shared_ptr<ImageTexture> diffuseTexture;
     std::shared_ptr<UniformBuffer> materialBuffer;
 
-    float ambientIntensity;
-    float diffuseIntensity;
-    float specularIntensity;
-    int specularHardness;
+    float ambientIntensity = 1.0f;
+    float diffuseIntensity = 1.0f;
+    float specularIntensity = 0.5f;
+    int specularHardness = 50;
 
-    Math::Vec3 diffuseColor;
-    Math::Vec3 specularColor;
+    Math::Vec3 diffuseColor = { 1.0f, 1.0f, 1.0f };
+    Math::Vec3 specularColor = { 1.0f, 1.0f, 1.0f };
 
-    GLuint ubo;
+    GLuint ubo = 0;
 };
 
 }  // namespace Graphene

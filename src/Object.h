@@ -34,7 +34,7 @@ class SceneNode;
 
 class Object: public Rotatable, public Movable {
 public:
-    enum ObjectType {
+    enum class ObjectType {
         TYPE_ENTITY,
         TYPE_LIGHT,
         TYPE_CAMERA

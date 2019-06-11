@@ -31,7 +31,13 @@
 
 namespace Graphene {
 
-enum MouseButton { LEFT, MIDDLE, RIGHT, X1, X2 };
+enum MouseButton {
+    LEFT,
+    MIDDLE,
+    RIGHT,
+    X1,
+    X2
+};
 
 constexpr int KeyboardScancodes = 256;
 constexpr int MouseButtons = 5;
@@ -66,9 +72,9 @@ protected:
     void setMousePosition(int x, int y);
     void setMouseCaptured(bool capture);
 
-    KeyboardState keyboardState = { };
-    MouseState mouseState = { };
-    MousePosition mousePosition = { };
+    KeyboardState keyboardState;
+    MouseState mouseState;
+    MousePosition mousePosition;
     bool mouseCaptured = false;
 };
 
