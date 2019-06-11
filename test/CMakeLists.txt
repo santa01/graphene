@@ -45,27 +45,31 @@ elseif (WIN32)
     add_compile_options (/WX)
 endif ()
 
-add_compile_definitions (_USE_MATH_DEFINES)
+add_compile_definitions (GRAPHENE_TEST _USE_MATH_DEFINES)
 
 set (TEST_LINK_LIBRARIES ${MATH_LIBRARIES} ${CPPUNIT_LIBRARIES})
 set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)
 
+set (TEST_GRAPHENE_SOURCES
+     ../src/SceneNode.cpp ../src/Object.cpp ../src/Entity.cpp ../src/Camera.cpp ../src/Light.cpp ../src/UniformBuffer.cpp)
+add_library (TEST_GRAPHENE_LIBRARY OBJECT ${TEST_GRAPHENE_SOURCES})
+
 set (TEST_CAMERA_EXECUTABLE test-camera)
 add_test (${TEST_CAMERA_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_CAMERA_EXECUTABLE})
-add_executable (${TEST_CAMERA_EXECUTABLE} src/TestCamera.cpp ../src/Camera.cpp)
+add_executable (${TEST_CAMERA_EXECUTABLE} src/TestCamera.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
 target_link_libraries (${TEST_CAMERA_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
 set (TEST_ENTITY_EXECUTABLE test-entity)
 add_test (${TEST_ENTITY_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_ENTITY_EXECUTABLE})
-add_executable (${TEST_ENTITY_EXECUTABLE} src/TestEntity.cpp ../src/Entity.cpp)
+add_executable (${TEST_ENTITY_EXECUTABLE} src/TestEntity.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
 target_link_libraries (${TEST_ENTITY_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
 set (TEST_LIGHT_EXECUTABLE test-light)
 add_test (${TEST_LIGHT_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_LIGHT_EXECUTABLE})
-add_executable (${TEST_LIGHT_EXECUTABLE} src/TestLight.cpp ../src/Light.cpp)
+add_executable (${TEST_LIGHT_EXECUTABLE} src/TestLight.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
 target_link_libraries (${TEST_LIGHT_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
 set (TEST_SCENE_NODE_EXECUTABLE test-scenenode)
 add_test (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_SCENE_NODE_EXECUTABLE})
-add_executable (${TEST_SCENE_NODE_EXECUTABLE} src/TestSceneNode.cpp ../src/SceneNode.cpp ../src/Entity.cpp ../src/Light.cpp)
+add_executable (${TEST_SCENE_NODE_EXECUTABLE} src/TestSceneNode.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
 target_link_libraries (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_LINK_LIBRARIES})

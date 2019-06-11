@@ -23,6 +23,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <FrameBuffer.h>
 #include <Window.h>
@@ -36,59 +37,23 @@ namespace Graphene {
 
 class Engine: public NonCopyable {
 public:
-    Engine(int width, int height);
-    virtual ~Engine() {}
+    GRAPHENE_API Engine(int width, int height);
+    GRAPHENE_API virtual ~Engine() {}
 
-    const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() {
-        return this->frameBuffers;
-    }
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers();
+    GRAPHENE_API void addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer);
 
-    void addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer) {
-        if (frameBuffer == nullptr) {
-            throw std::invalid_argument("FrameBuffer cannot be nullptr");
-        }
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneManager>>& getSceneManagers();
+    GRAPHENE_API void addSceneManager(const std::shared_ptr<SceneManager> sceneManager);
 
-        this->frameBuffers.insert(frameBuffer);
-    }
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<ObjectManager>>& getObjectManagers();
+    GRAPHENE_API void addObjectManager(const std::shared_ptr<ObjectManager> objectManager);
 
-    const std::unordered_set<std::shared_ptr<SceneManager>>& getSceneManagers() {
-        return this->sceneManagers;
-    }
+    GRAPHENE_API std::shared_ptr<Window> getWindow();
+    GRAPHENE_API float getFrameTime() const;
 
-    void addSceneManager(const std::shared_ptr<SceneManager> sceneManager) {
-        if (sceneManager == nullptr) {
-            throw std::invalid_argument("SceneManager cannot be nullptr");
-        }
-
-        this->sceneManagers.insert(sceneManager);
-    }
-
-    const std::unordered_set<std::shared_ptr<ObjectManager>>& getObjectManagers() {
-        return this->objectManagers;
-    }
-
-    void addObjectManager(const std::shared_ptr<ObjectManager> objectManager) {
-        if (objectManager == nullptr) {
-            throw std::invalid_argument("ObjectManager cannot be nullptr");
-        }
-
-        this->objectManagers.insert(objectManager);
-    }
-
-    std::shared_ptr<Window> getWindow() {
-        return this->window;
-    }
-
-    float getFrameTime() const {
-        return this->frameTime;
-    }
-
-    void exit(int result) {
-        this->result = result;
-        this->running = false;
-    }
-
-    int exec();
+    GRAPHENE_API void exit(int result);
+    GRAPHENE_API int exec();
 
 protected:
     virtual void onMouseMotion(int /*x*/, int /*y*/) {}

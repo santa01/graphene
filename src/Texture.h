@@ -23,6 +23,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <OpenGL.h>
 
@@ -30,33 +31,14 @@ namespace Graphene {
 
 class Texture: public NonCopyable {
 public:
-    Texture() {
-        this->width = 0;
-        this->height = 0;
+    GRAPHENE_API Texture();
+    GRAPHENE_API virtual ~Texture();
 
-        glGenTextures(1, &this->texture);
-    }
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API GLuint getHandle() const;
 
-    virtual ~Texture() {
-        glDeleteTextures(1, &this->texture);
-    }
-
-    int getWidth() const {
-        return this->width;
-    }
-
-    int getHeight() const {
-        return this->height;
-    }
-
-    GLuint getHandle() const {
-        return this->texture;
-    }
-
-    void bind(int textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D, this->texture);
-    }
+    GRAPHENE_API void bind(int textureUnit);
 
 protected:
     GLuint texture;

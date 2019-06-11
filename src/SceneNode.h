@@ -23,6 +23,7 @@
 #ifndef SCENENODE_H
 #define SCENENODE_H
 
+#include <GrapheneApi.h>
 #include <Rotatable.h>
 #include <Scalable.h>
 #include <Movable.h>
@@ -42,119 +43,47 @@ class SceneManager;
 class SceneNode: public std::enable_shared_from_this<SceneNode>,
         public Rotatable, public Scalable, public Movable, public NonCopyable {
 public:
-    SceneNode(const std::shared_ptr<SceneManager> sceneManager):
-            scalingFactors(1.0f, 1.0f, 1.0f) {
-        if (sceneManager == nullptr) {
-            throw std::invalid_argument("SceneManager cannot be nullptr");
-        }
-
-        this->sceneManager = sceneManager;
-    }
+    GRAPHENE_API SceneNode(const std::shared_ptr<SceneManager> sceneManager);
 
     /* Rotatable */
 
-    void roll(float angle) {
-        this->rotate(Math::Vec3::UNIT_X, angle);
-    }
+    GRAPHENE_API void roll(float angle);
+    GRAPHENE_API void yaw(float angle);
+    GRAPHENE_API void pitch(float angle);
 
-    void yaw(float angle) {
-        this->rotate(Math::Vec3::UNIT_Y, angle);
-    }
-
-    void pitch(float angle) {
-        this->rotate(Math::Vec3::UNIT_Z, angle);
-    }
-
-    void rotate(const Math::Vec3& vector, float angle);
-
-    Math::Vec3 getRotationAngles() const {
-        return this->rotationAngles;
-    }
+    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
+    GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
     /* Scalable */
 
-    void scaleX(float factor) {
-        this->scale(factor, 1.0f, 1.0f);
-    }
+    GRAPHENE_API void scaleX(float factor);
+    GRAPHENE_API void scaleY(float factor);
+    GRAPHENE_API void scaleZ(float factor);
 
-    void scaleY(float factor) {
-        this->scale(1.0f, factor, 1.0f);
-    }
-
-    void scaleZ(float factor) {
-        this->scale(1.0f, 1.0f, factor);
-    }
-
-    void scale(float xFactor, float yFactor, float zFactor) {
-        this->scale(Math::Vec3(xFactor, yFactor, zFactor));
-    }
-
-    void scale(const Math::Vec3& factors);
-
-    Math::Vec3 getScalingFactors() const {
-        return this->scalingFactors;
-    }
+    GRAPHENE_API void scale(float xFactor, float yFactor, float zFactor);
+    GRAPHENE_API void scale(const Math::Vec3& factors);
+    GRAPHENE_API Math::Vec3 getScalingFactors() const;
 
     /* Movable */
 
-    void translate(float x, float y, float z) {
-        this->translate(Math::Vec3(x, y, z));
-    }
+    GRAPHENE_API void translate(float x, float y, float z);
+    GRAPHENE_API void translate(const Math::Vec3& position);
 
-    void translate(const Math::Vec3& position) {
-        this->move(position - this->position);
-    }
+    GRAPHENE_API void move(float x, float y, float z);
+    GRAPHENE_API void move(const Math::Vec3& position);
 
-    void move(float x, float y, float z) {
-        this->move(Math::Vec3(x, y, z));
-    }
-
-    void move(const Math::Vec3& position) {
-        this->position += position;
-
-        for (auto& node: this->nodes) {
-            node->move(position);
-        }
-
-        for (auto& object: this->objects) {
-            object->move(position);
-        }
-    }
-
-    Math::Vec3 getPosition() const {
-        return this->position;
-    }
+    GRAPHENE_API Math::Vec3 getPosition() const;
 
     /* SceneNode */
 
-    const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes() {
-        return this->nodes;
-    }
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes();
+    GRAPHENE_API void attachNode(std::shared_ptr<SceneNode> node);
 
-    void attachNode(std::shared_ptr<SceneNode> node) {
-        if (node == nullptr) {
-            throw std::invalid_argument("SceneNode cannot be nullptr");
-        }
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Object>>& getObjects();
+    GRAPHENE_API void attachObject(std::shared_ptr<Object> object);
 
-        auto inserted = this->nodes.insert(node);
-        if (inserted.second) {
-            node->parent = this->shared_from_this();
-        }
-    }
-
-    const std::unordered_set<std::shared_ptr<Object>>& getObjects() {
-        return this->objects;
-    }
-
-    void attachObject(std::shared_ptr<Object> object);
-
-    std::shared_ptr<class SceneManager> getSceneManager() {
-        return this->sceneManager.lock();
-    }
-
-    std::shared_ptr<SceneNode> getParent() {
-        return this->parent.lock();
-    }
+    GRAPHENE_API std::shared_ptr<class SceneManager> getSceneManager();
+    GRAPHENE_API std::shared_ptr<SceneNode> getParent();
 
 private:
     std::unordered_set<std::shared_ptr<SceneNode>> nodes;

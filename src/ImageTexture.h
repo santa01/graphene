@@ -23,6 +23,7 @@
 #ifndef IMAGETEXTURE_H
 #define IMAGETEXTURE_H
 
+#include <GrapheneApi.h>
 #include <Texture.h>
 #include <string>
 
@@ -30,8 +31,8 @@ namespace Graphene {
 
 class ImageTexture: public Texture {
 public:
-    ImageTexture(const std::string& name);
-    ImageTexture(int width, int height);
+    GRAPHENE_API ImageTexture(const std::string& name);
+    GRAPHENE_API ImageTexture(int width, int height);
 };
 
 }  // namespace Graphene

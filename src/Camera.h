@@ -23,6 +23,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <GrapheneApi.h>
 #include <Object.h>
 #include <Mat4.h>
 #include <Vec3.h>
@@ -36,138 +37,54 @@ public:
         TYPE_ORTHOGRAPHIC
     };
 
-    Camera() {
-        this->objectType = ObjectType::TYPE_CAMERA;
-        this->aspectRatio = 1.3333f;
-        this->nearPlane = 0.1f;
-        this->farPlane = 100.0f;
-        this->fov = 70.0f;
-
-        this->updateProjection(TYPE_PERSPECTIVE);
-        this->rotation.set(2, 2, -1.0f);  // Look at Z
-    }
+    GRAPHENE_API Camera();
 
     /* Rotatable */
 
-    void roll(float angle) {
-        this->rotate(Math::Vec3::UNIT_X, angle);
-    }
+    GRAPHENE_API void roll(float angle);
+    GRAPHENE_API void yaw(float angle);
+    GRAPHENE_API void pitch(float angle);
 
-    void yaw(float angle) {
-        this->rotate(Math::Vec3::UNIT_Y, angle);
-    }
-
-    void pitch(float angle) {
-        this->rotate(Math::Vec3::UNIT_Z, angle);
-    }
-
-    void rotate(const Math::Vec3& vector, float angle);
-
-    Math::Vec3 getRotationAngles() const {
-        return this->rotationAngles;
-    }
+    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
+    GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
     /* Movable */
 
-    void translate(float x, float y, float z) {
-        this->translate(Math::Vec3(x, y, z));
-    }
+    GRAPHENE_API void translate(float x, float y, float z);
+    GRAPHENE_API void translate(const Math::Vec3& position);
 
-    void translate(const Math::Vec3& position) {
-        this->translation.set(0, 3, -position.get(Math::Vec3::X));
-        this->translation.set(1, 3, -position.get(Math::Vec3::Y));
-        this->translation.set(2, 3, -position.get(Math::Vec3::Z));
-    }
+    GRAPHENE_API void move(float x, float y, float z);
+    GRAPHENE_API void move(const Math::Vec3& position);
 
-    void move(float x, float y, float z) {
-        this->move(Math::Vec3(x, y, z));
-    }
-
-    void move(const Math::Vec3& position) {
-        this->translation.set(0, 3, this->translation.get(0, 3) - position.get(Math::Vec3::X));
-        this->translation.set(1, 3, this->translation.get(1, 3) - position.get(Math::Vec3::Y));
-        this->translation.set(2, 3, this->translation.get(2, 3) - position.get(Math::Vec3::Z));
-    }
-
-    Math::Vec3 getPosition() const {
-        return Math::Vec3(-this->translation.get(0, 3), -this->translation.get(1, 3), -this->translation.get(2, 3));
-    }
+    GRAPHENE_API Math::Vec3 getPosition() const;
 
     /* Camera */
 
-    ProjectionType getProjectionType() const {
-        return this->projectionType;
-    }
+    GRAPHENE_API ProjectionType getProjectionType() const;
+    GRAPHENE_API void setProjectionType(ProjectionType type);
 
-    void setProjectionType(ProjectionType type) {
-        this->updateProjection(type);
-    }
+    GRAPHENE_API float getAspectRatio() const;
+    GRAPHENE_API void setAspectRatio(float aspectRatio);
 
-    float getAspectRatio() const {
-        return this->aspectRatio;
-    }
+    GRAPHENE_API float getNearPlane() const;
+    GRAPHENE_API void setNearPlane(float nearPlane);
 
-    void setAspectRatio(float aspectRatio) {
-        this->aspectRatio = aspectRatio;
-        this->updateProjection(this->projectionType);
-    }
+    GRAPHENE_API float getFarPlane() const;
+    GRAPHENE_API void setFarPlane(float farPlane);
 
-    float getNearPlane() const {
-        return this->nearPlane;
-    }
+    GRAPHENE_API float getFov() const;
+    GRAPHENE_API void setFov(float fov);
 
-    void setNearPlane(float nearPlane) {
-        this->nearPlane = nearPlane;
-        this->updateProjection(this->projectionType);
-    }
+    GRAPHENE_API Math::Vec3 getRight() const;
+    GRAPHENE_API Math::Vec3 getUp() const;
+    GRAPHENE_API Math::Vec3 getTarget() const;
 
-    float getFarPlane() const {
-        return this->farPlane;
-    }
+    GRAPHENE_API const Math::Mat4& getTranslation() const;
+    GRAPHENE_API const Math::Mat4& getRotation() const;
+    GRAPHENE_API const Math::Mat4& getProjection() const;
 
-    void setFarPlane(float farPlane) {
-        this->farPlane = farPlane;
-        this->updateProjection(this->projectionType);
-    }
-
-    float getFov() const {
-        return this->fov;
-    }
-
-    void setFov(float fov) {
-        this->fov = fov;
-        this->updateProjection(this->projectionType);
-    }
-
-    Math::Vec3 getRight() const {
-        return Math::Vec3(this->rotation.get(0, 0), this->rotation.get(0, 1), this->rotation.get(0, 2));
-    }
-
-    Math::Vec3 getUp() const {
-        return Math::Vec3(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
-    }
-
-    Math::Vec3 getTarget() const {
-        return -Math::Vec3(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
-    }
-
-    const Math::Mat4& getTranslation() const {
-        return this->translation;
-    }
-
-    const Math::Mat4& getRotation() const {
-        return this->rotation;
-    }
-
-    const Math::Mat4& getProjection() const {
-        return this->projection;
-    }
-
-    void lookAt(float x, float y, float z) {
-        this->lookAt(Math::Vec3(x, y, z));
-    }
-
-    void lookAt(const Math::Vec3& target);
+    GRAPHENE_API void lookAt(float x, float y, float z);
+    GRAPHENE_API void lookAt(const Math::Vec3& target);
 
 private:
     void updateProjection(ProjectionType projectionType);

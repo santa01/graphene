@@ -25,6 +25,7 @@
 
 #if defined(_WIN32)
 
+#include <GrapheneApi.h>
 #include <Window.h>
 #include <OpenGL.h>
 
@@ -32,12 +33,12 @@ namespace Graphene {
 
 class WindowWin32: public Window {
 public:
-    WindowWin32(int width, int height);
-    ~WindowWin32();
+    GRAPHENE_API WindowWin32(int width, int height);
+    GRAPHENE_API ~WindowWin32();
 
-    void captureMouse(bool captured) override;
-    void update() override;
-    void dispatchEvents() override;
+    GRAPHENE_API void captureMouse(bool captured) override;
+    GRAPHENE_API void update() override;
+    GRAPHENE_API void dispatchEvents() override;
 
 private:
     friend LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);

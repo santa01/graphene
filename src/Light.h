@@ -23,6 +23,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include <GrapheneApi.h>
 #include <UniformBuffer.h>
 #include <Quaternion.h>
 #include <Vec3.h>
@@ -56,136 +57,53 @@ public:
         TYPE_DIRECTED
     };
 
-    Light();
+    GRAPHENE_API Light();
 
     /* Rotatable */
 
-    void roll(float angle) {
-        this->rotate(Math::Vec3::UNIT_X, angle);
-    }
+    GRAPHENE_API void roll(float angle);
+    GRAPHENE_API void yaw(float angle);
+    GRAPHENE_API void pitch(float angle);
 
-    void yaw(float angle) {
-        this->rotate(Math::Vec3::UNIT_Y, angle);
-    }
-
-    void pitch(float angle) {
-        this->rotate(Math::Vec3::UNIT_Z, angle);
-    }
-
-    void rotate(const Math::Vec3& vector, float angle);
-
-    Math::Vec3 getRotationAngles() const {
-        return this->rotationAngles;
-    }
+    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
+    GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
     /* Movable */
 
-    void translate(float x, float y, float z) {
-        this->translate(Math::Vec3(x, y, z));
-    }
+    GRAPHENE_API void translate(float x, float y, float z);
+    GRAPHENE_API void translate(const Math::Vec3& position);
 
-    void translate(const Math::Vec3& position) {
-        this->position = position;
-        updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
-    }
+    GRAPHENE_API void move(float x, float y, float z);
+    GRAPHENE_API void move(const Math::Vec3& position);
 
-    void move(float x, float y, float z) {
-        this->move(Math::Vec3(x, y, z));
-    }
-
-    void move(const Math::Vec3& position) {
-        this->position += position;
-        updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
-    }
-
-    Math::Vec3 getPosition() const {
-        return this->position;
-    }
+    GRAPHENE_API Math::Vec3 getPosition() const;
 
     /* Light */
 
-    LightType getLightType() const {
-        return this->lightType;
-    }
+    GRAPHENE_API LightType getLightType() const;
+    GRAPHENE_API void setLightType(LightType type);
 
-    void setLightType(LightType type) {
-        this->lightType = type;
-        updateBuffer(this->lightBuffer, LightBuffer, lightType, &this->lightType);
-    }
+    GRAPHENE_API const Math::Vec3& getColor() const;
+    GRAPHENE_API void setColor(float red, float green, float blue);
+    GRAPHENE_API void setColor(const Math::Vec3& color);
 
-    const Math::Vec3& getColor() const {
-        return this->color;
-    }
+    GRAPHENE_API const Math::Vec3& getDirection() const;
+    GRAPHENE_API void setDirection(float x, float y, float z);
+    GRAPHENE_API void setDirection(const Math::Vec3& direction);
 
-    void setColor(float red, float green, float blue) {
-        this->setColor(Math::Vec3(red, green, blue));
-    }
+    GRAPHENE_API float getEnergy() const;
+    GRAPHENE_API void setEnergy(float energy);
 
-    void setColor(const Math::Vec3& color) {
-        this->color = color;
-        updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
-    }
+    GRAPHENE_API float getFalloff() const;
+    GRAPHENE_API void setFalloff(float falloff);
 
-    const Math::Vec3& getDirection() const {
-        return this->direction;
-    }
+    GRAPHENE_API float getAngle() const;
+    GRAPHENE_API void setAngle(float angle);
 
-    void setDirection(float x, float y, float z) {
-        this->setDirection(Math::Vec3(x, y, z));
-    }
+    GRAPHENE_API float getBlend() const;
+    GRAPHENE_API void setBlend(float blend);
 
-    void setDirection(const Math::Vec3& direction) {
-        if (direction == Math::Vec3::ZERO) {
-            throw std::invalid_argument("Vector cannot be of zero length");
-        }
-
-        this->direction = direction;
-        updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
-    }
-
-    float getEnergy() const {
-        return this->energy;
-    }
-
-    void setEnergy(float energy) {
-        this->energy = energy;
-        updateBuffer(this->lightBuffer, LightBuffer, energy, &this->energy);
-    }
-
-    float getFalloff() const {
-        return this->falloff;
-    }
-
-    void setFalloff(float falloff) {
-        this->falloff = falloff;
-        updateBuffer(this->lightBuffer, LightBuffer, falloff, &this->falloff);
-    }
-
-    float getAngle() const {
-        return this->angle;
-    }
-
-    void setAngle(float angle) {
-        this->angle = angle;
-        updateBuffer(this->lightBuffer, LightBuffer, angle, &this->angle);
-    }
-
-    float getBlend() const {
-        return this->blend;
-    }
-
-    void setBlend(float blend) {
-        if (blend < 0.0f || blend > 1.0f) {
-            throw std::invalid_argument("Blend is not in [0.0; 1.0] range");
-        }
-
-        this->blend = blend;
-        updateBuffer(this->lightBuffer, LightBuffer, blend, &this->blend);
-    }
-
-    std::shared_ptr<UniformBuffer> getLightBuffer() {
-        return this->lightBuffer;
-    }
+    GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer();
 
 private:
     LightType lightType;

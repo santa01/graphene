@@ -26,4 +26,18 @@ namespace Graphene {
 
 std::stack<RenderState> RenderStack::stack;
 
+void RenderStack::push(RenderState state) {
+    RenderStack::stack.push(state);
+}
+
+void RenderStack::pop() {
+    RenderState state(RenderStack::stack.top());
+    RenderStack::stack.pop();
+    state();
+}
+
+int RenderStack::depth() {
+    return static_cast<int>(RenderStack::stack.size());
+}
+
 }  // namespace Graphene

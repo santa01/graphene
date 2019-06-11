@@ -46,4 +46,42 @@ GeometryBuffer::GeometryBuffer(int width, int height):
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
+GeometryBuffer::~GeometryBuffer() {
+    glDeleteFramebuffers(1, &this->fbo);
+}
+
+int GeometryBuffer::getWidth() const {
+    return this->width;
+}
+
+int GeometryBuffer::getHeight() const {
+    return this->height;
+}
+
+std::shared_ptr<ImageTexture> GeometryBuffer::getDiffuseTexture() {
+    return this->diffuseTexture;
+}
+
+std::shared_ptr<ImageTexture> GeometryBuffer::getSpecularTexture() {
+    return this->specularTexture;
+}
+
+std::shared_ptr<ImageTexture> GeometryBuffer::getPositionTexture() {
+    return this->positionTexture;
+}
+
+std::shared_ptr<ImageTexture> GeometryBuffer::getNormalTexture() {
+    return this->normalTexture;
+}
+
+std::shared_ptr<DepthTexture> GeometryBuffer::getDepthTexture() {
+    return this->depthTexture;
+}
+
+void GeometryBuffer::bind() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+    glDrawBuffers(4, this->buffers);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 }  // namespace Graphene

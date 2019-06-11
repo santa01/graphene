@@ -23,6 +23,7 @@
 #ifndef SCENEMANAGER_H
 #define SCENEMANAGER_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <SceneNode.h>
 #include <Camera.h>
@@ -59,95 +60,36 @@ void traverseScene(std::shared_ptr<SceneNode> node, Function function) {
 
 class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
 public:
-    SceneManager();
+    GRAPHENE_API SceneManager();
 
     /* const version of shared_from_this() is selected otherwise */
-    std::shared_ptr<SceneNode> createNode() {
-        return std::make_shared<SceneNode>(this->shared_from_this());
-    }
+    GRAPHENE_API std::shared_ptr<SceneNode> createNode();
 
     /* shared_from_this() cannot be called from constructor */
-    std::shared_ptr<SceneNode> getRootNode() {
-        if (this->rootNode == nullptr) {
-            this->rootNode = this->createNode();
-        }
+    GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
 
-        return this->rootNode;
-    }
+    GRAPHENE_API std::shared_ptr<Shader> getGeometryShader();
+    GRAPHENE_API void setGeometryShader(const std::shared_ptr<Shader> geometryShader);
 
-    std::shared_ptr<Shader> getGeometryShader() {
-        return this->geometryShader;
-    }
+    GRAPHENE_API std::shared_ptr<Shader> getAmbientShader();
+    GRAPHENE_API void setAmbientShader(const std::shared_ptr<Shader> ambientShader);
 
-    void setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
-        if (geometryShader == nullptr) {
-            throw std::invalid_argument("Shader cannot be nullptr");
-        }
+    GRAPHENE_API std::shared_ptr<Shader> getLightingShader();
+    GRAPHENE_API void setLightingShader(const std::shared_ptr<Shader> lightingShader);
 
-        this->geometryShader = geometryShader;
-    }
+    GRAPHENE_API const Math::Vec3& getAmbientColor() const;
+    GRAPHENE_API void setAmbientColor(const Math::Vec3& ambientColor);
 
-    std::shared_ptr<Shader> getAmbientShader() {
-        return this->ambientShader;
-    }
+    GRAPHENE_API float getAmbientEnergy() const;
+    GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
 
-    void setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
-        if (ambientShader == nullptr) {
-            throw std::invalid_argument("Shader cannot be nullptr");
-        }
+    GRAPHENE_API bool hasShadowPass() const;
+    GRAPHENE_API void setShadowPass(bool shadowPass);
 
-        this->ambientShader = ambientShader;
-    }
+    GRAPHENE_API bool hasLightPass() const;
+    GRAPHENE_API void setLightPass(bool lightPass);
 
-    std::shared_ptr<Shader> getLightingShader() {
-        return this->lightingShader;
-    }
-
-    void setLightingShader(const std::shared_ptr<Shader> lightingShader) {
-        if (lightingShader == nullptr) {
-            throw std::invalid_argument("Shader cannot be nullptr");
-        }
-
-        this->lightingShader = lightingShader;
-    }
-
-    const Math::Vec3& getAmbientColor() const {
-        return this->ambientColor;
-    }
-
-    void setAmbientColor(const Math::Vec3& ambientColor) {
-        this->ambientColor = ambientColor;
-    }
-
-    float getAmbientEnergy() const {
-        return this->ambientEnergy;
-    }
-
-    void setAmbientEnergy(float ambientEnergy) {
-        if (ambientEnergy < 0.0f) {
-            throw std::runtime_error("Ambient energy is less than 0.0f");
-        }
-
-        this->ambientEnergy = ambientEnergy;
-    }
-
-    bool hasShadowPass() const {
-        return this->shadowPass;
-    }
-
-    void setShadowPass(bool shadowPass) {
-        this->shadowPass = shadowPass;
-    }
-
-    bool hasLightPass() const {
-        return this->lightPass;
-    }
-
-    void setLightPass(bool lightPass) {
-        this->lightPass = lightPass;
-    }
-
-    void render(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 
 private:
     enum BindPoints {

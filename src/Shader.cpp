@@ -50,6 +50,102 @@ Shader::Shader(const std::string& name) {
     this->buildShader();
 }
 
+Shader::Shader(const char* source, int sourceLength) {
+    this->source = std::string(source, sourceLength);
+    this->version = 330;
+    this->buildShader();
+}
+
+Shader::~Shader() {
+    if (this->program != 0) {
+        glDeleteProgram(this->program);
+    }
+}
+
+void Shader::setUniform(const std::string& name, const Math::Mat4& value) {
+    GLint uniform = this->checkoutUniform(name);
+    if (uniform > -1) {
+        glUniformMatrix4fv(uniform, 1, GL_TRUE, (GLfloat*)value.data());
+    }
+}
+
+void Shader::setUniform(const std::string& name, const Math::Mat3& value) {
+    GLint uniform = this->checkoutUniform(name);
+    if (uniform > -1) {
+        glUniformMatrix3fv(uniform, 1, GL_TRUE, (GLfloat*)value.data());
+    }
+}
+
+void Shader::setUniform(const std::string& name, const Math::Vec4& value) {
+    GLint uniform = this->checkoutUniform(name);
+    if (uniform > -1) {
+        glUniform4fv(uniform, 1, (GLfloat*)value.data());
+    }
+}
+
+void Shader::setUniform(const std::string& name, const Math::Vec3& value) {
+    GLint uniform = this->checkoutUniform(name);
+    if (uniform > -1) {
+        glUniform3fv(uniform, 1, (GLfloat*)value.data());
+    }
+}
+
+void Shader::setUniform(const std::string& name, float value) {
+    GLint uniform = this->checkoutUniform(name);
+    if (uniform > -1) {
+        glUniform1f(uniform, value);
+    }
+}
+
+void Shader::setUniform(const std::string& name, int value) {
+    GLint uniform = this->checkoutUniform(name);
+    if (uniform > -1) {
+        glUniform1i(uniform, value);
+    }
+}
+
+void Shader::setUniformBlock(const std::string& name, int bindPoint) {
+    GLuint uniformBlock = this->checkoutUniformBlock(name);
+    if (uniformBlock != GL_INVALID_INDEX) {
+        glUniformBlockBinding(this->program, uniformBlock, bindPoint);
+    }
+}
+
+const std::string& Shader::getSource() const {
+    return this->source;
+}
+
+GLuint Shader::getVersion() const {
+    return this->version;
+}
+
+void Shader::enable() {
+    if (this->program != Shader::activeProgram) {
+        Shader::activeProgram = this->program;
+        glUseProgram(this->program);
+    }
+}
+
+GLint Shader::checkoutUniform(const std::string& name) {
+    this->enable();
+
+    if (this->uniforms.find(name) == this->uniforms.end()) {
+        this->uniforms.insert(std::make_pair(name, glGetUniformLocation(this->program, name.c_str())));
+    }
+
+    return this->uniforms.at(name);
+}
+
+GLuint Shader::checkoutUniformBlock(const std::string& name) {
+    this->enable();
+
+    if (this->uniformBlocks.find(name) == this->uniformBlocks.end()) {
+        this->uniformBlocks.insert(std::make_pair(name, glGetUniformBlockIndex(this->program, name.c_str())));
+    }
+
+    return this->uniformBlocks.at(name);
+}
+
 void Shader::buildShader() {
     std::vector<GLuint> shaders;
     std::unordered_map<std::string, GLenum> shaderTypes = {

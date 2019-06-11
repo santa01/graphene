@@ -47,6 +47,90 @@ SceneManager::SceneManager():
     this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
 }
 
+std::shared_ptr<SceneNode> SceneManager::createNode() {
+    return std::make_shared<SceneNode>(this->shared_from_this());
+}
+
+std::shared_ptr<SceneNode> SceneManager::getRootNode() {
+    if (this->rootNode == nullptr) {
+        this->rootNode = this->createNode();
+    }
+
+    return this->rootNode;
+}
+
+std::shared_ptr<Shader> SceneManager::getGeometryShader() {
+    return this->geometryShader;
+}
+
+void SceneManager::setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
+    if (geometryShader == nullptr) {
+        throw std::invalid_argument("Shader cannot be nullptr");
+    }
+
+    this->geometryShader = geometryShader;
+}
+
+std::shared_ptr<Shader> SceneManager::getAmbientShader() {
+    return this->ambientShader;
+}
+
+void SceneManager::setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
+    if (ambientShader == nullptr) {
+        throw std::invalid_argument("Shader cannot be nullptr");
+    }
+
+    this->ambientShader = ambientShader;
+}
+
+std::shared_ptr<Shader> SceneManager::getLightingShader() {
+    return this->lightingShader;
+}
+
+void SceneManager::setLightingShader(const std::shared_ptr<Shader> lightingShader) {
+    if (lightingShader == nullptr) {
+        throw std::invalid_argument("Shader cannot be nullptr");
+    }
+
+    this->lightingShader = lightingShader;
+}
+
+const Math::Vec3& SceneManager::getAmbientColor() const {
+    return this->ambientColor;
+}
+
+void SceneManager::setAmbientColor(const Math::Vec3& ambientColor) {
+    this->ambientColor = ambientColor;
+}
+
+float SceneManager::getAmbientEnergy() const {
+    return this->ambientEnergy;
+}
+
+void SceneManager::setAmbientEnergy(float ambientEnergy) {
+    if (ambientEnergy < 0.0f) {
+        throw std::runtime_error("Ambient energy is less than 0.0f");
+    }
+
+    this->ambientEnergy = ambientEnergy;
+}
+
+bool SceneManager::hasShadowPass() const {
+    return this->shadowPass;
+}
+
+void SceneManager::setShadowPass(bool shadowPass) {
+    this->shadowPass = shadowPass;
+}
+
+bool SceneManager::hasLightPass() const {
+    return this->lightPass;
+}
+
+void SceneManager::setLightPass(bool lightPass) {
+    this->lightPass = lightPass;
+}
+
 void SceneManager::render(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
         throw std::invalid_argument("Camera cannot be nullptr");

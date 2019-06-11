@@ -23,6 +23,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include <GrapheneApi.h>
 #include <ImageTexture.h>
 #include <UniformBuffer.h>
 #include <OpenGL.h>
@@ -50,103 +51,33 @@ typedef struct {
 
 class Material {
 public:
-    Material();
+    GRAPHENE_API Material();
+    GRAPHENE_API ~Material();
 
-    ~Material() {
-        glDeleteBuffers(1, &this->ubo);
-    }
+    GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture();
+    GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture);
 
-    std::shared_ptr<ImageTexture> getDiffuseTexture() {
-        return this->diffuseTexture;
-    }
+    GRAPHENE_API float getAmbientIntensity() const;
+    GRAPHENE_API void setAmbientIntensity(float ambientIntensity);
 
-    void setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture) {
-        if (diffuseTexture == nullptr) {
-            throw std::invalid_argument("ImageTexture cannot be nullptr");
-        }
+    GRAPHENE_API float getDiffuseIntensity() const;
+    GRAPHENE_API void setDiffuseIntensity(float diffuseIntensity);
 
-        this->diffuseTexture = diffuseTexture;
-        bool diffuseTextureAvailable = true;
-        updateBuffer(this->materialBuffer, MaterialBuffer, diffuseTexture, &diffuseTextureAvailable);
-    }
+    GRAPHENE_API float getSpecularIntensity() const;
+    GRAPHENE_API void setSpecularIntensity(float specularIntensity);
 
-    float getAmbientIntensity() const {
-        return this->ambientIntensity;
-    }
+    GRAPHENE_API int getSpecularHardness() const;
+    GRAPHENE_API void setSpecularHardness(int specularHardness);
 
-    void setAmbientIntensity(float ambientIntensity) {
-        if (ambientIntensity < 0.0f || ambientIntensity > 1.0f) {
-            throw std::runtime_error("Ambient intensity is not in [0.0f, 1.0f] range");
-        }
+    GRAPHENE_API const Math::Vec3& getDiffuseColor() const;
+    GRAPHENE_API void setDiffuseColor(const Math::Vec3& diffuseColor);
 
-        this->ambientIntensity = ambientIntensity;
-        updateBuffer(this->materialBuffer, MaterialBuffer, ambientIntensity, &this->ambientIntensity);
-    }
+    GRAPHENE_API const Math::Vec3& getSpecularColor() const;
+    GRAPHENE_API void setSpecularColor(const Math::Vec3& specularColor);
 
-    float getDiffuseIntensity() const {
-        return this->diffuseIntensity;
-    }
+    GRAPHENE_API std::shared_ptr<UniformBuffer> getMaterialBuffer();
 
-    void setDiffuseIntensity(float diffuseIntensity) {
-        if (diffuseIntensity < 0.0f || diffuseIntensity > 1.0f) {
-            throw std::runtime_error("Diffuse intensity is not in [0.0f, 1.0f] range");
-        }
-
-        this->diffuseIntensity = diffuseIntensity;
-        updateBuffer(this->materialBuffer, MaterialBuffer, diffuseIntensity, &this->diffuseIntensity);
-    }
-
-    float getSpecularIntensity() const {
-        return this->specularIntensity;
-    }
-
-    void setSpecularIntensity(float specularIntensity) {
-        if (specularIntensity < 0.0f || specularIntensity > 1.0f) {
-            throw std::runtime_error("Specular intensity is not in [0.0f, 1.0f] range");
-        }
-
-        this->specularIntensity = specularIntensity;
-        updateBuffer(this->materialBuffer, MaterialBuffer, specularIntensity, &this->specularIntensity);
-    }
-
-    int getSpecularHardness() const {
-        return this->specularHardness;
-    }
-
-    void setSpecularHardness(int specularHardness) {
-        if (specularHardness < 0) {
-            throw std::runtime_error("Specular hardness is less than 0");
-        }
-
-        this->specularHardness = specularHardness;
-        updateBuffer(this->materialBuffer, MaterialBuffer, specularHardness, &this->specularHardness);
-    }
-
-    const Math::Vec3& getDiffuseColor() const {
-        return this->diffuseColor;
-    }
-
-    void setDiffuseColor(const Math::Vec3& diffuseColor) {
-        this->diffuseColor = diffuseColor;
-        updateBuffer(this->materialBuffer, MaterialBuffer, diffuseColor, this->diffuseColor.data());
-    }
-
-    const Math::Vec3& getSpecularColor() const {
-        return this->specularColor;
-    }
-
-    void setSpecularColor(const Math::Vec3& specularColor) {
-        this->specularColor = specularColor;
-        updateBuffer(this->materialBuffer, MaterialBuffer, specularColor, this->specularColor.data());
-    }
-
-    std::shared_ptr<UniformBuffer> getMaterialBuffer() {
-        return this->materialBuffer;
-    }
-
-    void bind(int bindPoint) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, bindPoint, this->ubo);
-    }
+    GRAPHENE_API void bind(int bindPoint);
 
 private:
     std::shared_ptr<ImageTexture> diffuseTexture;

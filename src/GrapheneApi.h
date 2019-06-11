@@ -24,8 +24,10 @@
 #define GRAPHENEAPI_H
 
 #if defined(_WIN32)
-#ifdef GRAPHENE_EXPORT
+#if defined(GRAPHENE_EXPORT)
 #define GRAPHENE_API __declspec(dllexport)
+#elif defined(GRAPHENE_TEST)
+#define GRAPHENE_API
 #else
 #define GRAPHENE_API __declspec(dllimport)
 #endif

@@ -46,4 +46,100 @@ Material::Material():
     this->materialBuffer = std::make_shared<UniformBuffer>(&material, sizeof(material));
 }
 
+Material::~Material() {
+    glDeleteBuffers(1, &this->ubo);
+}
+
+std::shared_ptr<ImageTexture> Material::getDiffuseTexture() {
+    return this->diffuseTexture;
+}
+
+void Material::setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture) {
+    if (diffuseTexture == nullptr) {
+        throw std::invalid_argument("ImageTexture cannot be nullptr");
+    }
+
+    this->diffuseTexture = diffuseTexture;
+    bool diffuseTextureAvailable = true;
+    updateBuffer(this->materialBuffer, MaterialBuffer, diffuseTexture, &diffuseTextureAvailable);
+}
+
+float Material::getAmbientIntensity() const {
+    return this->ambientIntensity;
+}
+
+void Material::setAmbientIntensity(float ambientIntensity) {
+    if (ambientIntensity < 0.0f || ambientIntensity > 1.0f) {
+        throw std::runtime_error("Ambient intensity is not in [0.0f, 1.0f] range");
+    }
+
+    this->ambientIntensity = ambientIntensity;
+    updateBuffer(this->materialBuffer, MaterialBuffer, ambientIntensity, &this->ambientIntensity);
+}
+
+float Material::getDiffuseIntensity() const {
+    return this->diffuseIntensity;
+}
+
+void Material::setDiffuseIntensity(float diffuseIntensity) {
+    if (diffuseIntensity < 0.0f || diffuseIntensity > 1.0f) {
+        throw std::runtime_error("Diffuse intensity is not in [0.0f, 1.0f] range");
+    }
+
+    this->diffuseIntensity = diffuseIntensity;
+    updateBuffer(this->materialBuffer, MaterialBuffer, diffuseIntensity, &this->diffuseIntensity);
+}
+
+float Material::getSpecularIntensity() const {
+    return this->specularIntensity;
+}
+
+void Material::setSpecularIntensity(float specularIntensity) {
+    if (specularIntensity < 0.0f || specularIntensity > 1.0f) {
+        throw std::runtime_error("Specular intensity is not in [0.0f, 1.0f] range");
+    }
+
+    this->specularIntensity = specularIntensity;
+    updateBuffer(this->materialBuffer, MaterialBuffer, specularIntensity, &this->specularIntensity);
+}
+
+int Material::getSpecularHardness() const {
+    return this->specularHardness;
+}
+
+void Material::setSpecularHardness(int specularHardness) {
+    if (specularHardness < 0) {
+        throw std::runtime_error("Specular hardness is less than 0");
+    }
+
+    this->specularHardness = specularHardness;
+    updateBuffer(this->materialBuffer, MaterialBuffer, specularHardness, &this->specularHardness);
+}
+
+const Math::Vec3& Material::getDiffuseColor() const {
+    return this->diffuseColor;
+}
+
+void Material::setDiffuseColor(const Math::Vec3& diffuseColor) {
+    this->diffuseColor = diffuseColor;
+    updateBuffer(this->materialBuffer, MaterialBuffer, diffuseColor, this->diffuseColor.data());
+}
+
+const Math::Vec3& Material::getSpecularColor() const {
+    return this->specularColor;
+}
+
+void Material::setSpecularColor(const Math::Vec3& specularColor) {
+    this->specularColor = specularColor;
+    updateBuffer(this->materialBuffer, MaterialBuffer, specularColor, this->specularColor.data());
+}
+
+std::shared_ptr<UniformBuffer> Material::getMaterialBuffer() {
+    return this->materialBuffer;
+}
+
+void Material::bind(int bindPoint) {
+    glBindBufferBase(GL_UNIFORM_BUFFER, bindPoint, this->ubo);
+}
+
 }  // namespace Graphene

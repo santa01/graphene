@@ -44,4 +44,4 @@ target_compile_options (${EXAMPLE_EXECUTABLE} PUBLIC
 )
 target_compile_definitions (${EXAMPLE_EXECUTABLE} PUBLIC _USE_MATH_DEFINES)
 
-target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_STATIC} ${MATH_LIBRARIES})
+target_link_libraries (${EXAMPLE_EXECUTABLE} ${GRAPHENE_SHARED} ${MATH_LIBRARIES})

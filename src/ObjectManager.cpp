@@ -29,6 +29,14 @@
 
 namespace Graphene {
 
+std::shared_ptr<Camera> ObjectManager::createCamera() const {
+    return std::make_shared<Camera>();
+}
+
+std::shared_ptr<Light> ObjectManager::createLight() const {
+    return std::make_shared<Light>();
+}
+
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     std::unordered_set<std::shared_ptr<Mesh>> meshes;
 
@@ -45,6 +53,16 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     }
 
     return entity;
+}
+
+std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& name) {
+    if (this->textureCache.find(name) != this->textureCache.end()) {
+        return this->textureCache.at(name);
+    }
+
+    auto texture = std::make_shared<ImageTexture>(name);
+    this->textureCache.insert(std::make_pair(name, texture));
+    return texture;
 }
 
 std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std::string& name) {

@@ -23,6 +23,7 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
+#include <GrapheneApi.h>
 #include <RenderTarget.h>
 #include <ImageTexture.h>
 #include <OpenGL.h>
@@ -32,22 +33,10 @@ namespace Graphene {
 
 class FrameBuffer: public RenderTarget {
 public:
-    FrameBuffer(int width, int height):
-            RenderTarget(width, height),
-            colorTexture(new ImageTexture(width, height)) {
-        glGenFramebuffers(1, &this->fbo);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->colorTexture->getHandle(), 0);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    }
+    GRAPHENE_API FrameBuffer(int width, int height);
+    GRAPHENE_API ~FrameBuffer();
 
-    ~FrameBuffer() {
-        glDeleteFramebuffers(1, &this->fbo);
-    }
-
-    std::shared_ptr<ImageTexture> getColorTexture() {
-        return this->colorTexture;
-    }
+    GRAPHENE_API std::shared_ptr<ImageTexture> getColorTexture();
 
 private:
     std::shared_ptr<ImageTexture> colorTexture;

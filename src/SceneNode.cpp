@@ -28,6 +28,27 @@
 
 namespace Graphene {
 
+SceneNode::SceneNode(const std::shared_ptr<SceneManager> sceneManager):
+        scalingFactors(1.0f, 1.0f, 1.0f) {
+    if (sceneManager == nullptr) {
+        throw std::invalid_argument("SceneManager cannot be nullptr");
+    }
+
+    this->sceneManager = sceneManager;
+}
+
+void SceneNode::roll(float angle) {
+    this->rotate(Math::Vec3::UNIT_X, angle);
+}
+
+void SceneNode::yaw(float angle) {
+    this->rotate(Math::Vec3::UNIT_Y, angle);
+}
+
+void SceneNode::pitch(float angle) {
+    this->rotate(Math::Vec3::UNIT_Z, angle);
+}
+
 void SceneNode::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
         throw std::invalid_argument("Vector cannot be of zero length");
@@ -57,6 +78,26 @@ void SceneNode::rotate(const Math::Vec3& vector, float angle) {
     }
 }
 
+Math::Vec3 SceneNode::getRotationAngles() const {
+    return this->rotationAngles;
+}
+
+void SceneNode::scaleX(float factor) {
+    this->scale(factor, 1.0f, 1.0f);
+}
+
+void SceneNode::scaleY(float factor) {
+    this->scale(1.0f, factor, 1.0f);
+}
+
+void SceneNode::scaleZ(float factor) {
+    this->scale(1.0f, 1.0f, factor);
+}
+
+void SceneNode::scale(float xFactor, float yFactor, float zFactor) {
+    this->scale(Math::Vec3(xFactor, yFactor, zFactor));
+}
+
 void SceneNode::scale(const Math::Vec3& factors) {
     if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
         throw std::invalid_argument("Factor is less or equals zero");
@@ -81,6 +122,57 @@ void SceneNode::scale(const Math::Vec3& factors) {
     }
 }
 
+Math::Vec3 SceneNode::getScalingFactors() const {
+    return this->scalingFactors;
+}
+
+void SceneNode::translate(float x, float y, float z) {
+    this->translate(Math::Vec3(x, y, z));
+}
+
+void SceneNode::translate(const Math::Vec3& position) {
+    this->move(position - this->position);
+}
+
+void SceneNode::move(float x, float y, float z) {
+    this->move(Math::Vec3(x, y, z));
+}
+
+void SceneNode::move(const Math::Vec3& position) {
+    this->position += position;
+
+    for (auto& node: this->nodes) {
+        node->move(position);
+    }
+
+    for (auto& object: this->objects) {
+        object->move(position);
+    }
+}
+
+Math::Vec3 SceneNode::getPosition() const {
+    return this->position;
+}
+
+const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() {
+    return this->nodes;
+}
+
+void SceneNode::attachNode(std::shared_ptr<SceneNode> node) {
+    if (node == nullptr) {
+        throw std::invalid_argument("SceneNode cannot be nullptr");
+    }
+
+    auto inserted = this->nodes.insert(node);
+    if (inserted.second) {
+        node->parent = this->shared_from_this();
+    }
+}
+
+const std::unordered_set<std::shared_ptr<Object>>& SceneNode::getObjects() {
+    return this->objects;
+}
+
 void SceneNode::attachObject(std::shared_ptr<Object> object) {
     if (object == nullptr) {
         throw std::invalid_argument("Object cannot be nullptr");
@@ -103,6 +195,14 @@ void SceneNode::attachObject(std::shared_ptr<Object> object) {
 
         object->parent = this->shared_from_this();
     }
+}
+
+std::shared_ptr<class SceneManager> SceneNode::getSceneManager() {
+    return this->sceneManager.lock();
+}
+
+std::shared_ptr<SceneNode> SceneNode::getParent() {
+    return this->parent.lock();
 }
 
 }  // namespace Graphene

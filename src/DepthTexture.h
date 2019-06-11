@@ -23,6 +23,7 @@
 #ifndef DEPTHTEXTURE_H
 #define DEPTHTEXTURE_H
 
+#include <GrapheneApi.h>
 #include <Texture.h>
 #include <OpenGL.h>
 
@@ -30,14 +31,7 @@ namespace Graphene {
 
 class DepthTexture: public Texture {
 public:
-    DepthTexture(int width, int height) {
-        this->width = width;
-        this->height = height;
-
-        glBindTexture(GL_TEXTURE_2D, this->texture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, this->width, this->height);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+    GRAPHENE_API DepthTexture(int width, int height);
 };
 
 }  // namespace Graphene

@@ -23,6 +23,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <GrapheneApi.h>
 #include <Material.h>
 #include <OpenGL.h>
 #include <stdexcept>
@@ -32,38 +33,16 @@ namespace Graphene {
 
 class Mesh {
 public:
-    Mesh(const void* data, int faces, int vertices);
+    GRAPHENE_API Mesh(const void* data, int faces, int vertices);
+    GRAPHENE_API ~Mesh();
 
-    ~Mesh() {
-        glDeleteVertexArrays(1, &this->vao);
-        glDeleteBuffers(2, this->buffers);
-    }
+    GRAPHENE_API std::shared_ptr<Material> getMaterial();
+    GRAPHENE_API void setMaterial(const std::shared_ptr<Material> material);
 
-    std::shared_ptr<Material> getMaterial() {
-        return this->material;
-    }
+    GRAPHENE_API int getFaces() const;
+    GRAPHENE_API int getVertices() const;
 
-    void setMaterial(const std::shared_ptr<Material> material) {
-        if (material == nullptr) {
-            throw std::invalid_argument("Material cannot be nullptr");
-        }
-
-        this->material = material;
-    }
-
-    int getFaces() const {
-        return this->faces;
-    }
-
-    int getVertices() const {
-        return this->vertices;
-    }
-
-    void render() {
-        glBindVertexArray(this->vao);
-        glDrawElements(GL_TRIANGLES, this->faces * 3, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-    }
+    GRAPHENE_API void render();
 
 private:
     enum DataBuffer {

@@ -24,4 +24,12 @@
 
 namespace Graphene {
 
+Object::ObjectType Object::getObjectType() const {
+    return this->objectType;
+}
+
+std::shared_ptr<class SceneNode> Object::getParent() {
+    return this->parent.lock();
+}
+
 }  // namespace Graphene

@@ -23,6 +23,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include <GrapheneApi.h>
 #include <RenderTarget.h>
 #include <Signals.h>
 #include <array>
@@ -41,17 +42,17 @@ typedef std::pair<int, int> MousePosition;
 
 class Window: public RenderTarget {
 public:
-    Window(int width, int height);
-    virtual ~Window() = default;
+    GRAPHENE_API Window(int width, int height);
+    GRAPHENE_API virtual ~Window() = default;
 
-    const KeyboardState& getKeyboardState() const;
-    const MouseState& getMouseState() const;
-    const MousePosition& getMousePosition() const;
-    bool isMouseCaptured() const;
+    GRAPHENE_API const KeyboardState& getKeyboardState() const;
+    GRAPHENE_API const MouseState& getMouseState() const;
+    GRAPHENE_API const MousePosition& getMousePosition() const;
+    GRAPHENE_API bool isMouseCaptured() const;
 
-    virtual void captureMouse(bool captured) = 0;
-    virtual void update() = 0;
-    virtual void dispatchEvents() = 0;
+    GRAPHENE_API virtual void captureMouse(bool captured) = 0;
+    GRAPHENE_API virtual void update() = 0;
+    GRAPHENE_API virtual void dispatchEvents() = 0;
 
     Signals::Signal<int, int> onMouseMotion;
     Signals::Signal<int, bool> onMouseButton;

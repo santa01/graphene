@@ -23,6 +23,7 @@
 #ifndef IMAGETGA_H
 #define IMAGETGA_H
 
+#include <GrapheneApi.h>
 #include <string>
 #include <memory>
 
@@ -30,14 +31,14 @@ namespace Graphene {
 
 class ImageTGA {
 public:
-    ImageTGA(const std::string& filename);
+    GRAPHENE_API ImageTGA(const std::string& filename);
 
-    int getWidth() const;
-    int getHeights() const;
-    int getPixelDepth() const;
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeights() const;
+    GRAPHENE_API int getPixelDepth() const;
 
-    const std::string& getFilename() const;
-    const void* getPixels() const;
+    GRAPHENE_API const std::string& getFilename() const;
+    GRAPHENE_API const void* getPixels() const;
 
 private:
     int width = 0;

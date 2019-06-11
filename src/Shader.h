@@ -23,6 +23,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <OpenGL.h>
 #include <Mat4.h>
@@ -41,104 +42,26 @@ namespace Graphene {
 
 class Shader: public NonCopyable {
 public:
-    Shader(const std::string& name);
+    GRAPHENE_API Shader(const std::string& name);
+    GRAPHENE_API Shader(const char* source, int sourceLength);
+    GRAPHENE_API ~Shader();
 
-    Shader(const char* source, int sourceLength) {
-        this->source = std::string(source, sourceLength);
-        this->version = 330;
-        this->buildShader();
-    }
+    GRAPHENE_API void setUniform(const std::string& name, const Math::Mat4& value);
+    GRAPHENE_API void setUniform(const std::string& name, const Math::Mat3& value);
+    GRAPHENE_API void setUniform(const std::string& name, const Math::Vec4& value);
+    GRAPHENE_API void setUniform(const std::string& name, const Math::Vec3& value);
+    GRAPHENE_API void setUniform(const std::string& name, float value);
+    GRAPHENE_API void setUniform(const std::string& name, int value);
+    GRAPHENE_API void setUniformBlock(const std::string& name, int bindPoint);
 
-    ~Shader() {
-        if (this->program != 0) {
-            glDeleteProgram(this->program);
-        }
-    }
+    GRAPHENE_API const std::string& getSource() const;
+    GRAPHENE_API GLuint getVersion() const;
 
-    void setUniform(const std::string& name, const Math::Mat4& value) {
-        GLint uniform = this->checkoutUniform(name);
-        if (uniform > -1) {
-            glUniformMatrix4fv(uniform, 1, GL_TRUE, (GLfloat*)value.data());
-        }
-    }
-
-    void setUniform(const std::string& name, const Math::Mat3& value) {
-        GLint uniform = this->checkoutUniform(name);
-        if (uniform > -1) {
-            glUniformMatrix3fv(uniform, 1, GL_TRUE, (GLfloat*)value.data());
-        }
-    }
-
-    void setUniform(const std::string& name, const Math::Vec4& value) {
-        GLint uniform = this->checkoutUniform(name);
-        if (uniform > -1) {
-            glUniform4fv(uniform, 1, (GLfloat*)value.data());
-        }
-    }
-
-    void setUniform(const std::string& name, const Math::Vec3& value) {
-        GLint uniform = this->checkoutUniform(name);
-        if (uniform > -1) {
-            glUniform3fv(uniform, 1, (GLfloat*)value.data());
-        }
-    }
-
-    void setUniform(const std::string& name, float value) {
-        GLint uniform = this->checkoutUniform(name);
-        if (uniform > -1) {
-            glUniform1f(uniform, value);
-        }
-    }
-
-    void setUniform(const std::string& name, int value) {
-        GLint uniform = this->checkoutUniform(name);
-        if (uniform > -1) {
-            glUniform1i(uniform, value);
-        }
-    }
-
-    void setUniformBlock(const std::string& name, int bindPoint) {
-        GLuint uniformBlock = this->checkoutUniformBlock(name);
-        if (uniformBlock != GL_INVALID_INDEX) {
-            glUniformBlockBinding(this->program, uniformBlock, bindPoint);
-        }
-    }
-
-    const std::string& getSource() const {
-        return this->source;
-    }
-
-    GLuint getVersion() const {
-        return this->version;
-    }
-
-    void enable() {
-        if (this->program != Shader::activeProgram) {
-            Shader::activeProgram = this->program;
-            glUseProgram(this->program);
-        }
-    }
+    GRAPHENE_API void enable();
 
 private:
-    GLint checkoutUniform(const std::string& name) {
-        this->enable();
-
-        if (this->uniforms.find(name) == this->uniforms.end()) {
-            this->uniforms.insert(std::make_pair(name, glGetUniformLocation(this->program, name.c_str())));
-        }
-
-        return this->uniforms.at(name);
-    }
-
-    GLuint checkoutUniformBlock(const std::string& name) {
-        this->enable();
-
-        if (this->uniformBlocks.find(name) == this->uniformBlocks.end()) {
-            this->uniformBlocks.insert(std::make_pair(name, glGetUniformBlockIndex(this->program, name.c_str())));
-        }
-
-        return this->uniformBlocks.at(name);
-    }
+    GLint checkoutUniform(const std::string& name);
+    GLuint checkoutUniformBlock(const std::string& name);
 
     void buildShader();
     GLuint compile(const std::string& source, GLenum type);

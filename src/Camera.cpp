@@ -28,6 +28,29 @@
 
 namespace Graphene {
 
+Camera::Camera() {
+    this->objectType = ObjectType::TYPE_CAMERA;
+    this->aspectRatio = 1.3333f;
+    this->nearPlane = 0.1f;
+    this->farPlane = 100.0f;
+    this->fov = 70.0f;
+
+    this->updateProjection(TYPE_PERSPECTIVE);
+    this->rotation.set(2, 2, -1.0f);  // Look at Z
+}
+
+void Camera::roll(float angle) {
+    this->rotate(Math::Vec3::UNIT_X, angle);
+}
+
+void Camera::yaw(float angle) {
+    this->rotate(Math::Vec3::UNIT_Y, angle);
+}
+
+void Camera::pitch(float angle) {
+    this->rotate(Math::Vec3::UNIT_Z, angle);
+}
+
 void Camera::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
         throw std::invalid_argument("Vector cannot be of zero length");
@@ -54,6 +77,106 @@ void Camera::rotate(const Math::Vec3& vector, float angle) {
     this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
 
     this->updateRotation(right, up, target);
+}
+
+Math::Vec3 Camera::getRotationAngles() const {
+    return this->rotationAngles;
+}
+
+void Camera::translate(float x, float y, float z) {
+    this->translate(Math::Vec3(x, y, z));
+}
+
+void Camera::translate(const Math::Vec3& position) {
+    this->translation.set(0, 3, -position.get(Math::Vec3::X));
+    this->translation.set(1, 3, -position.get(Math::Vec3::Y));
+    this->translation.set(2, 3, -position.get(Math::Vec3::Z));
+}
+
+void Camera::move(float x, float y, float z) {
+    this->move(Math::Vec3(x, y, z));
+}
+
+void Camera::move(const Math::Vec3& position) {
+    this->translation.set(0, 3, this->translation.get(0, 3) - position.get(Math::Vec3::X));
+    this->translation.set(1, 3, this->translation.get(1, 3) - position.get(Math::Vec3::Y));
+    this->translation.set(2, 3, this->translation.get(2, 3) - position.get(Math::Vec3::Z));
+}
+
+Math::Vec3 Camera::getPosition() const {
+    return Math::Vec3(-this->translation.get(0, 3), -this->translation.get(1, 3), -this->translation.get(2, 3));
+}
+
+Camera::ProjectionType Camera::getProjectionType() const {
+    return this->projectionType;
+}
+
+void Camera::setProjectionType(ProjectionType type) {
+    this->updateProjection(type);
+}
+
+float Camera::getAspectRatio() const {
+    return this->aspectRatio;
+}
+
+void Camera::setAspectRatio(float aspectRatio) {
+    this->aspectRatio = aspectRatio;
+    this->updateProjection(this->projectionType);
+}
+
+float Camera::getNearPlane() const {
+    return this->nearPlane;
+}
+
+void Camera::setNearPlane(float nearPlane) {
+    this->nearPlane = nearPlane;
+    this->updateProjection(this->projectionType);
+}
+
+float Camera::getFarPlane() const {
+    return this->farPlane;
+}
+
+void Camera::setFarPlane(float farPlane) {
+    this->farPlane = farPlane;
+    this->updateProjection(this->projectionType);
+}
+
+float Camera::getFov() const {
+    return this->fov;
+}
+
+void Camera::setFov(float fov) {
+    this->fov = fov;
+    this->updateProjection(this->projectionType);
+}
+
+Math::Vec3 Camera::getRight() const {
+    return Math::Vec3(this->rotation.get(0, 0), this->rotation.get(0, 1), this->rotation.get(0, 2));
+}
+
+Math::Vec3 Camera::getUp() const {
+    return Math::Vec3(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
+}
+
+Math::Vec3 Camera::getTarget() const {
+    return -Math::Vec3(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
+}
+
+const Math::Mat4& Camera::getTranslation() const {
+    return this->translation;
+}
+
+const Math::Mat4& Camera::getRotation() const {
+    return this->rotation;
+}
+
+const Math::Mat4& Camera::getProjection() const {
+    return this->projection;
+}
+
+void Camera::lookAt(float x, float y, float z) {
+    this->lookAt(Math::Vec3(x, y, z));
 }
 
 void Camera::lookAt(const Math::Vec3& vector) {

@@ -23,6 +23,7 @@
 #ifndef RENDERTARGET_H
 #define RENDERTARGET_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <RenderStack.h>
 #include <Viewport.h>
@@ -35,61 +36,22 @@ namespace Graphene {
 
 class RenderTarget: public NonCopyable {
 public:
-    RenderTarget(int width, int height) {
-        this->buffer = GL_FRONT;
-        this->fbo = 0;
+    GRAPHENE_API RenderTarget(int width, int height);
+    GRAPHENE_API virtual ~RenderTarget() = default;
 
-        this->width = width;
-        this->height = height;
-        this->autoUpdate = true;
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
 
-        auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
-        this->viewports.insert(viewport);
-    }
+    GRAPHENE_API bool isAutoUpdate() const;
+    GRAPHENE_API void setAutoUpdate(bool autoUpdate);
 
-    virtual ~RenderTarget() {}
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Viewport>>& getViewports();
+    GRAPHENE_API void addViewport(const std::shared_ptr<Viewport> viewport);
 
-    int getWidth() const {
-        return this->width;
-    }
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Viewport>>& getOverlays();
+    GRAPHENE_API void addOverlay(const std::shared_ptr<Viewport> overlay);
 
-    int getHeight() const {
-        return this->height;
-    }
-
-    bool isAutoUpdate() const {
-        return this->autoUpdate;
-    }
-
-    void setAutoUpdate(bool autoUpdate) {
-        this->autoUpdate = autoUpdate;
-    }
-
-    const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() {
-        return this->viewports;
-    }
-
-    void addViewport(const std::shared_ptr<Viewport> viewport) {
-        if (viewport == nullptr) {
-            throw std::invalid_argument("Viewport cannot be nullptr");
-        }
-
-        this->viewports.insert(viewport);
-    }
-
-    const std::unordered_set<std::shared_ptr<Viewport>>& getOverlays() {
-        return this->overlays;
-    }
-
-    void addOverlay(const std::shared_ptr<Viewport> overlay) {
-        if (overlay == nullptr) {
-            throw std::invalid_argument("Viewport cannot be nullptr");
-        }
-
-        this->overlays.insert(overlay);
-    }
-
-    void update();
+    GRAPHENE_API void update();
 
 protected:
     std::unordered_set<std::shared_ptr<Viewport>> viewports;

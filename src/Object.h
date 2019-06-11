@@ -23,6 +23,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <GrapheneApi.h>
 #include <Rotatable.h>
 #include <Movable.h>
 #include <memory>
@@ -39,13 +40,8 @@ public:
         TYPE_CAMERA
     };
 
-    ObjectType getObjectType() const {
-        return this->objectType;
-    }
-
-    std::shared_ptr<class SceneNode> getParent() {
-        return this->parent.lock();
-    }
+    GRAPHENE_API ObjectType getObjectType() const;
+    GRAPHENE_API std::shared_ptr<class SceneNode> getParent();
 
 protected:
     ObjectType objectType;

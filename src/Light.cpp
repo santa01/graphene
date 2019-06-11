@@ -53,6 +53,18 @@ Light::Light():
     this->lightBuffer = std::make_shared<UniformBuffer>(&light, sizeof(light));
 }
 
+void Light::roll(float angle) {
+    this->rotate(Math::Vec3::UNIT_X, angle);
+}
+
+void Light::yaw(float angle) {
+    this->rotate(Math::Vec3::UNIT_Y, angle);
+}
+
+void Light::pitch(float angle) {
+    this->rotate(Math::Vec3::UNIT_Z, angle);
+}
+
 void Light::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
         throw std::invalid_argument("Vector cannot be of zero length");
@@ -70,6 +82,115 @@ void Light::rotate(const Math::Vec3& vector, float angle) {
     this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
     this->direction = q.extractMat4().extractMat3() * this->direction;
     updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
+}
+
+Math::Vec3 Light::getRotationAngles() const {
+    return this->rotationAngles;
+}
+
+void Light::translate(float x, float y, float z) {
+    this->translate(Math::Vec3(x, y, z));
+}
+
+void Light::translate(const Math::Vec3& position) {
+    this->position = position;
+    updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
+}
+
+void Light::move(float x, float y, float z) {
+    this->move(Math::Vec3(x, y, z));
+}
+
+void Light::move(const Math::Vec3& position) {
+    this->position += position;
+    updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
+}
+
+Math::Vec3 Light::getPosition() const {
+    return this->position;
+}
+
+Light::LightType Light::getLightType() const {
+    return this->lightType;
+}
+
+void Light::setLightType(LightType type) {
+    this->lightType = type;
+    updateBuffer(this->lightBuffer, LightBuffer, lightType, &this->lightType);
+}
+
+const Math::Vec3& Light::getColor() const {
+    return this->color;
+}
+
+void Light::setColor(float red, float green, float blue) {
+    this->setColor(Math::Vec3(red, green, blue));
+}
+
+void Light::setColor(const Math::Vec3& color) {
+    this->color = color;
+    updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
+}
+
+const Math::Vec3& Light::getDirection() const {
+    return this->direction;
+}
+
+void Light::setDirection(float x, float y, float z) {
+    this->setDirection(Math::Vec3(x, y, z));
+}
+
+void Light::setDirection(const Math::Vec3& direction) {
+    if (direction == Math::Vec3::ZERO) {
+        throw std::invalid_argument("Vector cannot be of zero length");
+    }
+
+    this->direction = direction;
+    updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
+}
+
+float Light::getEnergy() const {
+    return this->energy;
+}
+
+void Light::setEnergy(float energy) {
+    this->energy = energy;
+    updateBuffer(this->lightBuffer, LightBuffer, energy, &this->energy);
+}
+
+float Light::getFalloff() const {
+    return this->falloff;
+}
+
+void Light::setFalloff(float falloff) {
+    this->falloff = falloff;
+    updateBuffer(this->lightBuffer, LightBuffer, falloff, &this->falloff);
+}
+
+float Light::getAngle() const {
+    return this->angle;
+}
+
+void Light::setAngle(float angle) {
+    this->angle = angle;
+    updateBuffer(this->lightBuffer, LightBuffer, angle, &this->angle);
+}
+
+float Light::getBlend() const {
+    return this->blend;
+}
+
+void Light::setBlend(float blend) {
+    if (blend < 0.0f || blend > 1.0f) {
+        throw std::invalid_argument("Blend is not in [0.0; 1.0] range");
+    }
+
+    this->blend = blend;
+    updateBuffer(this->lightBuffer, LightBuffer, blend, &this->blend);
+}
+
+std::shared_ptr<UniformBuffer> Light::getLightBuffer() {
+    return this->lightBuffer;
 }
 
 }  // namespace Graphene

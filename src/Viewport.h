@@ -23,6 +23,7 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <GeometryBuffer.h>
 #include <SceneManager.h>
@@ -37,59 +38,24 @@ class RenderTarget;
 
 class Viewport: public NonCopyable {
 public:
-    Viewport(int left, int top, int width, int height) {
-        this->left = left;
-        this->top = top;
-        this->width = width;
-        this->height = height;
-    }
+    GRAPHENE_API Viewport(int left, int top, int width, int height);
 
-    std::shared_ptr<Camera> getCamera() {
-        return this->camera;
-    }
+    GRAPHENE_API std::shared_ptr<Camera> getCamera();
+    GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
 
-    void setCamera(const std::shared_ptr<Camera> camera) {
-        if (camera == nullptr) {
-            throw std::invalid_argument("Camera cannot be nullptr");
-        }
+    GRAPHENE_API int getLeft() const;
+    GRAPHENE_API void setLeft(int left);
 
-        this->camera = camera;
-        this->camera->setAspectRatio(this->width / (this->height / 1.0f));
-    }
+    GRAPHENE_API int getTop() const;
+    GRAPHENE_API void setTop(int top);
 
-    int getLeft() const {
-        return this->left;
-    }
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API void setWidth(int width);
 
-    void setLeft(int left) {
-        this->left = left;
-    }
+    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API void setHeight(int height);
 
-    int getTop() const {
-        return this->top;
-    }
-
-    void setTop(int top) {
-        this->top = top;
-    }
-
-    int getWidth() const {
-        return this->width;
-    }
-
-    void setWidth(int width) {
-        this->width = width;
-    }
-
-    int getHeight() const {
-        return this->height;
-    }
-
-    void setHeight(int height) {
-        this->height = height;
-    }
-
-    void update();
+    GRAPHENE_API void update();
 
 private:
     std::shared_ptr<Camera> camera;

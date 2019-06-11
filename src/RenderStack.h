@@ -23,6 +23,7 @@
 #ifndef RENDERSTACK_H
 #define RENDERSTACK_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <OpenGL.h>
 #include <functional>
@@ -34,19 +35,9 @@ typedef std::function<void()> RenderState;
 
 class RenderStack: public NonCopyable {
 public:
-    static void push(RenderState state) {
-        stack.push(state);
-    }
-
-    static void pop() {
-        RenderState state(stack.top());
-        stack.pop();
-        state();
-    }
-
-    static int depth() {
-        return static_cast<int>(stack.size());
-    }
+    GRAPHENE_API static void push(RenderState state);
+    GRAPHENE_API static void pop();
+    GRAPHENE_API static int depth();
 
 private:
     RenderStack() = default;

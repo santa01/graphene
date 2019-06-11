@@ -24,4 +24,13 @@
 
 namespace Graphene {
 
+DepthTexture::DepthTexture(int width, int height) {
+    this->width = width;
+    this->height = height;
+
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, this->width, this->height);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 }  // namespace Graphene

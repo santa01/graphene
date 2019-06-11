@@ -25,6 +25,7 @@
 
 #if defined(__linux__)
 
+#include <GrapheneApi.h>
 #include <Window.h>
 #include <OpenGL.h>
 
@@ -32,12 +33,12 @@ namespace Graphene {
 
 class WindowLinux: public Window {
 public:
-    WindowLinux(int width, int height);
-    ~WindowLinux();
+    GRAPHENE_API WindowLinux(int width, int height);
+    GRAPHENE_API ~WindowLinux();
 
-    void captureMouse(bool captured) override;
-    void update() override;
-    void dispatchEvents() override;
+    GRAPHENE_API void captureMouse(bool captured) override;
+    GRAPHENE_API void update() override;
+    GRAPHENE_API void dispatchEvents() override;
 
 private:
     void createWindow(const char* windowName);

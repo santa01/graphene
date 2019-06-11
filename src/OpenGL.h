@@ -23,6 +23,8 @@
 #ifndef OPENGL_H
 #define OPENGL_H
 
+#include <GrapheneApi.h>
+
 // Override vendor provided gl.h
 #include <GL/gl.h>  // Renamed glcorearb.h
 #include <string>
@@ -107,16 +109,16 @@ extern PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;  // GLX_ARB
 
 namespace OpenGL {
 
-void loadCore();
-void loadExtensions();
+GRAPHENE_API void loadCore();
+GRAPHENE_API void loadExtensions();
 
 #if defined(_WIN32)
-void loadWglExtensions();
+GRAPHENE_API void loadWglExtensions();
 #elif defined(__linux__)
-void loadGlxExtensions();
+GRAPHENE_API void loadGlxExtensions();
 #endif
 
-bool isExtensionSupported(const std::string& extension);
+GRAPHENE_API bool isExtensionSupported(const std::string& extension);
 
 }  // namespace OpenGL
 

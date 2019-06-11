@@ -104,6 +104,55 @@ Engine::Engine(int width, int height):
     this->result = 0;
 }
 
+const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers() {
+    return this->frameBuffers;
+}
+
+void Engine::addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer) {
+    if (frameBuffer == nullptr) {
+        throw std::invalid_argument("FrameBuffer cannot be nullptr");
+    }
+
+    this->frameBuffers.insert(frameBuffer);
+}
+
+const std::unordered_set<std::shared_ptr<SceneManager>>& Engine::getSceneManagers() {
+    return this->sceneManagers;
+}
+
+void Engine::addSceneManager(const std::shared_ptr<SceneManager> sceneManager) {
+    if (sceneManager == nullptr) {
+        throw std::invalid_argument("SceneManager cannot be nullptr");
+    }
+
+    this->sceneManagers.insert(sceneManager);
+}
+
+const std::unordered_set<std::shared_ptr<ObjectManager>>& Engine::getObjectManagers() {
+    return this->objectManagers;
+}
+
+void Engine::addObjectManager(const std::shared_ptr<ObjectManager> objectManager) {
+    if (objectManager == nullptr) {
+        throw std::invalid_argument("ObjectManager cannot be nullptr");
+    }
+
+    this->objectManagers.insert(objectManager);
+}
+
+std::shared_ptr<Window> Engine::getWindow() {
+    return this->window;
+}
+
+float Engine::getFrameTime() const {
+    return this->frameTime;
+}
+
+void Engine::exit(int result) {
+    this->result = result;
+    this->running = false;
+}
+
 int Engine::exec() {
     std::chrono::time_point<std::chrono::steady_clock> timestamp;
 

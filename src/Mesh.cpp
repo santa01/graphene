@@ -60,4 +60,35 @@ Mesh::Mesh(const void* data, int faces, int vertices):
     glBindVertexArray(0);
 }
 
+Mesh::~Mesh() {
+    glDeleteVertexArrays(1, &this->vao);
+    glDeleteBuffers(2, this->buffers);
+}
+
+std::shared_ptr<Material> Mesh::getMaterial() {
+    return this->material;
+}
+
+void Mesh::setMaterial(const std::shared_ptr<Material> material) {
+    if (material == nullptr) {
+        throw std::invalid_argument("Material cannot be nullptr");
+    }
+
+    this->material = material;
+}
+
+int Mesh::getFaces() const {
+    return this->faces;
+}
+
+int Mesh::getVertices() const {
+    return this->vertices;
+}
+
+void Mesh::render() {
+    glBindVertexArray(this->vao);
+    glDrawElements(GL_TRIANGLES, this->faces * 3, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 }  // namespace Graphene

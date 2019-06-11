@@ -23,6 +23,7 @@
 #ifndef UNIFORMBUFFER_H
 #define UNIFORMBUFFER_H
 
+#include <GrapheneApi.h>
 #include <OpenGL.h>
 #include <cstddef>
 
@@ -33,26 +34,11 @@ namespace Graphene {
 
 class UniformBuffer {
 public:
-    UniformBuffer(const void* data, size_t dataSize) {
-        glGenBuffers(1, &this->ubo);
-        glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
-        glBufferData(GL_UNIFORM_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    }
+    GRAPHENE_API UniformBuffer(const void* data, size_t dataSize);
+    GRAPHENE_API ~UniformBuffer();
 
-    ~UniformBuffer() {
-        glDeleteBuffers(1, &this->ubo);
-    }
-
-    void update(const void* data, size_t dataSize, size_t dataOffset) {
-        glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
-        glBufferSubData(GL_UNIFORM_BUFFER, dataOffset, dataSize, data);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    }
-
-    void bind(int bindPoint) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, bindPoint, this->ubo);
-    }
+    GRAPHENE_API void update(const void* data, size_t dataSize, size_t dataOffset);
+    GRAPHENE_API void bind(int bindPoint);
 
 private:
     GLuint ubo;

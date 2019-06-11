@@ -23,6 +23,7 @@
 #ifndef OBJECTMANAGER_H
 #define OBJECTMANAGER_H
 
+#include <GrapheneApi.h>
 #include <Camera.h>
 #include <Light.h>
 #include <Entity.h>
@@ -64,27 +65,12 @@ typedef struct {
 
 class ObjectManager: public NonCopyable {
 public:
-    std::shared_ptr<Camera> createCamera() const {
-        return std::make_shared<Camera>();
-    }
-
-    std::shared_ptr<Light> createLight() const {
-        return std::make_shared<Light>();
-    }
-
-    std::shared_ptr<Entity> createEntity(const std::string& name);
+    GRAPHENE_API std::shared_ptr<Camera> createCamera() const;
+    GRAPHENE_API std::shared_ptr<Light> createLight() const;
+    GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
 
 private:
-    std::shared_ptr<ImageTexture> createTexture(const std::string& name) {
-        if (this->textureCache.find(name) != this->textureCache.end()) {
-            return this->textureCache.at(name);
-        }
-
-        auto texture = std::make_shared<ImageTexture>(name);
-        this->textureCache.insert(std::make_pair(name, texture));
-        return texture;
-    }
-
+    std::shared_ptr<ImageTexture> createTexture(const std::string& name);
     std::unordered_set<std::shared_ptr<Mesh>> createMeshes(const std::string& name);
 
     std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;

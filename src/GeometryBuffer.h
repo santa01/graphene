@@ -23,6 +23,7 @@
 #ifndef GEOMETRYBUFFER_H
 #define GEOMETRYBUFFER_H
 
+#include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <ImageTexture.h>
 #include <DepthTexture.h>
@@ -43,45 +44,19 @@ namespace Graphene {
 
 class GeometryBuffer: public NonCopyable {
 public:
-    GeometryBuffer(int width, int height);
+    GRAPHENE_API GeometryBuffer(int width, int height);
+    GRAPHENE_API ~GeometryBuffer();
 
-    ~GeometryBuffer() {
-        glDeleteFramebuffers(1, &this->fbo);
-    }
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
 
-    int getWidth() const {
-        return this->width;
-    }
+    GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture();
+    GRAPHENE_API std::shared_ptr<ImageTexture> getSpecularTexture();
+    GRAPHENE_API std::shared_ptr<ImageTexture> getPositionTexture();
+    GRAPHENE_API std::shared_ptr<ImageTexture> getNormalTexture();
+    GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture();
 
-    int getHeight() const {
-        return this->height;
-    }
-
-    std::shared_ptr<ImageTexture> getDiffuseTexture() {
-        return this->diffuseTexture;
-    }
-
-    std::shared_ptr<ImageTexture> getSpecularTexture() {
-        return this->specularTexture;
-    }
-
-    std::shared_ptr<ImageTexture> getPositionTexture() {
-        return this->positionTexture;
-    }
-
-    std::shared_ptr<ImageTexture> getNormalTexture() {
-        return this->normalTexture;
-    }
-
-    std::shared_ptr<DepthTexture> getDepthTexture() {
-        return this->depthTexture;
-    }
-
-    void bind() {
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-        glDrawBuffers(4, this->buffers);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+    GRAPHENE_API void bind();
 
 private:
     std::shared_ptr<ImageTexture> diffuseTexture;

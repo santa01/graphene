@@ -24,4 +24,32 @@
 
 namespace Graphene {
 
+Texture::Texture() {
+    this->width = 0;
+    this->height = 0;
+
+    glGenTextures(1, &this->texture);
+}
+
+Texture::~Texture() {
+    glDeleteTextures(1, &this->texture);
+}
+
+int Texture::getWidth() const {
+    return this->width;
+}
+
+int Texture::getHeight() const {
+    return this->height;
+}
+
+GLuint Texture::getHandle() const {
+    return this->texture;
+}
+
+void Texture::bind(int textureUnit) {
+    glActiveTexture(GL_TEXTURE0 + textureUnit);
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+}
+
 }  // namespace Graphene
