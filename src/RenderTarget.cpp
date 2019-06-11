@@ -21,6 +21,8 @@
  */
 
 #include <RenderTarget.h>
+#include <RenderStack.h>
+#include <stdexcept>
 
 namespace Graphene {
 

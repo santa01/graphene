@@ -26,6 +26,7 @@
 #include <Light.h>
 #include <Entity.h>
 #include <Sources.h>
+#include <stdexcept>
 
 namespace Graphene {
 

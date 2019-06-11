@@ -25,10 +25,8 @@
 
 #include <GrapheneApi.h>
 #include <UniformBuffer.h>
-#include <Quaternion.h>
 #include <Vec3.h>
 #include <Object.h>
-#include <stdexcept>
 #include <memory>
 
 namespace Graphene {

@@ -21,9 +21,11 @@
  */
 
 #include <Light.h>
+#include <Quaternion.h>
 #include <Mat3.h>
 #include <Mat4.h>
 #include <algorithm>
+#include <stdexcept>
 #include <cmath>
 
 namespace Graphene {

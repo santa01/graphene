@@ -28,9 +28,7 @@
 #include <UniformBuffer.h>
 #include <OpenGL.h>
 #include <Vec3.h>
-#include <stdexcept>
 #include <memory>
-#include <algorithm>
 
 namespace Graphene {
 

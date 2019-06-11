@@ -30,7 +30,6 @@
 #include <Shader.h>
 #include <Mesh.h>
 #include <Vec3.h>
-#include <stdexcept>
 #include <algorithm>
 #include <memory>
 

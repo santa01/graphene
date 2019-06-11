@@ -30,7 +30,6 @@
 #include <SceneManager.h>
 #include <ObjectManager.h>
 #include <unordered_set>
-#include <stdexcept>
 #include <memory>
 
 namespace Graphene {

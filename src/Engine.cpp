@@ -28,6 +28,7 @@
 #include <WindowLinux.h>
 #endif
 #include <chrono>
+#include <stdexcept>
 #include <iostream>
 #include <string>
 #include <unordered_map>

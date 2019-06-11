@@ -26,7 +26,6 @@
 #include <GrapheneApi.h>
 #include <Material.h>
 #include <OpenGL.h>
-#include <stdexcept>
 #include <memory>
 
 namespace Graphene {

@@ -21,6 +21,7 @@
  */
 
 #include <Mesh.h>
+#include <stdexcept>
 
 namespace Graphene {
 

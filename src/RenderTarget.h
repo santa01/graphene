@@ -25,11 +25,9 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <RenderStack.h>
 #include <Viewport.h>
 #include <OpenGL.h>
 #include <unordered_set>
-#include <stdexcept>
 #include <memory>
 
 namespace Graphene {

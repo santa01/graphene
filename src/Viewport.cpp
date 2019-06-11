@@ -21,6 +21,9 @@
  */
 
 #include <Viewport.h>
+#include <SceneManager.h>
+#include <RenderStack.h>
+#include <SceneNode.h>
 
 namespace Graphene {
 

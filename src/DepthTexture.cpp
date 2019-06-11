@@ -21,6 +21,7 @@
  */
 
 #include <DepthTexture.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 

@@ -25,7 +25,6 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <OpenGL.h>
 #include <functional>
 #include <stack>
 

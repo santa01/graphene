@@ -21,6 +21,7 @@
  */
 
 #include <FrameBuffer.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 

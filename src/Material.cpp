@@ -21,6 +21,8 @@
  */
 
 #include <Material.h>
+#include <stdexcept>
+#include <algorithm>
 
 namespace Graphene {
 

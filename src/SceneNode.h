@@ -33,7 +33,6 @@
 #include <Light.h>
 #include <Vec3.h>
 #include <unordered_set>
-#include <stdexcept>
 #include <memory>
 
 namespace Graphene {
@@ -82,7 +81,7 @@ public:
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Object>>& getObjects();
     GRAPHENE_API void attachObject(std::shared_ptr<Object> object);
 
-    GRAPHENE_API std::shared_ptr<class SceneManager> getSceneManager();
+    GRAPHENE_API std::shared_ptr<SceneManager> getSceneManager();
     GRAPHENE_API std::shared_ptr<SceneNode> getParent();
 
 private:

@@ -21,6 +21,9 @@
  */
 
 #include <Entity.h>
+#include <Quaternion.h>
+#include <stdexcept>
+#include <algorithm>
 #include <cmath>
 
 namespace Graphene {

@@ -26,9 +26,6 @@
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
 #include <GeometryBuffer.h>
-#include <SceneManager.h>
-#include <RenderStack.h>
-#include <SceneNode.h>
 #include <Camera.h>
 #include <memory>
 
