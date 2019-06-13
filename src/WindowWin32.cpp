@@ -127,8 +127,6 @@ WindowWin32::WindowWin32(int width, int height):
     SetWindowObject(this->window, this);
     ShowWindow(this->window, SW_SHOWDEFAULT);
     UpdateWindow(this->window);
-
-    this->setMousePosition(this->width >> 1, this->height >> 1);
 }
 
 WindowWin32::~WindowWin32() {

@@ -72,9 +72,9 @@ protected:
     void setMousePosition(int x, int y);
     void setMouseCaptured(bool capture);
 
-    KeyboardState keyboardState;
-    MouseState mouseState;
-    MousePosition mousePosition;
+    KeyboardState keyboardState = { };
+    MouseState mouseState = { };
+    MousePosition mousePosition = { };
     bool mouseCaptured = false;
 };
 
