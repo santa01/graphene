@@ -22,9 +22,8 @@
 
 #include <Example.h>
 #include <Light.h>
+#include <Logger.h>
 #include <Vec3.h>
-#include <iostream>
-#include <iomanip>
 
 Example::Example(int width, int height):
         Graphene::Engine(width, height) {
@@ -131,10 +130,7 @@ void Example::onIdle() {
     frames++;
 
     if (renderTime >= 1.0f) {
-        std::cout << frames << " frames in " << std::fixed
-                  << std::setprecision(1) << renderTime << " seconds = "
-                  << std::setprecision(3) << frames / renderTime << " FPS"
-                  << std::endl;
+        Graphene::LogInfo("%d frames in %.1f seconds = %.3f FPS", frames, renderTime, frames / renderTime);
         renderTime = 0.0f;
         frames = 0;
     }

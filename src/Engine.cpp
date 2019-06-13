@@ -22,6 +22,7 @@
 
 #include <Engine.h>
 #include <OpenGL.h>
+#include <Logger.h>
 #if defined(_WIN32)
 #include <WindowWin32.h>
 #elif defined(__linux__)
@@ -29,7 +30,6 @@
 #endif
 #include <chrono>
 #include <stdexcept>
-#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -61,7 +61,7 @@ std::unordered_map<GLenum, std::string> typeMap = {
 
 extern "C" void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /*severity*/,
         GLsizei /*length*/, const GLchar* message, const GLvoid* /*userParam*/) {
-    std::cout << typeMap[type] << " [" << sourceMap[source] << "]: "<< message << std::endl;
+    LogDebug("%s [%s]: %s", sourceMap[source].c_str(), typeMap[type].c_str(), message);
 }
 
 Engine::Engine(int width, int height):
@@ -69,18 +69,17 @@ Engine::Engine(int width, int height):
     OpenGL::loadCore();
     OpenGL::loadExtensions();
 
-    std::cout
-            << "Vendor: " << glGetString(GL_VENDOR) << std::endl
-            << "Renderer: " << glGetString(GL_RENDERER) << std::endl
-            << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl
-            << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    LogInfo("Vendor: %s", glGetString(GL_VENDOR));
+    LogInfo("Renderer: %s", glGetString(GL_RENDERER));
+    LogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
+    LogInfo("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
         glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
         glDebugMessageCallbackARB(debugHandler, nullptr);
     } else {
-        std::cout << "GL_ARB_debug_output unavailable, OpenGL debug disabled" << std::endl;
+        LogWarn("GL_ARB_debug_output unavailable, OpenGL debug disabled");
     }
 
     glFrontFace(GL_CW);
