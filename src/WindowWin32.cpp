@@ -23,6 +23,7 @@
 #if defined(_WIN32)
 
 #include <WindowWin32.h>
+#include <Logger.h>
 #include <RenderTarget.h>
 #include <windowsx.h>
 #include <stdexcept>
@@ -179,7 +180,7 @@ HWND WindowWin32::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC wi
     wcex.lpszClassName = className;
 
     if (!RegisterClassEx(&wcex)) {
-        throw std::runtime_error("RegisterClassEx()");
+        throw std::runtime_error(LogFormat("RegisterClassEx()"));
     }
 
     HWND window = CreateWindow(
@@ -187,7 +188,7 @@ HWND WindowWin32::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC wi
             CW_USEDEFAULT, CW_USEDEFAULT, this->width, this->height,
             nullptr, nullptr, this->instance, nullptr);
     if (window == nullptr) {
-        throw std::runtime_error("CreateWindow()");
+        throw std::runtime_error(LogFormat("CreateWindow()"));
     }
 
     return window;
@@ -219,7 +220,7 @@ void WindowWin32::createContext() {
 void WindowWin32::createBaseContext(HWND window) {
     this->deviceContext = GetDC(window);
     if (this->deviceContext == nullptr) {
-        throw std::runtime_error("GetDC()");
+        throw std::runtime_error(LogFormat("GetDC()"));
     }
 
     PIXELFORMATDESCRIPTOR pfd = { };
@@ -233,27 +234,27 @@ void WindowWin32::createBaseContext(HWND window) {
 
     int pixelFormat = ChoosePixelFormat(this->deviceContext, &pfd);
     if (pixelFormat == 0) {
-        throw std::runtime_error("ChoosePixelFormat()");
+        throw std::runtime_error(LogFormat("ChoosePixelFormat()"));
     }
 
     if (!SetPixelFormat(this->deviceContext, pixelFormat, &pfd)) {
-        throw std::runtime_error("SetPixelFormat()");
+        throw std::runtime_error(LogFormat("SetPixelFormat()"));
     }
 
     this->renderingContext = wglCreateContext(this->deviceContext);
     if (this->renderingContext == nullptr) {
-        throw std::runtime_error("wglCreateContext()");
+        throw std::runtime_error(LogFormat("wglCreateContext()"));
     }
 
     if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
-        throw std::runtime_error("wglMakeCurrent()");
+        throw std::runtime_error(LogFormat("wglMakeCurrent()"));
     }
 }
 
 void WindowWin32::createExtContext(HWND window) {
     this->deviceContext = GetDC(window);
     if (this->deviceContext == nullptr) {
-        throw std::runtime_error("GetDC()");
+        throw std::runtime_error(LogFormat("GetDC()"));
     }
 
     const int pixelAttribList[] = {
@@ -270,12 +271,12 @@ void WindowWin32::createExtContext(HWND window) {
     int pixelFormat;
     UINT numberFormats;
     if (!wglChoosePixelFormatARB(this->deviceContext, pixelAttribList, nullptr, 1, &pixelFormat, &numberFormats)) {
-        throw std::runtime_error("wglChoosePixelFormatARB()");
+        throw std::runtime_error(LogFormat("wglChoosePixelFormatARB()"));
     }
 
     PIXELFORMATDESCRIPTOR pfd;
     if (!SetPixelFormat(this->deviceContext, pixelFormat, &pfd)) {
-        throw std::runtime_error("SetPixelFormat()");
+        throw std::runtime_error(LogFormat("SetPixelFormat()"));
     }
 
     const int contextAttribList[] = {
@@ -287,11 +288,11 @@ void WindowWin32::createExtContext(HWND window) {
 
     this->renderingContext = wglCreateContextAttribsARB(this->deviceContext, nullptr, contextAttribList);
     if (this->renderingContext == nullptr) {
-        throw std::runtime_error("wglCreateContextAttribsARB()");
+        throw std::runtime_error(LogFormat("wglCreateContextAttribsARB()"));
     }
 
     if (!wglMakeCurrent(this->deviceContext, this->renderingContext)) {
-        throw std::runtime_error("wglMakeCurrent()");
+        throw std::runtime_error(LogFormat("wglMakeCurrent()"));
     }
 }
 

@@ -21,6 +21,7 @@
  */
 
 #include <Mesh.h>
+#include <Logger.h>
 #include <stdexcept>
 
 namespace Graphene {
@@ -72,7 +73,7 @@ std::shared_ptr<Material> Mesh::getMaterial() {
 
 void Mesh::setMaterial(const std::shared_ptr<Material> material) {
     if (material == nullptr) {
-        throw std::invalid_argument("Material cannot be nullptr");
+        throw std::invalid_argument(LogFormat("Material cannot be nullptr"));
     }
 
     this->material = material;

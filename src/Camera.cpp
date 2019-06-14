@@ -21,6 +21,7 @@
  */
 
 #include <Camera.h>
+#include <Logger.h>
 #include <Quaternion.h>
 #include <Mat3.h>
 #include <stdexcept>
@@ -49,7 +50,7 @@ void Camera::pitch(float angle) {
 
 void Camera::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument("Vector cannot be of zero length");
+        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
     }
 
     Math::Vec3 axis(vector);
@@ -177,7 +178,7 @@ void Camera::lookAt(float x, float y, float z) {
 
 void Camera::lookAt(const Math::Vec3& vector) {
     if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument("Vector cannot be of zero length");
+        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
     }
 
     Math::Vec3 target(-vector);

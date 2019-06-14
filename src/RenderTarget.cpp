@@ -21,6 +21,7 @@
  */
 
 #include <RenderTarget.h>
+#include <Logger.h>
 #include <RenderStack.h>
 #include <stdexcept>
 
@@ -55,7 +56,7 @@ const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getViewports(
 
 void RenderTarget::addViewport(const std::shared_ptr<Viewport> viewport) {
     if (viewport == nullptr) {
-        throw std::invalid_argument("Viewport cannot be nullptr");
+        throw std::invalid_argument(LogFormat("Viewport cannot be nullptr"));
     }
 
     this->viewports.insert(viewport);
@@ -67,7 +68,7 @@ const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getOverlays()
 
 void RenderTarget::addOverlay(const std::shared_ptr<Viewport> overlay) {
     if (overlay == nullptr) {
-        throw std::invalid_argument("Viewport cannot be nullptr");
+        throw std::invalid_argument(LogFormat("Viewport cannot be nullptr"));
     }
 
     this->overlays.insert(overlay);

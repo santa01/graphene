@@ -21,6 +21,7 @@
  */
 
 #include <Viewport.h>
+#include <Logger.h>
 #include <SceneManager.h>
 #include <RenderStack.h>
 #include <SceneNode.h>
@@ -40,7 +41,7 @@ std::shared_ptr<Camera> Viewport::getCamera() {
 
 void Viewport::setCamera(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
-        throw std::invalid_argument("Camera cannot be nullptr");
+        throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
     this->camera = camera;

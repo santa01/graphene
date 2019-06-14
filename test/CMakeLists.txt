@@ -50,8 +50,8 @@ add_compile_definitions (GRAPHENE_TEST _USE_MATH_DEFINES)
 set (TEST_LINK_LIBRARIES ${MATH_LIBRARIES} ${CPPUNIT_LIBRARIES})
 set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)
 
-set (TEST_GRAPHENE_SOURCES
-     ../src/SceneNode.cpp ../src/Object.cpp ../src/Entity.cpp ../src/Camera.cpp ../src/Light.cpp ../src/UniformBuffer.cpp)
+set (TEST_GRAPHENE_SOURCES Object.cpp SceneNode.cpp Entity.cpp Camera.cpp Light.cpp UniformBuffer.cpp Logger.cpp)
+list (TRANSFORM TEST_GRAPHENE_SOURCES PREPEND ../src/)
 add_library (TEST_GRAPHENE_LIBRARY OBJECT ${TEST_GRAPHENE_SOURCES})
 
 set (TEST_CAMERA_EXECUTABLE test-camera)

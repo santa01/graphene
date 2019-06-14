@@ -21,6 +21,7 @@
  */
 
 #include <ObjectManager.h>
+#include <Logger.h>
 #include <Material.h>
 #include <Vec3.h>
 #include <stdexcept>
@@ -68,7 +69,7 @@ std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& na
 std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
-        throw std::runtime_error("Failed to open `" + name + "'");
+        throw std::runtime_error(LogFormat("Failed to open '%s'", name));
     }
 
     EntityHeader entityHeader;
@@ -76,7 +77,7 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
 
     std::string magic(entityHeader.magic, 4);
     if (magic != "GPHN") {
-        throw std::runtime_error("Invalid magic number");
+        throw std::runtime_error(LogFormat("Invalid magic number"));
     }
 
     ObjectGeometry objectGeometry;

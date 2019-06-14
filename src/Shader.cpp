@@ -21,6 +21,7 @@
  */
 
 #include <Shader.h>
+#include <Logger.h>
 #include <unordered_map>
 #include <stdexcept>
 #include <sstream>
@@ -35,7 +36,7 @@ GLuint Shader::activeProgram = 0;
 Shader::Shader(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
-        throw std::runtime_error("Failed to open `" + name + "'");
+        throw std::runtime_error(LogFormat("Failed to open '%s'", name));
     }
 
     file.seekg(0, std::ios::end);
@@ -186,7 +187,7 @@ GLuint Shader::compile(const std::string& source, GLenum type) {
         glGetShaderInfoLog(shader, infoLogLength, nullptr, infoLog.get());
         glDeleteShader(shader);
 
-        throw std::runtime_error(infoLog.get());
+        throw std::runtime_error(LogFormat("%s", infoLog.get()));
     }
 
     return shader;
@@ -213,7 +214,7 @@ GLuint Shader::link(const std::vector<GLuint>& shaders) {
         glGetProgramInfoLog(program, infoLogLength, nullptr, infoLog.get());
         glDeleteProgram(program);
 
-        throw std::runtime_error(infoLog.get());
+        throw std::runtime_error(LogFormat("%s", infoLog.get()));
     }
 
     return program;

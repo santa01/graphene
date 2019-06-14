@@ -21,6 +21,7 @@
  */
 
 #include <Entity.h>
+#include <Logger.h>
 #include <Quaternion.h>
 #include <stdexcept>
 #include <algorithm>
@@ -46,7 +47,7 @@ void Entity::pitch(float angle) {
 
 void Entity::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument("Vector cannot be of zero length");
+        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
     }
 
     Math::Vec3 axis(vector);
@@ -84,7 +85,7 @@ void Entity::scale(float xFactor, float yFactor, float zFactor) {
 
 void Entity::scale(const Math::Vec3& factors) {
     if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
-        throw std::invalid_argument("Factor is less or equals zero");
+        throw std::invalid_argument(LogFormat("Factor is less or equals zero"));
     }
 
     this->scaling.set(0, 0, this->scaling.get(0, 0) * factors.get(Math::Vec3::X));
@@ -138,7 +139,7 @@ const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() {
 
 void Entity::addMesh(const std::shared_ptr<Mesh> mesh) {
     if (mesh == nullptr) {
-        throw std::invalid_argument("Mesh cannot be nullptr");
+        throw std::invalid_argument(LogFormat("Mesh cannot be nullptr"));
     }
 
     this->meshes.insert(mesh);

@@ -21,6 +21,7 @@
  */
 
 #include <OpenGL.h>
+#include <Logger.h>
 #include <stdexcept>
 #include <unordered_set>
 
@@ -114,12 +115,12 @@ do {                                                                    \
     proc = reinterpret_cast<decltype(proc)>(glGetProcAddress(#proc));   \
 } while (0)
 
-#define LOAD_MANDATORY(proc)                            \
-do {                                                    \
-    LOAD_PROC_ADDR(proc);                               \
-    if (proc == nullptr) {                              \
-        throw std::runtime_error(#proc " == nullptr");  \
-    }                                                   \
+#define LOAD_MANDATORY(proc)                                            \
+do {                                                                    \
+    LOAD_PROC_ADDR(proc);                                               \
+    if (proc == nullptr) {                                              \
+        throw std::runtime_error(LogFormat("%s == nullptr", #proc));    \
+    }                                                                   \
 } while(0)
 
 #define LOAD_OPTIONAL LOAD_PROC_ADDR
