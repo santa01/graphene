@@ -33,7 +33,7 @@ void Font::initFreeType() {
     if (Font::library == nullptr) {
         FT_Library library;
         if (FT_Init_FreeType(&library) != FT_Err_Ok) {
-            throw std::runtime_error(LogFormat("FT_Init_FreeType()"));
+            throw std::runtime_error(FormatMessage("FT_Init_FreeType()"));
         }
 
         Font::library.reset(library, FT_Done_FreeType);
@@ -50,14 +50,14 @@ Font::Font(const std::string& filename, int size, int dpi):
 
     FT_Face face;
     if (FT_New_Face(Font::library.get(), this->filename.c_str(), 0, &face) != FT_Err_Ok) {
-        throw std::runtime_error(LogFormat("FT_New_Face()"));
+        throw std::runtime_error(FormatMessage("FT_New_Face()"));
     }
 
     this->face.reset(face, FT_Done_Face);
 
     FT_F26Dot6 fontSize = this->size << 6;  // Size in 1/64th of a pixel
     if (FT_Set_Char_Size(this->face.get(), fontSize, 0, this->dpi, 0) != FT_Err_Ok) {
-        throw std::runtime_error(LogFormat("FT_Set_Char_Size()"));
+        throw std::runtime_error(FormatMessage("FT_Set_Char_Size()"));
     }
 }
 

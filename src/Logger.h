@@ -27,11 +27,13 @@
 #include <NonCopyable.h>
 #include <string>
 
-#define LogFormat(format, ...)  Logger::getInstance().formatMessage("%s:%d: " format, __FILE__, __LINE__, __VA_ARGS__)
-#define LogError(format, ...)   Logger::getInstance().log(Graphene::LogLevel::LOG_ERROR, "%s:%d: " format, __FILE__, __LINE__, __VA_ARGS__)
-#define LogWarn(format, ...)    Logger::getInstance().log(Graphene::LogLevel::LOG_WARN,  "%s:%d: " format, __FILE__, __LINE__, __VA_ARGS__)
-#define LogInfo(format, ...)    Logger::getInstance().log(Graphene::LogLevel::LOG_INFO,  "%s:%d: " format, __FILE__, __LINE__, __VA_ARGS__)
-#define LogDebug(format, ...)   Logger::getInstance().log(Graphene::LogLevel::LOG_DEBUG, "%s:%d: " format, __FILE__, __LINE__, __VA_ARGS__)
+#define FormatMessage(...)      Logger::getInstance().formatLine(__FILE__, __LINE__, __VA_ARGS__)
+#define LogMessage(level, ...)  Logger::getInstance().logLine(level, __FILE__, __LINE__, __VA_ARGS__)
+
+#define LogError(...)           LogMessage(Graphene::LogLevel::LOG_ERROR, __VA_ARGS__)
+#define LogWarn(...)            LogMessage(Graphene::LogLevel::LOG_WARN, __VA_ARGS__)
+#define LogInfo(...)            LogMessage(Graphene::LogLevel::LOG_INFO, __VA_ARGS__)
+#define LogDebug(...)           LogMessage(Graphene::LogLevel::LOG_DEBUG, __VA_ARGS__)
 
 namespace Graphene {
 
@@ -45,14 +47,16 @@ enum class LogLevel {
 class Logger: public NonCopyable {
 public:
     GRAPHENE_API static Logger& getInstance();
-    GRAPHENE_API static std::string formatMessage(const char* format, ...);
+    GRAPHENE_API static std::string format(const char* format, ...);
+    GRAPHENE_API static std::string formatLine(const char* file, int line, const char* format, ...);
 
     GRAPHENE_API void setLogLevel(LogLevel logLevel);
     GRAPHENE_API void log(LogLevel level, const char* format, ...);
+    GRAPHENE_API void logLine(LogLevel level, const char* file, int line, const char* format, ...);
 
 private:
     Logger() = default;
-    static std::string formatMessage(const char* format, va_list args);
+    static std::string formatVariadic(const char* format, va_list vlist);
 
     LogLevel logLevel = LogLevel::LOG_DEBUG;
 };

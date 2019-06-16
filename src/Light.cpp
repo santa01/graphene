@@ -61,7 +61,7 @@ void Light::pitch(float angle) {
 
 void Light::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
+        throw std::invalid_argument(FormatMessage("Vector cannot be of zero length"));
     }
 
     Math::Vec3 axis(vector);
@@ -136,7 +136,7 @@ void Light::setDirection(float x, float y, float z) {
 
 void Light::setDirection(const Math::Vec3& direction) {
     if (direction == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
+        throw std::invalid_argument(FormatMessage("Vector cannot be of zero length"));
     }
 
     this->direction = direction;
@@ -176,7 +176,7 @@ float Light::getBlend() const {
 
 void Light::setBlend(float blend) {
     if (blend < 0.0f || blend > 1.0f) {
-        throw std::invalid_argument(LogFormat("Blend is not in [0.0; 1.0] range"));
+        throw std::invalid_argument(FormatMessage("Blend is not in [0.0; 1.0] range"));
     }
 
     this->blend = blend;

@@ -91,24 +91,24 @@ ImageTGA::ImageTGA(const std::string& filename):
         filename(filename) {
     std::ifstream image(this->filename.c_str(), std::ios::binary);
     if (!image) {
-        throw std::runtime_error(LogFormat("std::ifstream()"));
+        throw std::runtime_error(FormatMessage("std::ifstream()"));
     }
 
     Header header = { };
     image.read(reinterpret_cast<char*>(&header), sizeof(header));
 
     if (header.colorMapType != ColorMapType::TGA_COLORMAP_NOT_INCLUDED) {
-        throw std::runtime_error(LogFormat("Unsupported TGA Colormap Type"));
+        throw std::runtime_error(FormatMessage("Unsupported TGA Colormap Type"));
     }
 
     if (header.imageType != ImageType::TGA_IMAGE_UNCOMPRESSED_TRUECOLOR) {
-        throw std::runtime_error(LogFormat("Unsupported TGA Image Type"));
+        throw std::runtime_error(FormatMessage("Unsupported TGA Image Type"));
     }
 
     // attributeBitsPerPixel is bits per alpha channel for 32 and 24 bit images
     if ((header.imageSpec.depth != 32 || header.imageSpec.imageDescr.attributeBitsPerPixel != 8) &&
         (header.imageSpec.depth != 24 || header.imageSpec.imageDescr.attributeBitsPerPixel != 0)) {
-        throw std::runtime_error(LogFormat("Unsupported TGA Bit Depth"));
+        throw std::runtime_error(FormatMessage("Unsupported TGA Bit Depth"));
     }
 
     this->width = header.imageSpec.width;

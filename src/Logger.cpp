@@ -28,6 +28,10 @@
 #include <cstdarg>
 #include <cstring>
 
+#define VA_START(name, format)  va_list name; va_start(name, format)
+#define VA_COPY(name, source)   va_list name; va_copy(name, source)
+#define VA_END(name)            va_end(name)
+
 namespace Graphene {
 
 std::unordered_map<LogLevel, std::string> levelNames = {
@@ -42,14 +46,23 @@ Logger& Logger::getInstance() {
     return instance;
 }
 
-std::string Logger::formatMessage(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-
+std::string Logger::format(const char* format, ...) {
     std::ostringstream messageStream;
-    messageStream << Logger::formatMessage(format, args);
 
-    va_end(args);
+    VA_START(vlist, format);
+    messageStream << Logger::formatVariadic(format, vlist);
+    VA_END(vlist);
+
+    return messageStream.str();
+}
+
+std::string Logger::formatLine(const char* file, int line, const char* format, ...) {
+    std::ostringstream messageStream;
+    messageStream << file << ":" << line << ": ";
+
+    VA_START(vlist, format);
+    messageStream << Logger::formatVariadic(format, vlist);
+    VA_END(vlist);
 
     return messageStream.str();
 }
@@ -63,23 +76,41 @@ void Logger::log(LogLevel level, const char* format, ...) {
         return;
     }
 
-    va_list args;
-    va_start(args, format);
-
     std::ostringstream messageStream;
-    messageStream << levelNames.at(level) << " " << Logger::formatMessage(format, args) << std::endl;
+    messageStream << levelNames.at(level) << " ";
 
-    va_end(args);
+    VA_START(vlist, format);
+    messageStream << Logger::formatVariadic(format, vlist);
+    VA_END(vlist);
 
     FILE* stream = (level == LogLevel::LOG_ERROR) ? stderr : stdout;
-    fprintf(stream, messageStream.str().c_str());
+    fprintf(stream, "%s\n", messageStream.str().c_str());
 }
 
-std::string Logger::formatMessage(const char* format, va_list args) {
-    std::vector<char> messageData(vsnprintf(nullptr, 0, format, args) + 1);
-    vsnprintf(messageData.data(), messageData.size(), format, args);
+void Logger::logLine(LogLevel level, const char* file, int line, const char* format, ...) {
+    if (level > this->logLevel) {
+        return;
+    }
 
-    return messageData.data();
+    std::ostringstream messageStream;
+    messageStream << levelNames.at(level) << " " << file << ":" << line << ": ";
+
+    VA_START(vlist, format);
+    messageStream << Logger::formatVariadic(format, vlist);
+    VA_END(vlist);
+
+    FILE* stream = (level == LogLevel::LOG_ERROR) ? stderr : stdout;
+    fprintf(stream, "%s\n", messageStream.str().c_str());
+}
+
+std::string Logger::formatVariadic(const char* format, va_list vlist) {
+    VA_COPY(vlist_copy, vlist);  // Argument values are indeterminate after vsnprintf()
+
+    int messageLength = vsnprintf(nullptr, 0, format, vlist);
+    std::vector<char> messageData(messageLength + 1);  // Include NULL terminator
+
+    vsnprintf(messageData.data(), messageData.size(), format, vlist_copy);
+    return std::string(messageData.data());
 }
 
 }  // namespace Graphene

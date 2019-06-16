@@ -33,7 +33,7 @@ namespace Graphene {
 SceneNode::SceneNode(const std::shared_ptr<SceneManager> sceneManager):
         scalingFactors(1.0f, 1.0f, 1.0f) {
     if (sceneManager == nullptr) {
-        throw std::invalid_argument(LogFormat("SceneManager cannot be nullptr"));
+        throw std::invalid_argument(FormatMessage("SceneManager cannot be nullptr"));
     }
 
     this->sceneManager = sceneManager;
@@ -53,7 +53,7 @@ void SceneNode::pitch(float angle) {
 
 void SceneNode::rotate(const Math::Vec3& vector, float angle) {
     if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
+        throw std::invalid_argument(FormatMessage("Vector cannot be of zero length"));
     }
 
     Math::Vec3 axis(vector);
@@ -102,7 +102,7 @@ void SceneNode::scale(float xFactor, float yFactor, float zFactor) {
 
 void SceneNode::scale(const Math::Vec3& factors) {
     if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
-        throw std::invalid_argument(LogFormat("Factor is less or equals zero"));
+        throw std::invalid_argument(FormatMessage("Factor is less or equals zero"));
     }
 
     Math::Mat3 scalingMatrix;
@@ -162,7 +162,7 @@ const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() {
 
 void SceneNode::attachNode(std::shared_ptr<SceneNode> node) {
     if (node == nullptr) {
-        throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
+        throw std::invalid_argument(FormatMessage("SceneNode cannot be nullptr"));
     }
 
     auto inserted = this->nodes.insert(node);
@@ -177,7 +177,7 @@ const std::unordered_set<std::shared_ptr<Object>>& SceneNode::getObjects() {
 
 void SceneNode::attachObject(std::shared_ptr<Object> object) {
     if (object == nullptr) {
-        throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
+        throw std::invalid_argument(FormatMessage("Object cannot be nullptr"));
     }
 
     auto inserted = this->objects.insert(object);
