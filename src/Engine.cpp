@@ -64,43 +64,24 @@ void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /*severity*/
     LogDebug("%s [%s]: %s", sourceMap[source].c_str(), typeMap[type].c_str(), message);
 }
 
-Engine::Engine(int width, int height):
-        window(new WindowImpl(width, height)) {
-    OpenGL::loadCore();
-    OpenGL::loadExtensions();
-
-    LogInfo("Vendor: %s", glGetString(GL_VENDOR));
-    LogInfo("Renderer: %s", glGetString(GL_RENDERER));
-    LogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
-    LogInfo("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-
-    if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-        glDebugMessageCallbackARB(debugHandler, nullptr);
-    } else {
-        LogWarn("GL_ARB_debug_output unavailable, OpenGL debug disabled");
+Engine::Engine() {
+    if (this->config.isDebug()) {
+        GetLogger().setLogLevel(LogLevel::LOG_DEBUG);
     }
-
-    glFrontFace(GL_CW);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glEnable(GL_CULL_FACE);
-
-    this->sceneManagers.insert(std::make_shared<SceneManager>());
-    this->objectManagers.insert(std::make_shared<ObjectManager>());
-
-    this->window->onMouseMotion.connect(
-            Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));
-    this->window->onMouseButton.connect(
-            Signals::Slot<int, bool>(&Engine::onMouseButton, this, std::placeholders::_1, std::placeholders::_2));
-    this->window->onKeyboardButton.connect(
-            Signals::Slot<int, bool>(&Engine::onKeyboardButton, this, std::placeholders::_1, std::placeholders::_2));
-
-    this->window->onQuit.connect(Signals::Slot<>(&Engine::onQuit, this));
-    this->window->onIdle.connect(Signals::Slot<>(&Engine::onIdle, this));
 }
 
-const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers() {
+Engine::Engine(const EngineConfig& config):
+        config(config) {
+    if (this->config.isDebug()) {
+        GetLogger().setLogLevel(LogLevel::LOG_DEBUG);
+    }
+}
+
+const EngineConfig& Engine::getConfig() const {
+    return this->config;
+}
+
+const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers() const {
     return this->frameBuffers;
 }
 
@@ -112,7 +93,7 @@ void Engine::addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer) {
     this->frameBuffers.insert(frameBuffer);
 }
 
-const std::unordered_set<std::shared_ptr<SceneManager>>& Engine::getSceneManagers() {
+const std::unordered_set<std::shared_ptr<SceneManager>>& Engine::getSceneManagers() const {
     return this->sceneManagers;
 }
 
@@ -124,7 +105,7 @@ void Engine::addSceneManager(const std::shared_ptr<SceneManager> sceneManager) {
     this->sceneManagers.insert(sceneManager);
 }
 
-const std::unordered_set<std::shared_ptr<ObjectManager>>& Engine::getObjectManagers() {
+const std::unordered_set<std::shared_ptr<ObjectManager>>& Engine::getObjectManagers() const {
     return this->objectManagers;
 }
 
@@ -152,22 +133,82 @@ void Engine::exit(int result) {
 int Engine::exec() {
     std::chrono::time_point<std::chrono::steady_clock> timestamp;
 
+    this->setupWindow();
+    this->setupOpenGL();
+    this->setupEngine();
+    this->onSetupSignal();
+
     while (this->running) {
         timestamp = std::chrono::steady_clock::now();
-        this->window->dispatchEvents();
 
-        for (auto& frameBuffer: this->frameBuffers) {
-            if (frameBuffer->isAutoUpdate()) {
-                frameBuffer->update();
-            }
+        if (this->window->dispatchEvents()) {
+            this->onQuitSignal();
+            this->exit(0);
+        } else {
+            this->onIdleSignal();
+            this->render();
         }
-        this->window->update();
 
         std::chrono::duration<float> duration = std::chrono::steady_clock::now() - timestamp;
         this->frameTime = duration.count();
     }
 
     return this->result;
+}
+
+void Engine::setupWindow() {
+    this->window = std::shared_ptr<Window>(
+            new WindowImpl(this->config.getWidth(), this->config.getHeight()));
+
+    this->window->onMouseMotionSignal.connect(
+            Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));
+    this->window->onMouseButtonSignal.connect(
+            Signals::Slot<int, bool>(&Engine::onMouseButton, this, std::placeholders::_1, std::placeholders::_2));
+    this->window->onKeyboardButtonSignal.connect(
+            Signals::Slot<int, bool>(&Engine::onKeyboardButton, this, std::placeholders::_1, std::placeholders::_2));
+}
+
+void Engine::setupOpenGL() {
+    OpenGL::loadCore();
+    OpenGL::loadExtensions();
+
+    LogInfo("Vendor: %s", glGetString(GL_VENDOR));
+    LogInfo("Renderer: %s", glGetString(GL_RENDERER));
+    LogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
+    LogInfo("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+    if (this->config.isDebug()) {
+        if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+            glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+            glDebugMessageCallbackARB(debugHandler, nullptr);
+        } else {
+            LogWarn("GL_ARB_debug_output unavailable, OpenGL debug disabled");
+        }
+    }
+
+    glFrontFace(GL_CW);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_CULL_FACE);
+}
+
+void Engine::setupEngine() {
+    this->sceneManagers.insert(std::make_shared<SceneManager>());
+    this->objectManagers.insert(std::make_shared<ObjectManager>());
+
+    this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
+    this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
+    this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));
+}
+
+void Engine::render() {
+    for (auto& frameBuffer: this->frameBuffers) {
+        if (frameBuffer->isAutoUpdate()) {
+            frameBuffer->update();
+        }
+    }
+
+    this->window->update();
 }
 
 }  // namespace Graphene

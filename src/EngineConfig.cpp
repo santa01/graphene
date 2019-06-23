@@ -20,9 +20,64 @@
  * SOFTWARE.
  */
 
-#include <Example.h>
+#include <EngineConfig.h>
 
-int main() {
-    Example example;
-    return example.exec();
+namespace Graphene {
+
+int EngineConfig::getFov() const {
+    return this->fov;
 }
+
+void EngineConfig::setFov(int fov) {
+    this->fov = fov;
+}
+
+int EngineConfig::getHeight() const {
+    return this->height;
+}
+
+void EngineConfig::setHeight(int height) {
+    this->height = height;
+}
+
+int EngineConfig::getWidth() const {
+    return this->width;
+}
+
+void EngineConfig::setWidth(int width) {
+    this->width = width;
+}
+
+int EngineConfig::getSamples() const {
+    return this->samples;
+}
+
+void EngineConfig::setSamples(int samples) {
+    this->samples = samples;
+}
+
+int EngineConfig::getMaxFps() const {
+    return this->maxFps;
+}
+
+void EngineConfig::setMaxFps(int maxFps) {
+    this->maxFps = maxFps;
+}
+
+bool EngineConfig::isVsync() const {
+    return this->vsync;
+}
+
+void EngineConfig::setVsync(bool vsync) {
+    this->vsync = vsync;
+}
+
+bool EngineConfig::isDebug() const {
+    return this->debug;
+}
+
+void EngineConfig::setDebug(bool debug) {
+    this->debug = debug;
+}
+
+}  // namespace Graphene

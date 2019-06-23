@@ -20,9 +20,46 @@
  * SOFTWARE.
  */
 
-#include <Example.h>
+#ifndef ENGINECONFIG_H
+#define ENGINECONFIG_H
 
-int main() {
-    Example example;
-    return example.exec();
-}
+#include <GrapheneApi.h>
+
+namespace Graphene {
+
+class EngineConfig {
+public:
+    GRAPHENE_API int getFov() const;
+    GRAPHENE_API void setFov(int fov);
+
+    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API void setHeight(int height);
+
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API void setWidth(int width);
+
+    GRAPHENE_API int getSamples() const;
+    GRAPHENE_API void setSamples(int samples);
+
+    GRAPHENE_API int getMaxFps() const;
+    GRAPHENE_API void setMaxFps(int maxFps);
+
+    GRAPHENE_API bool isVsync() const;
+    GRAPHENE_API void setVsync(bool vsync);
+
+    GRAPHENE_API bool isDebug() const;
+    GRAPHENE_API void setDebug(bool debug);
+
+private:
+    int fov = 75;
+    int height = 600;
+    int width = 800;
+    int samples = 0;     // TODO
+    int maxFps = 30;     // TODO
+    bool vsync = false;  // TODO
+    bool debug = true;
+};
+
+}  // namespace Graphene
+
+#endif  // ENGINECONFIG_H

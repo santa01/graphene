@@ -27,8 +27,9 @@
 #include <NonCopyable.h>
 #include <string>
 
-#define FormatMessage(...)      Logger::getInstance().formatLine(__FILE__, __LINE__, __VA_ARGS__)
-#define LogMessage(level, ...)  Logger::getInstance().logLine(level, __FILE__, __LINE__, __VA_ARGS__)
+#define GetLogger()             Logger::getInstance()
+#define FormatMessage(...)      GetLogger().formatLine(__FILE__, __LINE__, __VA_ARGS__)
+#define LogMessage(level, ...)  GetLogger().logLine(level, __FILE__, __LINE__, __VA_ARGS__)
 
 #define LogError(...)           LogMessage(Graphene::LogLevel::LOG_ERROR, __VA_ARGS__)
 #define LogWarn(...)            LogMessage(Graphene::LogLevel::LOG_WARN, __VA_ARGS__)
@@ -58,7 +59,7 @@ private:
     Logger() = default;
     static std::string formatVariadic(const char* format, va_list vlist);
 
-    LogLevel logLevel = LogLevel::LOG_DEBUG;
+    LogLevel logLevel = LogLevel::LOG_INFO;
 };
 
 }  // namespace Graphene

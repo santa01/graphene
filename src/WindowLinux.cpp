@@ -64,8 +64,9 @@ void WindowLinux::update() {
     glXSwapBuffers(this->display, this->window);
 }
 
-void WindowLinux::dispatchEvents() {
+bool WindowLinux::dispatchEvents() {
     XEvent event;
+    bool breakOrbit = false;
 
     while (XPending(this->display)) {
         XNextEvent(this->display, &event);
@@ -75,7 +76,7 @@ void WindowLinux::dispatchEvents() {
             case KeyRelease: {
                 bool keyState = (event.type == KeyPress);
                 this->setKeyboardState(event.xkey.keycode, keyState);
-                this->onKeyboardButton(event.xkey.keycode, keyState);
+                this->onKeyboardButtonSignal(event.xkey.keycode, keyState);
                 break;
             }
 
@@ -84,7 +85,7 @@ void WindowLinux::dispatchEvents() {
                 MouseButton mouseButton = static_cast<MouseButton>(event.xbutton.button);
                 bool mouseButtonState = (event.type == ButtonPress);
                 this->setMouseState(mouseButton, mouseButtonState);
-                this->onMouseButton(mouseButton, mouseButtonState);
+                this->onMouseButtonSignal(mouseButton, mouseButtonState);
                 break;
             }
 
@@ -107,7 +108,7 @@ void WindowLinux::dispatchEvents() {
 
                 if (mouseMoved) {
                     this->setMousePosition(xPosition, yPosition);
-                    this->onMouseMotion(xPosition, yPosition);
+                    this->onMouseMotionSignal(xPosition, yPosition);
                 }
 
                 break;
@@ -115,7 +116,7 @@ void WindowLinux::dispatchEvents() {
 
             case ClientMessage:
                 if (event.xclient.data.l[0] == (long)this->wmDeleteWindow) {
-                    this->onQuit();
+                    breakOrbit = true;
                 }
 
                 break;
@@ -125,7 +126,7 @@ void WindowLinux::dispatchEvents() {
         }
     }
 
-    this->onIdle();
+    return breakOrbit;
 }
 
 void WindowLinux::createWindow(const char* windowName) {

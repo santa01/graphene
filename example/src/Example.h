@@ -38,11 +38,9 @@
 #define MOUSE_SPEED 0.1f
 
 class Example: public Graphene::Engine {
-public:
-    Example(int width, int height);
-
 private:
     void onMouseMotion(int x, int y);
+    void onSetup();
     void onIdle();
 
     std::shared_ptr<Graphene::SceneNode> player;

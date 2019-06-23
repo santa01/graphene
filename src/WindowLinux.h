@@ -38,7 +38,7 @@ public:
 
     GRAPHENE_API void captureMouse(bool captured) override;
     GRAPHENE_API void update() override;
-    GRAPHENE_API void dispatchEvents() override;
+    GRAPHENE_API bool dispatchEvents() override;
 
 private:
     void createWindow(const char* windowName);

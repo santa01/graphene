@@ -25,8 +25,24 @@
 #include <Logger.h>
 #include <Vec3.h>
 
-Example::Example(int width, int height):
-        Graphene::Engine(width, height) {
+void Example::onMouseMotion(int x, int y) {
+    float xAngle = y * MOUSE_SPEED;
+    static float roll = 0.0f;
+
+    if (roll + xAngle > 90.0f) {
+        xAngle = 90.0f - roll;
+    } else if (roll + xAngle < -90.0f) {
+        xAngle = -90.0f - roll;
+    }
+    roll += xAngle;
+
+    this->player->yaw(x * MOUSE_SPEED);
+    if (xAngle != 0) {
+        this->player->rotate(this->camera->getRight(), xAngle);
+    }
+}
+
+void Example::onSetup() {
 
     /* Setup scene */
 
@@ -45,6 +61,7 @@ Example::Example(int width, int height):
     auto objectManager = *this->getObjectManagers().begin();
 
     this->camera = objectManager->createCamera();
+    this->camera->setFov(this->getConfig().getFov());
     this->player->attachObject(this->camera);
 
     auto flashlight = objectManager->createLight();
@@ -77,23 +94,6 @@ Example::Example(int width, int height):
     /* Keep mouse inside the window */
 
     this->getWindow()->captureMouse(true);
-}
-
-void Example::onMouseMotion(int x, int y) {
-    float xAngle = y * MOUSE_SPEED;
-    static float roll = 0.0f;
-
-    if (roll + xAngle > 90.0f) {
-        xAngle = 90.0f - roll;
-    } else if (roll + xAngle < -90.0f) {
-        xAngle = -90.0f - roll;
-    }
-    roll += xAngle;
-
-    this->player->yaw(x * MOUSE_SPEED);
-    if (xAngle != 0) {
-        this->player->rotate(this->camera->getRight(), xAngle);
-    }
 }
 
 void Example::onIdle() {

@@ -25,10 +25,12 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <EngineConfig.h>
 #include <FrameBuffer.h>
 #include <Window.h>
 #include <SceneManager.h>
 #include <ObjectManager.h>
+#include <Signals.h>
 #include <unordered_set>
 #include <memory>
 
@@ -36,16 +38,19 @@ namespace Graphene {
 
 class Engine: public NonCopyable {
 public:
-    GRAPHENE_API Engine(int width, int height);
+    GRAPHENE_API Engine();
+    GRAPHENE_API Engine(const EngineConfig& config);
     GRAPHENE_API virtual ~Engine() = default;
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers();
+    GRAPHENE_API const EngineConfig& getConfig() const;
+
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
     GRAPHENE_API void addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneManager>>& getSceneManagers();
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneManager>>& getSceneManagers() const;
     GRAPHENE_API void addSceneManager(const std::shared_ptr<SceneManager> sceneManager);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<ObjectManager>>& getObjectManagers();
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<ObjectManager>>& getObjectManagers() const;
     GRAPHENE_API void addObjectManager(const std::shared_ptr<ObjectManager> objectManager);
 
     GRAPHENE_API std::shared_ptr<Window> getWindow();
@@ -58,10 +63,21 @@ protected:
     virtual void onMouseMotion(int /*x*/, int /*y*/) {}
     virtual void onMouseButton(int /*button*/, bool /*state*/) {}
     virtual void onKeyboardButton(int /*button*/, bool /*state*/) {}
-    virtual void onQuit() { this->exit(0); }
+    virtual void onSetup() {}
     virtual void onIdle() {}
+    virtual void onQuit() {}
 
 private:
+    void setupWindow();
+    void setupOpenGL();
+    void setupEngine();
+    void render();
+
+    EngineConfig config;
+    Signals::Signal<> onSetupSignal;  // Once before event loop
+    Signals::Signal<> onIdleSignal;   // Empty event queue
+    Signals::Signal<> onQuitSignal;   // User-requested quit
+
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
     std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
