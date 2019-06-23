@@ -36,7 +36,7 @@ GLuint Shader::activeProgram = 0;
 Shader::Shader(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
-        throw std::runtime_error(FormatMessage("Failed to open '%s'", name));
+        throw std::runtime_error(FormatMessage("Failed to open '%s'", name.c_str()));
     }
 
     file.seekg(0, std::ios::end);
