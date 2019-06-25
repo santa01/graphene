@@ -34,6 +34,7 @@ PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLBINDTEXTUREPROC glBindTexture;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+PFNGLBLENDCOLORPROC glClearColor;
 PFNGLBLENDFUNCPROC glBlendFunc;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
@@ -135,6 +136,7 @@ void loadCore() {
     LOAD_MANDATORY(glBindFramebuffer);
     LOAD_MANDATORY(glBindTexture);
     LOAD_MANDATORY(glBindVertexArray);
+    LOAD_MANDATORY(glClearColor);
     LOAD_MANDATORY(glBlendFunc);
     LOAD_MANDATORY(glBufferData);
     LOAD_MANDATORY(glBufferSubData);
