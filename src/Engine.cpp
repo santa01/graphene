@@ -87,7 +87,7 @@ const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers(
 
 void Engine::addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer) {
     if (frameBuffer == nullptr) {
-        throw std::invalid_argument(FormatMessage("FrameBuffer cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("FrameBuffer cannot be nullptr"));
     }
 
     this->frameBuffers.insert(frameBuffer);
@@ -99,7 +99,7 @@ const std::unordered_set<std::shared_ptr<SceneManager>>& Engine::getSceneManager
 
 void Engine::addSceneManager(const std::shared_ptr<SceneManager> sceneManager) {
     if (sceneManager == nullptr) {
-        throw std::invalid_argument(FormatMessage("SceneManager cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("SceneManager cannot be nullptr"));
     }
 
     this->sceneManagers.insert(sceneManager);
@@ -111,7 +111,7 @@ const std::unordered_set<std::shared_ptr<ObjectManager>>& Engine::getObjectManag
 
 void Engine::addObjectManager(const std::shared_ptr<ObjectManager> objectManager) {
     if (objectManager == nullptr) {
-        throw std::invalid_argument(FormatMessage("ObjectManager cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("ObjectManager cannot be nullptr"));
     }
 
     this->objectManagers.insert(objectManager);

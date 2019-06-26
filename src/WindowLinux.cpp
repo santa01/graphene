@@ -132,7 +132,7 @@ bool WindowLinux::dispatchEvents() {
 void WindowLinux::createWindow(const char* windowName) {
     this->display = XOpenDisplay(nullptr);
     if (this->display == nullptr) {
-        throw std::runtime_error(FormatMessage("XOpenDisplay()"));
+        throw std::runtime_error(LogFormat("XOpenDisplay()"));
     }
 
     int screen = XDefaultScreen(this->display);
@@ -155,7 +155,7 @@ void WindowLinux::createWindow(const char* windowName) {
     int fbNumberConfigs;
     GLXFBConfig* fbConfigs = glXChooseFBConfig(this->display, screen, fbAttribList, &fbNumberConfigs);
     if (fbConfigs == nullptr) {
-        throw std::runtime_error(FormatMessage("glXChooseFBConfig()"));
+        throw std::runtime_error(LogFormat("glXChooseFBConfig()"));
     }
 
     this->fbConfig = fbConfigs[0];
@@ -164,7 +164,7 @@ void WindowLinux::createWindow(const char* windowName) {
     XVisualInfo* visualInfo = glXGetVisualFromFBConfig(this->display, this->fbConfig);
     this->colormap = XCreateColormap(this->display, rootWindow, visualInfo->visual, AllocNone);
     if (this->colormap == None) {
-        throw std::runtime_error(FormatMessage("XCreateColormap()"));
+        throw std::runtime_error(LogFormat("XCreateColormap()"));
     }
 
     XSetWindowAttributes windowAttributes = { };
@@ -175,7 +175,7 @@ void WindowLinux::createWindow(const char* windowName) {
             this->display, rootWindow, 0, 0, this->width, this->height, 0,
             visualInfo->depth, InputOutput, visualInfo->visual, CWColormap | CWEventMask, &windowAttributes);
     if (this->window == None) {
-        throw std::runtime_error(FormatMessage("XCreateWindow()"));
+        throw std::runtime_error(LogFormat("XCreateWindow()"));
     }
 
     XStoreName(this->display, this->window, windowName);
@@ -216,15 +216,15 @@ void WindowLinux::createContext() {
 
     this->renderingContext = glXCreateContextAttribsARB(this->display, this->fbConfig, nullptr, True, contextAttribList);
     if (this->renderingContext == nullptr) {
-        throw std::runtime_error(FormatMessage("glXCreateContextAttribsARB()"));
+        throw std::runtime_error(LogFormat("glXCreateContextAttribsARB()"));
     }
 
     if (!glXIsDirect(this->display, this->renderingContext)) {
-        throw std::runtime_error(FormatMessage("glXIsDirect()"));
+        throw std::runtime_error(LogFormat("glXIsDirect()"));
     }
 
     if (!glXMakeCurrent(this->display, this->window, this->renderingContext)) {
-        throw std::runtime_error(FormatMessage("glXMakeCurrent()"));
+        throw std::runtime_error(LogFormat("glXMakeCurrent()"));
     }
 }
 

@@ -73,7 +73,7 @@ std::shared_ptr<Material> Mesh::getMaterial() {
 
 void Mesh::setMaterial(const std::shared_ptr<Material> material) {
     if (material == nullptr) {
-        throw std::invalid_argument(FormatMessage("Material cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("Material cannot be nullptr"));
     }
 
     this->material = material;

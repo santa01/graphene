@@ -62,7 +62,7 @@ std::shared_ptr<Shader> SceneManager::getGeometryShader() {
 
 void SceneManager::setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
     if (geometryShader == nullptr) {
-        throw std::invalid_argument(FormatMessage("Shader cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
 
     this->geometryShader = geometryShader;
@@ -74,7 +74,7 @@ std::shared_ptr<Shader> SceneManager::getAmbientShader() {
 
 void SceneManager::setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
     if (ambientShader == nullptr) {
-        throw std::invalid_argument(FormatMessage("Shader cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
 
     this->ambientShader = ambientShader;
@@ -86,7 +86,7 @@ std::shared_ptr<Shader> SceneManager::getLightingShader() {
 
 void SceneManager::setLightingShader(const std::shared_ptr<Shader> lightingShader) {
     if (lightingShader == nullptr) {
-        throw std::invalid_argument(FormatMessage("Shader cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
 
     this->lightingShader = lightingShader;
@@ -106,7 +106,7 @@ float SceneManager::getAmbientEnergy() const {
 
 void SceneManager::setAmbientEnergy(float ambientEnergy) {
     if (ambientEnergy < 0.0f) {
-        throw std::runtime_error(FormatMessage("Ambient energy is less than 0.0f"));
+        throw std::runtime_error(LogFormat("Ambient energy is less than 0.0f"));
     }
 
     this->ambientEnergy = ambientEnergy;
@@ -130,7 +130,7 @@ void SceneManager::setLightPass(bool lightPass) {
 
 void SceneManager::render(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
-        throw std::invalid_argument(FormatMessage("Camera cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
     RenderStack::pop();  // Geometry buffer

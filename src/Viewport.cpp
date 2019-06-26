@@ -41,7 +41,7 @@ std::shared_ptr<Camera> Viewport::getCamera() {
 
 void Viewport::setCamera(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
-        throw std::invalid_argument(FormatMessage("Camera cannot be nullptr"));
+        throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
     this->camera = camera;

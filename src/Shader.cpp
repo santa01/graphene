@@ -36,7 +36,7 @@ GLuint Shader::activeProgram = 0;
 Shader::Shader(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
-        throw std::runtime_error(FormatMessage("Failed to open '%s'", name.c_str()));
+        throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 
     file.seekg(0, std::ios::end);
@@ -187,7 +187,7 @@ GLuint Shader::compile(const std::string& source, GLenum type) {
         glGetShaderInfoLog(shader, infoLogLength, nullptr, infoLog.get());
         glDeleteShader(shader);
 
-        throw std::runtime_error(FormatMessage("%s", infoLog.get()));
+        throw std::runtime_error(LogFormat("%s", infoLog.get()));
     }
 
     return shader;
@@ -214,7 +214,7 @@ GLuint Shader::link(const std::vector<GLuint>& shaders) {
         glGetProgramInfoLog(program, infoLogLength, nullptr, infoLog.get());
         glDeleteProgram(program);
 
-        throw std::runtime_error(FormatMessage("%s", infoLog.get()));
+        throw std::runtime_error(LogFormat("%s", infoLog.get()));
     }
 
     return program;

@@ -28,7 +28,7 @@
 #include <string>
 
 #define GetLogger()             Logger::getInstance()
-#define FormatMessage(...)      GetLogger().formatLine(__FILE__, __LINE__, __VA_ARGS__)
+#define LogFormat(...)          GetLogger().formatLine(__FILE__, __LINE__, __VA_ARGS__)
 #define LogMessage(level, ...)  GetLogger().logLine(level, __FILE__, __LINE__, __VA_ARGS__)
 
 #define LogError(...)           LogMessage(Graphene::LogLevel::LOG_ERROR, __VA_ARGS__)
