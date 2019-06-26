@@ -29,8 +29,8 @@ namespace Graphene {
 
 class EngineConfig {
 public:
-    GRAPHENE_API int getFov() const;
-    GRAPHENE_API void setFov(int fov);
+    GRAPHENE_API float getFov() const;
+    GRAPHENE_API void setFov(float fov);
 
     GRAPHENE_API int getHeight() const;
     GRAPHENE_API void setHeight(int height);
@@ -41,8 +41,8 @@ public:
     GRAPHENE_API int getSamples() const;
     GRAPHENE_API void setSamples(int samples);
 
-    GRAPHENE_API int getMaxFps() const;
-    GRAPHENE_API void setMaxFps(int maxFps);
+    GRAPHENE_API float getMaxFps() const;
+    GRAPHENE_API void setMaxFps(float maxFps);
 
     GRAPHENE_API bool isVsync() const;
     GRAPHENE_API void setVsync(bool vsync);
@@ -51,12 +51,12 @@ public:
     GRAPHENE_API void setDebug(bool debug);
 
 private:
-    int fov = 75;
+    float fov = 75.0f;
     int height = 600;
     int width = 800;
-    int samples = 0;     // TODO
-    int maxFps = 30;     // TODO
-    bool vsync = false;  // TODO
+    int samples = 0;        // TODO
+    float maxFps = 30.0f;   // TODO
+    bool vsync = false;     // TODO
     bool debug = true;
 };
 

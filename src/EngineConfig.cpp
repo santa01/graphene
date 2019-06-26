@@ -24,11 +24,11 @@
 
 namespace Graphene {
 
-int EngineConfig::getFov() const {
+float EngineConfig::getFov() const {
     return this->fov;
 }
 
-void EngineConfig::setFov(int fov) {
+void EngineConfig::setFov(float fov) {
     this->fov = fov;
 }
 
@@ -56,11 +56,11 @@ void EngineConfig::setSamples(int samples) {
     this->samples = samples;
 }
 
-int EngineConfig::getMaxFps() const {
+float EngineConfig::getMaxFps() const {
     return this->maxFps;
 }
 
-void EngineConfig::setMaxFps(int maxFps) {
+void EngineConfig::setMaxFps(float maxFps) {
     this->maxFps = maxFps;
 }
 
