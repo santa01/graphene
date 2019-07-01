@@ -38,12 +38,7 @@
 
 namespace Graphene {
 
-enum class LogLevel {
-    LOG_ERROR,
-    LOG_WARN,
-    LOG_INFO,
-    LOG_DEBUG
-};
+enum class LogLevel { LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DEBUG };
 
 class Logger: public NonCopyable {
 public:

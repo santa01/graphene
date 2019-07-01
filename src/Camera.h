@@ -30,13 +30,10 @@
 
 namespace Graphene {
 
+enum class ProjectionType { PERSPECTIVE, ORTHOGRAPHIC };
+
 class Camera: public Object {
 public:
-    enum class ProjectionType {
-        TYPE_PERSPECTIVE,
-        TYPE_ORTHOGRAPHIC
-    };
-
     GRAPHENE_API Camera();
 
     /* Rotatable */
@@ -94,7 +91,7 @@ private:
     Math::Mat4 translation;
     Math::Mat4 rotation;
 
-    ProjectionType projectionType = ProjectionType::TYPE_PERSPECTIVE;
+    ProjectionType projectionType = ProjectionType::PERSPECTIVE;
     Math::Vec3 rotationAngles;
 
     float aspectRatio = 1.3333f;

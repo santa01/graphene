@@ -65,7 +65,7 @@ void Example::onSetup() {
     this->player->attachObject(this->camera);
 
     auto flashlight = objectManager->createLight();
-    flashlight->setLightType(Graphene::Light::LightType::TYPE_SPOT);
+    flashlight->setLightType(Graphene::LightType::SPOT);
     flashlight->setDirection(this->camera->getTarget());
     flashlight->setBlend(0.05f);
     flashlight->setAngle(20.0f);

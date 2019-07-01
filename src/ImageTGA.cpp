@@ -29,29 +29,22 @@
 namespace Graphene {
 
 enum class ColorMapType: uint8_t {
-    TGA_COLORMAP_NOT_INCLUDED,
-    TGA_COLORMAP_INCLUDED       // Unsupported
+    NOT_INCLUDED,
+    INCLUDED       // Unsupported
 };
 
 enum class ImageType: uint8_t {
-    TGA_IMAGE_NODATA,                    // Unsupported
-    TGA_IMAGE_UNCOMPRESSED_COLORMAPPED,  // Unsupported
-    TGA_IMAGE_UNCOMPRESSED_TRUECOLOR,
-    TGA_IMAGE_UNCOMPRESSED_BLACKWHITE,   // Unsupported
-    TGA_RLE_COLORMAPPED = 9,             // Unsupported
-    TGA_RLE_TRUECOLOR,                   // Unsupported
-    TGA_RLE_BLACKWHITE                   // Unsupported
+    NODATA,                    // Unsupported
+    UNCOMPRESSED_COLORMAPPED,  // Unsupported
+    UNCOMPRESSED_TRUECOLOR,
+    UNCOMPRESSED_BLACKWHITE,   // Unsupported
+    RLE_COLORMAPPED = 9,       // Unsupported
+    RLE_TRUECOLOR,             // Unsupported
+    RLE_BLACKWHITE             // Unsupported
 };
 
-enum class ColumnOrdering {
-    TGA_COLUMN_LEFT_TO_RIGHT,
-    TGA_COLUMN_RIGHT_TO_LEFT
-};
-
-enum class RowOrdering {
-    TGA_ROW_BOTTOM_TO_TOP,
-    TGA_ROW_TOP_TO_BOTTOM
-};
+enum class ColumnOrdering { LEFT_TO_RIGHT, RIGHT_TO_LEFT };
+enum class RowOrdering { BOTTOM_TO_TOP, TOP_TO_BOTTOM };
 
 #pragma pack(push, 1)
 
@@ -97,11 +90,11 @@ ImageTGA::ImageTGA(const std::string& filename):
     Header header = { };
     image.read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    if (header.colorMapType != ColorMapType::TGA_COLORMAP_NOT_INCLUDED) {
+    if (header.colorMapType != ColorMapType::NOT_INCLUDED) {
         throw std::runtime_error(LogFormat("Unsupported TGA Colormap Type"));
     }
 
-    if (header.imageType != ImageType::TGA_IMAGE_UNCOMPRESSED_TRUECOLOR) {
+    if (header.imageType != ImageType::UNCOMPRESSED_TRUECOLOR) {
         throw std::runtime_error(LogFormat("Unsupported TGA Image Type"));
     }
 
@@ -123,8 +116,8 @@ ImageTGA::ImageTGA(const std::string& filename):
 
     uint8_t rowOrdering = header.imageSpec.imageDescr.topToBottomOrdering;
     uint8_t columnOrdering = header.imageSpec.imageDescr.leftToRightOrdering;
-    bool flipRows = (static_cast<RowOrdering>(rowOrdering) == RowOrdering::TGA_ROW_BOTTOM_TO_TOP);
-    bool flipColumns = (static_cast<ColumnOrdering>(columnOrdering) == ColumnOrdering::TGA_COLUMN_RIGHT_TO_LEFT);
+    bool flipRows = (static_cast<RowOrdering>(rowOrdering) == RowOrdering::BOTTOM_TO_TOP);
+    bool flipColumns = (static_cast<ColumnOrdering>(columnOrdering) == ColumnOrdering::RIGHT_TO_LEFT);
 
     std::ifstream::pos_type pixelsOffset = sizeof(header) + header.idLength +
         (header.colorMapSpec.colorMapLength * header.colorMapSpec.colorMapEntrySize);

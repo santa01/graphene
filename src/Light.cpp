@@ -103,7 +103,7 @@ Math::Vec3 Light::getPosition() const {
     return this->position;
 }
 
-Light::LightType Light::getLightType() const {
+LightType Light::getLightType() const {
     return this->lightType;
 }
 

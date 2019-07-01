@@ -47,14 +47,10 @@ typedef struct {
 
 #pragma pack(pop)
 
+enum LightType { POINT, SPOT, DIRECTED };
+
 class Light: public Object {
 public:
-    enum LightType {
-        TYPE_POINT,
-        TYPE_SPOT,
-        TYPE_DIRECTED
-    };
-
     GRAPHENE_API Light();
 
     /* Rotatable */
@@ -104,7 +100,7 @@ public:
     GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer();
 
 private:
-    LightType lightType = LightType::TYPE_POINT;
+    LightType lightType = LightType::POINT;
     std::shared_ptr<UniformBuffer> lightBuffer;
 
     Math::Vec3 color = { 1.0f, 1.0f, 1.0f };
