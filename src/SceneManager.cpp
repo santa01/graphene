@@ -142,7 +142,7 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
             camera->getProjection() * camera->getRotation() * camera->getTranslation());
 
     traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
-        if (object->getObjectType() == Object::ObjectType::TYPE_ENTITY) {
+        if (object->getObjectType() == ObjectType::ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
 
             this->geometryShader->setUniform("normalRotation", entity->getRotation());
@@ -196,7 +196,7 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->lightingShader->setUniform("cameraPosition", camera->getPosition());
 
     traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
-        if (object->getObjectType() == Object::ObjectType::TYPE_LIGHT) {
+        if (object->getObjectType() == ObjectType::LIGHT) {
             auto light = std::dynamic_pointer_cast<Light>(object);
             light->getLightBuffer()->bind(BIND_LIGHT);
 

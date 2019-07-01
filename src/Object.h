@@ -32,21 +32,18 @@ namespace Graphene {
 
 class SceneNode;
 
+enum class ObjectType { ENTITY, LIGHT, CAMERA };
+
 class Object: public Rotatable, public Movable {
 public:
-    enum class ObjectType {
-        TYPE_ENTITY,
-        TYPE_LIGHT,
-        TYPE_CAMERA
-    };
+    GRAPHENE_API Object(ObjectType objectType);
 
     GRAPHENE_API ObjectType getObjectType() const;
     GRAPHENE_API std::shared_ptr<class SceneNode> getParent();
 
-protected:
+private:
     ObjectType objectType;
 
-private:
     friend class SceneNode;
     std::weak_ptr<class SceneNode> parent;
 };

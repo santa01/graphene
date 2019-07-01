@@ -29,8 +29,8 @@
 
 namespace Graphene {
 
-Entity::Entity() {
-    this->objectType = ObjectType::TYPE_ENTITY;
+Entity::Entity():
+        Object(ObjectType::ENTITY) {
 }
 
 void Entity::roll(float angle) {

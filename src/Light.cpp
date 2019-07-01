@@ -31,9 +31,8 @@
 
 namespace Graphene {
 
-Light::Light() {
-    this->objectType = ObjectType::TYPE_LIGHT;
-
+Light::Light():
+        Object(ObjectType::LIGHT) {
     LightBuffer light = {
         { 0.0f, 0.0f, 0.0f }, this->energy,
         { 0.0f, 0.0f, 0.0f }, this->falloff,

@@ -24,7 +24,11 @@
 
 namespace Graphene {
 
-Object::ObjectType Object::getObjectType() const {
+Object::Object(ObjectType objectType):
+        objectType(objectType) {
+}
+
+ObjectType Object::getObjectType() const {
     return this->objectType;
 }
 

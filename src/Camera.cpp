@@ -29,9 +29,8 @@
 
 namespace Graphene {
 
-Camera::Camera() {
-    this->objectType = ObjectType::TYPE_CAMERA;
-
+Camera::Camera():
+        Object(ObjectType::CAMERA) {
     this->updateProjection(ProjectionType::TYPE_PERSPECTIVE);
     this->rotation.set(2, 2, -1.0f);  // Look at Z
 }
