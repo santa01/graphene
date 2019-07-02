@@ -38,7 +38,7 @@ class Object: public Rotatable, public Movable {
 public:
     GRAPHENE_API Object(ObjectType objectType);
 
-    GRAPHENE_API ObjectType getObjectType() const;
+    GRAPHENE_API ObjectType getType() const;
     GRAPHENE_API std::shared_ptr<class SceneNode> getParent();
 
 private:

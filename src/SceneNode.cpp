@@ -182,7 +182,7 @@ void SceneNode::attachObject(std::shared_ptr<Object> object) {
 
     auto inserted = this->objects.insert(object);
     if (inserted.second) {
-        switch (object->getObjectType()) {
+        switch (object->getType()) {
             case ObjectType::ENTITY:
                 this->entities.insert(std::dynamic_pointer_cast<Entity>(object));
                 break;

@@ -28,7 +28,7 @@ Object::Object(ObjectType objectType):
         objectType(objectType) {
 }
 
-ObjectType Object::getObjectType() const {
+ObjectType Object::getType() const {
     return this->objectType;
 }
 
