@@ -31,6 +31,7 @@
 #include <Mesh.h>
 #include <Vec3.h>
 #include <algorithm>
+#include <functional>
 #include <memory>
 
 namespace Graphene {
@@ -46,25 +47,11 @@ typedef struct {
 
 #pragma pack(pop)
 
-template<typename Function>
-void traverseScene(std::shared_ptr<SceneNode> node, Function function) {
-    auto objects = node->getObjects();
-    std::for_each(objects.begin(), objects.end(), function);
-
-    auto nodes = node->getNodes();
-    std::for_each(nodes.begin(), nodes.end(), [&function](std::shared_ptr<SceneNode> node) {
-        traverseScene(node, function);
-    });
-}
-
 class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
 public:
     GRAPHENE_API SceneManager();
 
-    /* const version of shared_from_this() is selected otherwise */
     GRAPHENE_API std::shared_ptr<SceneNode> createNode();
-
-    /* shared_from_this() cannot be called from constructor */
     GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
 
     GRAPHENE_API std::shared_ptr<Shader> getGeometryShader();
@@ -106,6 +93,8 @@ private:
 
     void renderShadows(const std::shared_ptr<Camera> camera);
     void renderLights(const std::shared_ptr<Camera> camera);
+
+    void traverseScene(std::function<void(const std::shared_ptr<Object>)> handler);
 
     std::shared_ptr<SceneNode> rootNode;
     std::shared_ptr<Mesh> frame;

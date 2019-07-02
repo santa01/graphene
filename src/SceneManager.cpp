@@ -46,10 +46,12 @@ SceneManager::SceneManager():
 }
 
 std::shared_ptr<SceneNode> SceneManager::createNode() {
+    /* const version of shared_from_this() is selected otherwise */
     return std::make_shared<SceneNode>(this->shared_from_this());
 }
 
 std::shared_ptr<SceneNode> SceneManager::getRootNode() {
+    /* shared_from_this() cannot be called from constructor */
     if (this->rootNode == nullptr) {
         this->rootNode = this->createNode();
     }
@@ -143,7 +145,7 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     Math::Mat4 modelViewProjection = camera->getProjection() * camera->getRotation() * camera->getTranslation();
     this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
 
-    traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
+    this->traverseScene([this](const std::shared_ptr<Object> object) {
         if (object->getType() == ObjectType::ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
             auto node = entity->getParent();
@@ -201,7 +203,7 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->lightingShader->setUniform("depthSampler", TEXTURE_DEPTH);
     this->lightingShader->setUniform("cameraPosition", camera->getPosition());
 
-    traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
+    this->traverseScene([this](const std::shared_ptr<Object> object) {
         if (object->getType() == ObjectType::LIGHT) {
             auto light = std::dynamic_pointer_cast<Light>(object);
             light->getLightBuffer()->bind(BIND_LIGHT);
@@ -209,6 +211,20 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
             this->frame->render();
         }
     });
+}
+
+void SceneManager::traverseScene(std::function<void(const std::shared_ptr<Object>)> handler) {
+    std::function<void(const std::shared_ptr<SceneNode>)> traverser;
+
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node) {
+        auto objects = node->getObjects();
+        std::for_each(objects.begin(), objects.end(), handler);
+
+        auto nodes = node->getNodes();
+        std::for_each(nodes.begin(), nodes.end(), traverser);
+    };
+
+    traverser(this->getRootNode());
 }
 
 }  // namespace Graphene
