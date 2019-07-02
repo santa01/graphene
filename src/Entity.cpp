@@ -67,36 +67,6 @@ Math::Vec3 Entity::getRotationAngles() const {
     return this->rotationAngles;
 }
 
-void Entity::scaleX(float factor) {
-    this->scale(factor, 1.0f, 1.0f);
-}
-
-void Entity::scaleY(float factor) {
-    this->scale(1.0f, factor, 1.0f);
-}
-
-void Entity::scaleZ(float factor) {
-    this->scale(1.0f, 1.0f, factor);
-}
-
-void Entity::scale(float xFactor, float yFactor, float zFactor) {
-    this->scale(Math::Vec3(xFactor, yFactor, zFactor));
-}
-
-void Entity::scale(const Math::Vec3& factors) {
-    if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
-        throw std::invalid_argument(LogFormat("Factor is less or equals zero"));
-    }
-
-    this->scaling.set(0, 0, this->scaling.get(0, 0) * factors.get(Math::Vec3::X));
-    this->scaling.set(1, 1, this->scaling.get(1, 1) * factors.get(Math::Vec3::Y));
-    this->scaling.set(2, 2, this->scaling.get(2, 2) * factors.get(Math::Vec3::Z));
-}
-
-Math::Vec3 Entity::getScalingFactors() const {
-    return Math::Vec3(this->scaling.get(0, 0), this->scaling.get(1, 1), this->scaling.get(2, 2));
-}
-
 void Entity::translate(float x, float y, float z) {
     this->translate(Math::Vec3(x, y, z));
 }
@@ -127,10 +97,6 @@ const Math::Mat4& Entity::getTranslation() const {
 
 const Math::Mat4& Entity::getRotation() const {
     return this->rotation;
-}
-
-const Math::Mat4& Entity::getScaling() const {
-    return this->scaling;
 }
 
 const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() {

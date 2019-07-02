@@ -47,17 +47,6 @@ public:
     GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
     GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
-    /* Scalable */
-
-    GRAPHENE_API void scaleX(float factor);
-    GRAPHENE_API void scaleY(float factor);
-    GRAPHENE_API void scaleZ(float factor);
-
-    GRAPHENE_API void scale(float xFactor, float yFactor, float zFactor);
-    GRAPHENE_API void scale(const Math::Vec3& factors);
-
-    GRAPHENE_API Math::Vec3 getScalingFactors() const;
-
     /* Movable */
 
     GRAPHENE_API void translate(float x, float y, float z);
@@ -72,7 +61,6 @@ public:
 
     GRAPHENE_API const Math::Mat4& getTranslation() const;
     GRAPHENE_API const Math::Mat4& getRotation() const;
-    GRAPHENE_API const Math::Mat4& getScaling() const;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes();
     GRAPHENE_API void addMesh(const std::shared_ptr<Mesh> mesh);
@@ -82,7 +70,6 @@ private:
 
     Math::Mat4 translation;
     Math::Mat4 rotation;
-    Math::Mat4 scaling;
 
     Math::Vec3 rotationAngles;
 };

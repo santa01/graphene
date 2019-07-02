@@ -53,16 +53,6 @@ public:
     GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
     GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
-    /* Scalable */
-
-    GRAPHENE_API void scaleX(float factor);
-    GRAPHENE_API void scaleY(float factor);
-    GRAPHENE_API void scaleZ(float factor);
-
-    GRAPHENE_API void scale(float xFactor, float yFactor, float zFactor);
-    GRAPHENE_API void scale(const Math::Vec3& factors);
-    GRAPHENE_API Math::Vec3 getScalingFactors() const;
-
     /* Movable */
 
     GRAPHENE_API void translate(float x, float y, float z);
@@ -96,7 +86,6 @@ private:
 
     Math::Vec3 position;
     Math::Vec3 rotationAngles;
-    Math::Vec3 scalingFactors;
 };
 
 }  // namespace Graphene

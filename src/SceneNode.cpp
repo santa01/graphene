@@ -30,8 +30,7 @@
 
 namespace Graphene {
 
-SceneNode::SceneNode(const std::shared_ptr<SceneManager> sceneManager):
-        scalingFactors(1.0f, 1.0f, 1.0f) {
+SceneNode::SceneNode(const std::shared_ptr<SceneManager> sceneManager) {
     if (sceneManager == nullptr) {
         throw std::invalid_argument(LogFormat("SceneManager cannot be nullptr"));
     }
@@ -82,50 +81,6 @@ void SceneNode::rotate(const Math::Vec3& vector, float angle) {
 
 Math::Vec3 SceneNode::getRotationAngles() const {
     return this->rotationAngles;
-}
-
-void SceneNode::scaleX(float factor) {
-    this->scale(factor, 1.0f, 1.0f);
-}
-
-void SceneNode::scaleY(float factor) {
-    this->scale(1.0f, factor, 1.0f);
-}
-
-void SceneNode::scaleZ(float factor) {
-    this->scale(1.0f, 1.0f, factor);
-}
-
-void SceneNode::scale(float xFactor, float yFactor, float zFactor) {
-    this->scale(Math::Vec3(xFactor, yFactor, zFactor));
-}
-
-void SceneNode::scale(const Math::Vec3& factors) {
-    if (std::any_of(factors.data(), factors.data() + 3, [](float factor) { return (factor <= 0.0f); })) {
-        throw std::invalid_argument(LogFormat("Factor is less or equals zero"));
-    }
-
-    Math::Mat3 scalingMatrix;
-    scalingMatrix.set(0, 0, factors.get(Math::Vec3::X));
-    scalingMatrix.set(1, 1, factors.get(Math::Vec3::Y));
-    scalingMatrix.set(2, 2, factors.get(Math::Vec3::Z));
-    this->scalingFactors = scalingMatrix * this->scalingFactors;
-
-    Math::Vec3 position = this->getPosition();
-
-    for (auto& node: this->nodes) {
-        node->translate(position + scalingMatrix * (node->getPosition() - position));
-        node->scale(factors);
-    }
-
-    for (auto& entity: this->entities) {
-        entity->translate(position + scalingMatrix * (entity->getPosition() - position));
-        entity->scale(factors);
-    }
-}
-
-Math::Vec3 SceneNode::getScalingFactors() const {
-    return this->scalingFactors;
 }
 
 void SceneNode::translate(float x, float y, float z) {

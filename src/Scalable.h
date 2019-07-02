@@ -23,22 +23,26 @@
 #ifndef SCALABLE_H
 #define SCALABLE_H
 
+#include <GrapheneApi.h>
+#include <Mat4.h>
 #include <Vec3.h>
 
 namespace Graphene {
 
 class Scalable {
 public:
-    virtual ~Scalable() = default;
+    GRAPHENE_API void scaleX(float factor);
+    GRAPHENE_API void scaleY(float factor);
+    GRAPHENE_API void scaleZ(float factor);
 
-    virtual void scaleX(float factor) = 0;
-    virtual void scaleY(float factor) = 0;
-    virtual void scaleZ(float factor) = 0;
+    GRAPHENE_API void scale(float xFactor, float yFactor, float zFactor);
+    GRAPHENE_API void scale(const Math::Vec3& factors);
 
-    virtual void scale(float xFactor, float yFactor, float zFactor) = 0;
-    virtual void scale(const Math::Vec3& factors) = 0;
+    GRAPHENE_API Math::Vec3 getScalingFactors() const;
+    GRAPHENE_API const Math::Mat4& getScaling() const;
 
-    virtual Math::Vec3 getScalingFactors() const = 0;
+protected:
+    Math::Mat4 scaling;
 };
 
 }  // namespace Graphene

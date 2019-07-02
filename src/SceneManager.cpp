@@ -27,6 +27,7 @@
 #include <Light.h>
 #include <Entity.h>
 #include <Sources.h>
+#include <Mat4.h>
 #include <stdexcept>
 
 namespace Graphene {
@@ -136,18 +137,23 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     RenderStack::pop();  // Geometry buffer
     this->geometryShader->enable();
     this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
-
     this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
-    this->geometryShader->setUniform("modelViewProjection",
-            camera->getProjection() * camera->getRotation() * camera->getTranslation());
+
+    // Translate -> rotate -> project
+    Math::Mat4 modelViewProjection = camera->getProjection() * camera->getRotation() * camera->getTranslation();
+    this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
 
     traverseScene(this->rootNode, [this](const std::shared_ptr<Object> object) {
         if (object->getType() == ObjectType::ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
+            auto node = entity->getParent();
+
+            // Scale -> rotate -> translate
+            Math::Mat4 entityTransformation = entity->getTranslation() * entity->getRotation() * entity->getScaling();
+            Math::Mat4 nodeTransformation = node->getScaling();
 
             this->geometryShader->setUniform("normalRotation", entity->getRotation());
-            this->geometryShader->setUniform("localWorld",
-                    entity->getScaling() * entity->getRotation() * entity->getTranslation());
+            this->geometryShader->setUniform("localWorld", nodeTransformation * entityTransformation);
 
             for (auto& mesh: entity->getMeshes()) {
                 auto material = mesh->getMaterial();
