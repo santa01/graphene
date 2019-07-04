@@ -91,10 +91,25 @@ private:
         TEXTURE_DEPTH
     };
 
+    enum TransformationMask {
+        MASK_TRANSLATION = 1 << 0,
+        MASK_ROTATION = 1 << 1,
+        MASK_SCALING = 1 << 2
+    };
+
+    typedef struct {
+        Math::Mat4 translation;
+        Math::Mat4 rotation;
+        Math::Mat4 scaling;
+    } Transformation;
+
+    typedef std::function<void(const std::shared_ptr<Object>, const Transformation&)> ObjectHandler;
+
     void renderShadows(const std::shared_ptr<Camera> camera);
     void renderLights(const std::shared_ptr<Camera> camera);
 
-    void traverseScene(std::function<void(const std::shared_ptr<Object>)> handler);
+    Transformation calculateTransformation(const std::shared_ptr<Object> object, int calculationMask);
+    void traverseScene(ObjectHandler handler);
 
     std::shared_ptr<SceneNode> rootNode;
     std::shared_ptr<Mesh> frame;
