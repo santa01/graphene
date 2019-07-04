@@ -31,22 +31,6 @@
 
 namespace Graphene {
 
-#pragma pack(push, 1)
-
-/* std140 layout */
-typedef struct {
-    float color[3];
-    float energy;
-    float position[3];
-    float falloff;
-    float direction[3];
-    float angle;
-    float blend;
-    int lightType;
-} LightBuffer;
-
-#pragma pack(pop)
-
 enum LightType { POINT, SPOT, DIRECTED };
 
 class Light: public Object {

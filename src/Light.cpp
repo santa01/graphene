@@ -31,19 +31,34 @@
 
 namespace Graphene {
 
+#pragma pack(push, 1)
+
+/* std140 layout */
+typedef struct {
+    float color[3];
+    float energy;
+    float falloff;
+    float angle;
+    float blend;
+    int lightType;
+} LightBuffer;
+
+#pragma pack(pop)
+
 Light::Light():
         Object(ObjectType::LIGHT) {
-    LightBuffer light = {
-        { 0.0f, 0.0f, 0.0f }, this->energy,
-        { 0.0f, 0.0f, 0.0f }, this->falloff,
-        { 0.0f, 0.0f, 0.0f }, this->angle,
-        this->blend, this->lightType
-    };
-    std::copy(this->color.data(), this->color.data() + 3, light.color);
-    std::copy(this->position.data(), this->position.data() + 3, light.position);
-    std::copy(this->direction.data(), this->direction.data() + 3, light.direction);
+    LightBuffer buffer = { };
 
-    this->lightBuffer = std::make_shared<UniformBuffer>(&light, sizeof(light));
+    Math::Vec3 color = this->getColor();
+    std::copy(color.data(), color.data() + 3, buffer.color);
+
+    buffer.energy = this->getEnergy();
+    buffer.falloff = this->getFalloff();
+    buffer.angle = this->getAngle();
+    buffer.blend = this->getBlend();
+    buffer.lightType = this->getLightType();
+
+    this->lightBuffer = std::make_shared<UniformBuffer>(&buffer, sizeof(buffer));
 }
 
 void Light::roll(float angle) {
@@ -74,7 +89,6 @@ void Light::rotate(const Math::Vec3& vector, float angle) {
 
     this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
     this->direction = q.extractMat4().extractMat3() * this->direction;
-    updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
 }
 
 Math::Vec3 Light::getRotationAngles() const {
@@ -117,7 +131,6 @@ void Light::setDirection(const Math::Vec3& direction) {
     }
 
     this->direction = direction;
-    updateBuffer(this->lightBuffer, LightBuffer, direction, this->direction.data());
 }
 
 float Light::getEnergy() const {
