@@ -23,21 +23,25 @@
 #ifndef MOVABLE_H
 #define MOVABLE_H
 
+#include <GrapheneApi.h>
+#include <Mat4.h>
 #include <Vec3.h>
 
 namespace Graphene {
 
 class Movable {
 public:
-    virtual ~Movable() = default;
+    GRAPHENE_API void translate(float x, float y, float z);
+    GRAPHENE_API void translate(const Math::Vec3& position);
 
-    virtual void translate(float x, float y, float z) = 0;
-    virtual void translate(const Math::Vec3& position) = 0;
+    GRAPHENE_API void move(float x, float y, float z);
+    GRAPHENE_API void move(const Math::Vec3& position);
 
-    virtual void move(float x, float y, float z) = 0;
-    virtual void move(const Math::Vec3& position) = 0;
+    GRAPHENE_API Math::Vec3 getPosition() const;
+    GRAPHENE_API const Math::Mat4& getTranslation() const;
 
-    virtual Math::Vec3 getPosition() const = 0;
+protected:
+    Math::Mat4 translation;
 };
 
 }  // namespace Graphene

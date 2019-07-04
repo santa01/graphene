@@ -67,34 +67,6 @@ Math::Vec3 Entity::getRotationAngles() const {
     return this->rotationAngles;
 }
 
-void Entity::translate(float x, float y, float z) {
-    this->translate(Math::Vec3(x, y, z));
-}
-
-void Entity::translate(const Math::Vec3& position) {
-    this->translation.set(0, 3, position.get(Math::Vec3::X));
-    this->translation.set(1, 3, position.get(Math::Vec3::Y));
-    this->translation.set(2, 3, position.get(Math::Vec3::Z));
-}
-
-void Entity::move(float x, float y, float z) {
-    this->move(Math::Vec3(x, y, z));
-}
-
-void Entity::move(const Math::Vec3& position) {
-    this->translation.set(0, 3, this->translation.get(0, 3) + position.get(Math::Vec3::X));
-    this->translation.set(1, 3, this->translation.get(1, 3) + position.get(Math::Vec3::Y));
-    this->translation.set(2, 3, this->translation.get(2, 3) + position.get(Math::Vec3::Z));
-}
-
-Math::Vec3 Entity::getPosition() const {
-    return Math::Vec3(this->translation.get(0, 3), this->translation.get(1, 3), this->translation.get(2, 3));
-}
-
-const Math::Mat4& Entity::getTranslation() const {
-    return this->translation;
-}
-
 const Math::Mat4& Entity::getRotation() const {
     return this->rotation;
 }

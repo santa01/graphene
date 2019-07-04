@@ -45,16 +45,6 @@ public:
     GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
     GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
-    /* Movable */
-
-    GRAPHENE_API void translate(float x, float y, float z);
-    GRAPHENE_API void translate(const Math::Vec3& position);
-
-    GRAPHENE_API void move(float x, float y, float z);
-    GRAPHENE_API void move(const Math::Vec3& position);
-
-    GRAPHENE_API Math::Vec3 getPosition() const;
-
     /* Camera */
 
     GRAPHENE_API ProjectionType getProjectionType() const;
@@ -76,7 +66,6 @@ public:
     GRAPHENE_API Math::Vec3 getUp() const;
     GRAPHENE_API Math::Vec3 getTarget() const;
 
-    GRAPHENE_API const Math::Mat4& getTranslation() const;
     GRAPHENE_API const Math::Mat4& getRotation() const;
     GRAPHENE_API const Math::Mat4& getProjection() const;
 
@@ -88,7 +77,6 @@ private:
     void updateRotation(const Math::Vec3& right, const Math::Vec3& up, const Math::Vec3& target);
 
     Math::Mat4 projection;
-    Math::Mat4 translation;
     Math::Mat4 rotation;
 
     ProjectionType projectionType = ProjectionType::PERSPECTIVE;

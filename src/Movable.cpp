@@ -20,47 +20,36 @@
  * SOFTWARE.
  */
 
-#ifndef ENTITY_H
-#define ENTITY_H
-
-#include <GrapheneApi.h>
-#include <Scalable.h>
-#include <Mesh.h>
-#include <Object.h>
-#include <Vec3.h>
-#include <Mat4.h>
-#include <unordered_set>
-#include <memory>
+#include <Movable.h>
 
 namespace Graphene {
 
-class Entity: public Object, public Scalable {
-public:
-    GRAPHENE_API Entity();
+void Movable::translate(float x, float y, float z) {
+    this->translate(Math::Vec3(x, y, z));
+}
 
-    /* Rotatable */
+void Movable::translate(const Math::Vec3& position) {
+    this->translation.set(0, 3, position.get(Math::Vec3::X));
+    this->translation.set(1, 3, position.get(Math::Vec3::Y));
+    this->translation.set(2, 3, position.get(Math::Vec3::Z));
+}
 
-    GRAPHENE_API void roll(float angle);
-    GRAPHENE_API void yaw(float angle);
-    GRAPHENE_API void pitch(float angle);
+void Movable::move(float x, float y, float z) {
+    this->move(Math::Vec3(x, y, z));
+}
 
-    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
-    GRAPHENE_API Math::Vec3 getRotationAngles() const;
+void Movable::move(const Math::Vec3& position) {
+    this->translation.set(0, 3, this->translation.get(0, 3) + position.get(Math::Vec3::X));
+    this->translation.set(1, 3, this->translation.get(1, 3) + position.get(Math::Vec3::Y));
+    this->translation.set(2, 3, this->translation.get(2, 3) + position.get(Math::Vec3::Z));
+}
 
-    /* Entity */
+Math::Vec3 Movable::getPosition() const {
+    return Math::Vec3(this->translation.get(0, 3), this->translation.get(1, 3), this->translation.get(2, 3));
+}
 
-    GRAPHENE_API const Math::Mat4& getRotation() const;
-
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes();
-    GRAPHENE_API void addMesh(const std::shared_ptr<Mesh> mesh);
-
-private:
-    std::unordered_set<std::shared_ptr<Mesh>> meshes;
-
-    Math::Mat4 rotation;
-    Math::Vec3 rotationAngles;
-};
+const Math::Mat4& Movable::getTranslation() const {
+    return this->translation;
+}
 
 }  // namespace Graphene
-
-#endif  // ENTITY_H

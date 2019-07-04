@@ -62,16 +62,6 @@ public:
     GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
     GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
-    /* Movable */
-
-    GRAPHENE_API void translate(float x, float y, float z);
-    GRAPHENE_API void translate(const Math::Vec3& position);
-
-    GRAPHENE_API void move(float x, float y, float z);
-    GRAPHENE_API void move(const Math::Vec3& position);
-
-    GRAPHENE_API Math::Vec3 getPosition() const;
-
     /* Light */
 
     GRAPHENE_API LightType getLightType() const;
@@ -104,7 +94,6 @@ private:
     std::shared_ptr<UniformBuffer> lightBuffer;
 
     Math::Vec3 color = { 1.0f, 1.0f, 1.0f };
-    Math::Vec3 position = Math::Vec3::ZERO;  // TYPE_POINT, TYPE_SPOT
     Math::Vec3 direction = Math::Vec3::UNIT_X;  // TYPE_SPOT, TYPE_DIRECTED
 
     float energy = 1.0f;

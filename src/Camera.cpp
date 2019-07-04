@@ -79,30 +79,6 @@ Math::Vec3 Camera::getRotationAngles() const {
     return this->rotationAngles;
 }
 
-void Camera::translate(float x, float y, float z) {
-    this->translate(Math::Vec3(x, y, z));
-}
-
-void Camera::translate(const Math::Vec3& position) {
-    this->translation.set(0, 3, -position.get(Math::Vec3::X));
-    this->translation.set(1, 3, -position.get(Math::Vec3::Y));
-    this->translation.set(2, 3, -position.get(Math::Vec3::Z));
-}
-
-void Camera::move(float x, float y, float z) {
-    this->move(Math::Vec3(x, y, z));
-}
-
-void Camera::move(const Math::Vec3& position) {
-    this->translation.set(0, 3, this->translation.get(0, 3) - position.get(Math::Vec3::X));
-    this->translation.set(1, 3, this->translation.get(1, 3) - position.get(Math::Vec3::Y));
-    this->translation.set(2, 3, this->translation.get(2, 3) - position.get(Math::Vec3::Z));
-}
-
-Math::Vec3 Camera::getPosition() const {
-    return Math::Vec3(-this->translation.get(0, 3), -this->translation.get(1, 3), -this->translation.get(2, 3));
-}
-
 ProjectionType Camera::getProjectionType() const {
     return this->projectionType;
 }
@@ -157,10 +133,6 @@ Math::Vec3 Camera::getUp() const {
 
 Math::Vec3 Camera::getTarget() const {
     return -Math::Vec3(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
-}
-
-const Math::Mat4& Camera::getTranslation() const {
-    return this->translation;
 }
 
 const Math::Mat4& Camera::getRotation() const {

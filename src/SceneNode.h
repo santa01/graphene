@@ -53,16 +53,6 @@ public:
     GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
     GRAPHENE_API Math::Vec3 getRotationAngles() const;
 
-    /* Movable */
-
-    GRAPHENE_API void translate(float x, float y, float z);
-    GRAPHENE_API void translate(const Math::Vec3& position);
-
-    GRAPHENE_API void move(float x, float y, float z);
-    GRAPHENE_API void move(const Math::Vec3& position);
-
-    GRAPHENE_API Math::Vec3 getPosition() const;
-
     /* SceneNode */
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes();
@@ -84,7 +74,6 @@ private:
     std::weak_ptr<SceneManager> sceneManager;
     std::weak_ptr<SceneNode> parent;
 
-    Math::Vec3 position;
     Math::Vec3 rotationAngles;
 };
 

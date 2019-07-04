@@ -81,28 +81,6 @@ Math::Vec3 Light::getRotationAngles() const {
     return this->rotationAngles;
 }
 
-void Light::translate(float x, float y, float z) {
-    this->translate(Math::Vec3(x, y, z));
-}
-
-void Light::translate(const Math::Vec3& position) {
-    this->position = position;
-    updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
-}
-
-void Light::move(float x, float y, float z) {
-    this->move(Math::Vec3(x, y, z));
-}
-
-void Light::move(const Math::Vec3& position) {
-    this->position += position;
-    updateBuffer(this->lightBuffer, LightBuffer, position, this->position.data());
-}
-
-Math::Vec3 Light::getPosition() const {
-    return this->position;
-}
-
 LightType Light::getLightType() const {
     return this->lightType;
 }

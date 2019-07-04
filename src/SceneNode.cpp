@@ -69,46 +69,16 @@ void SceneNode::rotate(const Math::Vec3& vector, float angle) {
     Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
 
     for (auto& node: this->nodes) {
-        node->translate(position + rotationMatrix * (node->getPosition() - position));
         node->rotate(vector, angle);
     }
 
     for (auto& object: this->objects) {
-        object->translate(position + rotationMatrix * (object->getPosition() - position));
         object->rotate(vector, angle);
     }
 }
 
 Math::Vec3 SceneNode::getRotationAngles() const {
     return this->rotationAngles;
-}
-
-void SceneNode::translate(float x, float y, float z) {
-    this->translate(Math::Vec3(x, y, z));
-}
-
-void SceneNode::translate(const Math::Vec3& position) {
-    this->move(position - this->position);
-}
-
-void SceneNode::move(float x, float y, float z) {
-    this->move(Math::Vec3(x, y, z));
-}
-
-void SceneNode::move(const Math::Vec3& position) {
-    this->position += position;
-
-    for (auto& node: this->nodes) {
-        node->move(position);
-    }
-
-    for (auto& object: this->objects) {
-        object->move(position);
-    }
-}
-
-Math::Vec3 SceneNode::getPosition() const {
-    return this->position;
 }
 
 const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() {
