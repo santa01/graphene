@@ -108,7 +108,7 @@ private:
     void renderShadows(const std::shared_ptr<Camera> camera);
     void renderLights(const std::shared_ptr<Camera> camera);
 
-    Transformation calculateTransformation(const std::shared_ptr<Object> object, int calculationMask);
+    Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
     void traverseScene(ObjectHandler handler);
 
     std::shared_ptr<SceneNode> rootNode;

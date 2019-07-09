@@ -142,14 +142,8 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
     this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
-    Transformation cameraTransformation = this->calculateTransformation(camera, MASK_TRANSLATION);
-
-    Math::Mat4 cameraTranslation = cameraTransformation.translation;
-    cameraTranslation = cameraTranslation * camera->getTranslation();
-    cameraTranslation.invert();  // World translates the opposite direction
-
-    // Translate -> rotate -> project
-    Math::Mat4 modelViewProjection = camera->getProjection() * camera->getRotation() * cameraTranslation;
+    // Modelview -> project
+    Math::Mat4 modelViewProjection = camera->getProjection() * this->calculateModelView(camera);
     this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
 
     this->traverseScene([this](const std::shared_ptr<Object> object, const Transformation& transformation) {
@@ -227,26 +221,19 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
     });
 }
 
-SceneManager::Transformation SceneManager::calculateTransformation(const std::shared_ptr<Object> object, int calculationMask) {
-    std::shared_ptr<SceneNode> node = object->getParent();
-    Transformation transformation;
+Math::Mat4 SceneManager::calculateModelView(const std::shared_ptr<Camera> camera) {
+    std::shared_ptr<SceneNode> node = camera->getParent();
+    Math::Mat4 modelView;
 
     while (node != nullptr) {
-        // Moving to the root node, current node's transformation matrix is the right operand
-        // to be the first operation. Eventually root node's transformation will be the first one.
-
-        if (calculationMask & MASK_TRANSLATION) {
-            transformation.translation = transformation.translation * node->getTranslation();
-        }
-
-        if (calculationMask & MASK_SCALING) {
-            transformation.scaling = transformation.scaling * node->getScaling();
-        }
-
+        // Moving to the root node, current node's transformation matrix is the left operand
+        // to be the last operation. Eventually root node's transformation will be the first one.
+        modelView = node->getOppositeRotation() * node->getOppositeTranslation() * modelView;
         node = node->getParent();
     }
 
-    return transformation;
+    modelView = camera->getOppositeRotation() * camera->getOppositeTranslation() * modelView;
+    return modelView;
 }
 
 void SceneManager::traverseScene(ObjectHandler handler) {
