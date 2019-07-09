@@ -187,9 +187,12 @@ void Engine::setupOpenGL() {
         }
     }
 
-    glFrontFace(GL_CW);
-    glBlendFunc(GL_ONE, GL_ONE);
     glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
 }
 
 void Engine::setupEngine() {

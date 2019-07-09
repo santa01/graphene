@@ -57,11 +57,10 @@ public:
     GRAPHENE_API void lookAt(const Math::Vec3& target);
 
 private:
-    void updateProjection(ProjectionType projectionType);
-
-    Math::Mat4 projection;
+    void updateProjection();
 
     ProjectionType projectionType = ProjectionType::PERSPECTIVE;
+    Math::Mat4 projection;
 
     float aspectRatio = 1.3333f;
     float nearPlane = 0.1f;

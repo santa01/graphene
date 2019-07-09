@@ -54,6 +54,7 @@ extern PFNGLCLEARPROC glClear;
 extern PFNGLCOMPILESHADERPROC glCompileShader;
 extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLCULLFACEPROC glCullFace;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 extern PFNGLDELETEPROGRAMPROC glDeleteProgram;

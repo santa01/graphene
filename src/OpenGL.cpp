@@ -42,6 +42,7 @@ PFNGLCLEARPROC glClear;
 PFNGLCOMPILESHADERPROC glCompileShader;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLCREATESHADERPROC glCreateShader;
+PFNGLCULLFACEPROC glCullFace;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 PFNGLDELETEPROGRAMPROC glDeleteProgram;
@@ -144,6 +145,7 @@ void loadCore() {
     LOAD_MANDATORY(glCompileShader);
     LOAD_MANDATORY(glCreateProgram);
     LOAD_MANDATORY(glCreateShader);
+    LOAD_MANDATORY(glCullFace);
     LOAD_MANDATORY(glDeleteBuffers);
     LOAD_MANDATORY(glDeleteFramebuffers);
     LOAD_MANDATORY(glDeleteProgram);

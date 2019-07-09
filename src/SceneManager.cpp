@@ -40,7 +40,8 @@ SceneManager::SceneManager():
     FrameGeometry geometry = {
         { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f },
         {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
-        {  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f }, { 0, 1, 3, 1, 2, 3 }
+        {  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f },
+        { 0, 1, 3, 1, 2, 3 }
     };
     this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
 }

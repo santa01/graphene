@@ -30,8 +30,7 @@ namespace Graphene {
 
 Camera::Camera():
         Object(ObjectType::CAMERA) {
-    this->updateProjection(ProjectionType::PERSPECTIVE);
-    this->rotation.set(2, 2, -1.0f);  // Look at Z
+    this->updateProjection();
 }
 
 ProjectionType Camera::getProjectionType() const {
@@ -39,7 +38,8 @@ ProjectionType Camera::getProjectionType() const {
 }
 
 void Camera::setProjectionType(ProjectionType type) {
-    this->updateProjection(type);
+    this->projectionType = type;
+    this->updateProjection();
 }
 
 float Camera::getAspectRatio() const {
@@ -48,7 +48,7 @@ float Camera::getAspectRatio() const {
 
 void Camera::setAspectRatio(float aspectRatio) {
     this->aspectRatio = aspectRatio;
-    this->updateProjection(this->projectionType);
+    this->updateProjection();
 }
 
 float Camera::getNearPlane() const {
@@ -57,7 +57,7 @@ float Camera::getNearPlane() const {
 
 void Camera::setNearPlane(float nearPlane) {
     this->nearPlane = nearPlane;
-    this->updateProjection(this->projectionType);
+    this->updateProjection();
 }
 
 float Camera::getFarPlane() const {
@@ -66,7 +66,7 @@ float Camera::getFarPlane() const {
 
 void Camera::setFarPlane(float farPlane) {
     this->farPlane = farPlane;
-    this->updateProjection(this->projectionType);
+    this->updateProjection();
 }
 
 float Camera::getFov() const {
@@ -75,7 +75,7 @@ float Camera::getFov() const {
 
 void Camera::setFov(float fov) {
     this->fov = fov;
-    this->updateProjection(this->projectionType);
+    this->updateProjection();
 }
 
 const Math::Mat4& Camera::getProjection() const {
@@ -123,30 +123,79 @@ void Camera::lookAt(const Math::Vec3& vector) {
     this->updateRotation(right, up, target);
 }
 
-void Camera::updateProjection(ProjectionType projectionType) {
-    this->projection = Math::Mat4();
-    this->projectionType = projectionType;
-    float pi = static_cast<float>(M_PI);
+void Camera::updateProjection() {
+    /*
+     * References:
+     *     http://www.songho.ca/opengl/gl_projectionmatrix.html
+     *     https://softwareengineering.stackexchange.com/a/88776
+     *
+     * Frustum dimentions:
+     *     N - near plane
+     *     F - far plane
+     *
+     * Near plane dimentions:
+     *     R - right
+     *     L - left
+     *     T - top
+     *     B - botton
+     *
+     * Prespective projection for eye space to NDC transformation
+     * (left handed coordinate system to left handed coordinate system):
+     *     | 2 * N / (R - L) ;        0        ; - (R + L) / (R - L) ;          0          |
+     *     |        0        ; 2 * N / (T - B) ; - (T + B) / (T - B) ;          0          |
+     *     |        0        ;        0        ; - (N + F) / (N - F) ; 2 * N * F / (N - F) |
+     *     |        0        ;        0        ;           1         ;          0          |
+     *
+     * Where:
+     *     L = -R
+     *     B = -T
+     *     AR = (2 * R) / (2 * T)
+     *     R - L = 2 * R = 2 * N * tan(FOV / 2) * AR
+     *     R + L = 0
+     *     T - B = 2 * T = 2 * N * tan(FOV / 2)
+     *     T + B = 0
+     *
+     * Orthographic projection for eye space to NDC transformation
+     * (left handed coordinate system to left handed coordinate system):
+     *     | 2 / (R - L) ;      0      ;           0         ; - (R + L) / (R - L) |
+     *     |      0      ; 2 / (T - B) ;           0         ; - (T + B) / (T - B) |
+     *     |      0      ;      0      ;      2 / (F - N)    ; - (F + N) / (F - N) |
+     *     |      0      ;      0      ;           0         ;          1          |
+     *
+     * Where:
+     *     L = -R
+     *     B = -T
+     *     AR = (2 * R) / (2 * T)
+     *     R = T = (F + N) / 2
+     *     R - L = (F - N) * AR
+     *     R + L = 0
+     *     T - B = F - N
+     *     T + B = 0
+     */
 
-    switch (this->projectionType) {
+    this->projection = Math::Mat4();
+
+    float pi = static_cast<float>(M_PI);
+    float fovRadian = this->getFov() * pi / 180.0f;
+
+    float aspectRatio = this->getAspectRatio();
+    float nearPlane = this->getNearPlane();
+    float farPlane = this->getFarPlane();
+
+    switch (this->getProjectionType()) {
         case ProjectionType::PERSPECTIVE:
-            this->projection.set(0, 0, 1.0f / (tanf(this->fov * pi / 180.0f / 2.0f) *
-                                       this->aspectRatio));
-            this->projection.set(1, 1, 1.0f / (tanf(this->fov * pi / 180.0f / 2.0f)));
-            this->projection.set(2, 2, (-this->farPlane - this->nearPlane) /
-                                       (this->farPlane - this->nearPlane));
-            this->projection.set(2, 3, (-2.0f * this->farPlane * this->nearPlane) /
-                                       (this->farPlane - this->nearPlane));
-            this->projection.set(3, 2, -1.0f);
+            this->projection.set(0, 0, 1.0f / (tanf(fovRadian / 2.0f) * aspectRatio));
+            this->projection.set(1, 1, 1.0f / (tanf(fovRadian / 2.0f)));
+            this->projection.set(2, 2, - (nearPlane + farPlane) / (nearPlane - farPlane));
+            this->projection.set(2, 3, 2.0f * nearPlane * farPlane / (nearPlane - farPlane));
+            this->projection.set(3, 2, 1.0f);
             this->projection.set(3, 3, 0.0f);
             break;
         case ProjectionType::ORTHOGRAPHIC:
-            this->projection.set(0, 0, 1.0f / ((this->farPlane - this->nearPlane) *
-                                       this->aspectRatio));
-            this->projection.set(1, 1, 1.0f / (this->farPlane - this->nearPlane));
-            this->projection.set(2, 2, -2.0f / (this->farPlane - this->nearPlane));
-            this->projection.set(2, 3, (-this->farPlane - this->nearPlane) /
-                                       (this->farPlane - this->nearPlane));
+            this->projection.set(0, 0, 1.0f / ((farPlane - nearPlane) * aspectRatio));
+            this->projection.set(1, 1, 1.0f / (farPlane - nearPlane));
+            this->projection.set(2, 2, 2.0f / (farPlane - nearPlane));
+            this->projection.set(2, 3, - (farPlane + nearPlane) / (farPlane - nearPlane));
             break;
     }
 }

@@ -159,7 +159,7 @@ class ExportEntity(Operator, ExportHelper):
     filter_glob = StringProperty(default="*.entity", options={'HIDDEN'})
 
     axis_forward = EnumProperty(
-        name="Forward", default='-Z',
+        name="Forward", default='Z',
         items=(
             ('X', "X Forward", ""),
             ('Y', "Y Forward", ""),
