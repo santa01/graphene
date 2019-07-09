@@ -82,22 +82,6 @@ void Light::setColor(const Math::Vec3& color) {
     updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
 }
 
-const Math::Vec3& Light::getDirection() const {
-    return this->direction;
-}
-
-void Light::setDirection(float x, float y, float z) {
-    this->setDirection(Math::Vec3(x, y, z));
-}
-
-void Light::setDirection(const Math::Vec3& direction) {
-    if (direction == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
-    }
-
-    this->direction = direction;
-}
-
 float Light::getEnergy() const {
     return this->energy;
 }
@@ -136,6 +120,18 @@ void Light::setBlend(float blend) {
 
     this->blend = blend;
     updateBuffer(this->lightBuffer, LightBuffer, blend, &this->blend);
+}
+
+const Math::Vec3 Light::getDirection() const {
+    return this->getTarget();
+}
+
+void Light::setDirection(float x, float y, float z) {
+    this->setDirection(Math::Vec3(x, y, z));
+}
+
+void Light::setDirection(const Math::Vec3& direction) {
+    this->targetAt(direction);
 }
 
 std::shared_ptr<UniformBuffer> Light::getLightBuffer() {

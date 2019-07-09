@@ -87,40 +87,7 @@ void Camera::lookAt(float x, float y, float z) {
 }
 
 void Camera::lookAt(const Math::Vec3& vector) {
-    if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
-    }
-
-    Math::Vec3 target(-vector);
-    target.normalize();
-
-    Math::Vec3 right = this->getRight();
-    if (target != Math::Vec3::UNIT_Y && target != -Math::Vec3::UNIT_Y) {
-        right = target.cross(Math::Vec3::UNIT_Y);
-        right.normalize();
-    }
-
-    Math::Vec3 up = right.cross(target);
-    up.normalize();
-
-    float angle = acosf(target.dot(this->getTarget()));
-    Math::Vec3 axis = target.cross(this->getTarget());
-    axis.normalize();
-
-    float xAngle = atan2f(axis.get(Math::Vec3::X) * sinf(angle) -
-                          axis.get(Math::Vec3::Y) * axis.get(Math::Vec3::Z) * (1 - cosf(angle)),
-                          1 - (axis.get(Math::Vec3::X) * axis.get(Math::Vec3::X) +
-                               axis.get(Math::Vec3::Z) * axis.get(Math::Vec3::Z)) * (1 - cosf(angle)));
-    float yAngle = atan2f(axis.get(Math::Vec3::Y) * sinf(angle) -
-                          axis.get(Math::Vec3::X) * axis.get(Math::Vec3::Z) * (1 - cosf(angle)),
-                          1 - (axis.get(Math::Vec3::Y) * axis.get(Math::Vec3::Y) +
-                               axis.get(Math::Vec3::Z) * axis.get(Math::Vec3::Z)) * (1 - cosf(angle)));
-    float zAngle = asinf(axis.get(Math::Vec3::X) * axis.get(Math::Vec3::Y) * (1 - cosf(angle)) +
-                         axis.get(Math::Vec3::Z) * sinf(angle));
-
-    float pi = static_cast<float>(M_PI);
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
-    this->updateRotation(right, up, target);
+    this->targetAt(vector);
 }
 
 void Camera::updateProjection() {

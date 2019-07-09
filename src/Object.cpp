@@ -21,6 +21,9 @@
  */
 
 #include <Object.h>
+#include <Logger.h>
+#include <stdexcept>
+#include <cmath>
 
 namespace Graphene {
 
@@ -34,6 +37,26 @@ ObjectType Object::getType() const {
 
 std::shared_ptr<class SceneNode> Object::getParent() {
     return this->parent.lock();
+}
+
+void Object::targetAt(float x, float y, float z) {
+    this->targetAt(Math::Vec3(x, y, z));
+}
+
+void Object::targetAt(const Math::Vec3& vector) {
+    if (vector == Math::Vec3::ZERO) {
+        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
+    }
+
+    Math::Vec3 target(this->getTarget());
+    Math::Vec3 newTarget(vector - this->getPosition());
+    newTarget.normalize();
+
+    float pi = static_cast<float>(M_PI);
+    float angle = 180.0f * acosf(target.dot(newTarget)) / pi;
+
+    Math::Vec3 axis = target.cross(newTarget);
+    this->rotate(axis, angle);
 }
 
 }  // namespace Graphene

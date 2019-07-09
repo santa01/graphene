@@ -44,10 +44,6 @@ public:
     GRAPHENE_API void setColor(float red, float green, float blue);
     GRAPHENE_API void setColor(const Math::Vec3& color);
 
-    GRAPHENE_API const Math::Vec3& getDirection() const;
-    GRAPHENE_API void setDirection(float x, float y, float z);
-    GRAPHENE_API void setDirection(const Math::Vec3& direction);
-
     GRAPHENE_API float getEnergy() const;
     GRAPHENE_API void setEnergy(float energy);
 
@@ -60,15 +56,17 @@ public:
     GRAPHENE_API float getBlend() const;
     GRAPHENE_API void setBlend(float blend);
 
+    GRAPHENE_API const Math::Vec3 getDirection() const;
+    GRAPHENE_API void setDirection(float x, float y, float z);
+    GRAPHENE_API void setDirection(const Math::Vec3& direction);
+
     GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer();
 
 private:
-    LightType lightType = LightType::POINT;
     std::shared_ptr<UniformBuffer> lightBuffer;
 
+    LightType lightType = LightType::POINT;
     Math::Vec3 color = { 1.0f, 1.0f, 1.0f };
-    Math::Vec3 direction = Math::Vec3::UNIT_X;  // TYPE_SPOT, TYPE_DIRECTED
-
     float energy = 1.0f;
     float falloff = 25.0f;
     float angle = 45.0f;  // TYPE_SPOT

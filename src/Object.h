@@ -42,6 +42,9 @@ public:
     GRAPHENE_API ObjectType getType() const;
     GRAPHENE_API std::shared_ptr<class SceneNode> getParent();
 
+    GRAPHENE_API void targetAt(float x, float y, float z);
+    GRAPHENE_API void targetAt(const Math::Vec3& vector);
+
 private:
     ObjectType objectType;
 
