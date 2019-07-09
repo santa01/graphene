@@ -84,6 +84,7 @@ void Example::onSetup() {
     this->player->attachObject(this->camera);
 
     auto flashlight = objectManager->createLight();
+    flashlight->setDirection(flashlight->getDirection() + Math::Vec3(0.0f, -0.2f, 0.0f));
     flashlight->setLightType(Graphene::LightType::SPOT);
     flashlight->setBlend(0.05f);
     flashlight->setAngle(20.0f);
@@ -107,6 +108,7 @@ void Example::onSetup() {
     this->node->attachObject(this->entity1);
     this->node->attachObject(this->entity2);
     this->node->attachObject(this->entity3);
+    this->node->move(0.0f, 0.0f, 2.0f);
 
     /* Update default viewport with camera */
 
@@ -115,7 +117,7 @@ void Example::onSetup() {
 
     /* Update scene */
 
-    this->player->translate(0.0f, 0.0f, -5.0f);
+    this->player->translate(0.0f, 0.0f, -3.0f);
     light->translate(0.0f, 20.0f, 0.0f);
 
     /* Keep mouse inside the window */

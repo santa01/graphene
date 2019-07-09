@@ -146,17 +146,14 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     Math::Mat4 modelViewProjection = camera->getProjection() * this->calculateModelView(camera);
     this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
 
-    this->traverseScene([this](const std::shared_ptr<Object> object, const Transformation& transformation) {
+    this->traverseScene([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
         if (object->getType() == ObjectType::ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
             this->geometryShader->setUniform("normalRotation", entity->getRotation());
 
-            // Scale -> rotate -> translate
+            // Scale -> rotate -> translate. Local transformations first
             Math::Mat4 entityTransformation = entity->getTranslation() * entity->getRotation() * entity->getScaling();
-            Math::Mat4 nodesTransformation = transformation.translation * transformation.rotation * transformation.scaling;
-
-            // Local transformations first, than transform the resulting entity
-            this->geometryShader->setUniform("localWorld", nodesTransformation * entityTransformation);
+            this->geometryShader->setUniform("localWorld", worldTransformation * entityTransformation);
 
             for (auto& mesh: entity->getMeshes()) {
                 auto material = mesh->getMaterial();
@@ -205,15 +202,15 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
 
     this->lightingShader->setUniform("cameraPosition", camera->getPosition());
 
-    this->traverseScene([this](const std::shared_ptr<Object> object, const Transformation& transformation) {
+    this->traverseScene([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
         if (object->getType() == ObjectType::LIGHT) {
             auto light = std::dynamic_pointer_cast<Light>(object);
             light->getLightBuffer()->bind(BIND_LIGHT);
 
-            Math::Mat4 lightTranslation = transformation.translation * light->getTranslation();
-            Math::Vec3 lightPosition = Math::Vec3(lightTranslation.get(0, 3), lightTranslation.get(1, 3), lightTranslation.get(2, 3));
+            Math::Vec4 lightPosition(light->getPosition(), 1.0f);
+            lightPosition = worldTransformation * lightPosition;
 
-            this->lightingShader->setUniform("lightPosition", lightPosition);
+            this->lightingShader->setUniform("lightPosition", lightPosition.extractVec3());
             this->lightingShader->setUniform("lightDirection", light->getDirection());
 
             this->frame->render();
@@ -237,13 +234,11 @@ Math::Mat4 SceneManager::calculateModelView(const std::shared_ptr<Camera> camera
 }
 
 void SceneManager::traverseScene(ObjectHandler handler) {
-    std::function<void(const std::shared_ptr<SceneNode>, Transformation)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Transformation transformation) {
+    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4)> traverser;
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 transformation) {
         // Moving from the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Keep the root node's transformation the first one.
-
-        transformation.translation = node->getTranslation() * transformation.translation;
-        transformation.scaling = node->getScaling() * transformation.scaling;
+        // to be the last operation. Keep the root node's transformation the last one.
+        transformation = node->getTranslation() * node->getRotation() * node->getScaling() * transformation;
 
         auto objects = node->getObjects();
         std::for_each(objects.begin(), objects.end(), [&handler, &transformation](const std::shared_ptr<Object> object) {
@@ -256,7 +251,7 @@ void SceneManager::traverseScene(ObjectHandler handler) {
         });
     };
 
-    Transformation transformation;
+    Math::Mat4 transformation;
     traverser(this->getRootNode(), transformation);
 }
 
