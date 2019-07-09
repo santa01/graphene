@@ -31,6 +31,8 @@ namespace Graphene {
 
 class Movable {
 public:
+    GRAPHENE_API virtual ~Movable() = default;
+
     GRAPHENE_API void translate(float x, float y, float z);
     GRAPHENE_API void translate(const Math::Vec3& position);
 
@@ -39,9 +41,13 @@ public:
 
     GRAPHENE_API Math::Vec3 getPosition() const;
     GRAPHENE_API const Math::Mat4& getTranslation() const;
+    GRAPHENE_API const Math::Mat4& getOppositeTranslation() const;
 
-protected:
+private:
+    void updateTranslation(Math::Mat4& translation, const Math::Vec3& position);
+
     Math::Mat4 translation;
+    Math::Mat4 oppositeTranslation;
 };
 
 }  // namespace Graphene

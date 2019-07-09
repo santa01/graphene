@@ -31,6 +31,8 @@ namespace Graphene {
 
 class Scalable {
 public:
+    GRAPHENE_API virtual ~Scalable() = default;
+
     GRAPHENE_API void scaleX(float factor);
     GRAPHENE_API void scaleY(float factor);
     GRAPHENE_API void scaleZ(float factor);
@@ -41,7 +43,7 @@ public:
     GRAPHENE_API Math::Vec3 getScalingFactors() const;
     GRAPHENE_API const Math::Mat4& getScaling() const;
 
-protected:
+private:
     Math::Mat4 scaling;
 };
 
