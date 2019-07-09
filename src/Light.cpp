@@ -25,7 +25,6 @@
 #include <Quaternion.h>
 #include <Mat3.h>
 #include <Mat4.h>
-#include <algorithm>
 #include <stdexcept>
 #include <cmath>
 
@@ -59,40 +58,6 @@ Light::Light():
     buffer.lightType = this->getLightType();
 
     this->lightBuffer = std::make_shared<UniformBuffer>(&buffer, sizeof(buffer));
-}
-
-void Light::roll(float angle) {
-    this->rotate(Math::Vec3::UNIT_X, angle);
-}
-
-void Light::yaw(float angle) {
-    this->rotate(Math::Vec3::UNIT_Y, angle);
-}
-
-void Light::pitch(float angle) {
-    this->rotate(Math::Vec3::UNIT_Z, angle);
-}
-
-void Light::rotate(const Math::Vec3& vector, float angle) {
-    if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
-    }
-
-    Math::Vec3 axis(vector);
-    float pi = static_cast<float>(M_PI);
-
-    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
-    q.normalize();
-
-    float xAngle, yAngle, zAngle;
-    q.extractEulerAngles(xAngle, yAngle, zAngle);
-
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
-    this->direction = q.extractMat4().extractMat3() * this->direction;
-}
-
-Math::Vec3 Light::getRotationAngles() const {
-    return this->rotationAngles;
 }
 
 LightType Light::getLightType() const {

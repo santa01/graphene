@@ -27,8 +27,6 @@
 #include <Scalable.h>
 #include <Mesh.h>
 #include <Object.h>
-#include <Vec3.h>
-#include <Mat4.h>
 #include <unordered_set>
 #include <memory>
 
@@ -38,27 +36,11 @@ class Entity: public Object, public Scalable {
 public:
     GRAPHENE_API Entity();
 
-    /* Rotatable */
-
-    GRAPHENE_API void roll(float angle);
-    GRAPHENE_API void yaw(float angle);
-    GRAPHENE_API void pitch(float angle);
-
-    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
-    GRAPHENE_API Math::Vec3 getRotationAngles() const;
-
-    /* Entity */
-
-    GRAPHENE_API const Math::Mat4& getRotation() const;
-
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes();
     GRAPHENE_API void addMesh(const std::shared_ptr<Mesh> mesh);
 
 private:
     std::unordered_set<std::shared_ptr<Mesh>> meshes;
-
-    Math::Mat4 rotation;
-    Math::Vec3 rotationAngles;
 };
 
 }  // namespace Graphene

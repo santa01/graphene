@@ -22,11 +22,7 @@
 
 #include <SceneNode.h>
 #include <Logger.h>
-#include <Quaternion.h>
-#include <Mat3.h>
-#include <algorithm>
 #include <stdexcept>
-#include <cmath>
 
 namespace Graphene {
 
@@ -36,49 +32,6 @@ SceneNode::SceneNode(const std::shared_ptr<SceneManager> sceneManager) {
     }
 
     this->sceneManager = sceneManager;
-}
-
-void SceneNode::roll(float angle) {
-    this->rotate(Math::Vec3::UNIT_X, angle);
-}
-
-void SceneNode::yaw(float angle) {
-    this->rotate(Math::Vec3::UNIT_Y, angle);
-}
-
-void SceneNode::pitch(float angle) {
-    this->rotate(Math::Vec3::UNIT_Z, angle);
-}
-
-void SceneNode::rotate(const Math::Vec3& vector, float angle) {
-    if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
-    }
-
-    Math::Vec3 axis(vector);
-    float pi = static_cast<float>(M_PI);
-
-    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
-    q.normalize();
-
-    float xAngle, yAngle, zAngle;
-    q.extractEulerAngles(xAngle, yAngle, zAngle);
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
-
-    Math::Vec3 position = this->getPosition();
-    Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
-
-    for (auto& node: this->nodes) {
-        node->rotate(vector, angle);
-    }
-
-    for (auto& object: this->objects) {
-        object->rotate(vector, angle);
-    }
-}
-
-Math::Vec3 SceneNode::getRotationAngles() const {
-    return this->rotationAngles;
 }
 
 const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() {

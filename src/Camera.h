@@ -36,17 +36,6 @@ class Camera: public Object {
 public:
     GRAPHENE_API Camera();
 
-    /* Rotatable */
-
-    GRAPHENE_API void roll(float angle);
-    GRAPHENE_API void yaw(float angle);
-    GRAPHENE_API void pitch(float angle);
-
-    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
-    GRAPHENE_API Math::Vec3 getRotationAngles() const;
-
-    /* Camera */
-
     GRAPHENE_API ProjectionType getProjectionType() const;
     GRAPHENE_API void setProjectionType(ProjectionType type);
 
@@ -62,11 +51,6 @@ public:
     GRAPHENE_API float getFov() const;
     GRAPHENE_API void setFov(float fov);
 
-    GRAPHENE_API Math::Vec3 getRight() const;
-    GRAPHENE_API Math::Vec3 getUp() const;
-    GRAPHENE_API Math::Vec3 getTarget() const;
-
-    GRAPHENE_API const Math::Mat4& getRotation() const;
     GRAPHENE_API const Math::Mat4& getProjection() const;
 
     GRAPHENE_API void lookAt(float x, float y, float z);
@@ -74,13 +58,10 @@ public:
 
 private:
     void updateProjection(ProjectionType projectionType);
-    void updateRotation(const Math::Vec3& right, const Math::Vec3& up, const Math::Vec3& target);
 
     Math::Mat4 projection;
-    Math::Mat4 rotation;
 
     ProjectionType projectionType = ProjectionType::PERSPECTIVE;
-    Math::Vec3 rotationAngles;
 
     float aspectRatio = 1.3333f;
     float nearPlane = 0.1f;

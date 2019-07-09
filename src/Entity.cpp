@@ -22,53 +22,12 @@
 
 #include <Entity.h>
 #include <Logger.h>
-#include <Quaternion.h>
 #include <stdexcept>
-#include <algorithm>
-#include <cmath>
 
 namespace Graphene {
 
 Entity::Entity():
         Object(ObjectType::ENTITY) {
-}
-
-void Entity::roll(float angle) {
-    this->rotate(Math::Vec3::UNIT_X, angle);
-}
-
-void Entity::yaw(float angle) {
-    this->rotate(Math::Vec3::UNIT_Y, angle);
-}
-
-void Entity::pitch(float angle) {
-    this->rotate(Math::Vec3::UNIT_Z, angle);
-}
-
-void Entity::rotate(const Math::Vec3& vector, float angle) {
-    if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
-    }
-
-    Math::Vec3 axis(vector);
-    float pi = static_cast<float>(M_PI);
-
-    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
-    q.normalize();
-
-    float xAngle, yAngle, zAngle;
-    q.extractEulerAngles(xAngle, yAngle, zAngle);
-
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
-    this->rotation = this->rotation * q.extractMat4();
-}
-
-Math::Vec3 Entity::getRotationAngles() const {
-    return this->rotationAngles;
-}
-
-const Math::Mat4& Entity::getRotation() const {
-    return this->rotation;
 }
 
 const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() {

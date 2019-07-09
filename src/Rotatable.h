@@ -23,21 +23,36 @@
 #ifndef ROTATABLE_H
 #define ROTATABLE_H
 
+#include <GrapheneApi.h>
+#include <Mat4.h>
 #include <Vec3.h>
 
 namespace Graphene {
 
 class Rotatable {
 public:
-    virtual ~Rotatable() = default;
+    GRAPHENE_API virtual ~Rotatable() = default;
 
-    virtual void roll(float angle) = 0;
-    virtual void yaw(float angle) = 0;
-    virtual void pitch(float angle) = 0;
+    GRAPHENE_API void roll(float angle);
+    GRAPHENE_API void yaw(float angle);
+    GRAPHENE_API void pitch(float angle);
 
-    virtual void rotate(const Math::Vec3& vector, float angle) = 0;
+    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
 
-    virtual Math::Vec3 getRotationAngles() const = 0;
+    GRAPHENE_API Math::Vec3 getRight() const;
+    GRAPHENE_API Math::Vec3 getUp() const;
+    GRAPHENE_API Math::Vec3 getTarget() const;
+
+    GRAPHENE_API Math::Vec3 getRotationAngles() const;
+    GRAPHENE_API const Math::Mat4& getRotation() const;
+    GRAPHENE_API const Math::Mat4& getOppositeRotation() const;
+
+private:
+    Math::Vec3 updateRotation(Math::Mat4& rotation, const Math::Vec3& axis, float angle);
+
+    Math::Vec3 rotationAngles;
+    Math::Mat4 rotation;
+    Math::Mat4 oppositeRotation;
 };
 
 }  // namespace Graphene

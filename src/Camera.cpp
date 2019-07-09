@@ -22,7 +22,6 @@
 
 #include <Camera.h>
 #include <Logger.h>
-#include <Quaternion.h>
 #include <Mat3.h>
 #include <stdexcept>
 #include <cmath>
@@ -33,50 +32,6 @@ Camera::Camera():
         Object(ObjectType::CAMERA) {
     this->updateProjection(ProjectionType::PERSPECTIVE);
     this->rotation.set(2, 2, -1.0f);  // Look at Z
-}
-
-void Camera::roll(float angle) {
-    this->rotate(Math::Vec3::UNIT_X, angle);
-}
-
-void Camera::yaw(float angle) {
-    this->rotate(Math::Vec3::UNIT_Y, angle);
-}
-
-void Camera::pitch(float angle) {
-    this->rotate(Math::Vec3::UNIT_Z, angle);
-}
-
-void Camera::rotate(const Math::Vec3& vector, float angle) {
-    if (vector == Math::Vec3::ZERO) {
-        throw std::invalid_argument(LogFormat("Vector cannot be of zero length"));
-    }
-
-    Math::Vec3 axis(vector);
-    float pi = static_cast<float>(M_PI);
-
-    Math::Quaternion q(axis.normalize(), angle * pi / 180.0f);
-    q.normalize();
-
-    Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
-    Math::Vec3 up = this->getUp();
-    Math::Vec3 target = -this->getTarget();
-
-    up = rotationMatrix * up;
-    target = rotationMatrix * target;
-
-    Math::Vec3 right = target.cross(up);
-    right.normalize();
-
-    float xAngle, yAngle, zAngle;
-    q.extractEulerAngles(xAngle, yAngle, zAngle);
-    this->rotationAngles += Math::Vec3(xAngle * 180.0f / pi, yAngle * 180.0f / pi, zAngle * 180.0f / pi);
-
-    this->updateRotation(right, up, target);
-}
-
-Math::Vec3 Camera::getRotationAngles() const {
-    return this->rotationAngles;
 }
 
 ProjectionType Camera::getProjectionType() const {
@@ -121,22 +76,6 @@ float Camera::getFov() const {
 void Camera::setFov(float fov) {
     this->fov = fov;
     this->updateProjection(this->projectionType);
-}
-
-Math::Vec3 Camera::getRight() const {
-    return Math::Vec3(this->rotation.get(0, 0), this->rotation.get(0, 1), this->rotation.get(0, 2));
-}
-
-Math::Vec3 Camera::getUp() const {
-    return Math::Vec3(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
-}
-
-Math::Vec3 Camera::getTarget() const {
-    return -Math::Vec3(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
-}
-
-const Math::Mat4& Camera::getRotation() const {
-    return this->rotation;
 }
 
 const Math::Mat4& Camera::getProjection() const {
@@ -210,20 +149,6 @@ void Camera::updateProjection(ProjectionType projectionType) {
                                        (this->farPlane - this->nearPlane));
             break;
     }
-}
-
-void Camera::updateRotation(const Math::Vec3& right, const Math::Vec3& up, const Math::Vec3& target) {
-    this->rotation.set(0, 0, right.get(Math::Vec3::X));
-    this->rotation.set(0, 1, right.get(Math::Vec3::Y));
-    this->rotation.set(0, 2, right.get(Math::Vec3::Z));
-
-    this->rotation.set(1, 0, up.get(Math::Vec3::X));
-    this->rotation.set(1, 1, up.get(Math::Vec3::Y));
-    this->rotation.set(1, 2, up.get(Math::Vec3::Z));
-
-    this->rotation.set(2, 0, target.get(Math::Vec3::X));
-    this->rotation.set(2, 1, target.get(Math::Vec3::Y));
-    this->rotation.set(2, 2, target.get(Math::Vec3::Z));
 }
 
 }  // namespace Graphene

@@ -37,17 +37,6 @@ class Light: public Object {
 public:
     GRAPHENE_API Light();
 
-    /* Rotatable */
-
-    GRAPHENE_API void roll(float angle);
-    GRAPHENE_API void yaw(float angle);
-    GRAPHENE_API void pitch(float angle);
-
-    GRAPHENE_API void rotate(const Math::Vec3& vector, float angle);
-    GRAPHENE_API Math::Vec3 getRotationAngles() const;
-
-    /* Light */
-
     GRAPHENE_API LightType getLightType() const;
     GRAPHENE_API void setLightType(LightType type);
 
@@ -84,8 +73,6 @@ private:
     float falloff = 25.0f;
     float angle = 45.0f;  // TYPE_SPOT
     float blend = 0.15f;  // TYPE_SPOT
-
-    Math::Vec3 rotationAngles;
 };
 
 }  // namespace Graphene
