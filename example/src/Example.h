@@ -26,13 +26,26 @@
 #include <Engine.h>
 #include <SceneNode.h>
 #include <Camera.h>
+#include <Entity.h>
 #include <memory>
 
-#define KEY_ESC 9
-#define KEY_W   25
-#define KEY_S   39
-#define KEY_A   38
-#define KEY_D   40
+#if defined(_WIN32)
+#define KEY_ESC   1
+#define KEY_W     17
+#define KEY_S     31
+#define KEY_A     30
+#define KEY_D     32
+#define KEY_PLUS  78
+#define KEY_MINUS 74
+#elif defined(__linux__)
+#define KEY_ESC   9
+#define KEY_W     25
+#define KEY_S     39
+#define KEY_A     38
+#define KEY_D     40
+#define KEY_PLUS  86
+#define KEY_MINUS 82
+#endif
 
 #define MOVE_SPEED  6.0f
 #define MOUSE_SPEED 0.1f
@@ -40,11 +53,17 @@
 class Example: public Graphene::Engine {
 private:
     void onMouseMotion(int x, int y);
+    void onKeyboardButton(int button, bool state);
     void onSetup();
     void onIdle();
 
     std::shared_ptr<Graphene::SceneNode> player;
     std::shared_ptr<Graphene::Camera> camera;
+
+    std::shared_ptr<Graphene::SceneNode> node;
+    std::shared_ptr<Graphene::Entity> entity1;
+    std::shared_ptr<Graphene::Entity> entity2;
+    std::shared_ptr<Graphene::Entity> entity3;
 };
 
 #endif  // EXAMPLE_H
