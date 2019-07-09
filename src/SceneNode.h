@@ -45,9 +45,11 @@ public:
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes();
     GRAPHENE_API void attachNode(std::shared_ptr<SceneNode> node);
+    GRAPHENE_API void detachNode(std::shared_ptr<SceneNode> node);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Object>>& getObjects();
     GRAPHENE_API void attachObject(std::shared_ptr<Object> object);
+    GRAPHENE_API void detachObject(std::shared_ptr<Object> object);
 
     GRAPHENE_API std::shared_ptr<SceneManager> getSceneManager();
     GRAPHENE_API std::shared_ptr<SceneNode> getParent();
