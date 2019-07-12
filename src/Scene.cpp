@@ -101,7 +101,7 @@ void Scene::walkThrough(ObjectHandler handler) {
     };
 
     Math::Mat4 transformation;
-    traverser(this->getRootNode(), transformation);
+    traverser(this->rootNode, transformation);
 }
 
 }  // namespace Graphene

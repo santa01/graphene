@@ -47,15 +47,13 @@ typedef struct {
 Light::Light():
         Object(ObjectType::LIGHT) {
     LightBuffer buffer = { };
+    std::copy(this->color.data(), this->color.data() + 3, buffer.color);
 
-    Math::Vec3 color = this->getColor();
-    std::copy(color.data(), color.data() + 3, buffer.color);
-
-    buffer.energy = this->getEnergy();
-    buffer.falloff = this->getFalloff();
-    buffer.angle = this->getAngle();
-    buffer.blend = this->getBlend();
-    buffer.lightType = this->getLightType();
+    buffer.energy = this->energy;
+    buffer.falloff = this->falloff;
+    buffer.angle = this->angle;
+    buffer.blend = this->blend;
+    buffer.lightType = this->lightType;
 
     this->lightBuffer = std::make_shared<UniformBuffer>(&buffer, sizeof(buffer));
 }

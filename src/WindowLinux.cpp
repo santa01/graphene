@@ -41,9 +41,9 @@ WindowLinux::~WindowLinux() {
 }
 
 void WindowLinux::captureMouse(bool captured) {
-    this->setMouseCaptured(captured);
+    this->mouseCaptured = captured;
 
-    if (this->isMouseCaptured()) {
+    if (this->mouseCaptured) {
         char data[8] = { };
         Pixmap pixmap = XCreateBitmapFromData(this->display, this->window, data, 1, 1);
 
@@ -53,7 +53,8 @@ void WindowLinux::captureMouse(bool captured) {
         XFreePixmap(this->display, pixmap);
         XDefineCursor(this->display, this->window, cursor);
 
-        XWarpPointer(this->display, None, this->window, 0, 0, 0, 0, (this->width >> 1), (this->height >> 1));
+        this->mousePosition = std::make_pair(this->width >> 1, this->height >> 1);
+        XWarpPointer(this->display, None, this->window, 0, 0, 0, 0, this->mousePosition.first, this->mousePosition.second);
     } else {
         XUndefineCursor(this->display, this->window);
     }
@@ -75,7 +76,7 @@ bool WindowLinux::dispatchEvents() {
             case KeyPress:
             case KeyRelease: {
                 bool keyState = (event.type == KeyPress);
-                this->setKeyboardState(event.xkey.keycode, keyState);
+                this->keyboardState[event.xkey.keycode] = keyState;
                 this->onKeyboardButtonSignal(event.xkey.keycode, keyState);
                 break;
             }
@@ -84,7 +85,7 @@ bool WindowLinux::dispatchEvents() {
             case ButtonRelease: {
                 MouseButton mouseButton = static_cast<MouseButton>(event.xbutton.button);
                 bool mouseButtonState = (event.type == ButtonPress);
-                this->setMouseState(mouseButton, mouseButtonState);
+                this->mouseState[mouseButton] = mouseButtonState;
                 this->onMouseButtonSignal(mouseButton, mouseButtonState);
                 break;
             }
@@ -94,7 +95,7 @@ bool WindowLinux::dispatchEvents() {
                 int yPosition = event.xmotion.y;
                 bool mouseMoved = true;
 
-                if (this->isMouseCaptured()) {
+                if (this->mouseCaptured) {
                     std::pair<int, int> windowCenter = { this->width >> 1, this->height >> 1 };
                     xPosition -= windowCenter.first;
                     yPosition -= windowCenter.second;
@@ -107,7 +108,7 @@ bool WindowLinux::dispatchEvents() {
                 }
 
                 if (mouseMoved) {
-                    this->setMousePosition(xPosition, yPosition);
+                    this->mousePosition = std::make_pair(xPosition, yPosition);
                     this->onMouseMotionSignal(xPosition, yPosition);
                 }
 

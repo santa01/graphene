@@ -61,11 +61,6 @@ public:
     GRAPHENE_API virtual bool dispatchEvents() = 0;
 
 protected:
-    void setKeyboardState(int scancode, bool state);
-    void setMouseState(MouseButton button, bool state);
-    void setMousePosition(int x, int y);
-    void setMouseCaptured(bool capture);
-
     friend class Engine;
     Signals::Signal<int, int> onMouseMotionSignal;
     Signals::Signal<int, bool> onMouseButtonSignal;

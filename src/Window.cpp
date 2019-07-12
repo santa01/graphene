@@ -44,21 +44,4 @@ bool Window::isMouseCaptured() const {
     return this->mouseCaptured;
 }
 
-void Window::setKeyboardState(int scancode, bool state) {
-    this->keyboardState[scancode] = state;
-}
-
-void Window::setMouseState(MouseButton button, bool state) {
-    this->mouseState[button] = state;
-}
-
-void Window::setMousePosition(int x, int y) {
-    this->mousePosition.first = x;
-    this->mousePosition.second = y;
-}
-
-void Window::setMouseCaptured(bool captured) {
-    this->mouseCaptured = captured;
-}
-
 }  // namespace Graphene

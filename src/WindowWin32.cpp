@@ -41,7 +41,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         case WM_KEYUP: {
             int scancode = HIWORD(lParam) & 0xFF;  // lParam 16-23 bits is the keyboard scancode
             bool keyState = (message == WM_KEYDOWN);
-            self->setKeyboardState(scancode, keyState);
+            self->keyboardState[scancode] = keyState;
             self->onKeyboardButtonSignal(scancode, keyState);
             return 0;
         }
@@ -49,7 +49,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP: {
             bool mouseButtonState = (message == WM_LBUTTONDOWN);
-            self->setMouseState(MouseButton::LEFT, mouseButtonState);
+            self->mouseState[MouseButton::LEFT] = mouseButtonState;
             self->onMouseButtonSignal(MouseButton::LEFT, mouseButtonState);
             return 0;
         }
@@ -57,7 +57,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP: {
             bool mouseButtonState = (message == WM_MBUTTONDOWN);
-            self->setMouseState(MouseButton::MIDDLE, mouseButtonState);
+            self->mouseState[MouseButton::MIDDLE] = mouseButtonState;
             self->onMouseButtonSignal(MouseButton::MIDDLE, mouseButtonState);
             return 0;
         }
@@ -65,7 +65,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         case WM_RBUTTONDOWN:
         case WM_RBUTTONUP: {
             bool mouseButtonState = (message == WM_RBUTTONDOWN);
-            self->setMouseState(MouseButton::RIGHT, mouseButtonState);
+            self->mouseState[MouseButton::RIGHT] = mouseButtonState;
             self->onMouseButtonSignal(MouseButton::RIGHT, mouseButtonState);
             return 0;
         }
@@ -74,7 +74,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         case WM_XBUTTONUP: {
             MouseButton mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? MouseButton::X1 : MouseButton::X2;
             bool mouseButtonState = (message == WM_XBUTTONDOWN);
-            self->setMouseState(mouseButton, mouseButtonState);
+            self->mouseState[mouseButton] = mouseButtonState;
             self->onMouseButtonSignal(mouseButton, mouseButtonState);
             return 0;
         }
@@ -97,7 +97,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
             }
 
             if (mouseMoved) {
-                self->setMousePosition(xPosition, yPosition);
+                self->mousePosition = std::make_pair(xPosition, yPosition);
                 self->onMouseMotionSignal(xPosition, yPosition);
             }
 
@@ -138,12 +138,12 @@ WindowWin32::~WindowWin32() {
 }
 
 void WindowWin32::captureMouse(bool captured) {
-    this->setMouseCaptured(captured);
+    this->mouseCaptured = captured;
 
-    if (this->isMouseCaptured()) {
+    if (this->mouseCaptured) {
         POINT windowCenter = { this->width >> 1, this->height >> 1 };
+        this->mousePosition = std::make_pair(windowCenter.x, windowCenter.y);
         this->warpMousePointer(windowCenter.x, windowCenter.y);
-        this->setMousePosition(windowCenter.x, windowCenter.y);
     }
 
     ShowCursor(this->mouseCaptured ? FALSE : TRUE);

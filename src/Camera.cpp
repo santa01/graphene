@@ -143,26 +143,22 @@ void Camera::updateProjection() {
     this->projection = Math::Mat4();
 
     float pi = static_cast<float>(M_PI);
-    float fovRadian = this->getFov() * pi / 180.0f;
+    float fovRadian = this->fov * pi / 180.0f;
 
-    float aspectRatio = this->getAspectRatio();
-    float nearPlane = this->getNearPlane();
-    float farPlane = this->getFarPlane();
-
-    switch (this->getProjectionType()) {
+    switch (this->projectionType) {
         case ProjectionType::PERSPECTIVE:
-            this->projection.set(0, 0, 1.0f / (tanf(fovRadian / 2.0f) * aspectRatio));
+            this->projection.set(0, 0, 1.0f / (tanf(fovRadian / 2.0f) * this->aspectRatio));
             this->projection.set(1, 1, 1.0f / (tanf(fovRadian / 2.0f)));
-            this->projection.set(2, 2, - (nearPlane + farPlane) / (nearPlane - farPlane));
-            this->projection.set(2, 3, 2.0f * nearPlane * farPlane / (nearPlane - farPlane));
+            this->projection.set(2, 2, - (this->nearPlane + this->farPlane) / (this->nearPlane - this->farPlane));
+            this->projection.set(2, 3, 2.0f * this->nearPlane * this->farPlane / (this->nearPlane - this->farPlane));
             this->projection.set(3, 2, 1.0f);
             this->projection.set(3, 3, 0.0f);
             break;
         case ProjectionType::ORTHOGRAPHIC:
-            this->projection.set(0, 0, 1.0f / ((farPlane - nearPlane) * aspectRatio));
-            this->projection.set(1, 1, 1.0f / (farPlane - nearPlane));
-            this->projection.set(2, 2, 2.0f / (farPlane - nearPlane));
-            this->projection.set(2, 3, - (farPlane + nearPlane) / (farPlane - nearPlane));
+            this->projection.set(0, 0, 1.0f / ((this->farPlane - this->nearPlane) * this->aspectRatio));
+            this->projection.set(1, 1, 1.0f / (this->farPlane - this->nearPlane));
+            this->projection.set(2, 2, 2.0f / (this->farPlane - this->nearPlane));
+            this->projection.set(2, 3, - (this->farPlane + this->nearPlane) / (this->farPlane - this->nearPlane));
             break;
     }
 }
