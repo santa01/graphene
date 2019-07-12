@@ -20,39 +20,23 @@
  * SOFTWARE.
  */
 
-#ifndef SCENEMANAGER_H
-#define SCENEMANAGER_H
+#ifndef RENDERMANAGER_H
+#define RENDERMANAGER_H
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <SceneNode.h>
 #include <Camera.h>
 #include <Shader.h>
 #include <Mesh.h>
-#include <Vec3.h>
-#include <algorithm>
-#include <functional>
 #include <memory>
+
+#define GetRenderManager() RenderManager::getInstance()
 
 namespace Graphene {
 
-#pragma pack(push, 1)
-
-typedef struct {
-    float positons[12];
-    float normals[12];
-    float uvs[8];
-    int faces[6];
-} FrameGeometry;
-
-#pragma pack(pop)
-
-class SceneManager: public std::enable_shared_from_this<SceneManager>, public NonCopyable {
+class RenderManager: public NonCopyable {
 public:
-    GRAPHENE_API SceneManager();
-
-    GRAPHENE_API std::shared_ptr<SceneNode> createNode();
-    GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
+    GRAPHENE_API static RenderManager& getInstance();
 
     GRAPHENE_API std::shared_ptr<Shader> getGeometryShader();
     GRAPHENE_API void setGeometryShader(const std::shared_ptr<Shader> geometryShader);
@@ -63,12 +47,6 @@ public:
     GRAPHENE_API std::shared_ptr<Shader> getLightingShader();
     GRAPHENE_API void setLightingShader(const std::shared_ptr<Shader> lightingShader);
 
-    GRAPHENE_API const Math::Vec3& getAmbientColor() const;
-    GRAPHENE_API void setAmbientColor(const Math::Vec3& ambientColor);
-
-    GRAPHENE_API float getAmbientEnergy() const;
-    GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
-
     GRAPHENE_API bool hasShadowPass() const;
     GRAPHENE_API void setShadowPass(bool shadowPass);
 
@@ -78,36 +56,15 @@ public:
     GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 
 private:
-    enum BindPoints {
-        BIND_MATERIAL = 0,
-        BIND_LIGHT = 0
-    };
-
-    enum TextureUnits {
-        TEXTURE_DIFFUSE,
-        TEXTURE_SPECULAR,
-        TEXTURE_POSITION,
-        TEXTURE_NORMAL,
-        TEXTURE_DEPTH
-    };
-
-    typedef std::function<void(const std::shared_ptr<Object>, const Math::Mat4&)> ObjectHandler;
+    RenderManager();
 
     void renderShadows(const std::shared_ptr<Camera> camera);
     void renderLights(const std::shared_ptr<Camera> camera);
 
-    Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
-    void traverseScene(ObjectHandler handler);
-
-    std::shared_ptr<SceneNode> rootNode;
-    std::shared_ptr<Mesh> frame;
-
     std::shared_ptr<Shader> geometryShader;
     std::shared_ptr<Shader> ambientShader;
     std::shared_ptr<Shader> lightingShader;
-
-    Math::Vec3 ambientColor;
-    float ambientEnergy = 1.0f;
+    std::shared_ptr<Mesh> frame;
 
     bool shadowPass = false;
     bool lightPass = false;
@@ -115,4 +72,4 @@ private:
 
 }  // namespace Graphene
 
-#endif  // SCENEMANAGER_H
+#endif  // RENDERMANAGER_H

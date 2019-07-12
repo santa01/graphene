@@ -28,7 +28,7 @@
 #include <EngineConfig.h>
 #include <FrameBuffer.h>
 #include <Window.h>
-#include <SceneManager.h>
+#include <Scene.h>
 #include <ObjectManager.h>
 #include <Signals.h>
 #include <unordered_set>
@@ -45,14 +45,12 @@ public:
     GRAPHENE_API const EngineConfig& getConfig() const;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
-    GRAPHENE_API void addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer);
+    GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneManager>>& getSceneManagers() const;
-    GRAPHENE_API void addSceneManager(const std::shared_ptr<SceneManager> sceneManager);
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
+    GRAPHENE_API std::shared_ptr<Scene> createScene();
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<ObjectManager>>& getObjectManagers() const;
-    GRAPHENE_API void addObjectManager(const std::shared_ptr<ObjectManager> objectManager);
-
+    GRAPHENE_API std::shared_ptr<ObjectManager> getObjectManager();
     GRAPHENE_API std::shared_ptr<Window> getWindow();
     GRAPHENE_API float getFrameTime() const;
 
@@ -71,7 +69,7 @@ private:
     void setupWindow();
     void setupOpenGL();
     void setupEngine();
-    void render();
+    void update();
 
     EngineConfig config;
     Signals::Signal<> onSetupSignal;  // Once before event loop
@@ -79,8 +77,9 @@ private:
     Signals::Signal<> onQuitSignal;   // User-requested quit
 
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
-    std::unordered_set<std::shared_ptr<SceneManager>> sceneManagers;
-    std::unordered_set<std::shared_ptr<ObjectManager>> objectManagers;
+    std::unordered_set<std::shared_ptr<Scene>> scenes;
+
+    std::shared_ptr<ObjectManager> objectManager;
     std::shared_ptr<Window> window;
 
     float frameTime = 0.0f;

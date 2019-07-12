@@ -26,12 +26,12 @@
 
 namespace Graphene {
 
-SceneNode::SceneNode(const std::shared_ptr<SceneManager> sceneManager) {
-    if (sceneManager == nullptr) {
-        throw std::invalid_argument(LogFormat("SceneManager cannot be nullptr"));
+SceneNode::SceneNode(const std::shared_ptr<Scene> scene) {
+    if (scene == nullptr) {
+        throw std::invalid_argument(LogFormat("Scene cannot be nullptr"));
     }
 
-    this->sceneManager = sceneManager;
+    this->scene = scene;
 }
 
 const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() {
@@ -99,8 +99,8 @@ void SceneNode::detachObject(std::shared_ptr<Object> object) {
     }
 }
 
-std::shared_ptr<class SceneManager> SceneNode::getSceneManager() {
-    return this->sceneManager.lock();
+std::shared_ptr<class Scene> SceneNode::getScene() {
+    return this->scene.lock();
 }
 
 std::shared_ptr<SceneNode> SceneNode::getParent() {

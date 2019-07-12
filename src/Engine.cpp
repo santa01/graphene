@@ -64,14 +64,16 @@ void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /*severity*/
     LogDebug("%s [%s]: %s", sourceMap[source].c_str(), typeMap[type].c_str(), message);
 }
 
-Engine::Engine() {
+Engine::Engine():
+        objectManager(new ObjectManager()) {
     if (this->config.isDebug()) {
         GetLogger().setLogLevel(LogLevel::LOG_DEBUG);
     }
 }
 
 Engine::Engine(const EngineConfig& config):
-        config(config) {
+        config(config),
+        objectManager(new ObjectManager()) {
     if (this->config.isDebug()) {
         GetLogger().setLogLevel(LogLevel::LOG_DEBUG);
     }
@@ -85,36 +87,26 @@ const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers(
     return this->frameBuffers;
 }
 
-void Engine::addFrameBuffer(const std::shared_ptr<FrameBuffer> frameBuffer) {
-    if (frameBuffer == nullptr) {
-        throw std::invalid_argument(LogFormat("FrameBuffer cannot be nullptr"));
-    }
-
+std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height) {
+    std::shared_ptr<FrameBuffer> frameBuffer = std::make_shared<FrameBuffer>(width, height);
     this->frameBuffers.insert(frameBuffer);
+
+    return frameBuffer;
 }
 
-const std::unordered_set<std::shared_ptr<SceneManager>>& Engine::getSceneManagers() const {
-    return this->sceneManagers;
+const std::unordered_set<std::shared_ptr<Scene>>& Engine::getScenes() const {
+    return this->scenes;
 }
 
-void Engine::addSceneManager(const std::shared_ptr<SceneManager> sceneManager) {
-    if (sceneManager == nullptr) {
-        throw std::invalid_argument(LogFormat("SceneManager cannot be nullptr"));
-    }
+std::shared_ptr<Scene> Engine::createScene() {
+    std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+    this->scenes.insert(scene);
 
-    this->sceneManagers.insert(sceneManager);
+    return scene;
 }
 
-const std::unordered_set<std::shared_ptr<ObjectManager>>& Engine::getObjectManagers() const {
-    return this->objectManagers;
-}
-
-void Engine::addObjectManager(const std::shared_ptr<ObjectManager> objectManager) {
-    if (objectManager == nullptr) {
-        throw std::invalid_argument(LogFormat("ObjectManager cannot be nullptr"));
-    }
-
-    this->objectManagers.insert(objectManager);
+std::shared_ptr<ObjectManager> Engine::getObjectManager() {
+    return this->objectManager;
 }
 
 std::shared_ptr<Window> Engine::getWindow() {
@@ -146,7 +138,7 @@ int Engine::exec() {
             this->exit(0);
         } else {
             this->onIdleSignal();
-            this->render();
+            this->update();
         }
 
         std::chrono::duration<float> duration = std::chrono::steady_clock::now() - timestamp;
@@ -196,15 +188,12 @@ void Engine::setupOpenGL() {
 }
 
 void Engine::setupEngine() {
-    this->sceneManagers.insert(std::make_shared<SceneManager>());
-    this->objectManagers.insert(std::make_shared<ObjectManager>());
-
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));
 }
 
-void Engine::render() {
+void Engine::update() {
     for (auto& frameBuffer: this->frameBuffers) {
         if (frameBuffer->isAutoUpdate()) {
             frameBuffer->update();

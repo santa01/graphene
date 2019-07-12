@@ -21,6 +21,7 @@
  */
 
 #include <Example.h>
+#include <RenderManager.h>
 #include <Light.h>
 #include <Logger.h>
 #include <Vec3.h>
@@ -65,19 +66,21 @@ void Example::onSetup() {
 
     /* Setup scene */
 
-    auto sceneManager = *this->getSceneManagers().begin();
-    sceneManager->setAmbientEnergy(0.5f);
-    sceneManager->setLightPass(true);
+    auto scene = this->createScene();
+    scene->setAmbientEnergy(0.5f);
 
-    this->player = sceneManager->createNode();
-    sceneManager->getRootNode()->attachNode(this->player);
+    this->player = scene->createNode();
+    scene->getRootNode()->attachNode(this->player);
 
-    this->node = sceneManager->createNode();
-    sceneManager->getRootNode()->attachNode(this->node);
+    this->node = scene->createNode();
+    scene->getRootNode()->attachNode(this->node);
+
+    auto& renderManager = Graphene::GetRenderManager();
+    renderManager.setLightPass(true);
 
     /* Populate scene with objects */
 
-    auto objectManager = *this->getObjectManagers().begin();
+    auto objectManager = this->getObjectManager();
 
     this->camera = objectManager->createCamera();
     this->camera->setFov(this->getConfig().getFov());

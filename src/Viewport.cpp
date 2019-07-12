@@ -22,7 +22,7 @@
 
 #include <Viewport.h>
 #include <Logger.h>
-#include <SceneManager.h>
+#include <RenderManager.h>
 #include <RenderStack.h>
 #include <SceneNode.h>
 
@@ -109,7 +109,7 @@ void Viewport::update() {
     });
 
     glViewport(this->left, this->top, this->width, this->height);
-    parent->getSceneManager()->render(this->camera);
+    GetRenderManager().render(this->camera);
 }
 
 }  // namespace Graphene

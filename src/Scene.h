@@ -20,48 +20,44 @@
  * SOFTWARE.
  */
 
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
+#ifndef SCENE_H
+#define SCENE_H
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <GeometryBuffer.h>
+#include <SceneNode.h>
 #include <Camera.h>
+#include <Vec3.h>
+#include <functional>
 #include <memory>
 
 namespace Graphene {
 
-class Viewport: public NonCopyable {
+typedef std::function<void(const std::shared_ptr<Object>, const Math::Mat4&)> ObjectHandler;
+
+class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
-    GRAPHENE_API Viewport(int left, int top, int width, int height);
+    GRAPHENE_API Scene();
 
-    GRAPHENE_API std::shared_ptr<Camera> getCamera();
-    GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API std::shared_ptr<SceneNode> createNode();
+    GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
 
-    GRAPHENE_API int getLeft() const;
-    GRAPHENE_API void setLeft(int left);
+    GRAPHENE_API const Math::Vec3& getAmbientColor() const;
+    GRAPHENE_API void setAmbientColor(const Math::Vec3& ambientColor);
 
-    GRAPHENE_API int getTop() const;
-    GRAPHENE_API void setTop(int top);
+    GRAPHENE_API float getAmbientEnergy() const;
+    GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
 
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API void setWidth(int width);
-
-    GRAPHENE_API int getHeight() const;
-    GRAPHENE_API void setHeight(int height);
-
-    GRAPHENE_API void update();
+    GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void walkThrough(ObjectHandler handler);
 
 private:
-    std::shared_ptr<Camera> camera;
-    std::shared_ptr<GeometryBuffer> geometryBuffer;
+    std::shared_ptr<SceneNode> rootNode;
 
-    int left = 0;
-    int top = 0;
-    int width = 0;
-    int height = 0;
+    Math::Vec3 ambientColor;
+    float ambientEnergy = 1.0f;
 };
 
 }  // namespace Graphene
 
-#endif  // VIEWPORT_H
+#endif  // SCENE_H

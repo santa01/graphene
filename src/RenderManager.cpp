@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
-#include <SceneManager.h>
+#include <RenderManager.h>
 #include <Logger.h>
 #include <RenderStack.h>
+#include <Scene.h>
 #include <Object.h>
 #include <Light.h>
 #include <Entity.h>
@@ -32,11 +33,39 @@
 
 namespace Graphene {
 
-SceneManager::SceneManager():
+enum BindPoints {
+    BIND_MATERIAL = 0,
+    BIND_LIGHT = 0
+};
+
+enum TextureUnits {
+    TEXTURE_DIFFUSE,
+    TEXTURE_SPECULAR,
+    TEXTURE_POSITION,
+    TEXTURE_NORMAL,
+    TEXTURE_DEPTH
+};
+
+#pragma pack(push, 1)
+
+typedef struct {
+    float positons[12];
+    float normals[12];
+    float uvs[8];
+    int faces[6];
+} FrameGeometry;
+
+#pragma pack(pop)
+
+RenderManager& RenderManager::getInstance() {
+    static RenderManager instance;
+    return instance;
+}
+
+RenderManager::RenderManager():
         geometryShader(new Shader(Sources::geometryShader, sizeof(Sources::geometryShader))),
         ambientShader(new Shader(Sources::ambientShader, sizeof(Sources::ambientShader))),
-        lightingShader(new Shader(Sources::lightingShader, sizeof(Sources::lightingShader))),
-        ambientColor(1.0f, 1.0f, 1.0f) {
+        lightingShader(new Shader(Sources::lightingShader, sizeof(Sources::lightingShader))) {
     FrameGeometry geometry = {
         { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f },
         {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
@@ -46,25 +75,11 @@ SceneManager::SceneManager():
     this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
 }
 
-std::shared_ptr<SceneNode> SceneManager::createNode() {
-    /* const version of shared_from_this() is selected otherwise */
-    return std::make_shared<SceneNode>(this->shared_from_this());
-}
-
-std::shared_ptr<SceneNode> SceneManager::getRootNode() {
-    /* shared_from_this() cannot be called from constructor */
-    if (this->rootNode == nullptr) {
-        this->rootNode = this->createNode();
-    }
-
-    return this->rootNode;
-}
-
-std::shared_ptr<Shader> SceneManager::getGeometryShader() {
+std::shared_ptr<Shader> RenderManager::getGeometryShader() {
     return this->geometryShader;
 }
 
-void SceneManager::setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
+void RenderManager::setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
     if (geometryShader == nullptr) {
         throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
@@ -72,11 +87,11 @@ void SceneManager::setGeometryShader(const std::shared_ptr<Shader> geometryShade
     this->geometryShader = geometryShader;
 }
 
-std::shared_ptr<Shader> SceneManager::getAmbientShader() {
+std::shared_ptr<Shader> RenderManager::getAmbientShader() {
     return this->ambientShader;
 }
 
-void SceneManager::setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
+void RenderManager::setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
     if (ambientShader == nullptr) {
         throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
@@ -84,11 +99,11 @@ void SceneManager::setAmbientShader(const std::shared_ptr<Shader> ambientShader)
     this->ambientShader = ambientShader;
 }
 
-std::shared_ptr<Shader> SceneManager::getLightingShader() {
+std::shared_ptr<Shader> RenderManager::getLightingShader() {
     return this->lightingShader;
 }
 
-void SceneManager::setLightingShader(const std::shared_ptr<Shader> lightingShader) {
+void RenderManager::setLightingShader(const std::shared_ptr<Shader> lightingShader) {
     if (lightingShader == nullptr) {
         throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
@@ -96,43 +111,23 @@ void SceneManager::setLightingShader(const std::shared_ptr<Shader> lightingShade
     this->lightingShader = lightingShader;
 }
 
-const Math::Vec3& SceneManager::getAmbientColor() const {
-    return this->ambientColor;
-}
-
-void SceneManager::setAmbientColor(const Math::Vec3& ambientColor) {
-    this->ambientColor = ambientColor;
-}
-
-float SceneManager::getAmbientEnergy() const {
-    return this->ambientEnergy;
-}
-
-void SceneManager::setAmbientEnergy(float ambientEnergy) {
-    if (ambientEnergy < 0.0f) {
-        throw std::runtime_error(LogFormat("Ambient energy is less than 0.0f"));
-    }
-
-    this->ambientEnergy = ambientEnergy;
-}
-
-bool SceneManager::hasShadowPass() const {
+bool RenderManager::hasShadowPass() const {
     return this->shadowPass;
 }
 
-void SceneManager::setShadowPass(bool shadowPass) {
+void RenderManager::setShadowPass(bool shadowPass) {
     this->shadowPass = shadowPass;
 }
 
-bool SceneManager::hasLightPass() const {
+bool RenderManager::hasLightPass() const {
     return this->lightPass;
 }
 
-void SceneManager::setLightPass(bool lightPass) {
+void RenderManager::setLightPass(bool lightPass) {
     this->lightPass = lightPass;
 }
 
-void SceneManager::render(const std::shared_ptr<Camera> camera) {
+void RenderManager::render(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
@@ -143,10 +138,11 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
     // Modelview -> project
-    Math::Mat4 modelViewProjection = camera->getProjection() * this->calculateModelView(camera);
+    std::shared_ptr<Scene> scene = camera->getParent()->getScene();
+    Math::Mat4 modelViewProjection = camera->getProjection() * scene->calculateModelView(camera);
     this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
 
-    this->traverseScene([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
+    scene->walkThrough([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
         if (object->getType() == ObjectType::ENTITY) {
             auto entity = std::dynamic_pointer_cast<Entity>(object);
             this->geometryShader->setUniform("normalRotation", entity->getRotation());
@@ -172,8 +168,8 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     RenderStack::pop();  // Geometry textures
     this->ambientShader->enable();
     this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
-    this->ambientShader->setUniform("ambientColor", this->ambientColor);
-    this->ambientShader->setUniform("ambientEnergy", this->ambientEnergy);
+    this->ambientShader->setUniform("ambientColor", scene->getAmbientColor());
+    this->ambientShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
 
     RenderStack::pop();  // Output buffer
     this->frame->render();
@@ -187,11 +183,11 @@ void SceneManager::render(const std::shared_ptr<Camera> camera) {
     }
 }
 
-void SceneManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
+void RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
     // TODO
 }
 
-void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
+void RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->lightingShader->enable();
     this->lightingShader->setUniformBlock("Light", BIND_LIGHT);
 
@@ -202,7 +198,8 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
 
     this->lightingShader->setUniform("cameraPosition", camera->getPosition());
 
-    this->traverseScene([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
+    std::shared_ptr<Scene> scene = camera->getParent()->getScene();
+    scene->walkThrough([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
         if (object->getType() == ObjectType::LIGHT) {
             auto light = std::dynamic_pointer_cast<Light>(object);
             light->getLightBuffer()->bind(BIND_LIGHT);
@@ -216,43 +213,6 @@ void SceneManager::renderLights(const std::shared_ptr<Camera> camera) {
             this->frame->render();
         }
     });
-}
-
-Math::Mat4 SceneManager::calculateModelView(const std::shared_ptr<Camera> camera) {
-    std::shared_ptr<SceneNode> node = camera->getParent();
-    Math::Mat4 modelView;
-
-    while (node != nullptr) {
-        // Moving to the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Eventually root node's transformation will be the first one.
-        modelView = node->getOppositeRotation() * node->getOppositeTranslation() * modelView;
-        node = node->getParent();
-    }
-
-    modelView = camera->getOppositeRotation() * camera->getOppositeTranslation() * modelView;
-    return modelView;
-}
-
-void SceneManager::traverseScene(ObjectHandler handler) {
-    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 transformation) {
-        // Moving from the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Keep the root node's transformation the last one.
-        transformation = node->getTranslation() * node->getRotation() * node->getScaling() * transformation;
-
-        auto objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &transformation](const std::shared_ptr<Object> object) {
-            handler(object, transformation);
-        });
-
-        auto nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &transformation](const std::shared_ptr<SceneNode> node) {
-            traverser(node, transformation);
-        });
-    };
-
-    Math::Mat4 transformation;
-    traverser(this->getRootNode(), transformation);
 }
 
 }  // namespace Graphene

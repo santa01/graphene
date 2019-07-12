@@ -36,12 +36,12 @@
 
 namespace Graphene {
 
-class SceneManager;
+class Scene;
 
 class SceneNode: public std::enable_shared_from_this<SceneNode>,
         public Rotatable, public Scalable, public Movable, public NonCopyable {
 public:
-    GRAPHENE_API SceneNode(const std::shared_ptr<SceneManager> sceneManager);
+    GRAPHENE_API SceneNode(const std::shared_ptr<Scene> scene);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes();
     GRAPHENE_API void attachNode(std::shared_ptr<SceneNode> node);
@@ -51,7 +51,7 @@ public:
     GRAPHENE_API void attachObject(std::shared_ptr<Object> object);
     GRAPHENE_API void detachObject(std::shared_ptr<Object> object);
 
-    GRAPHENE_API std::shared_ptr<SceneManager> getSceneManager();
+    GRAPHENE_API std::shared_ptr<Scene> getScene();
     GRAPHENE_API std::shared_ptr<SceneNode> getParent();
 
 private:
@@ -61,7 +61,7 @@ private:
     std::unordered_set<std::shared_ptr<Entity>> entities;
     std::unordered_set<std::shared_ptr<Light>> lights;
 
-    std::weak_ptr<SceneManager> sceneManager;
+    std::weak_ptr<Scene> scene;
     std::weak_ptr<SceneNode> parent;
 };
 

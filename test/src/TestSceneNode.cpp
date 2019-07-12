@@ -26,13 +26,13 @@
 #include <memory>
 
 namespace Graphene {
-class SceneManager {};  // Stub
+class Scene {};  // Stub
 }
 
 class TestSceneNode: public CppUnit::TestFixture {
 public:
     void testRoll() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
         sceneNode.roll(30.0f);
@@ -49,7 +49,7 @@ public:
     }
 
     void testYaw() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
         sceneNode.yaw(30.0f);
@@ -66,7 +66,7 @@ public:
     }
 
     void testPitch() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
         sceneNode.pitch(30.0f);
@@ -87,7 +87,7 @@ public:
     }
 
     void testRotate() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
         sceneNode.rotate(Math::Vec3(1.0f, 2.0f, 3.0f), 30.0f);
@@ -101,7 +101,7 @@ public:
     }
 
     void testScale() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getScalingFactors(), Math::Vec3(1.0f, 1.0f, 1.0f));
 
         sceneNode.scaleX(2.4f);
@@ -124,7 +124,7 @@ public:
     }
 
     void testTranslate() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getPosition(), Math::Vec3::ZERO);
 
         sceneNode.translate(Math::Vec3::UNIT_X);
@@ -150,7 +150,7 @@ public:
     }
 
     void testMove() {
-        Graphene::SceneNode sceneNode(std::make_shared<Graphene::SceneManager>());
+        Graphene::SceneNode sceneNode(std::make_shared<Graphene::Scene>());
         ASSERT_VECTORS_EQUAL(sceneNode.getPosition(), Math::Vec3::ZERO);
 
         sceneNode.move(Math::Vec3::UNIT_X);
