@@ -88,7 +88,7 @@ const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers(
 }
 
 std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height) {
-    std::shared_ptr<FrameBuffer> frameBuffer = std::make_shared<FrameBuffer>(width, height);
+    auto frameBuffer = std::make_shared<FrameBuffer>(width, height);
     this->frameBuffers.insert(frameBuffer);
 
     return frameBuffer;
@@ -99,7 +99,7 @@ const std::unordered_set<std::shared_ptr<Scene>>& Engine::getScenes() const {
 }
 
 std::shared_ptr<Scene> Engine::createScene() {
-    std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+    auto scene = std::make_shared<Scene>();
     this->scenes.insert(scene);
 
     return scene;

@@ -34,8 +34,8 @@ namespace Graphene {
 void Rotatable::roll(float angle) {
     float cameraAngle = -angle;
 
-    Math::Vec3 right = Math::Vec3(this->rotation.get(0, 0), this->rotation.get(0, 1), this->rotation.get(0, 2));
-    Math::Vec3 cameraRight = Math::Vec3(this->oppositeRotation.get(0, 0), this->oppositeRotation.get(0, 1), this->oppositeRotation.get(0, 2));
+    Math::Vec3 right(this->rotation.get(0, 0), this->rotation.get(0, 1), this->rotation.get(0, 2));
+    Math::Vec3 cameraRight(this->oppositeRotation.get(0, 0), this->oppositeRotation.get(0, 1), this->oppositeRotation.get(0, 2));
 
     this->rotationAngles += this->updateRotation(this->rotation, right, angle);
     this->updateRotation(this->oppositeRotation, cameraRight, cameraAngle);
@@ -44,8 +44,8 @@ void Rotatable::roll(float angle) {
 void Rotatable::yaw(float angle) {
     float cameraAngle = -angle;
 
-    Math::Vec3 up = Math::Vec3(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
-    Math::Vec3 cameraUp = Math::Vec3(this->oppositeRotation.get(1, 0), this->oppositeRotation.get(1, 1), this->oppositeRotation.get(1, 2));
+    Math::Vec3 up(this->rotation.get(1, 0), this->rotation.get(1, 1), this->rotation.get(1, 2));
+    Math::Vec3 cameraUp(this->oppositeRotation.get(1, 0), this->oppositeRotation.get(1, 1), this->oppositeRotation.get(1, 2));
 
     this->rotationAngles += this->updateRotation(this->rotation, up, angle);
     this->updateRotation(this->oppositeRotation, cameraUp, cameraAngle);
@@ -54,8 +54,8 @@ void Rotatable::yaw(float angle) {
 void Rotatable::pitch(float angle) {
     float cameraAngle = -angle;
 
-    Math::Vec3 target = Math::Vec3(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
-    Math::Vec3 cameraTarget = Math::Vec3(this->oppositeRotation.get(2, 0), this->oppositeRotation.get(2, 1), this->oppositeRotation.get(2, 2));
+    Math::Vec3 target(this->rotation.get(2, 0), this->rotation.get(2, 1), this->rotation.get(2, 2));
+    Math::Vec3 cameraTarget(this->oppositeRotation.get(2, 0), this->oppositeRotation.get(2, 1), this->oppositeRotation.get(2, 2));
 
     this->rotationAngles += this->updateRotation(this->rotation, target, angle);
     this->updateRotation(this->oppositeRotation, cameraTarget, cameraAngle);
@@ -108,8 +108,8 @@ Math::Vec3 Rotatable::updateRotation(Math::Mat4& rotation, const Math::Vec3& axi
     Math::Quaternion q(axis, rotationAngle * pi / 180.0f);
     q.normalize();
 
-    Math::Vec3 up = Math::Vec3(rotation.get(1, 0), rotation.get(1, 1), rotation.get(1, 2));
-    Math::Vec3 target = Math::Vec3(rotation.get(2, 0), rotation.get(2, 1), rotation.get(2, 2));
+    Math::Vec3 up(rotation.get(1, 0), rotation.get(1, 1), rotation.get(1, 2));
+    Math::Vec3 target(rotation.get(2, 0), rotation.get(2, 1), rotation.get(2, 2));
 
     Math::Mat3 rotationMatrix = q.extractMat4().extractMat3();
     up = rotationMatrix * up;

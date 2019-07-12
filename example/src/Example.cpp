@@ -129,7 +129,7 @@ void Example::onSetup() {
 }
 
 void Example::onIdle() {
-    Graphene::KeyboardState keyStates = this->getWindow()->getKeyboardState();
+    const Graphene::KeyboardState& keyStates = this->getWindow()->getKeyboardState();
 
     if (keyStates[KEY_ESC]) {
         this->exit(0);
