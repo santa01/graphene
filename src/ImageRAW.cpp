@@ -20,29 +20,21 @@
  * SOFTWARE.
  */
 
-#include <Image.h>
+#include <ImageRAW.h>
 #include <algorithm>
 
 namespace Graphene {
 
-int Image::getWidth() const {
-    return this->width;
-}
+ImageRAW::ImageRAW(int width, int height, int pixelDepth, const void* pixels) {
+    this->width = width;
+    this->height = height;
+    this->pixelDepth = pixelDepth;
 
-int Image::getHeight() const {
-    return this->height;
-}
+    this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
+    this->pixels.reset(new char[this->pixelsSize]);
 
-int Image::getPixelDepth() const {
-    return this->pixelDepth;
-}
-
-int Image::getPixelsSize() const {
-    return this->pixelsSize;
-}
-
-const void* Image::getPixels() const {
-    return this->pixels.get();
+    const char* pixelsData = reinterpret_cast<const char*>(pixels);
+    std::copy(pixelsData, pixelsData + this->pixelsSize, this->pixels.get());
 }
 
 }  // namespace Graphene

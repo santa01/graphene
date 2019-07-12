@@ -20,29 +20,19 @@
  * SOFTWARE.
  */
 
+#ifndef IMAGERAW_H
+#define IMAGERAW_H
+
+#include <GrapheneApi.h>
 #include <Image.h>
-#include <algorithm>
 
 namespace Graphene {
 
-int Image::getWidth() const {
-    return this->width;
-}
-
-int Image::getHeight() const {
-    return this->height;
-}
-
-int Image::getPixelDepth() const {
-    return this->pixelDepth;
-}
-
-int Image::getPixelsSize() const {
-    return this->pixelsSize;
-}
-
-const void* Image::getPixels() const {
-    return this->pixels.get();
-}
+class ImageRAW: public Image {
+public:
+    GRAPHENE_API ImageRAW(int width, int height, int pixelDepth, const void* pixels);
+};
 
 }  // namespace Graphene
+
+#endif  // IMAGERAW_H

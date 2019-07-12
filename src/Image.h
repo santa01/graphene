@@ -24,14 +24,13 @@
 #define IMAGE_H
 
 #include <GrapheneApi.h>
+#include <NonCopyable.h>
 #include <memory>
 
 namespace Graphene {
 
-class Image {
+class Image: public NonCopyable {
 public:
-    GRAPHENE_API Image(int width, int height, int pixelDepth);
-    GRAPHENE_API Image(int width, int height, int pixelDepth, const void* pixels);
     GRAPHENE_API virtual ~Image() = default;
 
     GRAPHENE_API int getWidth() const;
@@ -42,7 +41,7 @@ public:
     GRAPHENE_API const void* getPixels() const;
 
 protected:
-    GRAPHENE_API Image() = default;
+    Image() = default;
 
     int width = 0;
     int height = 0;
