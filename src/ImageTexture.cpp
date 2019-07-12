@@ -21,22 +21,20 @@
  */
 
 #include <ImageTexture.h>
-#include <ImageTGA.h>
 #include <OpenGL.h>
 #include <stdexcept>
 
 namespace Graphene {
 
-ImageTexture::ImageTexture(const std::string& name) {
-    ImageTGA image(name);
+ImageTexture::ImageTexture(const Image& image) {
     this->width = image.getWidth();
-    this->height = image.getHeights();
+    this->height = image.getHeight();
 
     // Little-endian ARGB or RGB format
     GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
-    glTexStorage2D(GL_TEXTURE_2D, 8, GL_SRGB8_ALPHA8, this->width, this->height);
+    glTexStorage2D(GL_TEXTURE_2D, 4, GL_SRGB8_ALPHA8, this->width, this->height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

@@ -20,21 +20,38 @@
  * SOFTWARE.
  */
 
-#ifndef IMAGETEXTURE_H
-#define IMAGETEXTURE_H
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include <GrapheneApi.h>
-#include <Texture.h>
-#include <Image.h>
+#include <memory>
 
 namespace Graphene {
 
-class ImageTexture: public Texture {
+class Image {
 public:
-    GRAPHENE_API ImageTexture(const Image& image);
-    GRAPHENE_API ImageTexture(int width, int height);
+    GRAPHENE_API Image(int width, int height, int pixelDepth);
+    GRAPHENE_API Image(int width, int height, int pixelDepth, const void* pixels);
+    GRAPHENE_API virtual ~Image() = default;
+
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API int getPixelDepth() const;
+
+    GRAPHENE_API int getPixelsSize() const;
+    GRAPHENE_API const void* getPixels() const;
+
+protected:
+    GRAPHENE_API Image() = default;
+
+    int width = 0;
+    int height = 0;
+    int pixelDepth = 0;
+
+    int pixelsSize = 0;
+    std::unique_ptr<char[]> pixels;
 };
 
 }  // namespace Graphene
 
-#endif  // IMAGETEXTURE_H
+#endif  // IMAGE_H

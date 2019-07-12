@@ -109,10 +109,10 @@ ImageTGA::ImageTGA(const std::string& filename):
     this->pixelDepth = header.imageSpec.depth;
 
     int pixelBytes = this->pixelDepth >> 3;
-    int pixelsSize = this->height * this->width * pixelBytes;
     int pixelsRowSize = this->width * pixelBytes;
 
-    this->pixels.reset(new char[pixelsSize]);
+    this->pixelsSize = this->height * pixelsRowSize;
+    this->pixels.reset(new char[this->pixelsSize]);
 
     uint8_t rowOrdering = header.imageSpec.imageDescr.topToBottomOrdering;
     uint8_t columnOrdering = header.imageSpec.imageDescr.leftToRightOrdering;
@@ -134,24 +134,8 @@ ImageTGA::ImageTGA(const std::string& filename):
     }
 }
 
-int ImageTGA::getWidth() const {
-    return this->width;
-}
-
-int ImageTGA::getHeights() const {
-    return this->height;
-}
-
-int ImageTGA::getPixelDepth() const {
-    return this->pixelDepth;
-}
-
 const std::string& ImageTGA::getFilename() const {
     return this->filename;
-}
-
-const void* ImageTGA::getPixels() const {
-    return this->pixels.get();
 }
 
 }  // namespace Graphene

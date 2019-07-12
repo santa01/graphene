@@ -20,21 +20,43 @@
  * SOFTWARE.
  */
 
-#ifndef IMAGETEXTURE_H
-#define IMAGETEXTURE_H
-
-#include <GrapheneApi.h>
-#include <Texture.h>
 #include <Image.h>
+#include <algorithm>
 
 namespace Graphene {
 
-class ImageTexture: public Texture {
-public:
-    GRAPHENE_API ImageTexture(const Image& image);
-    GRAPHENE_API ImageTexture(int width, int height);
-};
+Image::Image(int width, int height, int pixelDepth):
+        width(width),
+        height(height),
+        pixelDepth(pixelDepth) {
+    this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
+    this->pixels.reset(new char[this->pixelsSize]);
+}
+
+Image::Image(int width, int height, int pixelDepth, const void* pixels):
+        Image(width, height, pixelDepth) {
+    const char* pixelsData = reinterpret_cast<const char*>(pixels);
+    std::copy(pixelsData, pixelsData + this->pixelsSize, this->pixels.get());
+}
+
+int Image::getWidth() const {
+    return this->width;
+}
+
+int Image::getHeight() const {
+    return this->height;
+}
+
+int Image::getPixelDepth() const {
+    return this->pixelDepth;
+}
+
+int Image::getPixelsSize() const {
+    return this->pixelsSize;
+}
+
+const void* Image::getPixels() const {
+    return this->pixels.get();
+}
 
 }  // namespace Graphene
-
-#endif  // IMAGETEXTURE_H
