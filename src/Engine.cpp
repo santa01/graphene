@@ -30,6 +30,7 @@
 #include <WindowLinux.h>
 #endif
 #include <chrono>
+#include <thread>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -120,6 +121,12 @@ int Engine::exec() {
 
         std::chrono::duration<float> duration = std::chrono::steady_clock::now() - timestamp;
         this->frameTime = duration.count();
+
+        float maxFrameTime = 1.0f / GetEngineConfig().getMaxFps();
+        if (this->frameTime < maxFrameTime) {
+            std::this_thread::sleep_for(std::chrono::duration<float>(maxFrameTime - this->frameTime));
+            this->frameTime = maxFrameTime;
+        }
     }
 
     GetObjectManager().clearCache();
