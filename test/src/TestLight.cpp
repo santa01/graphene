@@ -27,7 +27,7 @@
 class TestLight: public CppUnit::TestFixture {
 public:
     void testRoll() {
-        Graphene::Light light;
+        Graphene::Light light(Graphene::LightType::POINT);
         ASSERT_VECTORS_EQUAL(light.getDirection(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(light.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
@@ -49,7 +49,7 @@ public:
     }
 
     void testYaw() {
-        Graphene::Light light;
+        Graphene::Light light(Graphene::LightType::POINT);
         ASSERT_VECTORS_EQUAL(light.getDirection(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(light.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
@@ -71,7 +71,7 @@ public:
     }
 
     void testPitch() {
-        Graphene::Light light;
+        Graphene::Light light(Graphene::LightType::POINT);
         ASSERT_VECTORS_EQUAL(light.getDirection(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(light.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
@@ -97,7 +97,7 @@ public:
     }
 
     void testRotate() {
-        Graphene::Light light;
+        Graphene::Light light(Graphene::LightType::POINT);
         ASSERT_VECTORS_EQUAL(light.getDirection(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(light.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 0.0f));
 
@@ -115,7 +115,7 @@ public:
     }
 
     void testTranslate() {
-        Graphene::Light light;
+        Graphene::Light light(Graphene::LightType::POINT);
         ASSERT_VECTORS_EQUAL(light.getPosition(), Math::Vec3::ZERO);
 
         light.translate(Math::Vec3::UNIT_X);
@@ -141,7 +141,7 @@ public:
     }
 
     void testMove() {
-        Graphene::Light light;
+        Graphene::Light light(Graphene::LightType::POINT);
         ASSERT_VECTORS_EQUAL(light.getPosition(), Math::Vec3::ZERO);
 
         light.move(Math::Vec3::UNIT_X);

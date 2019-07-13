@@ -23,6 +23,7 @@
 #include <Engine.h>
 #include <OpenGL.h>
 #include <Logger.h>
+#include <ObjectManager.h>
 #if defined(_WIN32)
 #include <WindowWin32.h>
 #elif defined(__linux__)
@@ -64,23 +65,10 @@ void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /*severity*/
     LogDebug("%s [%s]: %s", sourceMap[source].c_str(), typeMap[type].c_str(), message);
 }
 
-Engine::Engine():
-        objectManager(new ObjectManager()) {
-    if (this->config.isDebug()) {
+Engine::Engine() {
+    if (GetEngineConfig().isDebug()) {
         GetLogger().setLogLevel(LogLevel::LOG_DEBUG);
     }
-}
-
-Engine::Engine(const EngineConfig& config):
-        config(config),
-        objectManager(new ObjectManager()) {
-    if (this->config.isDebug()) {
-        GetLogger().setLogLevel(LogLevel::LOG_DEBUG);
-    }
-}
-
-const EngineConfig& Engine::getConfig() const {
-    return this->config;
 }
 
 const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers() const {
@@ -94,23 +82,12 @@ std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height) {
     return frameBuffer;
 }
 
-const std::unordered_set<std::shared_ptr<Scene>>& Engine::getScenes() const {
-    return this->scenes;
-}
-
-std::shared_ptr<Scene> Engine::createScene() {
-    auto scene = std::make_shared<Scene>();
-    this->scenes.insert(scene);
-
-    return scene;
-}
-
-std::shared_ptr<ObjectManager> Engine::getObjectManager() {
-    return this->objectManager;
-}
-
 std::shared_ptr<Window> Engine::getWindow() {
     return this->window;
+}
+
+std::shared_ptr<Scene> Engine::getScene() {
+    return this->scene;
 }
 
 float Engine::getFrameTime() const {
@@ -145,12 +122,13 @@ int Engine::exec() {
         this->frameTime = duration.count();
     }
 
+    GetObjectManager().clearCache();
     return this->result;
 }
 
 void Engine::setupWindow() {
-    this->window = std::shared_ptr<Window>(
-            new WindowImpl(this->config.getWidth(), this->config.getHeight()));
+    auto& config = GetEngineConfig();
+    this->window = std::shared_ptr<Window>(new WindowImpl(config.getWidth(), config.getHeight()));
 
     this->window->onMouseMotionSignal.connect(
             Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));
@@ -169,7 +147,7 @@ void Engine::setupOpenGL() {
     LogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
     LogInfo("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    if (this->config.isDebug()) {
+    if (GetEngineConfig().isDebug()) {
         if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
             glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
@@ -188,6 +166,8 @@ void Engine::setupOpenGL() {
 }
 
 void Engine::setupEngine() {
+    this->scene = std::make_shared<Scene>();
+
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));

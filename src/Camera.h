@@ -34,7 +34,7 @@ enum class ProjectionType { PERSPECTIVE, ORTHOGRAPHIC };
 
 class Camera: public Object {
 public:
-    GRAPHENE_API Camera();
+    GRAPHENE_API Camera(ProjectionType type);
 
     GRAPHENE_API ProjectionType getProjectionType() const;
     GRAPHENE_API void setProjectionType(ProjectionType type);
@@ -59,7 +59,7 @@ public:
 private:
     void updateProjection();
 
-    ProjectionType projectionType = ProjectionType::PERSPECTIVE;
+    ProjectionType type = ProjectionType::PERSPECTIVE;
     Math::Mat4 projection;
 
     float aspectRatio = 1.3333f;

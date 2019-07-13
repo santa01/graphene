@@ -27,7 +27,7 @@
 class TestCamera: public CppUnit::TestFixture {
 public:
     void testRoll() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getRight(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(camera.getUp(), Math::Vec3::UNIT_Y);
         ASSERT_VECTORS_EQUAL(camera.getTarget(), Math::Vec3::UNIT_Z);
@@ -59,7 +59,7 @@ public:
     }
 
     void testYaw() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getRight(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(camera.getUp(), Math::Vec3::UNIT_Y);
         ASSERT_VECTORS_EQUAL(camera.getTarget(), Math::Vec3::UNIT_Z);
@@ -91,7 +91,7 @@ public:
     }
 
     void testPitch() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getRight(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(camera.getUp(), Math::Vec3::UNIT_Y);
         ASSERT_VECTORS_EQUAL(camera.getTarget(), Math::Vec3::UNIT_Z);
@@ -127,7 +127,7 @@ public:
     }
 
     void testRotate() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getRight(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(camera.getUp(), Math::Vec3::UNIT_Y);
         ASSERT_VECTORS_EQUAL(camera.getTarget(), Math::Vec3::UNIT_Z);
@@ -153,7 +153,7 @@ public:
     }
 
     void testLookAt() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getRight(), Math::Vec3::UNIT_X);
         ASSERT_VECTORS_EQUAL(camera.getUp(), Math::Vec3::UNIT_Y);
         ASSERT_VECTORS_EQUAL(camera.getTarget(), Math::Vec3::UNIT_Z);
@@ -185,7 +185,7 @@ public:
     }
 
     void testTranslate() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getPosition(), Math::Vec3::ZERO);
 
         camera.translate(Math::Vec3::UNIT_X);
@@ -211,7 +211,7 @@ public:
     }
 
     void testMove() {
-        Graphene::Camera camera;
+        Graphene::Camera camera(Graphene::ProjectionType::PERSPECTIVE);
         ASSERT_VECTORS_EQUAL(camera.getPosition(), Math::Vec3::ZERO);
 
         camera.move(Math::Vec3::UNIT_X);

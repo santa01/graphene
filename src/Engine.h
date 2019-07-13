@@ -29,7 +29,6 @@
 #include <FrameBuffer.h>
 #include <Window.h>
 #include <Scene.h>
-#include <ObjectManager.h>
 #include <Signals.h>
 #include <unordered_set>
 #include <memory>
@@ -39,19 +38,13 @@ namespace Graphene {
 class Engine: public NonCopyable {
 public:
     GRAPHENE_API Engine();
-    GRAPHENE_API Engine(const EngineConfig& config);
     GRAPHENE_API virtual ~Engine() = default;
-
-    GRAPHENE_API const EngineConfig& getConfig() const;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
     GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
-    GRAPHENE_API std::shared_ptr<Scene> createScene();
-
-    GRAPHENE_API std::shared_ptr<ObjectManager> getObjectManager();
     GRAPHENE_API std::shared_ptr<Window> getWindow();
+    GRAPHENE_API std::shared_ptr<Scene> getScene();
     GRAPHENE_API float getFrameTime() const;
 
     GRAPHENE_API void exit(int result);
@@ -71,16 +64,13 @@ private:
     void setupEngine();
     void update();
 
-    EngineConfig config;
     Signals::Signal<> onSetupSignal;  // Once before event loop
     Signals::Signal<> onIdleSignal;   // Empty event queue
     Signals::Signal<> onQuitSignal;   // User-requested quit
 
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
-    std::unordered_set<std::shared_ptr<Scene>> scenes;
-
-    std::shared_ptr<ObjectManager> objectManager;
     std::shared_ptr<Window> window;
+    std::shared_ptr<Scene> scene;
 
     float frameTime = 0.0f;
     bool running = true;

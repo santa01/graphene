@@ -21,6 +21,7 @@
  */
 
 #include <ObjectManager.h>
+#include <EngineConfig.h>
 #include <Logger.h>
 #include <Material.h>
 #include <ImageTGA.h>
@@ -31,12 +32,47 @@
 
 namespace Graphene {
 
-std::shared_ptr<Camera> ObjectManager::createCamera() const {
-    return std::make_shared<Camera>();
+#pragma pack(push, 1)
+
+typedef struct {
+    char magic[4];
+    char major;
+    char minor;
+    char patch;
+    char objects;
+} EntityHeader;
+
+typedef struct {
+    int vertices;
+    int faces;
+} ObjectGeometry;
+
+typedef struct {
+    float ambientIntensity;
+    float diffuseIntensity;
+    float diffuseColor[3];
+    float specularIntensity;
+    int specularHardness;
+    float specularColor[3];
+    char diffuseTexture[256];
+} ObjectMaterial;
+
+#pragma pack(pop)
+
+ObjectManager& ObjectManager::getInstance() {
+    static ObjectManager instance;
+    return instance;
 }
 
-std::shared_ptr<Light> ObjectManager::createLight() const {
-    return std::make_shared<Light>();
+std::shared_ptr<Camera> ObjectManager::createCamera(ProjectionType type) const {
+    auto camera = std::make_shared<Camera>(type);
+    camera->setFov(GetEngineConfig().getFov());
+
+    return camera;
+}
+
+std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
+    return std::make_shared<Light>(type);
 }
 
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
@@ -55,6 +91,11 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     }
 
     return entity;
+}
+
+void ObjectManager::clearCache() {
+    this->textureCache.clear();
+    this->meshCache.clear();
 }
 
 std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& name) {

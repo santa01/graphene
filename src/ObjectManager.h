@@ -34,42 +34,23 @@
 #include <string>
 #include <memory>
 
+#define GetObjectManager() ObjectManager::getInstance()
+
 namespace Graphene {
-
-#pragma pack(push, 1)
-
-typedef struct {
-    char magic[4];
-    char major;
-    char minor;
-    char patch;
-    char objects;
-} EntityHeader;
-
-typedef struct {
-    int vertices;
-    int faces;
-} ObjectGeometry;
-
-typedef struct {
-    float ambientIntensity;
-    float diffuseIntensity;
-    float diffuseColor[3];
-    float specularIntensity;
-    int specularHardness;
-    float specularColor[3];
-    char diffuseTexture[256];
-} ObjectMaterial;
-
-#pragma pack(pop)
 
 class ObjectManager: public NonCopyable {
 public:
-    GRAPHENE_API std::shared_ptr<Camera> createCamera() const;
-    GRAPHENE_API std::shared_ptr<Light> createLight() const;
+    GRAPHENE_API static ObjectManager& getInstance();
+
+    GRAPHENE_API std::shared_ptr<Camera> createCamera(ProjectionType type) const;
+    GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
 
+    GRAPHENE_API void clearCache();
+
 private:
+    ObjectManager() = default;
+
     std::shared_ptr<ImageTexture> createTexture(const std::string& name);
     std::unordered_set<std::shared_ptr<Mesh>> createMeshes(const std::string& name);
 

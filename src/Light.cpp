@@ -35,49 +35,36 @@ namespace Graphene {
 /* std140 layout */
 typedef struct {
     float color[3];
+    int type;
     float energy;
     float falloff;
     float angle;
     float blend;
-    int lightType;
 } LightBuffer;
 
 #pragma pack(pop)
 
-Light::Light():
-        Object(ObjectType::LIGHT) {
+Light::Light(LightType type):
+        Object(ObjectType::LIGHT),
+        type(type) {
     LightBuffer buffer = { };
-    std::copy(this->color.data(), this->color.data() + 3, buffer.color);
-
+    buffer.type = this->type;
     buffer.energy = this->energy;
     buffer.falloff = this->falloff;
     buffer.angle = this->angle;
     buffer.blend = this->blend;
-    buffer.lightType = this->lightType;
 
+    std::copy(this->color.data(), this->color.data() + 3, buffer.color);
     this->lightBuffer = std::make_shared<UniformBuffer>(&buffer, sizeof(buffer));
 }
 
 LightType Light::getLightType() const {
-    return this->lightType;
+    return this->type;
 }
 
 void Light::setLightType(LightType type) {
-    this->lightType = type;
-    updateBuffer(this->lightBuffer, LightBuffer, lightType, &this->lightType);
-}
-
-const Math::Vec3& Light::getColor() const {
-    return this->color;
-}
-
-void Light::setColor(float red, float green, float blue) {
-    this->setColor(Math::Vec3(red, green, blue));
-}
-
-void Light::setColor(const Math::Vec3& color) {
-    this->color = color;
-    updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
+    this->type = type;
+    updateBuffer(this->lightBuffer, LightBuffer, type, &this->type);
 }
 
 float Light::getEnergy() const {
@@ -118,6 +105,19 @@ void Light::setBlend(float blend) {
 
     this->blend = blend;
     updateBuffer(this->lightBuffer, LightBuffer, blend, &this->blend);
+}
+
+const Math::Vec3& Light::getColor() const {
+    return this->color;
+}
+
+void Light::setColor(float red, float green, float blue) {
+    this->setColor(Math::Vec3(red, green, blue));
+}
+
+void Light::setColor(const Math::Vec3& color) {
+    this->color = color;
+    updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
 }
 
 const Math::Vec3 Light::getDirection() const {

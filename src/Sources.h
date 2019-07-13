@@ -160,11 +160,11 @@ constexpr char lightingShader[] = R"(
 
     layout(std140) uniform Light {
         vec3 color;
+        int type;
         float energy;
         float falloff;
         float angle;
         float blend;
-        int lightType;
     } light;
 
     uniform vec3 cameraPosition;
@@ -188,7 +188,7 @@ constexpr char lightingShader[] = R"(
         vec3 position = positionSample.xyz;
         vec3 normal = normalize(normalSample.xyz);
 
-        vec3 direction = (light.lightType == TYPE_POINT) ? position - lightPosition : lightDirection;
+        vec3 direction = (light.type == TYPE_POINT) ? position - lightPosition : lightDirection;
         direction = normalize(direction);
 
         float luminance = dot(normal, -direction);
@@ -203,13 +203,13 @@ constexpr char lightingShader[] = R"(
 
         float falloff = pow(light.falloff, 2);
         float distance = pow(distance(lightPosition, position), 2);
-        float attenuation = (light.lightType == TYPE_DIRECTED) ? 1.0f : (falloff / (falloff + distance));
+        float attenuation = (light.type == TYPE_DIRECTED) ? 1.0f : (falloff / (falloff + distance));
 
         float softBorder = cos(radians(light.angle));
         float hardBorder = cos(radians(90.0f - light.angle * light.blend));
         float lightAngle = dot(direction, normalize(position - lightPosition));
         float borderIntensity = clamp((lightAngle - softBorder) / hardBorder - 1.0f, 0.0f, 1.0f);
-        float lightClip = (light.lightType == TYPE_SPOT) ? borderIntensity : 1.0f;
+        float lightClip = (light.type == TYPE_SPOT) ? borderIntensity : 1.0f;
 
         outputColor = vec4(diffuseColor + specularColor, 0.0f) * light.energy * attenuation * lightClip;
     }

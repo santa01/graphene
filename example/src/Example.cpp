@@ -21,8 +21,8 @@
  */
 
 #include <Example.h>
+#include <ObjectManager.h>
 #include <RenderManager.h>
-#include <Light.h>
 #include <Logger.h>
 #include <Vec3.h>
 
@@ -66,62 +66,57 @@ void Example::onSetup() {
 
     /* Setup scene */
 
-    auto scene = this->createScene();
-    scene->setAmbientEnergy(0.5f);
+    auto scene = this->getScene();
 
+    auto sceneRoot = scene->getRootNode();
     this->player = scene->createNode();
-    scene->getRootNode()->attachNode(this->player);
-
     this->node = scene->createNode();
-    scene->getRootNode()->attachNode(this->node);
+
+    sceneRoot->attachNode(this->player);
+    sceneRoot->attachNode(this->node);
+    scene->setAmbientEnergy(0.5f);
 
     auto& renderManager = Graphene::GetRenderManager();
     renderManager.setLightPass(true);
 
     /* Populate scene with objects */
 
-    auto objectManager = this->getObjectManager();
+    auto& objectManager = Graphene::GetObjectManager();
 
-    this->camera = objectManager->createCamera();
-    this->camera->setFov(this->getConfig().getFov());
-    this->player->attachObject(this->camera);
+    this->camera = objectManager.createCamera(Graphene::ProjectionType::PERSPECTIVE);
+    this->entity1 = objectManager.createEntity("assets/example.entity");
+    this->entity2 = objectManager.createEntity("assets/example.entity");
+    this->entity3 = objectManager.createEntity("assets/example.entity");
 
-    auto flashlight = objectManager->createLight();
-    flashlight->setDirection(flashlight->getDirection() + Math::Vec3(0.0f, -0.2f, 0.0f));
-    flashlight->setLightType(Graphene::LightType::SPOT);
-    flashlight->setBlend(0.05f);
-    flashlight->setAngle(20.0f);
-    flashlight->setEnergy(0.5f);
-    flashlight->setFalloff(8.0f);
-    flashlight->move((this->camera->getRight() - this->camera->getUp()) * 0.2f);
-    this->player->attachObject(flashlight);
+    auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
+    auto lightBulb = objectManager.createLight(Graphene::LightType::POINT);
 
-    auto light = objectManager->createLight();
-    light->setEnergy(0.8f);
-    this->node->attachObject(light);
+    flashLight->setBlend(0.05f);
+    flashLight->setAngle(20.0f);
+    flashLight->setEnergy(0.5f);
+    flashLight->setFalloff(8.0f);
+    flashLight->move((this->player->getRight() - this->player->getUp()) * 0.2f);
 
-    this->entity1 = objectManager->createEntity("assets/example.entity");
+    lightBulb->setEnergy(0.8f);
+    lightBulb->move(0.0f, 20.0f, 0.0f);
 
-    this->entity2 = objectManager->createEntity("assets/example.entity");
     this->entity2->move(2.0f, 2.0f, 0.0f);
-
-    this->entity3 = objectManager->createEntity("assets/example.entity");
     this->entity3->move(-2.0f, -2.0f, 0.0f);
+
+    this->player->attachObject(this->camera);
+    this->player->attachObject(flashLight);
+    this->player->move(0.0f, 0.0f, -3.0f);
 
     this->node->attachObject(this->entity1);
     this->node->attachObject(this->entity2);
     this->node->attachObject(this->entity3);
+    this->node->attachObject(lightBulb);
     this->node->move(0.0f, 0.0f, 2.0f);
 
     /* Update default viewport with camera */
 
     auto viewport = *this->getWindow()->getViewports().begin();
     viewport->setCamera(this->camera);
-
-    /* Update scene */
-
-    this->player->translate(0.0f, 0.0f, -3.0f);
-    light->translate(0.0f, 20.0f, 0.0f);
 
     /* Keep mouse inside the window */
 

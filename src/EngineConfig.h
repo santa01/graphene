@@ -24,11 +24,16 @@
 #define ENGINECONFIG_H
 
 #include <GrapheneApi.h>
+#include <NonCopyable.h>
+
+#define GetEngineConfig() EngineConfig::getInstance()
 
 namespace Graphene {
 
-class EngineConfig {
+class EngineConfig: public NonCopyable {
 public:
+    GRAPHENE_API static EngineConfig& getInstance();
+
     GRAPHENE_API float getFov() const;
     GRAPHENE_API void setFov(float fov);
 
@@ -51,6 +56,8 @@ public:
     GRAPHENE_API void setDebug(bool debug);
 
 private:
+    EngineConfig() = default;
+
     float fov = 75.0f;
     int height = 600;
     int width = 800;

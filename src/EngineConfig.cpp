@@ -24,6 +24,11 @@
 
 namespace Graphene {
 
+EngineConfig& EngineConfig::getInstance() {
+    static EngineConfig instance;
+    return instance;
+}
+
 float EngineConfig::getFov() const {
     return this->fov;
 }
