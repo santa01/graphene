@@ -23,7 +23,6 @@
 #include <Viewport.h>
 #include <Logger.h>
 #include <RenderManager.h>
-#include <RenderStack.h>
 #include <SceneNode.h>
 
 namespace Graphene {
@@ -94,22 +93,27 @@ void Viewport::update() {
         this->geometryBuffer = std::make_shared<GeometryBuffer>(this->width, this->height);
     }
 
-    RenderStack::push([this]() {
-        this->geometryBuffer->getDiffuseTexture()->bind(0);
-        this->geometryBuffer->getSpecularTexture()->bind(1);
-        this->geometryBuffer->getPositionTexture()->bind(2);
-        this->geometryBuffer->getNormalTexture()->bind(3);
-        this->geometryBuffer->getDepthTexture()->bind(4);
-    });
+    auto bindGeometryBufferTextures = [this]() {
+        this->geometryBuffer->getDiffuseTexture()->bind(TEXTURE_DIFFUSE);
+        this->geometryBuffer->getSpecularTexture()->bind(TEXTURE_SPECULAR);
+        this->geometryBuffer->getPositionTexture()->bind(TEXTURE_POSITION);
+        this->geometryBuffer->getNormalTexture()->bind(TEXTURE_NORMAL);
+        this->geometryBuffer->getDepthTexture()->bind(TEXTURE_DEPTH);
+    };
 
-    RenderStack::push([this]() {
+    auto bindGeometryBuffer = [this]() {
         this->geometryBuffer->bind();
+
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
-    });
+    };
+
+    auto& renderManager = GetRenderManager();
+    renderManager.pushState(std::make_pair("Bind Geometry Buffer Textures", bindGeometryBufferTextures));
+    renderManager.pushState(std::make_pair("Bind Geometry Buffer", bindGeometryBuffer));
 
     glViewport(this->left, this->top, this->width, this->height);
-    GetRenderManager().render(this->camera);
+    renderManager.render(this->camera);
 }
 
 }  // namespace Graphene

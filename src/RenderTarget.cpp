@@ -21,8 +21,8 @@
  */
 
 #include <RenderTarget.h>
+#include <RenderManager.h>
 #include <Logger.h>
-#include <RenderStack.h>
 #include <stdexcept>
 
 namespace Graphene {
@@ -75,24 +75,24 @@ void RenderTarget::addOverlay(const std::shared_ptr<Viewport> overlay) {
 }
 
 void RenderTarget::update() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-    glDrawBuffer(this->buffer);
-    glClear(GL_COLOR_BUFFER_BIT);
+    auto& renderManager = GetRenderManager();
 
-    auto renderState = [this]() {
+    auto bindFrontBuffer = [this]() {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
         glDrawBuffer(this->buffer);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
     };
 
     for (auto& viewport: this->viewports) {
-        RenderStack::push(renderState);
+        renderManager.pushState(std::make_pair("Bind Front Buffer", bindFrontBuffer));
         viewport->update();
     }
 
     for (auto& overlay: this->overlays) {
-        RenderStack::push(renderState);
+        renderManager.pushState(std::make_pair("Bind Front Buffer", bindFrontBuffer));
         overlay->update();
     }
 }

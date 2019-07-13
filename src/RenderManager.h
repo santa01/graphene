@@ -29,10 +29,24 @@
 #include <Shader.h>
 #include <Mesh.h>
 #include <memory>
+#include <functional>
+#include <stack>
+#include <algorithm>
+#include <string>
 
 #define GetRenderManager() RenderManager::getInstance()
 
 namespace Graphene {
+
+enum TextureUnits {
+    TEXTURE_DIFFUSE,
+    TEXTURE_SPECULAR,
+    TEXTURE_POSITION,
+    TEXTURE_NORMAL,
+    TEXTURE_DEPTH
+};
+
+typedef std::pair<std::string, std::function<void()>> RenderState;
 
 class RenderManager: public NonCopyable {
 public:
@@ -53,6 +67,8 @@ public:
     GRAPHENE_API bool hasLightPass() const;
     GRAPHENE_API void setLightPass(bool lightPass);
 
+    GRAPHENE_API void pushState(const RenderState& state);
+    GRAPHENE_API void popState();
     GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 
 private:
@@ -64,6 +80,8 @@ private:
     std::shared_ptr<Shader> geometryShader;
     std::shared_ptr<Shader> ambientShader;
     std::shared_ptr<Shader> lightingShader;
+
+    std::stack<RenderState> stateStack;
     std::shared_ptr<Mesh> frame;
 
     bool shadowPass = false;

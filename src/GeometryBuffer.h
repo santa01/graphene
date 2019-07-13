@@ -65,7 +65,7 @@ private:
     std::shared_ptr<ImageTexture> normalTexture;
     std::shared_ptr<DepthTexture> depthTexture;
 
-    GLenum buffers[4] = { };
+    GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
     GLuint fbo = 0;
 
     int width = 0;

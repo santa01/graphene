@@ -22,7 +22,6 @@
 
 #include <RenderManager.h>
 #include <Logger.h>
-#include <RenderStack.h>
 #include <Scene.h>
 #include <Object.h>
 #include <Light.h>
@@ -36,14 +35,6 @@ namespace Graphene {
 enum BindPoints {
     BIND_MATERIAL = 0,
     BIND_LIGHT = 0
-};
-
-enum TextureUnits {
-    TEXTURE_DIFFUSE,
-    TEXTURE_SPECULAR,
-    TEXTURE_POSITION,
-    TEXTURE_NORMAL,
-    TEXTURE_DEPTH
 };
 
 #pragma pack(push, 1)
@@ -127,12 +118,22 @@ void RenderManager::setLightPass(bool lightPass) {
     this->lightPass = lightPass;
 }
 
+void RenderManager::pushState(const RenderState& state) {
+    this->stateStack.push(state);
+}
+
+void RenderManager::popState() {
+    RenderState state(this->stateStack.top());
+    this->stateStack.pop();
+    state.second();
+}
+
 void RenderManager::render(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    RenderStack::pop();  // Geometry buffer
+    this->popState();  // Geometry buffer
     this->geometryShader->enable();
     this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
     this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
@@ -165,13 +166,13 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
         }
     });
 
-    RenderStack::pop();  // Geometry textures
+    this->popState();  // Geometry buffer textures
     this->ambientShader->enable();
     this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->ambientShader->setUniform("ambientColor", scene->getAmbientColor());
     this->ambientShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
 
-    RenderStack::pop();  // Output buffer
+    this->popState();  // Front buffer
     this->frame->render();
 
     if (this->shadowPass) {
