@@ -35,8 +35,8 @@ enum MouseButton {
     LEFT,
     MIDDLE,
     RIGHT,
-    X1,
-    X2
+    X1,     // Wheel up
+    X2      // Wheel down
 };
 
 constexpr int KeyboardScancodes = 256;

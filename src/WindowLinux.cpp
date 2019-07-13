@@ -83,7 +83,9 @@ bool WindowLinux::dispatchEvents() {
 
             case ButtonPress:
             case ButtonRelease: {
-                MouseButton mouseButton = static_cast<MouseButton>(event.xbutton.button);
+                // XButtonEvent.button values start from 1 (left button)
+                // to 5 (x2 button). Scale to MouseButton enum values (0 to 4).
+                MouseButton mouseButton = static_cast<MouseButton>(event.xbutton.button - 1);
                 bool mouseButtonState = (event.type == ButtonPress);
                 this->mouseState[mouseButton] = mouseButtonState;
                 this->onMouseButtonSignal(mouseButton, mouseButtonState);
