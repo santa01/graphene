@@ -31,7 +31,7 @@ namespace Graphene {
 
 class Texture: public NonCopyable {
 public:
-    GRAPHENE_API Texture();
+    GRAPHENE_API Texture(int width, int height);
     GRAPHENE_API virtual ~Texture();
 
     GRAPHENE_API int getWidth() const;

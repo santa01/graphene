@@ -25,7 +25,7 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <ImageTexture.h>
+#include <GeometryTexture.h>
 #include <DepthTexture.h>
 #include <OpenGL.h>
 #include <memory>
@@ -50,22 +50,22 @@ public:
     GRAPHENE_API int getWidth() const;
     GRAPHENE_API int getHeight() const;
 
-    GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture();
-    GRAPHENE_API std::shared_ptr<ImageTexture> getSpecularTexture();
-    GRAPHENE_API std::shared_ptr<ImageTexture> getPositionTexture();
-    GRAPHENE_API std::shared_ptr<ImageTexture> getNormalTexture();
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getDiffuseTexture();
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getSpecularTexture();
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getPositionTexture();
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getNormalTexture();
     GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture();
 
     GRAPHENE_API void bind();
 
 private:
-    std::shared_ptr<ImageTexture> diffuseTexture;
-    std::shared_ptr<ImageTexture> specularTexture;
-    std::shared_ptr<ImageTexture> positionTexture;
-    std::shared_ptr<ImageTexture> normalTexture;
+    std::shared_ptr<GeometryTexture> diffuseTexture;
+    std::shared_ptr<GeometryTexture> specularTexture;
+    std::shared_ptr<GeometryTexture> positionTexture;
+    std::shared_ptr<GeometryTexture> normalTexture;
     std::shared_ptr<DepthTexture> depthTexture;
 
-    GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+    GLenum drawBuffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
     GLuint fbo = 0;
 
     int width = 0;

@@ -30,7 +30,10 @@ FrameBuffer::FrameBuffer(int width, int height):
         colorTexture(new ImageTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->colorTexture->getHandle(), 0);
+    this->drawBuffer = GL_COLOR_ATTACHMENT0;
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 

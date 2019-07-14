@@ -79,7 +79,7 @@ void RenderTarget::update() {
 
     auto bindFrontBuffer = [this]() {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-        glDrawBuffer(this->buffer);
+        glDrawBuffer(this->drawBuffer);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glEnable(GL_BLEND);

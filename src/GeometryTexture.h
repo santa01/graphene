@@ -20,35 +20,19 @@
  * SOFTWARE.
  */
 
+#ifndef GEOMETRYTEXTURE_H
+#define GEOMETRYTEXTURE_H
+
+#include <GrapheneApi.h>
 #include <Texture.h>
 
 namespace Graphene {
 
-Texture::Texture(int width, int height):
-        width(width),
-        height(height) {
-    glGenTextures(1, &this->texture);
-}
-
-Texture::~Texture() {
-    glDeleteTextures(1, &this->texture);
-}
-
-int Texture::getWidth() const {
-    return this->width;
-}
-
-int Texture::getHeight() const {
-    return this->height;
-}
-
-GLuint Texture::getHandle() const {
-    return this->texture;
-}
-
-void Texture::bind(int textureUnit) {
-    glActiveTexture(GL_TEXTURE0 + textureUnit);
-    glBindTexture(GL_TEXTURE_2D, this->texture);
-}
+class GeometryTexture: public Texture {
+public:
+    GRAPHENE_API GeometryTexture(int width, int height);
+};
 
 }  // namespace Graphene
+
+#endif  // GEOMETRYTEXTURE_H

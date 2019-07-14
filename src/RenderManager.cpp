@@ -172,7 +172,7 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
     this->ambientShader->setUniform("ambientColor", scene->getAmbientColor());
     this->ambientShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
 
-    this->popState();  // Front buffer
+    this->popState();  // Target frame buffer
     this->frame->render();
 
     if (this->shadowPass) {

@@ -25,10 +25,10 @@
 namespace Graphene {
 
 GeometryBuffer::GeometryBuffer(int width, int height):
-        diffuseTexture(new ImageTexture(width, height)),
-        specularTexture(new ImageTexture(width, height)),
-        positionTexture(new ImageTexture(width, height)),
-        normalTexture(new ImageTexture(width, height)),
+        diffuseTexture(new GeometryTexture(width, height)),
+        specularTexture(new GeometryTexture(width, height)),
+        positionTexture(new GeometryTexture(width, height)),
+        normalTexture(new GeometryTexture(width, height)),
         depthTexture(new DepthTexture(width, height)),
         width(width),
         height(height) {
@@ -56,19 +56,19 @@ int GeometryBuffer::getHeight() const {
     return this->height;
 }
 
-std::shared_ptr<ImageTexture> GeometryBuffer::getDiffuseTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getDiffuseTexture() {
     return this->diffuseTexture;
 }
 
-std::shared_ptr<ImageTexture> GeometryBuffer::getSpecularTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getSpecularTexture() {
     return this->specularTexture;
 }
 
-std::shared_ptr<ImageTexture> GeometryBuffer::getPositionTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getPositionTexture() {
     return this->positionTexture;
 }
 
-std::shared_ptr<ImageTexture> GeometryBuffer::getNormalTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getNormalTexture() {
     return this->normalTexture;
 }
 
@@ -78,7 +78,7 @@ std::shared_ptr<DepthTexture> GeometryBuffer::getDepthTexture() {
 
 void GeometryBuffer::bind() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-    glDrawBuffers(4, this->buffers);
+    glDrawBuffers(4, this->drawBuffers);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

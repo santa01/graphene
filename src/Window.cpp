@@ -21,11 +21,13 @@
  */
 
 #include <Window.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 
 Window::Window(int width, int height):
         RenderTarget(width, height) {
+    this->drawBuffer = GL_BACK;  // Double buffered
 }
 
 const KeyboardState& Window::getKeyboardState() const {

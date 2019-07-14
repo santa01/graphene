@@ -20,35 +20,16 @@
  * SOFTWARE.
  */
 
-#include <Texture.h>
+#include <GeometryTexture.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 
-Texture::Texture(int width, int height):
-        width(width),
-        height(height) {
-    glGenTextures(1, &this->texture);
-}
-
-Texture::~Texture() {
-    glDeleteTextures(1, &this->texture);
-}
-
-int Texture::getWidth() const {
-    return this->width;
-}
-
-int Texture::getHeight() const {
-    return this->height;
-}
-
-GLuint Texture::getHandle() const {
-    return this->texture;
-}
-
-void Texture::bind(int textureUnit) {
-    glActiveTexture(GL_TEXTURE0 + textureUnit);
+GeometryTexture::GeometryTexture(int width, int height):
+        Texture(width, height) {
     glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16F, this->width, this->height);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 }  // namespace Graphene

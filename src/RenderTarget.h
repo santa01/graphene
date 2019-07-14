@@ -55,7 +55,7 @@ protected:
     std::unordered_set<std::shared_ptr<Viewport>> viewports;
     std::unordered_set<std::shared_ptr<Viewport>> overlays;
 
-    GLenum buffer = GL_FRONT;
+    GLenum drawBuffer = GL_FRONT;
     GLuint fbo = 0;
 
     int width = 0;
