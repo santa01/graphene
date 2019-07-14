@@ -23,7 +23,6 @@
 #include <Example.h>
 #include <ObjectManager.h>
 #include <RenderManager.h>
-#include <Logger.h>
 #include <Vec3.h>
 
 void Example::onMouseMotion(int x, int y) {
@@ -148,17 +147,5 @@ void Example::onIdle() {
 
     if (keyStates[KEY_A]) {
         this->player->move(-right);
-    }
-
-    static float renderTime = 0;
-    static int frames = 0;
-
-    renderTime += this->getFrameTime();
-    frames++;
-
-    if (renderTime >= 1.0f) {
-        Graphene::LogInfo("%d frames in %.1f seconds = %.3f FPS", frames, renderTime, frames / renderTime);
-        renderTime = 0.0f;
-        frames = 0;
     }
 }

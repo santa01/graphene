@@ -73,6 +73,9 @@ private:
     std::shared_ptr<Scene> scene;
 
     float frameTime = 0.0f;
+    float renderTime = 0.0f;
+    int frames = 0;
+
     bool running = true;
     int result = 0;
 };

@@ -127,6 +127,17 @@ int Engine::exec() {
             std::this_thread::sleep_for(std::chrono::duration<float>(maxFrameTime - this->frameTime));
             this->frameTime = maxFrameTime;
         }
+
+        this->renderTime += this->getFrameTime();
+        this->frames++;
+
+        if (renderTime >= 1.0f) {
+            float fps = this->frames / this->renderTime;
+            Graphene::LogInfo("%d frames in %.1f seconds = %.3f fps", this->frames, this->renderTime, fps);
+
+            this->renderTime = 0.0f;
+            this->frames = 0;
+        }
     }
 
     GetObjectManager().clearCache();
