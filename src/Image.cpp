@@ -21,7 +21,6 @@
  */
 
 #include <Image.h>
-#include <algorithm>
 
 namespace Graphene {
 

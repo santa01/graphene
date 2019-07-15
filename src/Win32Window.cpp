@@ -22,7 +22,7 @@
 
 #if defined(_WIN32)
 
-#include <WindowWin32.h>
+#include <Win32Window.h>
 #include <Logger.h>
 #include <RenderTarget.h>
 #include <windowsx.h>
@@ -31,10 +31,10 @@
 namespace Graphene {
 
 #define SetWindowObject(window, object) SetWindowLongPtr((window), GWLP_USERDATA, reinterpret_cast<LONG_PTR>((object)))
-#define GetWindowObject(window) reinterpret_cast<WindowWin32*>(GetWindowLongPtr((window), GWLP_USERDATA))
+#define GetWindowObject(window) reinterpret_cast<Win32Window*>(GetWindowLongPtr((window), GWLP_USERDATA))
 
 LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-    WindowWin32* self = GetWindowObject(window);
+    Win32Window* self = GetWindowObject(window);
 
     switch (message) {
         case WM_KEYDOWN:
@@ -112,7 +112,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     return DefWindowProc(window, message, wParam, lParam);
 }
 
-WindowWin32::WindowWin32(int width, int height):
+Win32Window::Win32Window(int width, int height):
         Window(width, height) {
     AllocConsole();
     AttachConsole(GetCurrentProcessId());
@@ -130,14 +130,14 @@ WindowWin32::WindowWin32(int width, int height):
     UpdateWindow(this->window);
 }
 
-WindowWin32::~WindowWin32() {
+Win32Window::~Win32Window() {
     this->destroyContext();
     this->destroyWindow(this->window);
 
     FreeConsole();
 }
 
-void WindowWin32::captureMouse(bool captured) {
+void Win32Window::captureMouse(bool captured) {
     this->mouseCaptured = captured;
 
     if (this->mouseCaptured) {
@@ -149,12 +149,12 @@ void WindowWin32::captureMouse(bool captured) {
     ShowCursor(this->mouseCaptured ? FALSE : TRUE);
 }
 
-void WindowWin32::update() {
+void Win32Window::update() {
     RenderTarget::update();
     SwapBuffers(this->deviceContext);
 }
 
-bool WindowWin32::dispatchEvents() {
+bool Win32Window::dispatchEvents() {
     MSG message;
     bool breakOrbit = false;
 
@@ -170,7 +170,7 @@ bool WindowWin32::dispatchEvents() {
     return breakOrbit;
 }
 
-HWND WindowWin32::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc) {
+HWND Win32Window::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc) {
     WNDCLASSEX wcex = { };
     wcex.cbSize = sizeof(wcex);
     wcex.style = CS_OWNDC;
@@ -195,7 +195,7 @@ HWND WindowWin32::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC wi
     return window;
 }
 
-void WindowWin32::destroyWindow(HWND window) {
+void Win32Window::destroyWindow(HWND window) {
     WCHAR className[64];
 
     if (window != nullptr) {
@@ -206,7 +206,7 @@ void WindowWin32::destroyWindow(HWND window) {
     UnregisterClass(className, this->instance);
 }
 
-void WindowWin32::createContext() {
+void Win32Window::createContext() {
     HWND dummyWindow = this->createWindow(L"Dummy Class", L"Dummy Window", DefWindowProc);
     this->createBaseContext(dummyWindow);
 
@@ -218,7 +218,7 @@ void WindowWin32::createContext() {
     this->createExtContext(this->window);
 }
 
-void WindowWin32::createBaseContext(HWND window) {
+void Win32Window::createBaseContext(HWND window) {
     this->deviceContext = GetDC(window);
     if (this->deviceContext == nullptr) {
         throw std::runtime_error(LogFormat("GetDC()"));
@@ -252,7 +252,7 @@ void WindowWin32::createBaseContext(HWND window) {
     }
 }
 
-void WindowWin32::createExtContext(HWND window) {
+void Win32Window::createExtContext(HWND window) {
     this->deviceContext = GetDC(window);
     if (this->deviceContext == nullptr) {
         throw std::runtime_error(LogFormat("GetDC()"));
@@ -297,7 +297,7 @@ void WindowWin32::createExtContext(HWND window) {
     }
 }
 
-void WindowWin32::destroyContext() {
+void Win32Window::destroyContext() {
     if (this->deviceContext != nullptr) {
         wglMakeCurrent(this->deviceContext, nullptr);
     }
@@ -313,7 +313,7 @@ void WindowWin32::destroyContext() {
     }
 }
 
-void WindowWin32::warpMousePointer(int x, int y) {
+void Win32Window::warpMousePointer(int x, int y) {
     POINT position = { x, y };
     ClientToScreen(this->window, &position);
     SetCursorPos(position.x, position.y);

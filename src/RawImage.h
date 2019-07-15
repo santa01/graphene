@@ -20,21 +20,19 @@
  * SOFTWARE.
  */
 
-#include <ImageRAW.h>
-#include <algorithm>
+#ifndef RAWIMAGE_H
+#define RAWIMAGE_H
+
+#include <GrapheneApi.h>
+#include <Image.h>
 
 namespace Graphene {
 
-ImageRAW::ImageRAW(int width, int height, int pixelDepth, const void* pixels) {
-    this->width = width;
-    this->height = height;
-    this->pixelDepth = pixelDepth;
-
-    this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
-    this->pixels.reset(new char[this->pixelsSize]);
-
-    const char* pixelsData = reinterpret_cast<const char*>(pixels);
-    std::copy(pixelsData, pixelsData + this->pixelsSize, this->pixels.get());
-}
+class RawImage: public Image {
+public:
+    GRAPHENE_API RawImage(int width, int height, int pixelDepth, const void* pixels);
+};
 
 }  // namespace Graphene
+
+#endif  // RAWIMAGE_H

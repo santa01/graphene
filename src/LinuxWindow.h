@@ -20,24 +20,43 @@
  * SOFTWARE.
  */
 
-#ifndef IMAGETGA_H
-#define IMAGETGA_H
+#ifndef LINUXWINDOW_H
+#define LINUXWINDOW_H
+
+#if defined(__linux__)
 
 #include <GrapheneApi.h>
-#include <Image.h>
-#include <string>
+#include <Window.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 
-class ImageTGA: public Image {
+class LinuxWindow: public Window {
 public:
-    GRAPHENE_API ImageTGA(const std::string& filename);
-    GRAPHENE_API const std::string& getFilename() const;
+    GRAPHENE_API LinuxWindow(int width, int height);
+    GRAPHENE_API ~LinuxWindow();
+
+    GRAPHENE_API void captureMouse(bool captured) override;
+    GRAPHENE_API void update() override;
+    GRAPHENE_API bool dispatchEvents() override;
 
 private:
-    std::string filename;
+    void createWindow(const char* windowName);
+    void destroyWindow();
+
+    void createContext();
+    void destroyContext();
+
+    Display* display = nullptr;
+    GLXFBConfig fbConfig = nullptr;
+    Colormap colormap = None;
+    XID window = None;
+    Atom wmDeleteWindow = None;
+    GLXContext renderingContext = nullptr;
 };
 
 }  // namespace Graphene
 
-#endif  // IMAGETGA_H
+#endif  // defined(__linux__)
+
+#endif  // LINUXWINDOW_H

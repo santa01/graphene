@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#ifndef WINDOWWIN32_H
-#define WINDOWWIN32_H
+#ifndef WIN32WINDOW_H
+#define WIN32WINDOW_H
 
 #if defined(_WIN32)
 
@@ -31,10 +31,10 @@
 
 namespace Graphene {
 
-class WindowWin32: public Window {
+class Win32Window: public Window {
 public:
-    GRAPHENE_API WindowWin32(int width, int height);
-    GRAPHENE_API ~WindowWin32();
+    GRAPHENE_API Win32Window(int width, int height);
+    GRAPHENE_API ~Win32Window();
 
     GRAPHENE_API void captureMouse(bool captured) override;
     GRAPHENE_API void update() override;
@@ -63,4 +63,4 @@ private:
 
 #endif  // defined(_WIN32)
 
-#endif  // WINDOWWIN32_H
+#endif  // WIN32WINDOW_H

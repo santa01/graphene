@@ -41,8 +41,6 @@ public:
     GRAPHENE_API const void* getPixels() const;
 
 protected:
-    Image() = default;
-
     int width = 0;
     int height = 0;
     int pixelDepth = 0;

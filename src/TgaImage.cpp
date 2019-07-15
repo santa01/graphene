@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include <ImageTGA.h>
+#include <TgaImage.h>
 #include <Logger.h>
 #include <cstdint>
 #include <fstream>
@@ -80,7 +80,7 @@ typedef struct {
 
 #pragma pack(pop)
 
-ImageTGA::ImageTGA(const std::string& filename):
+TgaImage::TgaImage(const std::string& filename):
         filename(filename) {
     std::ifstream image(this->filename.c_str(), std::ios::binary);
     if (!image) {
@@ -134,7 +134,7 @@ ImageTGA::ImageTGA(const std::string& filename):
     }
 }
 
-const std::string& ImageTGA::getFilename() const {
+const std::string& TgaImage::getFilename() const {
     return this->filename;
 }
 

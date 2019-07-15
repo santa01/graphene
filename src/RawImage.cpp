@@ -20,43 +20,21 @@
  * SOFTWARE.
  */
 
-#ifndef WINDOWLINUX_H
-#define WINDOWLINUX_H
-
-#if defined(__linux__)
-
-#include <GrapheneApi.h>
-#include <Window.h>
-#include <OpenGL.h>
+#include <RawImage.h>
+#include <algorithm>
 
 namespace Graphene {
 
-class WindowLinux: public Window {
-public:
-    GRAPHENE_API WindowLinux(int width, int height);
-    GRAPHENE_API ~WindowLinux();
+RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels) {
+    this->width = width;
+    this->height = height;
+    this->pixelDepth = pixelDepth;
 
-    GRAPHENE_API void captureMouse(bool captured) override;
-    GRAPHENE_API void update() override;
-    GRAPHENE_API bool dispatchEvents() override;
+    this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
+    this->pixels.reset(new char[this->pixelsSize]);
 
-private:
-    void createWindow(const char* windowName);
-    void destroyWindow();
-
-    void createContext();
-    void destroyContext();
-
-    Display* display = nullptr;
-    GLXFBConfig fbConfig = nullptr;
-    Colormap colormap = None;
-    XID window = None;
-    Atom wmDeleteWindow = None;
-    GLXContext renderingContext = nullptr;
-};
+    const char* pixelsData = reinterpret_cast<const char*>(pixels);
+    std::copy(pixelsData, pixelsData + this->pixelsSize, this->pixels.get());
+}
 
 }  // namespace Graphene
-
-#endif  // defined(__linux__)
-
-#endif  // WINDOWLINUX_H

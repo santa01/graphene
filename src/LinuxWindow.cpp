@@ -22,25 +22,25 @@
 
 #if defined(__linux__)
 
-#include <WindowLinux.h>
+#include <LinuxWindow.h>
 #include <Logger.h>
 #include <RenderTarget.h>
 #include <stdexcept>
 
 namespace Graphene {
 
-WindowLinux::WindowLinux(int width, int height):
+LinuxWindow::LinuxWindow(int width, int height):
         Window(width, height) {
     this->createWindow("OpenGL Window");
     this->createContext();
 }
 
-WindowLinux::~WindowLinux() {
+LinuxWindow::~LinuxWindow() {
     this->destroyContext();
     this->destroyWindow();
 }
 
-void WindowLinux::captureMouse(bool captured) {
+void LinuxWindow::captureMouse(bool captured) {
     this->mouseCaptured = captured;
 
     if (this->mouseCaptured) {
@@ -60,12 +60,12 @@ void WindowLinux::captureMouse(bool captured) {
     }
 }
 
-void WindowLinux::update() {
+void LinuxWindow::update() {
     RenderTarget::update();
     glXSwapBuffers(this->display, this->window);
 }
 
-bool WindowLinux::dispatchEvents() {
+bool LinuxWindow::dispatchEvents() {
     XEvent event;
     bool breakOrbit = false;
 
@@ -132,7 +132,7 @@ bool WindowLinux::dispatchEvents() {
     return breakOrbit;
 }
 
-void WindowLinux::createWindow(const char* windowName) {
+void LinuxWindow::createWindow(const char* windowName) {
     this->display = XOpenDisplay(nullptr);
     if (this->display == nullptr) {
         throw std::runtime_error(LogFormat("XOpenDisplay()"));
@@ -190,7 +190,7 @@ void WindowLinux::createWindow(const char* windowName) {
     XSetWMProtocols(this->display, this->window, &this->wmDeleteWindow, 1);
 }
 
-void WindowLinux::destroyWindow() {
+void LinuxWindow::destroyWindow() {
     if (this->display != nullptr) {
         if (this->window != None) {
             XDestroyWindow(this->display, this->window);
@@ -207,7 +207,7 @@ void WindowLinux::destroyWindow() {
     }
 }
 
-void WindowLinux::createContext() {
+void LinuxWindow::createContext() {
     OpenGL::loadGlxExtensions();
 
     const int contextAttribList[] = {
@@ -231,7 +231,7 @@ void WindowLinux::createContext() {
     }
 }
 
-void WindowLinux::destroyContext() {
+void LinuxWindow::destroyContext() {
     if (this->display != nullptr) {
         glXMakeCurrent(this->display, None, None);
 

@@ -20,19 +20,24 @@
  * SOFTWARE.
  */
 
-#ifndef IMAGERAW_H
-#define IMAGERAW_H
+#ifndef TGAIMAGE_H
+#define TGAIMAGE_H
 
 #include <GrapheneApi.h>
 #include <Image.h>
+#include <string>
 
 namespace Graphene {
 
-class ImageRAW: public Image {
+class TgaImage: public Image {
 public:
-    GRAPHENE_API ImageRAW(int width, int height, int pixelDepth, const void* pixels);
+    GRAPHENE_API TgaImage(const std::string& filename);
+    GRAPHENE_API const std::string& getFilename() const;
+
+private:
+    std::string filename;
 };
 
 }  // namespace Graphene
 
-#endif  // IMAGERAW_H
+#endif  // TGAIMAGE_H

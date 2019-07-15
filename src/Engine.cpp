@@ -25,9 +25,9 @@
 #include <Logger.h>
 #include <ObjectManager.h>
 #if defined(_WIN32)
-#include <WindowWin32.h>
+#include <Win32Window.h>
 #elif defined(__linux__)
-#include <WindowLinux.h>
+#include <LinuxWindow.h>
 #endif
 #include <chrono>
 #include <thread>
@@ -36,12 +36,6 @@
 #include <unordered_map>
 
 namespace Graphene {
-
-#if defined(_WIN32)
-typedef WindowWin32 WindowImpl;
-#elif defined(__linux__)
-typedef WindowLinux WindowImpl;
-#endif
 
 std::unordered_map<GLenum, std::string> sourceMap = {
     { GL_DEBUG_SOURCE_API_ARB,             "OpenGL" },
@@ -146,7 +140,12 @@ int Engine::exec() {
 
 void Engine::setupWindow() {
     auto& config = GetEngineConfig();
-    this->window = std::shared_ptr<Window>(new WindowImpl(config.getWidth(), config.getHeight()));
+
+#if defined(_WIN32)
+    this->window = std::shared_ptr<Window>(new Win32Window(config.getWidth(), config.getHeight()));
+#elif defined(__linux__)
+    this->window = std::shared_ptr<Window>(new LinuxWindow(config.getWidth(), config.getHeight()));
+#endif
 
     this->window->onMouseMotionSignal.connect(
             Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));

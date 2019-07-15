@@ -24,7 +24,7 @@
 #include <EngineConfig.h>
 #include <Logger.h>
 #include <Material.h>
-#include <ImageTGA.h>
+#include <TgaImage.h>
 #include <Vec3.h>
 #include <stdexcept>
 #include <utility>
@@ -103,7 +103,7 @@ std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& na
         return this->textureCache.at(name);
     }
 
-    ImageTGA image(name);
+    TgaImage image(name);
     auto texture = std::make_shared<ImageTexture>(image);
     this->textureCache.insert(std::make_pair(name, texture));
     return texture;
