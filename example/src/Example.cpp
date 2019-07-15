@@ -97,10 +97,11 @@ void Example::onSetup() {
     flashLight->move((this->player->getRight() - this->player->getUp()) * 0.2f);
 
     lightBulb->setEnergy(0.8f);
-    lightBulb->move(0.0f, 20.0f, 0.0f);
+    lightBulb->move(5.0f, 20.0f, 0.0f);
 
-    this->entity2->move(2.0f, 2.0f, 0.0f);
-    this->entity3->move(-2.0f, -2.0f, 0.0f);
+    this->entity2->move(1.25f, 0.0f, 0.0f);
+    this->entity3->move(0.5f, 1.0f, 0.0f);
+    this->entity3->yaw(30.0f);
 
     this->player->attachObject(this->camera);
     this->player->attachObject(flashLight);
@@ -110,7 +111,6 @@ void Example::onSetup() {
     this->node->attachObject(this->entity2);
     this->node->attachObject(this->entity3);
     this->node->attachObject(lightBulb);
-    this->node->move(0.0f, 0.0f, 2.0f);
 
     /* Update default viewport with camera */
 
