@@ -27,13 +27,16 @@
 #include <NonCopyable.h>
 #include <SceneNode.h>
 #include <Camera.h>
+#include <Entity.h>
+#include <Light.h>
 #include <Vec3.h>
 #include <functional>
 #include <memory>
 
 namespace Graphene {
 
-typedef std::function<void(const std::shared_ptr<Object>, const Math::Mat4&)> ObjectHandler;
+typedef std::function<void(const std::shared_ptr<Entity>, const Math::Mat4&)> EntityHandler;
+typedef std::function<void(const std::shared_ptr<Light>, const Math::Vec3&, const Math::Vec3&)> LightHandler;
 
 class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
@@ -49,7 +52,8 @@ public:
     GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
 
     GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
-    GRAPHENE_API void walkThrough(ObjectHandler handler);
+    GRAPHENE_API void iterateEntities(EntityHandler handler);
+    GRAPHENE_API void iterateLights(LightHandler handler);
 
 private:
     std::shared_ptr<SceneNode> rootNode;

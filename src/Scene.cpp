@@ -73,7 +73,7 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
 
     while (node != nullptr) {
         // Moving to the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Eventually root node's transformation will be the first one.
+        // to be the last operation. Eventually root node's transformation will be the last one.
         modelView = node->getOppositeRotation() * node->getOppositeTranslation() * modelView;
         node = node->getParent();
     }
@@ -82,16 +82,19 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
     return modelView;
 }
 
-void Scene::walkThrough(ObjectHandler handler) {
+void Scene::iterateEntities(EntityHandler handler) {
     std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4)> traverser;
     traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 transformation) {
-        // Moving from the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Keep the root node's transformation the last one.
-        transformation = node->getTranslation() * node->getRotation() * node->getScaling() * transformation;
+        // Moving from the root node, current node's transformation matrix is the right operand
+        // to be the first operation. Keep the root node's transformation the last one.
+        transformation = transformation * node->getTranslation() * node->getRotation() * node->getScaling();
 
         auto objects = node->getObjects();
         std::for_each(objects.begin(), objects.end(), [&handler, &transformation](const std::shared_ptr<Object> object) {
-            handler(object, transformation);
+            if (object->getType() == ObjectType::ENTITY) {
+                auto entity = std::dynamic_pointer_cast<Entity>(object);
+                handler(entity, transformation * entity->getTranslation() * entity->getRotation() * entity->getScaling());
+            }
         });
 
         auto nodes = node->getNodes();
@@ -102,6 +105,40 @@ void Scene::walkThrough(ObjectHandler handler) {
 
     Math::Mat4 transformation;
     traverser(this->rootNode, transformation);
+}
+
+void Scene::iterateLights(LightHandler handler) {
+    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 translation, Math::Mat4 modelView) {
+        // Moving from the root node, current node's transformation matrix is the left operand
+        // to be the last operation. Keep the root node's transformation the last one.
+        translation = translation * node->getTranslation();
+        modelView = modelView * node->getOppositeRotation() * node->getOppositeTranslation();
+
+        auto objects = node->getObjects();
+        std::for_each(objects.begin(), objects.end(), [&handler, &translation, &modelView](const std::shared_ptr<Object> object) {
+            if (object->getType() == ObjectType::LIGHT) {
+                auto light = std::dynamic_pointer_cast<Light>(object);
+
+                Math::Mat4 lightTranslation(translation * light->getTranslation());
+                Math::Mat4 lightModelView(modelView * light->getOppositeRotation() * light->getOppositeTranslation());
+
+                Math::Vec3 lightPosition(lightTranslation.get(0, 3), lightTranslation.get(1, 3), lightTranslation.get(2, 3));
+                Math::Vec3 lightDirection(lightModelView.get(2, 0), lightModelView.get(2, 1), lightModelView.get(2, 2));
+
+                handler(light, lightPosition, lightDirection);
+            }
+        });
+
+        auto nodes = node->getNodes();
+        std::for_each(nodes.begin(), nodes.end(), [&traverser, &translation, &modelView](const std::shared_ptr<SceneNode> node) {
+            traverser(node, translation, modelView);
+        });
+    };
+
+    Math::Mat4 translation;
+    Math::Mat4 modelView;
+    traverser(this->rootNode, translation, modelView);
 }
 
 }  // namespace Graphene

@@ -143,26 +143,20 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
     Math::Mat4 modelViewProjection = camera->getProjection() * scene->calculateModelView(camera);
     this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
 
-    scene->walkThrough([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
-        if (object->getType() == ObjectType::ENTITY) {
-            auto entity = std::dynamic_pointer_cast<Entity>(object);
-            this->geometryShader->setUniform("normalRotation", entity->getRotation());
+    scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld) {
+        this->geometryShader->setUniform("normalRotation", entity->getRotation());
+        this->geometryShader->setUniform("localWorld", localWorld);
 
-            // Scale -> rotate -> translate. Local transformations first
-            Math::Mat4 entityTransformation = entity->getTranslation() * entity->getRotation() * entity->getScaling();
-            this->geometryShader->setUniform("localWorld", worldTransformation * entityTransformation);
+        for (auto& mesh: entity->getMeshes()) {
+            auto material = mesh->getMaterial();
+            material->getMaterialBuffer()->bind(BIND_MATERIAL);
 
-            for (auto& mesh: entity->getMeshes()) {
-                auto material = mesh->getMaterial();
-                material->getMaterialBuffer()->bind(BIND_MATERIAL);
-
-                auto diffuseTexture = material->getDiffuseTexture();
-                if (diffuseTexture != nullptr) {
-                    diffuseTexture->bind(TEXTURE_DIFFUSE);
-                }
-
-                mesh->render();
+            auto diffuseTexture = material->getDiffuseTexture();
+            if (diffuseTexture != nullptr) {
+                diffuseTexture->bind(TEXTURE_DIFFUSE);
             }
+
+            mesh->render();
         }
     });
 
@@ -200,19 +194,13 @@ void RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->lightingShader->setUniform("cameraPosition", camera->getPosition());
 
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
-    scene->walkThrough([this](const std::shared_ptr<Object> object, const Math::Mat4& worldTransformation) {
-        if (object->getType() == ObjectType::LIGHT) {
-            auto light = std::dynamic_pointer_cast<Light>(object);
-            light->getLightBuffer()->bind(BIND_LIGHT);
+    scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& rotation) {
+        light->getLightBuffer()->bind(BIND_LIGHT);
 
-            Math::Vec4 lightPosition(light->getPosition(), 1.0f);
-            lightPosition = worldTransformation * lightPosition;
+        this->lightingShader->setUniform("lightPosition", position);
+        this->lightingShader->setUniform("lightDirection", rotation);
 
-            this->lightingShader->setUniform("lightPosition", lightPosition.extractVec3());
-            this->lightingShader->setUniform("lightDirection", light->getDirection());
-
-            this->frame->render();
-        }
+        this->frame->render();
     });
 }
 
