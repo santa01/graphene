@@ -43,8 +43,10 @@ public:
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
     GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height);
 
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
+    GRAPHENE_API std::shared_ptr<Scene> createScene();
+
     GRAPHENE_API std::shared_ptr<Window> getWindow();
-    GRAPHENE_API std::shared_ptr<Scene> getScene();
     GRAPHENE_API float getFrameTime() const;
 
     GRAPHENE_API void exit(int result);
@@ -69,8 +71,8 @@ private:
     Signals::Signal<> onQuitSignal;   // User-requested quit
 
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
+    std::unordered_set<std::shared_ptr<Scene>> scenes;
     std::shared_ptr<Window> window;
-    std::shared_ptr<Scene> scene;
 
     float frameTime = 0.0f;
     float renderTime = 0.0f;

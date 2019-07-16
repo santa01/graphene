@@ -77,12 +77,19 @@ std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height) {
     return frameBuffer;
 }
 
-std::shared_ptr<Window> Engine::getWindow() {
-    return this->window;
+const std::unordered_set<std::shared_ptr<Scene>>& Engine::getScenes() const {
+    return this->scenes;
 }
 
-std::shared_ptr<Scene> Engine::getScene() {
-    return this->scene;
+std::shared_ptr<Scene> Engine::createScene() {
+    auto scene = std::make_shared<Scene>();
+    this->scenes.insert(scene);
+
+    return scene;
+}
+
+std::shared_ptr<Window> Engine::getWindow() {
+    return this->window;
 }
 
 float Engine::getFrameTime() const {
@@ -182,8 +189,6 @@ void Engine::setupOpenGL() {
 }
 
 void Engine::setupEngine() {
-    this->scene = std::make_shared<Scene>();
-
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));

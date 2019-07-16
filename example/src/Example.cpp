@@ -65,7 +65,7 @@ void Example::onSetup() {
 
     /* Setup scene */
 
-    auto scene = this->getScene();
+    auto scene = this->createScene();
 
     auto sceneRoot = scene->getRootNode();
     this->player = scene->createNode();
@@ -105,7 +105,7 @@ void Example::onSetup() {
 
     this->player->attachObject(this->camera);
     this->player->attachObject(flashLight);
-    this->player->move(0.0f, 0.0f, -3.0f);
+    this->player->move(0.0f, 1.0f, -3.0f);
 
     this->node->attachObject(this->entity1);
     this->node->attachObject(this->entity2);
