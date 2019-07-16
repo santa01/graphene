@@ -58,9 +58,6 @@ private:
     std::unordered_set<std::shared_ptr<SceneNode>> nodes;
     std::unordered_set<std::shared_ptr<Object>> objects;
 
-    std::unordered_set<std::shared_ptr<Entity>> entities;
-    std::unordered_set<std::shared_ptr<Light>> lights;
-
     std::weak_ptr<Scene> scene;
     std::weak_ptr<SceneNode> parent;
 };

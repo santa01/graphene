@@ -45,7 +45,10 @@ void SceneNode::attachNode(std::shared_ptr<SceneNode> node) {
 
     auto inserted = this->nodes.insert(node);
     if (inserted.second) {
-        node->getParent()->detachNode(node);
+        if (!node->parent.expired()) {
+            node->getParent()->detachNode(node);
+        }
+
         node->parent = this->shared_from_this();
     }
 }
@@ -55,8 +58,8 @@ void SceneNode::detachNode(std::shared_ptr<SceneNode> node) {
         throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
     }
 
-    if (!node->parent.expired()) {
-        node->getParent()->nodes.erase(node);
+    if (this->nodes.find(node) != this->nodes.end()) {
+        this->nodes.erase(node);
     }
 }
 
@@ -71,20 +74,10 @@ void SceneNode::attachObject(std::shared_ptr<Object> object) {
 
     auto inserted = this->objects.insert(object);
     if (inserted.second) {
-        switch (object->getType()) {
-            case ObjectType::ENTITY:
-                this->entities.insert(std::dynamic_pointer_cast<Entity>(object));
-                break;
-
-            case ObjectType::LIGHT:
-                this->lights.insert(std::dynamic_pointer_cast<Light>(object));
-                break;
-
-            default:
-                break;
+        if (!object->parent.expired()) {
+            object->getParent()->detachObject(object);
         }
 
-        object->getParent()->detachObject(object);
         object->parent = this->shared_from_this();
     }
 }
@@ -94,7 +87,7 @@ void SceneNode::detachObject(std::shared_ptr<Object> object) {
         throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
     }
 
-    if (!object->parent.expired()) {
+    if (this->objects.find(object) != this->objects.end()) {
         object->getParent()->objects.erase(object);
     }
 }
