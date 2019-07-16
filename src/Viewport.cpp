@@ -90,29 +90,30 @@ void Viewport::update() {
     }
 
     if (this->geometryBuffer == nullptr) {  // Defer construction till OpenGL context is ready
-        this->geometryBuffer = std::make_shared<GeometryBuffer>(this->width, this->height);
+        this->geometryBuffer = std::make_shared<GeometryBuffer>(this->width - this->left, this->height - this->top);
     }
 
-    auto bindGeometryBufferTextures = [this]() {
+    auto prepareGeometryOutput = [this]() {
         this->geometryBuffer->getDiffuseTexture()->bind(TEXTURE_DIFFUSE);
         this->geometryBuffer->getSpecularTexture()->bind(TEXTURE_SPECULAR);
         this->geometryBuffer->getPositionTexture()->bind(TEXTURE_POSITION);
         this->geometryBuffer->getNormalTexture()->bind(TEXTURE_NORMAL);
         this->geometryBuffer->getDepthTexture()->bind(TEXTURE_DEPTH);
+
+        glViewport(this->left, this->top, this->width, this->height);
     };
 
-    auto bindGeometryBuffer = [this]() {
+    auto prepareGeometryBuffer = [this]() {
         this->geometryBuffer->bind();
 
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
+        glViewport(0, 0, this->width - this->left, this->height - this->top);
     };
 
     auto& renderManager = GetRenderManager();
-    renderManager.pushState(std::make_pair("Bind Geometry Buffer Textures", bindGeometryBufferTextures));
-    renderManager.pushState(std::make_pair("Bind Geometry Buffer", bindGeometryBuffer));
-
-    glViewport(this->left, this->top, this->width, this->height);
+    renderManager.pushState(std::make_pair("Prepare geometry output", prepareGeometryOutput));
+    renderManager.pushState(std::make_pair("Prepare geometry buffer", prepareGeometryBuffer));
     renderManager.render(this->camera);
 }
 

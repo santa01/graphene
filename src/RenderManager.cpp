@@ -160,7 +160,7 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
         }
     });
 
-    this->popState();  // Geometry buffer textures
+    this->popState();  // Geometry output
     this->ambientShader->enable();
     this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->ambientShader->setUniform("ambientColor", scene->getAmbientColor());
