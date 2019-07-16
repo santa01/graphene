@@ -30,8 +30,6 @@ namespace Graphene {
 RenderTarget::RenderTarget(int width, int height):
         width(width),
         height(height) {
-    auto viewport = std::make_shared<Viewport>(0, 0, this->width, this->height);
-    this->viewports.insert(viewport);
 }
 
 int RenderTarget::getWidth() const {
@@ -51,6 +49,11 @@ void RenderTarget::setAutoUpdate(bool autoUpdate) {
 }
 
 const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getViewports() {
+    if (this->viewports.empty()) {
+        // Always provide a default viewport
+        this->addViewport(std::make_shared<Viewport>(0, 0, this->width, this->height));
+    }
+
     return this->viewports;
 }
 
@@ -63,6 +66,11 @@ void RenderTarget::addViewport(const std::shared_ptr<Viewport> viewport) {
 }
 
 const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getOverlays() {
+    if (this->overlays.empty()) {
+        // Always provide a default overlay
+        this->addOverlay(std::make_shared<Viewport>(0, 0, this->width, this->height));
+    }
+
     return this->overlays;
 }
 

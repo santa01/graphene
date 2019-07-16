@@ -35,31 +35,24 @@ class Viewport: public NonCopyable {
 public:
     GRAPHENE_API Viewport(int left, int top, int width, int height);
 
+    GRAPHENE_API int getLeft() const;
+    GRAPHENE_API int getTop() const;
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
+
     GRAPHENE_API std::shared_ptr<Camera> getCamera();
     GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
-
-    GRAPHENE_API int getLeft() const;
-    GRAPHENE_API void setLeft(int left);
-
-    GRAPHENE_API int getTop() const;
-    GRAPHENE_API void setTop(int top);
-
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API void setWidth(int width);
-
-    GRAPHENE_API int getHeight() const;
-    GRAPHENE_API void setHeight(int height);
 
     GRAPHENE_API void update();
 
 private:
-    std::shared_ptr<Camera> camera;
-    std::shared_ptr<GeometryBuffer> geometryBuffer;
-
     int left = 0;
     int top = 0;
     int width = 0;
     int height = 0;
+
+    std::shared_ptr<Camera> camera;
+    std::shared_ptr<GeometryBuffer> geometryBuffer;
 };
 
 }  // namespace Graphene

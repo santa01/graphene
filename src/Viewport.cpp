@@ -31,7 +31,24 @@ Viewport::Viewport(int left, int top, int width, int height):
         left(left),
         top(top),
         width(width),
-        height(height) {
+        height(height),
+        geometryBuffer(new GeometryBuffer(width - left, height - top)) {
+}
+
+int Viewport::getLeft() const {
+    return this->left;
+}
+
+int Viewport::getTop() const {
+    return this->top;
+}
+
+int Viewport::getWidth() const {
+    return this->width;
+}
+
+int Viewport::getHeight() const {
+    return this->height;
 }
 
 std::shared_ptr<Camera> Viewport::getCamera() {
@@ -44,39 +61,7 @@ void Viewport::setCamera(const std::shared_ptr<Camera> camera) {
     }
 
     this->camera = camera;
-    this->camera->setAspectRatio(this->width / (this->height / 1.0f));
-}
-
-int Viewport::getLeft() const {
-    return this->left;
-}
-
-void Viewport::setLeft(int left) {
-    this->left = left;
-}
-
-int Viewport::getTop() const {
-    return this->top;
-}
-
-void Viewport::setTop(int top) {
-    this->top = top;
-}
-
-int Viewport::getWidth() const {
-    return this->width;
-}
-
-void Viewport::setWidth(int width) {
-    this->width = width;
-}
-
-int Viewport::getHeight() const {
-    return this->height;
-}
-
-void Viewport::setHeight(int height) {
-    this->height = height;
+    this->camera->setAspectRatio(static_cast<float>(this->width) / static_cast<float>(this->height));
 }
 
 void Viewport::update() {
@@ -87,10 +72,6 @@ void Viewport::update() {
     auto parent = this->camera->getParent();
     if (parent == nullptr) {
         return;
-    }
-
-    if (this->geometryBuffer == nullptr) {  // Defer construction till OpenGL context is ready
-        this->geometryBuffer = std::make_shared<GeometryBuffer>(this->width - this->left, this->height - this->top);
     }
 
     auto prepareGeometryOutput = [this]() {
@@ -105,10 +86,10 @@ void Viewport::update() {
 
     auto prepareGeometryBuffer = [this]() {
         this->geometryBuffer->bind();
+        glViewport(0, 0, this->geometryBuffer->getWidth(), this->geometryBuffer->getHeight());
 
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
-        glViewport(0, 0, this->width - this->left, this->height - this->top);
     };
 
     auto& renderManager = GetRenderManager();
