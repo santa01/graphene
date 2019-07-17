@@ -24,6 +24,8 @@
 #include <OpenGL.h>
 #include <Logger.h>
 #include <ObjectManager.h>
+#include <RenderManager.h>
+#include <Shader.h>
 #if defined(_WIN32)
 #include <Win32Window.h>
 #elif defined(__linux__)
@@ -189,6 +191,12 @@ void Engine::setupOpenGL() {
 }
 
 void Engine::setupEngine() {
+    auto& renderManager = GetRenderManager();
+
+    renderManager.setGeometryOutputShader(std::make_shared<Shader>("shaders/geometry_output.shader"));
+    renderManager.setAmbientLightingShader(std::make_shared<Shader>("shaders/ambient_lighting.shader"));
+    renderManager.setDeferredLightingShader(std::make_shared<Shader>("shaders/deferred_lighting.shader"));
+
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));

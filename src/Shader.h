@@ -42,7 +42,6 @@ namespace Graphene {
 class Shader: public NonCopyable {
 public:
     GRAPHENE_API Shader(const std::string& name);
-    GRAPHENE_API Shader(const char* source, int sourceLength);
     GRAPHENE_API ~Shader();
 
     GRAPHENE_API void setUniform(const std::string& name, const Math::Mat4& value);
@@ -70,9 +69,8 @@ private:
     std::unordered_map<std::string, GLuint> uniformBlocks;
     std::string source;
 
-    static GLuint activeProgram;
     GLuint program = 0;
-    GLuint version = 0;
+    GLuint version = 330;
 };
 
 }  // namespace Graphene

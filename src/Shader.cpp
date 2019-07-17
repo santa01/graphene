@@ -31,8 +31,6 @@
 
 namespace Graphene {
 
-GLuint Shader::activeProgram = 0;
-
 Shader::Shader(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
     if (!file.good()) {
@@ -48,13 +46,6 @@ Shader::Shader(const std::string& name) {
     file.close();
 
     this->source = std::string(source.get(), sourceLength);
-    this->version = 330;
-    this->buildShader();
-}
-
-Shader::Shader(const char* source, int sourceLength) {
-    this->source = std::string(source, sourceLength);
-    this->version = 330;
     this->buildShader();
 }
 
@@ -122,10 +113,7 @@ GLuint Shader::getVersion() const {
 }
 
 void Shader::enable() {
-    if (this->program != Shader::activeProgram) {
-        Shader::activeProgram = this->program;
-        glUseProgram(this->program);
-    }
+    glUseProgram(this->program);
 }
 
 GLint Shader::checkoutUniform(const std::string& name) {

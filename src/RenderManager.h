@@ -32,6 +32,7 @@
 #include <functional>
 #include <stack>
 #include <algorithm>
+#include <unordered_map>
 #include <string>
 
 #define GetRenderManager() RenderManager::getInstance()
@@ -52,14 +53,14 @@ class RenderManager: public NonCopyable {
 public:
     GRAPHENE_API static RenderManager& getInstance();
 
-    GRAPHENE_API std::shared_ptr<Shader> getGeometryShader();
-    GRAPHENE_API void setGeometryShader(const std::shared_ptr<Shader> geometryShader);
+    GRAPHENE_API std::shared_ptr<Shader> getGeometryOutputShader();
+    GRAPHENE_API void setGeometryOutputShader(const std::shared_ptr<Shader> shader);
 
-    GRAPHENE_API std::shared_ptr<Shader> getAmbientShader();
-    GRAPHENE_API void setAmbientShader(const std::shared_ptr<Shader> ambientShader);
+    GRAPHENE_API std::shared_ptr<Shader> getAmbientLightingShader();
+    GRAPHENE_API void setAmbientLightingShader(const std::shared_ptr<Shader> shader);
 
-    GRAPHENE_API std::shared_ptr<Shader> getLightingShader();
-    GRAPHENE_API void setLightingShader(const std::shared_ptr<Shader> lightingShader);
+    GRAPHENE_API std::shared_ptr<Shader> getDeferredLightingShader();
+    GRAPHENE_API void setDeferredLightingShader(const std::shared_ptr<Shader> shader);
 
     GRAPHENE_API bool hasShadowPass() const;
     GRAPHENE_API void setShadowPass(bool shadowPass);
@@ -69,17 +70,22 @@ public:
 
     GRAPHENE_API void pushState(const RenderState& state);
     GRAPHENE_API void popState();
+
     GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 
 private:
     RenderManager();
+    void enableShader(std::shared_ptr<Shader> shader);
 
+    void renderEntities(const std::shared_ptr<Camera> camera);
+    void renderFrame(const std::shared_ptr<Camera> camera);
     void renderShadows(const std::shared_ptr<Camera> camera);
     void renderLights(const std::shared_ptr<Camera> camera);
 
-    std::shared_ptr<Shader> geometryShader;
-    std::shared_ptr<Shader> ambientShader;
-    std::shared_ptr<Shader> lightingShader;
+    std::shared_ptr<Shader> geometryOutputShader;
+    std::shared_ptr<Shader> ambientLightingShader;
+    std::shared_ptr<Shader> deferredLightingShader;
+    std::shared_ptr<Shader> activeShader;
 
     std::stack<RenderState> stateStack;
     std::shared_ptr<Mesh> frame;

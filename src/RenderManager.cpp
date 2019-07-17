@@ -26,7 +26,6 @@
 #include <Object.h>
 #include <Light.h>
 #include <Entity.h>
-#include <Sources.h>
 #include <Mat4.h>
 #include <stdexcept>
 
@@ -53,10 +52,7 @@ RenderManager& RenderManager::getInstance() {
     return instance;
 }
 
-RenderManager::RenderManager():
-        geometryShader(new Shader(Sources::geometryShader, sizeof(Sources::geometryShader))),
-        ambientShader(new Shader(Sources::ambientShader, sizeof(Sources::ambientShader))),
-        lightingShader(new Shader(Sources::lightingShader, sizeof(Sources::lightingShader))) {
+RenderManager::RenderManager() {
     FrameGeometry geometry = {
         { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f },
         {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
@@ -66,40 +62,40 @@ RenderManager::RenderManager():
     this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
 }
 
-std::shared_ptr<Shader> RenderManager::getGeometryShader() {
-    return this->geometryShader;
+std::shared_ptr<Shader> RenderManager::getGeometryOutputShader() {
+    return this->geometryOutputShader;
 }
 
-void RenderManager::setGeometryShader(const std::shared_ptr<Shader> geometryShader) {
-    if (geometryShader == nullptr) {
+void RenderManager::setGeometryOutputShader(const std::shared_ptr<Shader> shader) {
+    if (shader == nullptr) {
         throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
 
-    this->geometryShader = geometryShader;
+    this->geometryOutputShader = shader;
 }
 
-std::shared_ptr<Shader> RenderManager::getAmbientShader() {
-    return this->ambientShader;
+std::shared_ptr<Shader> RenderManager::getAmbientLightingShader() {
+    return this->ambientLightingShader;
 }
 
-void RenderManager::setAmbientShader(const std::shared_ptr<Shader> ambientShader) {
-    if (ambientShader == nullptr) {
+void RenderManager::setAmbientLightingShader(const std::shared_ptr<Shader> shader) {
+    if (shader == nullptr) {
         throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
 
-    this->ambientShader = ambientShader;
+    this->ambientLightingShader = shader;
 }
 
-std::shared_ptr<Shader> RenderManager::getLightingShader() {
-    return this->lightingShader;
+std::shared_ptr<Shader> RenderManager::getDeferredLightingShader() {
+    return this->deferredLightingShader;
 }
 
-void RenderManager::setLightingShader(const std::shared_ptr<Shader> lightingShader) {
-    if (lightingShader == nullptr) {
+void RenderManager::setDeferredLightingShader(const std::shared_ptr<Shader> shader) {
+    if (shader == nullptr) {
         throw std::invalid_argument(LogFormat("Shader cannot be nullptr"));
     }
 
-    this->lightingShader = lightingShader;
+    this->deferredLightingShader = shader;
 }
 
 bool RenderManager::hasShadowPass() const {
@@ -128,24 +124,48 @@ void RenderManager::popState() {
     state.second();
 }
 
+void RenderManager::enableShader(std::shared_ptr<Shader> shader) {
+    this->activeShader = shader;
+    this->activeShader->enable();
+}
+
 void RenderManager::render(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    this->popState();  // Geometry buffer
-    this->geometryShader->enable();
-    this->geometryShader->setUniformBlock("Material", BIND_MATERIAL);
-    this->geometryShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->popState();  // Bind geometry buffer
+    this->enableShader(this->geometryOutputShader);
+    this->renderEntities(camera);
+
+    this->popState();  // Bind geometry output textures
+    this->popState();  // Bind target framebuffer
+    this->enableShader(this->ambientLightingShader);
+    this->renderFrame(camera);
+
+    if (this->shadowPass) {
+        // this->enableShader(this->shadowMapShader);
+        this->renderShadows(camera);
+    }
+
+    if (this->lightPass) {
+        this->enableShader(this->deferredLightingShader);
+        this->renderLights(camera);
+    }
+}
+
+void RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
+    this->activeShader->setUniformBlock("Material", BIND_MATERIAL);
+    this->activeShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
     // Modelview -> project
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
     Math::Mat4 modelViewProjection = camera->getProjection() * scene->calculateModelView(camera);
-    this->geometryShader->setUniform("modelViewProjection", modelViewProjection);
+    this->activeShader->setUniform("modelViewProjection", modelViewProjection);
 
     scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld) {
-        this->geometryShader->setUniform("normalRotation", entity->getRotation());
-        this->geometryShader->setUniform("localWorld", localWorld);
+        this->activeShader->setUniform("normalRotation", entity->getRotation());
+        this->activeShader->setUniform("localWorld", localWorld);
 
         for (auto& mesh: entity->getMeshes()) {
             auto material = mesh->getMaterial();
@@ -159,23 +179,16 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
             mesh->render();
         }
     });
+}
 
-    this->popState();  // Geometry output
-    this->ambientShader->enable();
-    this->ambientShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
-    this->ambientShader->setUniform("ambientColor", scene->getAmbientColor());
-    this->ambientShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
+void RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
+    std::shared_ptr<Scene> scene = camera->getParent()->getScene();
 
-    this->popState();  // Target frame buffer
+    this->activeShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->activeShader->setUniform("ambientColor", scene->getAmbientColor());
+    this->activeShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
+
     this->frame->render();
-
-    if (this->shadowPass) {
-        renderShadows(camera);
-    }
-
-    if (this->lightPass) {
-        renderLights(camera);
-    }
 }
 
 void RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
@@ -183,22 +196,21 @@ void RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
 }
 
 void RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
-    this->lightingShader->enable();
-    this->lightingShader->setUniformBlock("Light", BIND_LIGHT);
+    this->activeShader->setUniformBlock("Light", BIND_LIGHT);
 
-    this->lightingShader->setUniform("specularSampler", TEXTURE_SPECULAR);
-    this->lightingShader->setUniform("positionSampler", TEXTURE_POSITION);
-    this->lightingShader->setUniform("normalSampler", TEXTURE_NORMAL);
-    this->lightingShader->setUniform("depthSampler", TEXTURE_DEPTH);
+    this->activeShader->setUniform("specularSampler", TEXTURE_SPECULAR);
+    this->activeShader->setUniform("positionSampler", TEXTURE_POSITION);
+    this->activeShader->setUniform("normalSampler", TEXTURE_NORMAL);
+    this->activeShader->setUniform("depthSampler", TEXTURE_DEPTH);
 
-    this->lightingShader->setUniform("cameraPosition", camera->getPosition());
+    this->activeShader->setUniform("cameraPosition", camera->getPosition());
 
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
     scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& rotation) {
         light->getLightBuffer()->bind(BIND_LIGHT);
 
-        this->lightingShader->setUniform("lightPosition", position);
-        this->lightingShader->setUniform("lightDirection", rotation);
+        this->activeShader->setUniform("lightPosition", position);
+        this->activeShader->setUniform("lightDirection", rotation);
 
         this->frame->render();
     });
