@@ -31,8 +31,7 @@ Viewport::Viewport(int left, int top, int width, int height):
         left(left),
         top(top),
         width(width),
-        height(height),
-        geometryBuffer(new GeometryBuffer(width - left, height - top)) {
+        height(height) {
 }
 
 int Viewport::getLeft() const {
@@ -74,28 +73,16 @@ void Viewport::update() {
         return;
     }
 
-    auto prepareGeometryOutput = [this]() {
-        this->geometryBuffer->getDiffuseTexture()->bind(TEXTURE_DIFFUSE);
-        this->geometryBuffer->getSpecularTexture()->bind(TEXTURE_SPECULAR);
-        this->geometryBuffer->getPositionTexture()->bind(TEXTURE_POSITION);
-        this->geometryBuffer->getNormalTexture()->bind(TEXTURE_NORMAL);
-        this->geometryBuffer->getDepthTexture()->bind(TEXTURE_DEPTH);
-
+    auto setupViewport = [this]() {
         glViewport(this->left, this->top, this->width, this->height);
     };
 
-    auto prepareGeometryBuffer = [this]() {
-        this->geometryBuffer->bind();
-        glViewport(0, 0, this->geometryBuffer->getWidth(), this->geometryBuffer->getHeight());
-
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-    };
-
     auto& renderManager = GetRenderManager();
-    renderManager.pushState(std::make_pair("Prepare geometry output", prepareGeometryOutput));
-    renderManager.pushState(std::make_pair("Prepare geometry buffer", prepareGeometryBuffer));
-    renderManager.render(this->camera);
+    renderManager.pushState(std::make_pair("Setup Viewport", setupViewport));
+
+    int frameWidth = this->width - this->left;
+    int frameHeight = this->height - this->top;
+    renderManager.renderIndirect(this->camera, frameWidth, frameHeight);
 }
 
 }  // namespace Graphene

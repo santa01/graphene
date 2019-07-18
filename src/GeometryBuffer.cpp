@@ -80,6 +80,11 @@ void GeometryBuffer::bind() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
     glDrawBuffers(4, this->drawBuffers);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+    glViewport(0, 0, this->width, this->height);
 }
 
 }  // namespace Graphene

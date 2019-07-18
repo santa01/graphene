@@ -25,14 +25,14 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <GeometryBuffer.h>
 #include <Camera.h>
 #include <Shader.h>
 #include <Mesh.h>
 #include <memory>
 #include <functional>
 #include <stack>
-#include <algorithm>
-#include <unordered_map>
+#include <utility>
 #include <string>
 
 #define GetRenderManager() RenderManager::getInstance()
@@ -71,11 +71,14 @@ public:
     GRAPHENE_API void pushState(const RenderState& state);
     GRAPHENE_API void popState();
 
-    GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void renderDirect(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void renderIndirect(const std::shared_ptr<Camera> camera, int frameWidth, int frameHeight);
 
 private:
     RenderManager();
+
     void enableShader(std::shared_ptr<Shader> shader);
+    std::shared_ptr<GeometryBuffer> getGeometryBuffer(int width, int height);
 
     void renderEntities(const std::shared_ptr<Camera> camera);
     void renderFrame(const std::shared_ptr<Camera> camera);
@@ -87,6 +90,7 @@ private:
     std::shared_ptr<Shader> deferredLightingShader;
     std::shared_ptr<Shader> activeShader;
 
+    std::vector<std::shared_ptr<GeometryBuffer>> geometryBuffers;
     std::stack<RenderState> stateStack;
     std::shared_ptr<Mesh> frame;
 

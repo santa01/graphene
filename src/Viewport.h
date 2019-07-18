@@ -25,7 +25,6 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <GeometryBuffer.h>
 #include <Camera.h>
 #include <memory>
 
@@ -52,7 +51,6 @@ private:
     int height = 0;
 
     std::shared_ptr<Camera> camera;
-    std::shared_ptr<GeometryBuffer> geometryBuffer;
 };
 
 }  // namespace Graphene

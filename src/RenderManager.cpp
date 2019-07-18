@@ -28,6 +28,7 @@
 #include <Entity.h>
 #include <Mat4.h>
 #include <stdexcept>
+#include <algorithm>
 
 namespace Graphene {
 
@@ -60,6 +61,25 @@ RenderManager::RenderManager() {
         { 0, 1, 3, 1, 2, 3 }
     };
     this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
+}
+
+void RenderManager::enableShader(std::shared_ptr<Shader> shader) {
+    this->activeShader = shader;
+    this->activeShader->enable();
+}
+
+std::shared_ptr<GeometryBuffer> RenderManager::getGeometryBuffer(int width, int height) {
+    auto geometryBuffer = std::find_if(this->geometryBuffers.begin(), this->geometryBuffers.end(),
+        [width, height](std::shared_ptr<GeometryBuffer> buffer) {
+            return buffer->getWidth() == width && buffer->getHeight() == height;
+        });
+
+    if (geometryBuffer == this->geometryBuffers.end()) {
+        this->geometryBuffers.push_back(std::make_shared<GeometryBuffer>(width, height));
+        geometryBuffer = --this->geometryBuffers.end();
+    }
+
+    return *geometryBuffer;
 }
 
 std::shared_ptr<Shader> RenderManager::getGeometryOutputShader() {
@@ -124,22 +144,38 @@ void RenderManager::popState() {
     state.second();
 }
 
-void RenderManager::enableShader(std::shared_ptr<Shader> shader) {
-    this->activeShader = shader;
-    this->activeShader->enable();
-}
-
-void RenderManager::render(const std::shared_ptr<Camera> camera) {
+void RenderManager::renderDirect(const std::shared_ptr<Camera> camera) {
     if (camera == nullptr) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    this->popState();  // Bind geometry buffer
+    this->popState();  // Setup viewport
+    this->popState();  // Bind target buffer
+
+    this->enableShader(this->ambientLightingShader);
+    this->renderEntities(camera);
+}
+
+void RenderManager::renderIndirect(const std::shared_ptr<Camera> camera, int frameWidth, int frameHeight) {
+    if (camera == nullptr) {
+        throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
+    }
+
+    auto geometryBuffer = this->getGeometryBuffer(frameWidth, frameHeight);
+    geometryBuffer->bind();
+
     this->enableShader(this->geometryOutputShader);
     this->renderEntities(camera);
 
-    this->popState();  // Bind geometry output textures
-    this->popState();  // Bind target framebuffer
+    geometryBuffer->getDiffuseTexture()->bind(TEXTURE_DIFFUSE);
+    geometryBuffer->getSpecularTexture()->bind(TEXTURE_SPECULAR);
+    geometryBuffer->getPositionTexture()->bind(TEXTURE_POSITION);
+    geometryBuffer->getNormalTexture()->bind(TEXTURE_NORMAL);
+    geometryBuffer->getDepthTexture()->bind(TEXTURE_DEPTH);
+
+    this->popState();  // Setup viewport
+    this->popState();  // Bind target buffer
+
     this->enableShader(this->ambientLightingShader);
     this->renderFrame(camera);
 
