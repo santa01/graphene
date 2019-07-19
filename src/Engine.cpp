@@ -25,6 +25,7 @@
 #include <Logger.h>
 #include <ObjectManager.h>
 #include <RenderManager.h>
+#include <EngineConfig.h>
 #include <Shader.h>
 #if defined(_WIN32)
 #include <Win32Window.h>
@@ -193,9 +194,15 @@ void Engine::setupOpenGL() {
 void Engine::setupEngine() {
     auto& renderManager = GetRenderManager();
 
-    renderManager.setGeometryOutputShader(std::make_shared<Shader>("shaders/geometry_output.shader"));
-    renderManager.setAmbientLightingShader(std::make_shared<Shader>("shaders/ambient_lighting.shader"));
-    renderManager.setDeferredLightingShader(std::make_shared<Shader>("shaders/deferred_lighting.shader"));
+    auto geometryOutputShader = std::make_shared<Shader>("shaders/geometry_output.shader");
+    renderManager.setShader(RenderStep::GEOMETRY, geometryOutputShader);
+
+    auto ambientLightingShader = std::make_shared<Shader>("shaders/ambient_lighting.shader");
+    renderManager.setShader(RenderStep::OVERLAY, ambientLightingShader);
+    renderManager.setShader(RenderStep::FRAME, ambientLightingShader);
+
+    auto deferredLightingShader = std::make_shared<Shader>("shaders/deferred_lighting.shader");
+    renderManager.setShader(RenderStep::LIGHTS, deferredLightingShader);
 
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
@@ -204,9 +211,7 @@ void Engine::setupEngine() {
 
 void Engine::update() {
     for (auto& frameBuffer: this->frameBuffers) {
-        if (frameBuffer->isAutoUpdate()) {
-            frameBuffer->update();
-        }
+        frameBuffer->update();
     }
 
     this->window->update();

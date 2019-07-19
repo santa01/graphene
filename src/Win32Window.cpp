@@ -149,11 +149,6 @@ void Win32Window::captureMouse(bool captured) {
     ShowCursor(this->mouseCaptured ? FALSE : TRUE);
 }
 
-void Win32Window::update() {
-    RenderTarget::update();
-    this->swapBuffers();
-}
-
 bool Win32Window::dispatchEvents() {
     MSG message;
     bool breakOrbit = false;

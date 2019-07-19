@@ -21,17 +21,17 @@
  */
 
 #include <GeometryBuffer.h>
+#include <RenderManager.h>
 
 namespace Graphene {
 
 GeometryBuffer::GeometryBuffer(int width, int height):
+        RenderTarget(width, height),
         diffuseTexture(new GeometryTexture(width, height)),
         specularTexture(new GeometryTexture(width, height)),
         positionTexture(new GeometryTexture(width, height)),
         normalTexture(new GeometryTexture(width, height)),
-        depthTexture(new DepthTexture(width, height)),
-        width(width),
-        height(height) {
+        depthTexture(new DepthTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
 
@@ -48,43 +48,40 @@ GeometryBuffer::~GeometryBuffer() {
     glDeleteFramebuffers(1, &this->fbo);
 }
 
-int GeometryBuffer::getWidth() const {
-    return this->width;
-}
-
-int GeometryBuffer::getHeight() const {
-    return this->height;
-}
-
-std::shared_ptr<GeometryTexture> GeometryBuffer::getDiffuseTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getDiffuseTexture() const {
     return this->diffuseTexture;
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getSpecularTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getSpecularTexture() const {
     return this->specularTexture;
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getPositionTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getPositionTexture() const {
     return this->positionTexture;
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getNormalTexture() {
+std::shared_ptr<GeometryTexture> GeometryBuffer::getNormalTexture() const {
     return this->normalTexture;
 }
 
-std::shared_ptr<DepthTexture> GeometryBuffer::getDepthTexture() {
+std::shared_ptr<DepthTexture> GeometryBuffer::getDepthTexture() const {
     return this->depthTexture;
 }
 
-void GeometryBuffer::bind() {
+void GeometryBuffer::update() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-    glDrawBuffers(4, this->drawBuffers);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+    glDrawBuffers(4, drawBuffers);
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport(0, 0, this->width, this->height);
+    for (auto& viewport: this->viewports) {
+        GetRenderManager().setRenderStep(RenderStep::GEOMETRY);
+        viewport->update();
+    }
 }
 
 }  // namespace Graphene

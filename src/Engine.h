@@ -25,7 +25,6 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <EngineConfig.h>
 #include <FrameBuffer.h>
 #include <Window.h>
 #include <Scene.h>

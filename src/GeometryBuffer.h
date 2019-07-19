@@ -24,7 +24,7 @@
 #define GEOMETRYBUFFER_H
 
 #include <GrapheneApi.h>
-#include <NonCopyable.h>
+#include <RenderTarget.h>
 #include <GeometryTexture.h>
 #include <DepthTexture.h>
 #include <OpenGL.h>
@@ -42,21 +42,18 @@ namespace Graphene {
  * Tex4 (D16):     | depth      |
  */
 
-class GeometryBuffer: public NonCopyable {
+class GeometryBuffer: public RenderTarget {
 public:
     GRAPHENE_API GeometryBuffer(int width, int height);
     GRAPHENE_API ~GeometryBuffer();
 
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getDiffuseTexture() const;
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getSpecularTexture() const;
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getPositionTexture() const;
+    GRAPHENE_API std::shared_ptr<GeometryTexture> getNormalTexture() const;
+    GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture() const;
 
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getDiffuseTexture();
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getSpecularTexture();
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getPositionTexture();
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getNormalTexture();
-    GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture();
-
-    GRAPHENE_API void bind();
+    GRAPHENE_API void update() override;
 
 private:
     std::shared_ptr<GeometryTexture> diffuseTexture;
@@ -64,12 +61,6 @@ private:
     std::shared_ptr<GeometryTexture> positionTexture;
     std::shared_ptr<GeometryTexture> normalTexture;
     std::shared_ptr<DepthTexture> depthTexture;
-
-    GLenum drawBuffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-    GLuint fbo = 0;
-
-    int width = 0;
-    int height = 0;
 };
 
 }  // namespace Graphene

@@ -25,15 +25,12 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <GeometryBuffer.h>
 #include <Camera.h>
 #include <Shader.h>
 #include <Mesh.h>
+#include <utility>
 #include <memory>
 #include <functional>
-#include <stack>
-#include <utility>
-#include <string>
 
 #define GetRenderManager() RenderManager::getInstance()
 
@@ -47,20 +44,11 @@ enum TextureUnits {
     TEXTURE_DEPTH
 };
 
-typedef std::pair<std::string, std::function<void()>> RenderState;
+enum class RenderStep { OVERLAY, FRAMEBUFFER, GEOMETRY, FRAME, SHADOWS, LIGHTS, FINISH };
 
 class RenderManager: public NonCopyable {
 public:
     GRAPHENE_API static RenderManager& getInstance();
-
-    GRAPHENE_API std::shared_ptr<Shader> getGeometryOutputShader();
-    GRAPHENE_API void setGeometryOutputShader(const std::shared_ptr<Shader> shader);
-
-    GRAPHENE_API std::shared_ptr<Shader> getAmbientLightingShader();
-    GRAPHENE_API void setAmbientLightingShader(const std::shared_ptr<Shader> shader);
-
-    GRAPHENE_API std::shared_ptr<Shader> getDeferredLightingShader();
-    GRAPHENE_API void setDeferredLightingShader(const std::shared_ptr<Shader> shader);
 
     GRAPHENE_API bool hasShadowPass() const;
     GRAPHENE_API void setShadowPass(bool shadowPass);
@@ -68,30 +56,27 @@ public:
     GRAPHENE_API bool hasLightPass() const;
     GRAPHENE_API void setLightPass(bool lightPass);
 
-    GRAPHENE_API void pushState(const RenderState& state);
-    GRAPHENE_API void popState();
+    GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep step) const;
+    GRAPHENE_API void setShader(RenderStep step, std::shared_ptr<Shader> shader);
 
-    GRAPHENE_API void renderDirect(const std::shared_ptr<Camera> camera);
-    GRAPHENE_API void renderIndirect(const std::shared_ptr<Camera> camera, int frameWidth, int frameHeight);
+    GRAPHENE_API RenderStep getRenderStep() const;
+    GRAPHENE_API void setRenderStep(RenderStep step);
+
+    GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 
 private:
     RenderManager();
 
-    void enableShader(std::shared_ptr<Shader> shader);
-    std::shared_ptr<GeometryBuffer> getGeometryBuffer(int width, int height);
+    RenderStep renderEntities(const std::shared_ptr<Camera> camera);
+    RenderStep renderFrame(const std::shared_ptr<Camera> camera);
+    RenderStep renderShadows(const std::shared_ptr<Camera> camera);
+    RenderStep renderLights(const std::shared_ptr<Camera> camera);
 
-    void renderEntities(const std::shared_ptr<Camera> camera);
-    void renderFrame(const std::shared_ptr<Camera> camera);
-    void renderShadows(const std::shared_ptr<Camera> camera);
-    void renderLights(const std::shared_ptr<Camera> camera);
+    RenderStep step = RenderStep::FINISH;
+    std::unordered_map<RenderStep, std::shared_ptr<Shader>> shaders;
+    std::unordered_map<RenderStep, std::function<RenderStep(const std::shared_ptr<Camera>)>> renderers;
 
-    std::shared_ptr<Shader> geometryOutputShader;
-    std::shared_ptr<Shader> ambientLightingShader;
-    std::shared_ptr<Shader> deferredLightingShader;
-    std::shared_ptr<Shader> activeShader;
-
-    std::vector<std::shared_ptr<GeometryBuffer>> geometryBuffers;
-    std::stack<RenderState> stateStack;
+    std::shared_ptr<Shader> shader;
     std::shared_ptr<Mesh> frame;
 
     bool shadowPass = false;

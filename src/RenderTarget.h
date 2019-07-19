@@ -40,27 +40,18 @@ public:
     GRAPHENE_API int getWidth() const;
     GRAPHENE_API int getHeight() const;
 
-    GRAPHENE_API bool isAutoUpdate() const;
-    GRAPHENE_API void setAutoUpdate(bool autoUpdate);
+    GRAPHENE_API virtual const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() const;
+    GRAPHENE_API virtual std::shared_ptr<Viewport> createViewport(int left, int top, int width, int height);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Viewport>>& getViewports();
-    GRAPHENE_API void addViewport(const std::shared_ptr<Viewport> viewport);
-
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Viewport>>& getOverlays();
-    GRAPHENE_API void addOverlay(const std::shared_ptr<Viewport> overlay);
-
-    GRAPHENE_API void update();
+    GRAPHENE_API virtual void update() = 0;
 
 protected:
-    std::unordered_set<std::shared_ptr<Viewport>> viewports;
-    std::unordered_set<std::shared_ptr<Viewport>> overlays;
-
-    GLenum drawBuffer = GL_FRONT;
     GLuint fbo = 0;
 
     int width = 0;
     int height = 0;
-    bool autoUpdate = true;
+
+    std::unordered_set<std::shared_ptr<Viewport>> viewports;
 };
 
 }  // namespace Graphene

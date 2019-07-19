@@ -22,12 +22,13 @@
 
 #include <Window.h>
 #include <OpenGL.h>
+#include <RenderManager.h>
+#include <algorithm>
 
 namespace Graphene {
 
 Window::Window(int width, int height):
         RenderTarget(width, height) {
-    this->drawBuffer = GL_BACK;  // Double buffered
 }
 
 const KeyboardState& Window::getKeyboardState() const {
@@ -44,6 +45,61 @@ const MousePosition& Window::getMousePosition() const {
 
 bool Window::isMouseCaptured() const {
     return this->mouseCaptured;
+}
+
+const std::unordered_set<std::shared_ptr<Viewport>>& Window::getOverlays() const {
+    return this->overlays;
+}
+
+std::shared_ptr<Viewport> Window::createOverlay(int left, int top, int width, int height) {
+    auto overlay = std::make_shared<Viewport>(left, top, width, height);
+    this->overlays.insert(overlay);
+
+    return overlay;
+}
+
+std::shared_ptr<Viewport> Window::createViewport(int left, int top, int width, int height) {
+    auto geometryBuffer = std::make_shared<GeometryBuffer>(width, height);
+    auto geometryViewport = geometryBuffer->createViewport(0, 0, width, height);
+
+    this->geometryBuffers.insert(geometryBuffer);
+    return RenderTarget::createViewport(left, top, width, height);
+}
+
+void Window::update() {
+    for (auto& viewport: this->viewports) {
+        auto geometryFinder = [&viewport](std::shared_ptr<GeometryBuffer> buffer) {
+            return buffer->getWidth() == viewport->getWidth() && buffer->getHeight() == viewport->getHeight();
+        };
+
+        auto geometryBuffer = *std::find_if(this->geometryBuffers.begin(), this->geometryBuffers.end(), geometryFinder);
+        auto geometryViewport = *geometryBuffer->getViewports().begin();
+        geometryViewport->setCamera(viewport->getCamera());
+
+        geometryBuffer->update();
+        geometryBuffer->getDiffuseTexture()->bind(TEXTURE_DIFFUSE);
+        geometryBuffer->getSpecularTexture()->bind(TEXTURE_SPECULAR);
+        geometryBuffer->getPositionTexture()->bind(TEXTURE_POSITION);
+        geometryBuffer->getNormalTexture()->bind(TEXTURE_NORMAL);
+        geometryBuffer->getDepthTexture()->bind(TEXTURE_DEPTH);
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+        glDrawBuffer(GL_BACK);  // Double buffered
+
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        GetRenderManager().setRenderStep(RenderStep::FRAME);
+        viewport->update();
+    }
+
+    for (auto& overlay: this->overlays) {
+        GetRenderManager().setRenderStep(RenderStep::OVERLAY);
+        overlay->update();
+    }
+
+    this->swapBuffers();
 }
 
 }  // namespace Graphene

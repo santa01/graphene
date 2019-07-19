@@ -21,6 +21,7 @@
  */
 
 #include <FrameBuffer.h>
+#include <RenderManager.h>
 #include <OpenGL.h>
 
 namespace Graphene {
@@ -30,10 +31,7 @@ FrameBuffer::FrameBuffer(int width, int height):
         colorTexture(new ImageTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->colorTexture->getHandle(), 0);
-    this->drawBuffer = GL_COLOR_ATTACHMENT0;
-
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
@@ -41,8 +39,24 @@ FrameBuffer::~FrameBuffer() {
     glDeleteFramebuffers(1, &this->fbo);
 }
 
-std::shared_ptr<ImageTexture> FrameBuffer::getColorTexture() {
+std::shared_ptr<ImageTexture> FrameBuffer::getColorTexture() const {
     return this->colorTexture;
+}
+
+void FrameBuffer::update() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, drawBuffers);
+
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    for (auto& viewport: this->viewports) {
+        GetRenderManager().setRenderStep(RenderStep::FRAMEBUFFER);
+        viewport->update();
+    }
 }
 
 }  // namespace Graphene

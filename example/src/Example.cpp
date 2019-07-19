@@ -112,14 +112,15 @@ void Example::onSetup() {
     this->node->attachObject(this->entity3);
     this->node->attachObject(lightBulb);
 
-    /* Update default viewport with camera */
-
-    auto viewport = *this->getWindow()->getViewports().begin();
-    viewport->setCamera(this->camera);
-
     /* Keep mouse inside the window */
 
-    this->getWindow()->captureMouse(true);
+    auto window = this->getWindow();
+    window->captureMouse(true);
+
+    /* Update default viewport with camera */
+
+    auto viewport = window->createViewport(0, 0, window->getWidth(), window->getHeight());
+    viewport->setCamera(this->camera);
 }
 
 void Example::onIdle() {

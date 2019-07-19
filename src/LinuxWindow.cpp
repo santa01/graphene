@@ -60,11 +60,6 @@ void LinuxWindow::captureMouse(bool captured) {
     }
 }
 
-void LinuxWindow::update() {
-    RenderTarget::update();
-    this->swapBuffers();
-}
-
 bool LinuxWindow::dispatchEvents() {
     XEvent event;
     bool breakOrbit = false;

@@ -35,7 +35,9 @@ public:
     GRAPHENE_API FrameBuffer(int width, int height);
     GRAPHENE_API ~FrameBuffer();
 
-    GRAPHENE_API std::shared_ptr<ImageTexture> getColorTexture();
+    GRAPHENE_API std::shared_ptr<ImageTexture> getColorTexture() const;
+
+    GRAPHENE_API void update() override;
 
 private:
     std::shared_ptr<ImageTexture> colorTexture;

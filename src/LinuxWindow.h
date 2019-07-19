@@ -37,7 +37,6 @@ public:
     GRAPHENE_API ~LinuxWindow();
 
     GRAPHENE_API void captureMouse(bool captured) override;
-    GRAPHENE_API void update() override;
     GRAPHENE_API bool dispatchEvents() override;
     GRAPHENE_API void swapBuffers() override;
 

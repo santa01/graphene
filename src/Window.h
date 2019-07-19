@@ -25,9 +25,12 @@
 
 #include <GrapheneApi.h>
 #include <RenderTarget.h>
+#include <GeometryBuffer.h>
+#include <Viewport.h>
 #include <Signals.h>
 #include <array>
 #include <utility>
+#include <unordered_set>
 
 namespace Graphene {
 
@@ -57,9 +60,14 @@ public:
     GRAPHENE_API bool isMouseCaptured() const;
 
     GRAPHENE_API virtual void captureMouse(bool captured) = 0;
-    GRAPHENE_API virtual void update() = 0;
     GRAPHENE_API virtual bool dispatchEvents() = 0;
     GRAPHENE_API virtual void swapBuffers() = 0;
+
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Viewport>>& getOverlays() const;
+    GRAPHENE_API std::shared_ptr<Viewport> createOverlay(int left, int top, int width, int height);
+
+    GRAPHENE_API std::shared_ptr<Viewport> createViewport(int left, int top, int width, int height) override;
+    GRAPHENE_API void update() override;
 
 protected:
     friend class Engine;
@@ -71,6 +79,9 @@ protected:
     MouseState mouseState = { };
     MousePosition mousePosition = { };
     bool mouseCaptured = false;
+
+    std::unordered_set<std::shared_ptr<GeometryBuffer>> geometryBuffers;
+    std::unordered_set<std::shared_ptr<Viewport>> overlays;
 };
 
 }  // namespace Graphene

@@ -23,7 +23,7 @@
 #include <Viewport.h>
 #include <Logger.h>
 #include <RenderManager.h>
-#include <SceneNode.h>
+#include <stdexcept>
 
 namespace Graphene {
 
@@ -68,21 +68,8 @@ void Viewport::update() {
         return;
     }
 
-    auto parent = this->camera->getParent();
-    if (parent == nullptr) {
-        return;
-    }
-
-    auto setupViewport = [this]() {
-        glViewport(this->left, this->top, this->width, this->height);
-    };
-
-    auto& renderManager = GetRenderManager();
-    renderManager.pushState(std::make_pair("Setup Viewport", setupViewport));
-
-    int frameWidth = this->width - this->left;
-    int frameHeight = this->height - this->top;
-    renderManager.renderIndirect(this->camera, frameWidth, frameHeight);
+    glViewport(this->left, this->top, this->width, this->height);
+    GetRenderManager().render(this->camera);
 }
 
 }  // namespace Graphene
