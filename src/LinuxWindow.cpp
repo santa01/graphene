@@ -62,7 +62,7 @@ void LinuxWindow::captureMouse(bool captured) {
 
 void LinuxWindow::update() {
     RenderTarget::update();
-    glXSwapBuffers(this->display, this->window);
+    this->swapBuffers();
 }
 
 bool LinuxWindow::dispatchEvents() {
@@ -130,6 +130,10 @@ bool LinuxWindow::dispatchEvents() {
     }
 
     return breakOrbit;
+}
+
+void LinuxWindow::swapBuffers() {
+    glXSwapBuffers(this->display, this->window);
 }
 
 void LinuxWindow::createWindow(const char* windowName) {

@@ -39,6 +39,7 @@ public:
     GRAPHENE_API void captureMouse(bool captured) override;
     GRAPHENE_API void update() override;
     GRAPHENE_API bool dispatchEvents() override;
+    GRAPHENE_API void swapBuffers() override;
 
 private:
     friend LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);

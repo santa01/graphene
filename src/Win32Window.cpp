@@ -151,7 +151,7 @@ void Win32Window::captureMouse(bool captured) {
 
 void Win32Window::update() {
     RenderTarget::update();
-    SwapBuffers(this->deviceContext);
+    this->swapBuffers();
 }
 
 bool Win32Window::dispatchEvents() {
@@ -168,6 +168,10 @@ bool Win32Window::dispatchEvents() {
     }
 
     return breakOrbit;
+}
+
+void Win32Window::swapBuffers() {
+    SwapBuffers(this->deviceContext);
 }
 
 HWND Win32Window::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc) {

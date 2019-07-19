@@ -59,6 +59,7 @@ public:
     GRAPHENE_API virtual void captureMouse(bool captured) = 0;
     GRAPHENE_API virtual void update() = 0;
     GRAPHENE_API virtual bool dispatchEvents() = 0;
+    GRAPHENE_API virtual void swapBuffers() = 0;
 
 protected:
     friend class Engine;
