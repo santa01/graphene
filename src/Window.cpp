@@ -95,7 +95,7 @@ void Window::update() {
     }
 
     for (auto& overlay: this->overlays) {
-        GetRenderManager().setRenderStep(RenderStep::OVERLAY);
+        GetRenderManager().setRenderStep(RenderStep::BUFFER);
         overlay->update();
     }
 

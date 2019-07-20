@@ -44,7 +44,7 @@ enum TextureUnits {
     TEXTURE_DEPTH
 };
 
-enum class RenderStep { OVERLAY, FRAMEBUFFER, GEOMETRY, FRAME, SHADOWS, LIGHTS, FINISH };
+enum class RenderStep { BUFFER, GEOMETRY, FRAME, SHADOWS, LIGHTS, NONE };
 
 class RenderManager: public NonCopyable {
 public:
@@ -72,7 +72,7 @@ private:
     RenderStep renderShadows(const std::shared_ptr<Camera> camera);
     RenderStep renderLights(const std::shared_ptr<Camera> camera);
 
-    RenderStep step = RenderStep::FINISH;
+    RenderStep step = RenderStep::NONE;
     std::unordered_map<RenderStep, std::shared_ptr<Shader>> shaders;
     std::unordered_map<RenderStep, std::function<RenderStep(const std::shared_ptr<Camera>)>> renderers;
 

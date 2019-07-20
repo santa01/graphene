@@ -198,7 +198,7 @@ void Engine::setupEngine() {
     renderManager.setShader(RenderStep::GEOMETRY, geometryOutputShader);
 
     auto ambientLightingShader = std::make_shared<Shader>("shaders/ambient_lighting.shader");
-    renderManager.setShader(RenderStep::OVERLAY, ambientLightingShader);
+    renderManager.setShader(RenderStep::BUFFER, ambientLightingShader);
     renderManager.setShader(RenderStep::FRAME, ambientLightingShader);
 
     auto deferredLightingShader = std::make_shared<Shader>("shaders/deferred_lighting.shader");

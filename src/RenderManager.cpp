@@ -62,20 +62,18 @@ RenderManager::RenderManager() {
     this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
 
     this->shaders = {
-        { RenderStep::OVERLAY,     nullptr },
-        { RenderStep::FRAMEBUFFER, nullptr },
-        { RenderStep::GEOMETRY,    nullptr },
-        { RenderStep::FRAME,       nullptr },
-        { RenderStep::SHADOWS,     nullptr },
-        { RenderStep::LIGHTS,      nullptr }
+        { RenderStep::BUFFER,   nullptr },
+        { RenderStep::GEOMETRY, nullptr },
+        { RenderStep::FRAME,    nullptr },
+        { RenderStep::SHADOWS,  nullptr },
+        { RenderStep::LIGHTS,   nullptr }
     };
     this->renderers = {
-        { RenderStep::OVERLAY,     std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
-        { RenderStep::FRAMEBUFFER, std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
-        { RenderStep::GEOMETRY,    std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
-        { RenderStep::FRAME,       std::bind(&RenderManager::renderFrame, this, std::placeholders::_1) },
-        { RenderStep::SHADOWS,     std::bind(&RenderManager::renderShadows, this, std::placeholders::_1) },
-        { RenderStep::LIGHTS,      std::bind(&RenderManager::renderLights, this, std::placeholders::_1) }
+        { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
+        { RenderStep::GEOMETRY, std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
+        { RenderStep::FRAME,    std::bind(&RenderManager::renderFrame, this, std::placeholders::_1) },
+        { RenderStep::SHADOWS,  std::bind(&RenderManager::renderShadows, this, std::placeholders::_1) },
+        { RenderStep::LIGHTS,   std::bind(&RenderManager::renderLights, this, std::placeholders::_1) }
     };
 }
 
@@ -116,7 +114,7 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    while (this->step != RenderStep::FINISH) {
+    while (this->step != RenderStep::NONE) {
         this->shader = this->shaders.at(this->step);
         this->shader->enable();
 
@@ -151,7 +149,7 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
         }
     });
 
-    return RenderStep::FINISH;
+    return RenderStep::NONE;
 }
 
 RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
@@ -170,7 +168,7 @@ RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
         return RenderStep::LIGHTS;
     }
 
-    return RenderStep::FINISH;
+    return RenderStep::NONE;
 }
 
 RenderStep RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
@@ -178,7 +176,7 @@ RenderStep RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/
         return RenderStep::LIGHTS;
     }
 
-    return RenderStep::FINISH;
+    return RenderStep::NONE;
 }
 
 RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
@@ -201,7 +199,7 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
         this->frame->render();
     });
 
-    return RenderStep::FINISH;
+    return RenderStep::NONE;
 }
 
 }  // namespace Graphene
