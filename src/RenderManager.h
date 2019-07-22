@@ -44,7 +44,7 @@ enum TextureUnits {
     TEXTURE_DEPTH
 };
 
-enum class RenderStep { BUFFER, GEOMETRY, FRAME, OVERLAY, SHADOWS, LIGHTS, NONE };
+enum class RenderStep { GEOMETRY, FRAME, SHADOWS, LIGHTS, OVERLAY, BUFFER, NONE };
 
 class RenderManager: public NonCopyable {
 public:
