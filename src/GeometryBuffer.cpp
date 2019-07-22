@@ -73,13 +73,13 @@ void GeometryBuffer::update() {
 
     GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
     glDrawBuffers(4, drawBuffers);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    GetRenderManager().setRenderStep(RenderStep::GEOMETRY);
     for (auto& viewport: this->viewports) {
-        GetRenderManager().setRenderStep(RenderStep::GEOMETRY);
         viewport->update();
     }
 }

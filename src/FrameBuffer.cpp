@@ -48,13 +48,13 @@ void FrameBuffer::update() {
 
     GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, drawBuffers);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT);
 
+    GetRenderManager().setRenderStep(RenderStep::BUFFER);
     for (auto& viewport: this->viewports) {
-        GetRenderManager().setRenderStep(RenderStep::BUFFER);
         viewport->update();
     }
 }

@@ -62,17 +62,22 @@ std::shared_ptr<Viewport> Window::createViewport(int left, int top, int width, i
     auto geometryBuffer = std::make_shared<GeometryBuffer>(width, height);
     auto geometryViewport = geometryBuffer->createViewport(0, 0, width, height);
 
-    this->geometryBuffers.insert(geometryBuffer);
-    return RenderTarget::createViewport(left, top, width, height);
+    auto viewport = RenderTarget::createViewport(left, top, width, height);
+    this->geometryBuffers.emplace(viewport, geometryBuffer);
+
+    return viewport;
 }
 
 void Window::update() {
-    for (auto& viewport: this->viewports) {
-        auto geometryFinder = [&viewport](std::shared_ptr<GeometryBuffer> buffer) {
-            return buffer->getWidth() == viewport->getWidth() && buffer->getHeight() == viewport->getHeight();
-        };
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
+    glDrawBuffer(GL_BACK);  // Double buffered
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        auto geometryBuffer = *std::find_if(this->geometryBuffers.begin(), this->geometryBuffers.end(), geometryFinder);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    for (auto& viewport: this->viewports) {
+        auto geometryBuffer = this->geometryBuffers.at(viewport);
         auto geometryViewport = *geometryBuffer->getViewports().begin();
         geometryViewport->setCamera(viewport->getCamera());
 
@@ -88,14 +93,13 @@ void Window::update() {
 
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT);
 
         GetRenderManager().setRenderStep(RenderStep::FRAME);
         viewport->update();
     }
 
+    GetRenderManager().setRenderStep(RenderStep::BUFFER);
     for (auto& overlay: this->overlays) {
-        GetRenderManager().setRenderStep(RenderStep::BUFFER);
         overlay->update();
     }
 

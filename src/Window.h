@@ -31,6 +31,7 @@
 #include <array>
 #include <utility>
 #include <unordered_set>
+#include <unordered_map>
 
 namespace Graphene {
 
@@ -80,7 +81,7 @@ protected:
     MousePosition mousePosition = { };
     bool mouseCaptured = false;
 
-    std::unordered_set<std::shared_ptr<GeometryBuffer>> geometryBuffers;
+    std::unordered_map<std::shared_ptr<Viewport>, std::shared_ptr<GeometryBuffer>> geometryBuffers;
     std::unordered_set<std::shared_ptr<Viewport>> overlays;
 };
 
