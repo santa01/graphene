@@ -187,8 +187,6 @@ void Engine::setupOpenGL() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
-
-    glBlendFuncSeparate(GL_ONE, GL_ONE, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Engine::setupEngine() {
@@ -198,8 +196,10 @@ void Engine::setupEngine() {
     renderManager.setShader(RenderStep::GEOMETRY, geometryOutputShader);
 
     auto ambientLightingShader = std::make_shared<Shader>("shaders/ambient_lighting.shader");
-    renderManager.setShader(RenderStep::BUFFER, ambientLightingShader);
     renderManager.setShader(RenderStep::FRAME, ambientLightingShader);
+
+    auto overlayOutputShader = std::make_shared<Shader>("shaders/overlay_output.shader");
+    renderManager.setShader(RenderStep::OVERLAY, overlayOutputShader);
 
     auto deferredLightingShader = std::make_shared<Shader>("shaders/deferred_lighting.shader");
     renderManager.setShader(RenderStep::LIGHTS, deferredLightingShader);

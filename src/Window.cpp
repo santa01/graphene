@@ -73,9 +73,6 @@ void Window::update() {
     glDrawBuffer(GL_BACK);  // Double buffered
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-
     for (auto& viewport: this->viewports) {
         auto geometryBuffer = this->geometryBuffers.at(viewport);
         auto geometryViewport = *geometryBuffer->getViewports().begin();
@@ -92,13 +89,18 @@ void Window::update() {
         glDrawBuffer(GL_BACK);  // Double buffered
 
         glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
         glDisable(GL_DEPTH_TEST);
 
         GetRenderManager().setRenderStep(RenderStep::FRAME);
         viewport->update();
     }
 
-    GetRenderManager().setRenderStep(RenderStep::BUFFER);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    GetRenderManager().setRenderStep(RenderStep::OVERLAY);
     for (auto& overlay: this->overlays) {
         overlay->update();
     }

@@ -65,6 +65,7 @@ RenderManager::RenderManager() {
         { RenderStep::BUFFER,   nullptr },
         { RenderStep::GEOMETRY, nullptr },
         { RenderStep::FRAME,    nullptr },
+        { RenderStep::OVERLAY,  nullptr },
         { RenderStep::SHADOWS,  nullptr },
         { RenderStep::LIGHTS,   nullptr }
     };
@@ -72,6 +73,7 @@ RenderManager::RenderManager() {
         { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::GEOMETRY, std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::FRAME,    std::bind(&RenderManager::renderFrame, this, std::placeholders::_1) },
+        { RenderStep::OVERLAY,  std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::SHADOWS,  std::bind(&RenderManager::renderShadows, this, std::placeholders::_1) },
         { RenderStep::LIGHTS,   std::bind(&RenderManager::renderLights, this, std::placeholders::_1) }
     };
