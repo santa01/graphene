@@ -36,7 +36,7 @@ class Entity: public Object, public Scalable {
 public:
     GRAPHENE_API Entity();
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes();
+    GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes() const;
     GRAPHENE_API void addMesh(const std::shared_ptr<Mesh> mesh);
 
 private:

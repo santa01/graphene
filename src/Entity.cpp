@@ -30,7 +30,7 @@ Entity::Entity():
         Object(ObjectType::ENTITY) {
 }
 
-const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() {
+const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
     return this->meshes;
 }
 

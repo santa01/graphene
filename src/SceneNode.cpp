@@ -34,7 +34,7 @@ SceneNode::SceneNode(const std::shared_ptr<Scene> scene) {
     this->scene = scene;
 }
 
-const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() {
+const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() const {
     return this->nodes;
 }
 
@@ -63,7 +63,7 @@ void SceneNode::detachNode(std::shared_ptr<SceneNode> node) {
     }
 }
 
-const std::unordered_set<std::shared_ptr<Object>>& SceneNode::getObjects() {
+const std::unordered_set<std::shared_ptr<Object>>& SceneNode::getObjects() const {
     return this->objects;
 }
 
