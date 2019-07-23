@@ -33,6 +33,8 @@ class ImageTexture: public Texture {
 public:
     GRAPHENE_API ImageTexture(const Image& image);
     GRAPHENE_API ImageTexture(int width, int height);
+
+    GRAPHENE_API void update(const Image& image);
 };
 
 }  // namespace Graphene

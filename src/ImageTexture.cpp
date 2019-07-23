@@ -27,23 +27,27 @@ namespace Graphene {
 
 ImageTexture::ImageTexture(const Image& image):
         ImageTexture(image.getWidth(), image.getHeight()) {
-    // Little-endian ARGB or RGB format
-    GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;
+    this->update(image);
+}
 
+ImageTexture::ImageTexture(int width, int height):
+        Texture(width, height) {
     glBindTexture(GL_TEXTURE_2D, this->texture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
 
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexStorage2D(GL_TEXTURE_2D, 4, GL_SRGB8_ALPHA8, this->width, this->height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-ImageTexture::ImageTexture(int width, int height):
-        Texture(width, height) {
+void ImageTexture::update(const Image& image) {
     glBindTexture(GL_TEXTURE_2D, this->texture);
-    glTexStorage2D(GL_TEXTURE_2D, 4, GL_SRGB8_ALPHA8, this->width, this->height);
+
+    GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;  // Little-endian ARGB or RGB format
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
+    glGenerateMipmap(GL_TEXTURE_2D);
+
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
