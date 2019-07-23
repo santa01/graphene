@@ -50,7 +50,7 @@ int Viewport::getHeight() const {
     return this->height;
 }
 
-std::shared_ptr<Camera> Viewport::getCamera() {
+std::shared_ptr<Camera> Viewport::getCamera() const {
     return this->camera;
 }
 

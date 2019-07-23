@@ -46,7 +46,7 @@ Material::~Material() {
     glDeleteBuffers(1, &this->ubo);
 }
 
-std::shared_ptr<ImageTexture> Material::getDiffuseTexture() {
+std::shared_ptr<ImageTexture> Material::getDiffuseTexture() const {
     return this->diffuseTexture;
 }
 
@@ -130,7 +130,7 @@ void Material::setSpecularColor(const Math::Vec3& specularColor) {
     updateBuffer(this->materialBuffer, MaterialBuffer, specularColor, this->specularColor.data());
 }
 
-std::shared_ptr<UniformBuffer> Material::getMaterialBuffer() {
+std::shared_ptr<UniformBuffer> Material::getMaterialBuffer() const {
     return this->materialBuffer;
 }
 

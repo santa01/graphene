@@ -90,7 +90,7 @@ std::shared_ptr<Scene> Engine::createScene() {
     return scene;
 }
 
-std::shared_ptr<Window> Engine::getWindow() {
+std::shared_ptr<Window> Engine::getWindow() const {
     return this->window;
 }
 

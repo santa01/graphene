@@ -35,7 +35,7 @@ public:
     GRAPHENE_API Mesh(const void* data, int faces, int vertices);
     GRAPHENE_API ~Mesh();
 
-    GRAPHENE_API std::shared_ptr<Material> getMaterial();
+    GRAPHENE_API std::shared_ptr<Material> getMaterial() const;
     GRAPHENE_API void setMaterial(const std::shared_ptr<Material> material);
 
     GRAPHENE_API int getFaces() const;

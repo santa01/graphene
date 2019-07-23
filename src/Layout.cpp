@@ -28,7 +28,7 @@
 
 namespace Graphene {
 
-std::shared_ptr<Overlay> Layout::getOverlay() {
+std::shared_ptr<Overlay> Layout::getOverlay() const {
     return this->overlay.lock();
 }
 

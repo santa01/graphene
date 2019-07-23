@@ -67,7 +67,7 @@ Mesh::~Mesh() {
     glDeleteBuffers(2, this->buffers);
 }
 
-std::shared_ptr<Material> Mesh::getMaterial() {
+std::shared_ptr<Material> Mesh::getMaterial() const {
     return this->material;
 }
 

@@ -35,7 +35,7 @@ class Overlay;
 
 class Layout {
 public:
-    GRAPHENE_API std::shared_ptr<class Overlay> getOverlay();
+    GRAPHENE_API std::shared_ptr<class Overlay> getOverlay() const;
 
     GRAPHENE_API void addComponent(const std::shared_ptr<Label> component, int x, int y);
     GRAPHENE_API void arrangeComponents();

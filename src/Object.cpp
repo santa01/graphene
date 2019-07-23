@@ -35,7 +35,7 @@ ObjectType Object::getType() const {
     return this->objectType;
 }
 
-std::shared_ptr<class SceneNode> Object::getParent() {
+std::shared_ptr<class SceneNode> Object::getParent() const {
     return this->parent.lock();
 }
 

@@ -132,7 +132,7 @@ void Light::setDirection(const Math::Vec3& direction) {
     this->targetAt(direction);
 }
 
-std::shared_ptr<UniformBuffer> Light::getLightBuffer() {
+std::shared_ptr<UniformBuffer> Light::getLightBuffer() const {
     return this->lightBuffer;
 }
 

@@ -52,7 +52,7 @@ public:
     GRAPHENE_API Material();
     GRAPHENE_API ~Material();
 
-    GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture();
+    GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture() const;
     GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture);
 
     GRAPHENE_API float getAmbientIntensity() const;
@@ -73,7 +73,7 @@ public:
     GRAPHENE_API const Math::Vec3& getSpecularColor() const;
     GRAPHENE_API void setSpecularColor(const Math::Vec3& specularColor);
 
-    GRAPHENE_API std::shared_ptr<UniformBuffer> getMaterialBuffer();
+    GRAPHENE_API std::shared_ptr<UniformBuffer> getMaterialBuffer() const;
 
     GRAPHENE_API void bind(int bindPoint);
 

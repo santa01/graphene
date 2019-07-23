@@ -45,7 +45,7 @@ public:
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
     GRAPHENE_API std::shared_ptr<Scene> createScene();
 
-    GRAPHENE_API std::shared_ptr<Window> getWindow();
+    GRAPHENE_API std::shared_ptr<Window> getWindow() const;
     GRAPHENE_API float getFrameTime() const;
 
     GRAPHENE_API void exit(int result);

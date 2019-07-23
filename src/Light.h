@@ -60,7 +60,7 @@ public:
     GRAPHENE_API void setDirection(float x, float y, float z);
     GRAPHENE_API void setDirection(const Math::Vec3& direction);
 
-    GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer();
+    GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer() const;
 
 private:
     std::shared_ptr<UniformBuffer> lightBuffer;
