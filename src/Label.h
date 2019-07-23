@@ -20,30 +20,37 @@
  * SOFTWARE.
  */
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef LABEL_H
+#define LABEL_H
 
 #include <GrapheneApi.h>
-#include <Scalable.h>
-#include <Mesh.h>
-#include <Object.h>
-#include <unordered_set>
+#include <Entity.h>
+#include <Font.h>
+#include <string>
 #include <memory>
 
 namespace Graphene {
 
-class Entity: public Object, public Scalable {
+class Label: public Entity {
 public:
-    GRAPHENE_API Entity();
-    GRAPHENE_API virtual ~Entity() = default;
+    GRAPHENE_API Label(int width, int height, const std::shared_ptr<Font> font);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes() const;
-    GRAPHENE_API void addMesh(const std::shared_ptr<Mesh> mesh);
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
 
-protected:
-    std::unordered_set<std::shared_ptr<Mesh>> meshes;
+    GRAPHENE_API void setFont(const std::shared_ptr<Font> font);
+    GRAPHENE_API const std::shared_ptr<Font> getFont() const;
+
+    GRAPHENE_API void setText(const std::wstring& text);
+    GRAPHENE_API const std::wstring& getText() const;
+
+private:
+    void renderText();
+
+    std::shared_ptr<Font> font;
+    std::wstring text;
 };
 
 }  // namespace Graphene
 
-#endif  // ENTITY_H
+#endif  // LABEL_H
