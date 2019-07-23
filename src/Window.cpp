@@ -47,12 +47,12 @@ bool Window::isMouseCaptured() const {
     return this->mouseCaptured;
 }
 
-const std::unordered_set<std::shared_ptr<Viewport>>& Window::getOverlays() const {
+const std::unordered_set<std::shared_ptr<Overlay>>& Window::getOverlays() const {
     return this->overlays;
 }
 
-std::shared_ptr<Viewport> Window::createOverlay(int left, int top, int width, int height) {
-    auto overlay = std::make_shared<Viewport>(left, top, width, height);
+std::shared_ptr<Overlay> Window::createOverlay(int left, int top, int width, int height) {
+    auto overlay = std::make_shared<Overlay>(left, top, width, height);
     this->overlays.insert(overlay);
 
     return overlay;

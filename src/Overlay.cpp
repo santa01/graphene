@@ -20,40 +20,35 @@
  * SOFTWARE.
  */
 
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
-
-#include <GrapheneApi.h>
-#include <NonCopyable.h>
-#include <Camera.h>
-#include <memory>
+#include <Overlay.h>
+#include <Logger.h>
+#include <stdexcept>
 
 namespace Graphene {
 
-class Viewport: public NonCopyable {
-public:
-    GRAPHENE_API Viewport(int left, int top, int width, int height);
-    GRAPHENE_API ~Viewport() = default;
+Overlay::Overlay(int left, int top, int width, int height):
+        Viewport(left, top, width, height) {
+}
 
-    GRAPHENE_API int getLeft() const;
-    GRAPHENE_API int getTop() const;
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API int getHeight() const;
+std::shared_ptr<Layout> Overlay::getLayout() const {
+    return this->layout;
+}
 
-    GRAPHENE_API std::shared_ptr<Camera> getCamera();
-    GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
+void Overlay::setLayout(const std::shared_ptr<Layout> layout) {
+    if (layout == nullptr) {
+        throw std::invalid_argument(LogFormat("Layout cannot be nullptr"));
+    }
 
-    GRAPHENE_API virtual void update();
+    this->layout = layout;
+    this->layout->overlay = this->shared_from_this();
+}
 
-protected:
-    int left = 0;
-    int top = 0;
-    int width = 0;
-    int height = 0;
+void Overlay::update() {
+    if (this->layout != nullptr) {
+        this->layout->arrangeComponents();
+    }
 
-    std::shared_ptr<Camera> camera;
-};
+    Viewport::update();
+}
 
 }  // namespace Graphene
-
-#endif  // VIEWPORT_H

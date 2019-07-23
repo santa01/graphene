@@ -20,40 +20,29 @@
  * SOFTWARE.
  */
 
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
+#ifndef OVERLAY_H
+#define OVERLAY_H
 
 #include <GrapheneApi.h>
-#include <NonCopyable.h>
-#include <Camera.h>
+#include <Viewport.h>
+#include <Layout.h>
 #include <memory>
 
 namespace Graphene {
 
-class Viewport: public NonCopyable {
+class Overlay: public std::enable_shared_from_this<Overlay>, public Viewport {
 public:
-    GRAPHENE_API Viewport(int left, int top, int width, int height);
-    GRAPHENE_API ~Viewport() = default;
+    GRAPHENE_API Overlay(int left, int top, int width, int height);
 
-    GRAPHENE_API int getLeft() const;
-    GRAPHENE_API int getTop() const;
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API std::shared_ptr<Layout> getLayout() const;
+    GRAPHENE_API void setLayout(const std::shared_ptr<Layout> layout);
 
-    GRAPHENE_API std::shared_ptr<Camera> getCamera();
-    GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void update() override;
 
-    GRAPHENE_API virtual void update();
-
-protected:
-    int left = 0;
-    int top = 0;
-    int width = 0;
-    int height = 0;
-
-    std::shared_ptr<Camera> camera;
+private:
+    std::shared_ptr<Layout> layout;
 };
 
 }  // namespace Graphene
 
-#endif  // VIEWPORT_H
+#endif  // OVERLAY_H

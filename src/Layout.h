@@ -20,40 +20,39 @@
  * SOFTWARE.
  */
 
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
+#ifndef LAYOUT_H
+#define LAYOUT_H
 
 #include <GrapheneApi.h>
-#include <NonCopyable.h>
-#include <Camera.h>
+#include <Label.h>
 #include <memory>
+#include <vector>
+#include <utility>
 
 namespace Graphene {
 
-class Viewport: public NonCopyable {
+class Overlay;
+
+class Layout {
 public:
-    GRAPHENE_API Viewport(int left, int top, int width, int height);
-    GRAPHENE_API ~Viewport() = default;
+    GRAPHENE_API std::shared_ptr<class Overlay> getOverlay();
 
-    GRAPHENE_API int getLeft() const;
-    GRAPHENE_API int getTop() const;
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API void addComponent(const std::shared_ptr<Label> component, int x, int y);
+    GRAPHENE_API void arrangeComponents();
 
-    GRAPHENE_API std::shared_ptr<Camera> getCamera();
-    GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
+private:
+    typedef struct {
+        int x = 0;
+        int y = 0;
+        bool arranged = false;
+    } ComponentParameters;
 
-    GRAPHENE_API virtual void update();
+    std::vector<std::pair<std::shared_ptr<Label>, ComponentParameters>> components;
 
-protected:
-    int left = 0;
-    int top = 0;
-    int width = 0;
-    int height = 0;
-
-    std::shared_ptr<Camera> camera;
+    friend class Overlay;
+    std::weak_ptr<class Overlay> overlay;
 };
 
 }  // namespace Graphene
 
-#endif  // VIEWPORT_H
+#endif  // LAYOUT_H
