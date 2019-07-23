@@ -26,7 +26,7 @@
 #include <GrapheneApi.h>
 #include <Label.h>
 #include <memory>
-#include <vector>
+#include <unordered_map>
 #include <utility>
 
 namespace Graphene {
@@ -38,16 +38,13 @@ public:
     GRAPHENE_API std::shared_ptr<class Overlay> getOverlay() const;
 
     GRAPHENE_API void addComponent(const std::shared_ptr<Label> component, int x, int y);
+    GRAPHENE_API void removeComponent(const std::shared_ptr<Label> component);
+
     GRAPHENE_API void arrangeComponents();
 
 private:
-    typedef struct {
-        int x = 0;
-        int y = 0;
-        bool arranged = false;
-    } ComponentParameters;
-
-    std::vector<std::pair<std::shared_ptr<Label>, ComponentParameters>> components;
+    std::unordered_map<std::shared_ptr<Label>, std::pair<int, int>> componentPositions;
+    std::unordered_map<std::shared_ptr<Label>, std::pair<float, float>> componentScaleFactors;
 
     friend class Overlay;
     std::weak_ptr<class Overlay> overlay;

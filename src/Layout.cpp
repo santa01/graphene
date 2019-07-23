@@ -33,8 +33,22 @@ std::shared_ptr<Overlay> Layout::getOverlay() const {
 }
 
 void Layout::addComponent(const std::shared_ptr<Label> component, int x, int y) {
-    ComponentParameters parameters = { x, y, false };
-    this->components.push_back(std::make_pair(component, parameters));
+    this->componentPositions.emplace(component, std::make_pair(x, y));
+}
+
+void Layout::removeComponent(const std::shared_ptr<Label> component) {
+    auto componentPositionsIt = this->componentPositions.find(component);
+    if (componentPositionsIt != this->componentPositions.end()) {
+        this->componentPositions.erase(componentPositionsIt);
+    }
+
+    auto componentScaleFactorsIt = this->componentScaleFactors.find(component);
+    if (componentScaleFactorsIt != this->componentScaleFactors.end()) {
+        auto& scaleFactors = componentScaleFactorsIt->second;
+        component->scale(1.0f / scaleFactors.first, 1.0f / scaleFactors.second, 1.0f);
+
+        this->componentScaleFactors.erase(componentScaleFactorsIt);
+    }
 }
 
 void Layout::arrangeComponents() {
@@ -50,6 +64,10 @@ void Layout::arrangeComponents() {
      * Y(ndc) = 2 * (Y(window) - y) / height - 1
      *
      */
+    if (this->componentPositions.empty()) {
+        return;
+    }
+
     auto overlay = this->getOverlay();
     if (overlay == nullptr) {
         return;
@@ -69,31 +87,31 @@ void Layout::arrangeComponents() {
     Math::Mat4 inversePerspective(camera->getProjection());
     inversePerspective.invert();
 
-    for (auto& componentParameters: this->components) {
-        auto& parameters = componentParameters.second;
-        if (parameters.arranged) {
-            continue;
-        }
-
-        auto& component = componentParameters.first;
+    for (auto& componentPosition: this->componentPositions) {
+        auto& component = componentPosition.first;
         float componentWidth = static_cast<float>(component->getWidth());
         float componentHeight = static_cast<float>(component->getHeight());
 
         // Move component by the half of their dimentions to shift origin to the bottom-left
-        float x = parameters.x + componentWidth / 2.0f;
-        float y = parameters.y + componentHeight / 2.0f;
+        auto& position = componentPosition.second;
+        float x = position.first + componentWidth / 2.0f;
+        float y = position.second + componentHeight / 2.0f;
         float xNdc = 2.0f * (x - overlayLeft) / overlayWidth - 1.0f;
         float yNdc = 2.0f * (y - overlayTop) / overlayHeight - 1.0f;
 
         Math::Vec4 ndcPosition(xNdc, yNdc, 1.0f, 1.0f);
         Math::Vec4 worldPosition(inversePerspective * ndcPosition);
         worldPosition.set(Math::Vec4::Z, component->getPosition().get(Math::Vec4::Z));
-
-        component->scaleX(2.0f * overlayAspectRatio * componentWidth / overlayWidth);
-        component->scaleY(2.0f * componentHeight / overlayHeight);
         component->translate(worldPosition.extractVec3());
-        parameters.arranged = true;
+
+        float scaleX = 2.0f * overlayAspectRatio * componentWidth / overlayWidth;
+        float scaleY = 2.0f * componentHeight / overlayHeight;
+        component->scale(scaleX, scaleY, 1.0f);
+
+        this->componentScaleFactors.emplace(component, std::make_pair(scaleX, scaleY));
     }
+
+    this->componentPositions.clear();
 }
 
 }  // namespace Graphene
