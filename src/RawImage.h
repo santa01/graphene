@@ -30,7 +30,10 @@ namespace Graphene {
 
 class RawImage: public Image {
 public:
+    GRAPHENE_API RawImage(int width, int height, int pixelDepth);
     GRAPHENE_API RawImage(int width, int height, int pixelDepth, const void* pixels);
+
+    GRAPHENE_API char* getRawData();
 };
 
 }  // namespace Graphene

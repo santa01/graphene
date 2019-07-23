@@ -22,19 +22,28 @@
 
 #include <RawImage.h>
 #include <algorithm>
+#include <cstring>
 
 namespace Graphene {
 
-RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels) {
+RawImage::RawImage(int width, int height, int pixelDepth) {
     this->width = width;
     this->height = height;
     this->pixelDepth = pixelDepth;
 
     this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
     this->pixels.reset(new char[this->pixelsSize]);
+    memset(this->pixels.get(), 0, this->pixelsSize);
+}
 
+RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels):
+        RawImage(width, height, pixelDepth) {
     const char* pixelsData = reinterpret_cast<const char*>(pixels);
     std::copy(pixelsData, pixelsData + this->pixelsSize, this->pixels.get());
+}
+
+char* RawImage::getRawData() {
+    return this->pixels.get();
 }
 
 }  // namespace Graphene

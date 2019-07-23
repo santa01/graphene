@@ -22,6 +22,7 @@
 
 #include <Font.h>
 #include <Logger.h>
+#include <RawImage.h>
 #include <stdexcept>
 #include <algorithm>
 #include <vector>
@@ -73,7 +74,7 @@ const std::string& Font::getFilename() const {
     return this->filename;
 }
 
-std::shared_ptr<TextBitmap> Font::renderChar(wchar_t charCode) {
+std::shared_ptr<Image> Font::renderChar(wchar_t charCode) {
     std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(charCode);
     if (charGlyph == nullptr) {
         return nullptr;
@@ -82,16 +83,10 @@ std::shared_ptr<TextBitmap> Font::renderChar(wchar_t charCode) {
     FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
     FT_Bitmap charBitmap = bitmapGlyph->bitmap;
 
-    std::shared_ptr<TextBitmap> textBitmap(new TextBitmap());
-    textBitmap->width = charBitmap.width;
-    textBitmap->height = charBitmap.rows;
-    textBitmap->pixelDepth = 32;  // RGBA
-    textBitmap->pixels = charGlyph->pixels;
-
-    return textBitmap;
+    return std::make_shared<RawImage>(charBitmap.width, charBitmap.rows, 32, charGlyph->pixels.get());
 }
 
-std::shared_ptr<TextBitmap> Font::renderString(const std::wstring& stringText) {
+std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
     FT_BBox stringBox = { };
     std::vector<std::shared_ptr<CharGlyph>> stringGlyphs;
 
@@ -108,19 +103,11 @@ std::shared_ptr<TextBitmap> Font::renderString(const std::wstring& stringText) {
         stringGlyphs.push_back(charGlyph);
     }
 
-    std::shared_ptr<TextBitmap> stringBitmap(new TextBitmap());
-    stringBitmap->height = stringBox.yMax - stringBox.yMin;
-    stringBitmap->width = stringBox.xMax;
-    stringBitmap->pixelDepth = 32;  // RGBA
-
-    int pixelBytes = stringBitmap->pixelDepth >> 3;
-    int pixelsSize = stringBitmap->width * stringBitmap->height * pixelBytes;
-
-    stringBitmap->pixels.reset(new char[pixelsSize]);
-    char* pixels = stringBitmap->pixels.get();
-
+    auto stringImage = std::make_shared<RawImage>(stringBox.xMax, stringBox.yMax - stringBox.yMin, 32);
     int stringAdvance = 0;
-    memset(pixels, 0, pixelsSize);
+
+    int pixelBytes = stringImage->getPixelDepth() >> 3;
+    char* pixels = stringImage->getRawData();
 
     for (auto charGlyph: stringGlyphs) {
         FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
@@ -131,7 +118,7 @@ std::shared_ptr<TextBitmap> Font::renderString(const std::wstring& stringText) {
         int charBitmapRowSize = charBitmap.width * pixelBytes;
 
         for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++, stringRow++) {
-            int pixelsOffset = (stringRow * stringBitmap->width + stringAdvance) * pixelBytes;
+            int pixelsOffset = (stringRow * stringImage->getWidth() + stringAdvance) * pixelBytes;
             int charPixelsOffset = charRow * charBitmapRowSize;
             memcpy(pixels + pixelsOffset, charPixels + charPixelsOffset, charBitmapRowSize);
         }
@@ -139,7 +126,7 @@ std::shared_ptr<TextBitmap> Font::renderString(const std::wstring& stringText) {
         stringAdvance += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
     }
 
-    return stringBitmap;
+    return stringImage;
 }
 
 std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(FT_ULong charCode) {

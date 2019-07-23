@@ -24,6 +24,7 @@
 #define FONT_H
 
 #include <GrapheneApi.h>
+#include <Image.h>
 #include <string>
 #include <memory>
 #include <unordered_map>
@@ -33,13 +34,6 @@
 
 namespace Graphene {
 
-typedef struct {
-    int width = 0;
-    int height = 0;
-    int pixelDepth = 0;
-    std::shared_ptr<char[]> pixels;
-} TextBitmap;
-
 class Font {
 public:
     GRAPHENE_API Font(const std::string& filename, int size, int dpi = 72);
@@ -48,8 +42,8 @@ public:
     GRAPHENE_API int getSize() const;
     GRAPHENE_API const std::string& getFilename() const;
 
-    GRAPHENE_API std::shared_ptr<TextBitmap> renderChar(wchar_t charCode);
-    GRAPHENE_API std::shared_ptr<TextBitmap> renderString(const std::wstring& stringText);
+    GRAPHENE_API std::shared_ptr<Image> renderChar(wchar_t charCode);
+    GRAPHENE_API std::shared_ptr<Image> renderString(const std::wstring& stringText);
 
 private:
     typedef struct {
