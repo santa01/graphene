@@ -67,9 +67,13 @@ void LinuxWindow::setVsync(bool vsync) {
             LogInfo("GLX_EXT_swap_control_tear available, enable adaptive vsync");
         }
 
-        glXSwapIntervalEXT(vsync ? (adaptive ? -1 : 1) : 0);
+        glXSwapIntervalEXT(this->display, this->window, vsync ? (adaptive ? -1 : 1) : 0);
+    } else if (this->isExtensionSupported("GLX_MESA_swap_control")) {
+        LogInfo("GLX_EXT_swap_control unavailable, using GLX_MESA_swap_control instead");
+
+        glXSwapIntervalMESA(vsync ? 1 : 0);
     } else {
-        LogWarn("GLX_EXT_swap_control unavailable, leave vsync as-is");
+        LogWarn("GLX_EXT_swap_control, GLX_MESA_swap_control unavailable, leave vsync as-is");
     }
 }
 

@@ -110,6 +110,7 @@ extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;  // WGL_EXT_swap_control, W
 #elif defined(__linux__)
 extern PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;  // GLX_ARB_create_context
 extern PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT;  // GLX_EXT_swap_control, GLX_EXT_swap_control_tear
+extern PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA;  // GLX_MESA_swap_control
 #endif
 
 namespace OpenGL {

@@ -98,6 +98,7 @@ PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 #elif defined(__linux__)
 PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
 PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT;
+PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA;
 #endif
 
 #if defined(_WIN32)
@@ -210,6 +211,7 @@ void loadWglExtensions() {
 void loadGlxExtensions() {
     LOAD_MANDATORY(glXCreateContextAttribsARB);
     LOAD_OPTIONAL(glXSwapIntervalEXT);
+    LOAD_OPTIONAL(glXSwapIntervalMESA);
 }
 #endif
 
