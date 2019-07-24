@@ -170,22 +170,33 @@ void Win32Window::swapBuffers() {
 }
 
 HWND Win32Window::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc) {
-    WNDCLASSEX wcex = { };
-    wcex.cbSize = sizeof(wcex);
-    wcex.style = CS_OWNDC;
-    wcex.lpfnWndProc = windowProc;
-    wcex.hInstance = this->instance;
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = HBRUSH(COLOR_WINDOW);
-    wcex.lpszClassName = className;
+    WNDCLASSEX windowClass = { };
+    windowClass.cbSize = sizeof(windowClass);
+    windowClass.style = CS_OWNDC;
+    windowClass.lpfnWndProc = windowProc;
+    windowClass.hInstance = this->instance;
+    windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    windowClass.hbrBackground = HBRUSH(COLOR_WINDOW);
+    windowClass.lpszClassName = className;
 
-    if (!RegisterClassEx(&wcex)) {
+    if (!RegisterClassEx(&windowClass)) {
         throw std::runtime_error(LogFormat("RegisterClassEx()"));
     }
 
+    // AdjustWindowRect() doesn't recognize WS_OVERLAPPED
+    DWORD windowStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+
+    RECT windowRectangle = { };
+    windowRectangle.right = this->width;
+    windowRectangle.bottom = this->height;
+
+    AdjustWindowRect(&windowRectangle, windowStyle, FALSE);
+    int windowWidth = windowRectangle.right - windowRectangle.left;
+    int windowHeight = windowRectangle.bottom - windowRectangle.top;
+
     HWND window = CreateWindow(
-            className, windowName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-            CW_USEDEFAULT, CW_USEDEFAULT, this->width, this->height,
+            className, windowName, windowStyle | WS_OVERLAPPED,
+            CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
             nullptr, nullptr, this->instance, nullptr);
     if (window == nullptr) {
         throw std::runtime_error(LogFormat("CreateWindow()"));
