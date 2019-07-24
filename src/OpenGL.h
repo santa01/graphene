@@ -105,8 +105,11 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // ARB_debug
 #if defined(_WIN32)
 extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;  // WGL_ARB_pixel_format
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;  // WGL_ARB_create_context
+extern PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;  // WGL_ARB_extensions_string
+extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;  // WGL_EXT_swap_control, WGL_EXT_swap_control_tear
 #elif defined(__linux__)
 extern PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;  // GLX_ARB_create_context
+extern PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT;  // GLX_EXT_swap_control, GLX_EXT_swap_control_tear
 #endif
 
 namespace OpenGL {

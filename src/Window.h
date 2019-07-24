@@ -31,6 +31,7 @@
 #include <Signals.h>
 #include <array>
 #include <utility>
+#include <string>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -60,10 +61,11 @@ public:
     GRAPHENE_API const MouseState& getMouseState() const;
     GRAPHENE_API const MousePosition& getMousePosition() const;
     GRAPHENE_API bool isMouseCaptured() const;
+    GRAPHENE_API bool isExtensionSupported(const std::string& extension);
 
     GRAPHENE_API virtual void captureMouse(bool captured) = 0;
+    GRAPHENE_API virtual void setVsync(bool vsync) = 0;
     GRAPHENE_API virtual bool dispatchEvents() = 0;
-    GRAPHENE_API virtual void swapBuffers() = 0;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Overlay>>& getOverlays() const;
     GRAPHENE_API std::shared_ptr<Overlay> createOverlay(int left, int top, int width, int height);
@@ -72,6 +74,9 @@ public:
     GRAPHENE_API void update() override;
 
 protected:
+    virtual std::string getExtensions() = 0;
+    virtual void swapBuffers() = 0;
+
     friend class Engine;
     Signals::Signal<int, int> onMouseMotionSignal;
     Signals::Signal<int, bool> onMouseButtonSignal;
@@ -81,6 +86,8 @@ protected:
     MouseState mouseState = { };
     MousePosition mousePosition = { };
     bool mouseCaptured = false;
+
+    std::unordered_set<std::string> availableExtensions;
 
     std::unordered_map<std::shared_ptr<Viewport>, std::shared_ptr<GeometryBuffer>> geometryBuffers;
     std::unordered_set<std::shared_ptr<Overlay>> overlays;

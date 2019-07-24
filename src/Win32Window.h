@@ -28,6 +28,7 @@
 #include <GrapheneApi.h>
 #include <Window.h>
 #include <OpenGL.h>
+#include <string>
 
 namespace Graphene {
 
@@ -37,11 +38,14 @@ public:
     GRAPHENE_API ~Win32Window();
 
     GRAPHENE_API void captureMouse(bool captured) override;
+    GRAPHENE_API void setVsync(bool vsync) override;
     GRAPHENE_API bool dispatchEvents() override;
-    GRAPHENE_API void swapBuffers() override;
 
 private:
     friend LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+
+    std::string getExtensions() override;
+    void swapBuffers() override;
 
     HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
     void destroyWindow(HWND window);

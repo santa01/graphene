@@ -149,6 +149,19 @@ void Win32Window::captureMouse(bool captured) {
     ShowCursor(this->mouseCaptured ? FALSE : TRUE);
 }
 
+void Win32Window::setVsync(bool vsync) {
+    if (this->isExtensionSupported("WGL_EXT_swap_control")) {
+        bool adaptive = this->isExtensionSupported("WGL_EXT_swap_control_tear");
+        if (vsync && adaptive) {
+            LogInfo("WGL_EXT_swap_control_tear available, enable adaptive vsync");
+        }
+
+        wglSwapIntervalEXT(vsync ? (adaptive ? -1 : 1) : 0);
+    } else {
+        LogWarn("WGL_EXT_swap_control unavailable, leave vsync as-is");
+    }
+}
+
 bool Win32Window::dispatchEvents() {
     MSG message;
     bool breakOrbit = false;
@@ -163,6 +176,10 @@ bool Win32Window::dispatchEvents() {
     }
 
     return breakOrbit;
+}
+
+std::string Win32Window::getExtensions() {
+    return wglGetExtensionsStringARB(this->deviceContext);
 }
 
 void Win32Window::swapBuffers() {
@@ -226,6 +243,8 @@ void Win32Window::createContext() {
     this->destroyWindow(dummyWindow);
 
     this->createExtContext(this->window);
+    this->isExtensionSupported("WGL_EXT_swap_control");
+    this->isExtensionSupported("WGL_EXT_swap_control_tear");
 }
 
 void Win32Window::createBaseContext(HWND window) {

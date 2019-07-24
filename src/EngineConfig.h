@@ -62,8 +62,8 @@ private:
     int height = 600;
     int width = 800;
     int samples = 0;        // TODO
-    float maxFps = 30.0f;
-    bool vsync = false;     // TODO
+    float maxFps = 0.0f;
+    bool vsync = false;
     bool debug = true;
 };
 

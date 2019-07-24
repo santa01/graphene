@@ -93,8 +93,11 @@ PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 #if defined(_WIN32)
 PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
+PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 #elif defined(__linux__)
 PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
+PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT;
 #endif
 
 #if defined(_WIN32)
@@ -200,10 +203,13 @@ void loadExtensions() {
 void loadWglExtensions() {
     LOAD_MANDATORY(wglChoosePixelFormatARB);
     LOAD_MANDATORY(wglCreateContextAttribsARB);
+    LOAD_MANDATORY(wglGetExtensionsStringARB);
+    LOAD_OPTIONAL(wglSwapIntervalEXT);
 }
 #elif defined(__linux__)
 void loadGlxExtensions() {
     LOAD_MANDATORY(glXCreateContextAttribsARB);
+    LOAD_OPTIONAL(glXSwapIntervalEXT);
 }
 #endif
 

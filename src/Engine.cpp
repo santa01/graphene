@@ -105,6 +105,7 @@ void Engine::exit(int result) {
 
 int Engine::exec() {
     std::chrono::time_point<std::chrono::steady_clock> timestamp;
+    auto& config = GetEngineConfig();
 
     this->setupWindow();
     this->setupOpenGL();
@@ -124,19 +125,23 @@ int Engine::exec() {
 
         std::chrono::duration<float> duration = std::chrono::steady_clock::now() - timestamp;
         this->frameTime = duration.count();
+        float maxFps = config.getMaxFps();
 
-        float maxFrameTime = 1.0f / GetEngineConfig().getMaxFps();
-        if (this->frameTime < maxFrameTime) {
-            std::this_thread::sleep_for(std::chrono::duration<float>(maxFrameTime - this->frameTime));
-            this->frameTime = maxFrameTime;
+        if (!config.isVsync() && maxFps > 0.0f) {
+            float maxFrameTime = 1.0f / maxFps;
+
+            if (this->frameTime < maxFrameTime) {
+                std::this_thread::sleep_for(std::chrono::duration<float>(maxFrameTime - this->frameTime));
+                this->frameTime = maxFrameTime;
+            }
         }
 
         this->renderTime += this->getFrameTime();
         this->frames++;
 
-        if (renderTime >= 1.0f) {
+        if (this->renderTime >= 1.0f) {
             float fps = this->frames / this->renderTime;
-            Graphene::LogInfo("%d frames in %.1f seconds = %.3f fps", this->frames, this->renderTime, fps);
+            LogInfo("%d frames in %.1f seconds = %.3f fps", this->frames, this->renderTime, fps);
 
             this->renderTime = 0.0f;
             this->frames = 0;
@@ -155,6 +160,7 @@ void Engine::setupWindow() {
 #elif defined(__linux__)
     this->window = std::shared_ptr<Window>(new LinuxWindow(config.getWidth(), config.getHeight()));
 #endif
+    this->window->setVsync(config.isVsync());
 
     this->window->onMouseMotionSignal.connect(
             Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));

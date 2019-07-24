@@ -60,6 +60,19 @@ void LinuxWindow::captureMouse(bool captured) {
     }
 }
 
+void LinuxWindow::setVsync(bool vsync) {
+    if (this->isExtensionSupported("GLX_EXT_swap_control")) {
+        bool adaptive = this->isExtensionSupported("GLX_EXT_swap_control_tear");
+        if (vsync && adaptive) {
+            LogInfo("GLX_EXT_swap_control_tear available, enable adaptive vsync");
+        }
+
+        glXSwapIntervalEXT(vsync ? (adaptive ? -1 : 1) : 0);
+    } else {
+        LogWarn("GLX_EXT_swap_control unavailable, leave vsync as-is");
+    }
+}
+
 bool LinuxWindow::dispatchEvents() {
     XEvent event;
     bool breakOrbit = false;
@@ -127,6 +140,10 @@ bool LinuxWindow::dispatchEvents() {
     return breakOrbit;
 }
 
+std::string LinuxWindow::getExtensions() {
+    return glXQueryExtensionsString(this->display, this->screen);
+}
+
 void LinuxWindow::swapBuffers() {
     glXSwapBuffers(this->display, this->window);
 }
@@ -137,8 +154,8 @@ void LinuxWindow::createWindow(const char* windowName) {
         throw std::runtime_error(LogFormat("XOpenDisplay()"));
     }
 
-    int screen = XDefaultScreen(this->display);
-    XID rootWindow = XRootWindow(this->display, screen);
+    this->screen = XDefaultScreen(this->display);
+    XID rootWindow = XRootWindow(this->display, this->screen);
 
     const int fbAttribList[] = {
         GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -155,7 +172,7 @@ void LinuxWindow::createWindow(const char* windowName) {
     };
 
     int fbNumberConfigs;
-    GLXFBConfig* fbConfigs = glXChooseFBConfig(this->display, screen, fbAttribList, &fbNumberConfigs);
+    GLXFBConfig* fbConfigs = glXChooseFBConfig(this->display, this->screen, fbAttribList, &fbNumberConfigs);
     if (fbConfigs == nullptr) {
         throw std::runtime_error(LogFormat("glXChooseFBConfig()"));
     }

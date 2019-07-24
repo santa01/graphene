@@ -28,6 +28,7 @@
 #include <GrapheneApi.h>
 #include <Window.h>
 #include <OpenGL.h>
+#include <string>
 
 namespace Graphene {
 
@@ -37,10 +38,13 @@ public:
     GRAPHENE_API ~LinuxWindow();
 
     GRAPHENE_API void captureMouse(bool captured) override;
+    GRAPHENE_API void setVsync(bool vsync) override;
     GRAPHENE_API bool dispatchEvents() override;
-    GRAPHENE_API void swapBuffers() override;
 
 private:
+    std::string getExtensions() override;
+    void swapBuffers() override;
+
     void createWindow(const char* windowName);
     void destroyWindow();
 
@@ -48,6 +52,7 @@ private:
     void destroyContext();
 
     Display* display = nullptr;
+    int screen = 0;
     GLXFBConfig fbConfig = nullptr;
     Colormap colormap = None;
     XID window = None;
