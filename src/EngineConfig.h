@@ -46,6 +46,9 @@ public:
     GRAPHENE_API int getSamples() const;
     GRAPHENE_API void setSamples(int samples);
 
+    GRAPHENE_API int getAnisotropy() const;
+    GRAPHENE_API void setAnisotropy(int anisotropy);
+
     GRAPHENE_API float getMaxFps() const;
     GRAPHENE_API void setMaxFps(float maxFps);
 
@@ -62,6 +65,7 @@ private:
     int height = 600;
     int width = 800;
     int samples = 0;        // TODO
+    int anisotropy = 16;
     float maxFps = 0.0f;
     bool vsync = false;
     bool debug = true;

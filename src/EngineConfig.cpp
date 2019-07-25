@@ -61,6 +61,14 @@ void EngineConfig::setSamples(int samples) {
     this->samples = samples;
 }
 
+int EngineConfig::getAnisotropy() const {
+    return this->anisotropy;
+}
+
+void EngineConfig::setAnisotropy(int anisotropy) {
+    this->anisotropy = anisotropy;
+}
+
 float EngineConfig::getMaxFps() const {
     return this->maxFps;
 }

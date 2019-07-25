@@ -21,7 +21,10 @@
  */
 
 #include <ImageTexture.h>
+#include <EngineConfig.h>
 #include <OpenGL.h>
+#include <Logger.h>
+#include <algorithm>
 
 namespace Graphene {
 
@@ -37,6 +40,15 @@ ImageTexture::ImageTexture(int width, int height):
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_SRGB8_ALPHA8, this->width, this->height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int anisotropy = GetEngineConfig().getAnisotropy();
+    if (anisotropy > 0 && OpenGL::isExtensionSupported("GL_ARB_texture_filter_anisotropic")) {
+        GLint maxAnisotropy;
+        glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAnisotropy);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, std::min<int>(anisotropy, maxAnisotropy));
+    } else {
+        LogWarn("GL_ARB_texture_filter_anisotropic unavailable, anisotropic filtering disabled");
+    }
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }

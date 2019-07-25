@@ -96,8 +96,8 @@ std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
             continue;
         }
 
-        stringBox.yMin = std::min(stringBox.yMin, charGlyph->box.yMin);
-        stringBox.yMax = std::max(stringBox.yMax, charGlyph->box.yMax);
+        stringBox.yMin = std::min<int>(stringBox.yMin, charGlyph->box.yMin);
+        stringBox.yMax = std::max<int>(stringBox.yMax, charGlyph->box.yMax);
         stringBox.xMax += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
 
         stringGlyphs.push_back(charGlyph);
