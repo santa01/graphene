@@ -26,6 +26,7 @@
 #include <Logger.h>
 #include <RenderTarget.h>
 #include <windowsx.h>
+#include <sstream>
 #include <stdexcept>
 
 namespace Graphene {
@@ -178,10 +179,6 @@ bool Win32Window::dispatchEvents() {
     return breakOrbit;
 }
 
-std::string Win32Window::getExtensions() {
-    return wglGetExtensionsStringARB(this->deviceContext);
-}
-
 void Win32Window::swapBuffers() {
     SwapBuffers(this->deviceContext);
 }
@@ -243,8 +240,13 @@ void Win32Window::createContext() {
     this->destroyWindow(dummyWindow);
 
     this->createExtContext(this->window);
-    this->isExtensionSupported("WGL_EXT_swap_control");
-    this->isExtensionSupported("WGL_EXT_swap_control_tear");
+
+    std::stringstream extensions(wglGetExtensionsStringARB(this->deviceContext));
+    std::string extension;
+
+    while (std::getline(extensions, extension, ' ')) {
+        this->availableExtensions.insert(extension);
+    }
 }
 
 void Win32Window::createBaseContext(HWND window) {

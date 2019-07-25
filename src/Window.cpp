@@ -24,7 +24,6 @@
 #include <OpenGL.h>
 #include <RenderManager.h>
 #include <algorithm>
-#include <sstream>
 
 namespace Graphene {
 
@@ -48,17 +47,12 @@ bool Window::isMouseCaptured() const {
     return this->mouseCaptured;
 }
 
-bool Window::isExtensionSupported(const std::string& extension) {
-    if (this->availableExtensions.empty()) {
-        std::stringstream extensions(this->getExtensions());
-        std::string extension;
-
-        while (std::getline(extensions, extension, ' ')) {
-            this->availableExtensions.insert(extension);
-        }
-    }
-
+bool Window::isExtensionSupported(const std::string& extension) const {
     return this->availableExtensions.find(extension) != availableExtensions.end();
+}
+
+const std::unordered_set<std::string>& Window::getSupportedExtensions() const {
+    return this->availableExtensions;
 }
 
 const std::unordered_set<std::shared_ptr<Overlay>>& Window::getOverlays() const {

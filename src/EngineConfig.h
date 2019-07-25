@@ -25,14 +25,17 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <string>
 
 #define GetEngineConfig() EngineConfig::getInstance()
+#define FormatOption(width, name, value) std::setw((width)) << std::left << (name) << " : " << (value) << '\n'
 
 namespace Graphene {
 
 class EngineConfig: public NonCopyable {
 public:
     GRAPHENE_API static EngineConfig& getInstance();
+    GRAPHENE_API std::string toString() const;
 
     GRAPHENE_API float getFov() const;
     GRAPHENE_API void setFov(float fov);

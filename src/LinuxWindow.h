@@ -40,11 +40,9 @@ public:
     GRAPHENE_API void captureMouse(bool captured) override;
     GRAPHENE_API void setVsync(bool vsync) override;
     GRAPHENE_API bool dispatchEvents() override;
+    GRAPHENE_API void swapBuffers() override;
 
 private:
-    std::string getExtensions() override;
-    void swapBuffers() override;
-
     void createWindow(const char* windowName);
     void destroyWindow();
 

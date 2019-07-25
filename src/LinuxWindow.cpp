@@ -25,6 +25,7 @@
 #include <LinuxWindow.h>
 #include <Logger.h>
 #include <RenderTarget.h>
+#include <sstream>
 #include <stdexcept>
 
 namespace Graphene {
@@ -144,10 +145,6 @@ bool LinuxWindow::dispatchEvents() {
     return breakOrbit;
 }
 
-std::string LinuxWindow::getExtensions() {
-    return glXQueryExtensionsString(this->display, this->screen);
-}
-
 void LinuxWindow::swapBuffers() {
     glXSwapBuffers(this->display, this->window);
 }
@@ -248,6 +245,13 @@ void LinuxWindow::createContext() {
 
     if (!glXMakeCurrent(this->display, this->window, this->renderingContext)) {
         throw std::runtime_error(LogFormat("glXMakeCurrent()"));
+    }
+
+    std::stringstream extensions(glXQueryExtensionsString(this->display, this->screen));
+    std::string extension;
+
+    while (std::getline(extensions, extension, ' ')) {
+        this->availableExtensions.insert(extension);
     }
 }
 

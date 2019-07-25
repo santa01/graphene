@@ -23,7 +23,6 @@
 #include <OpenGL.h>
 #include <Logger.h>
 #include <stdexcept>
-#include <unordered_set>
 
 namespace Graphene {
 
@@ -195,7 +194,16 @@ void loadCore() {
     LOAD_MANDATORY(glViewport);
 }
 
+std::unordered_set<std::string> availableExtensions;
+
 void loadExtensions() {
+    int numExtensions;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+
+    for (int i = 0; i < numExtensions; i++) {
+        availableExtensions.insert(reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i)));
+    }
+
     LOAD_OPTIONAL(glDebugMessageControlARB);
     LOAD_OPTIONAL(glDebugMessageCallbackARB);
 }
@@ -205,29 +213,24 @@ void loadWglExtensions() {
     LOAD_MANDATORY(wglChoosePixelFormatARB);
     LOAD_MANDATORY(wglCreateContextAttribsARB);
     LOAD_MANDATORY(wglGetExtensionsStringARB);
+
     LOAD_OPTIONAL(wglSwapIntervalEXT);
 }
 #elif defined(__linux__)
 void loadGlxExtensions() {
     LOAD_MANDATORY(glXCreateContextAttribsARB);
+
     LOAD_OPTIONAL(glXSwapIntervalEXT);
     LOAD_OPTIONAL(glXSwapIntervalMESA);
 }
 #endif
 
-std::unordered_set<std::string> availableExtensions;
-
 bool isExtensionSupported(const std::string& extension) {
-    if (availableExtensions.empty()) {
-        int numExtensions;
-        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
-
-        for (int i = 0; i < numExtensions; i++) {
-            availableExtensions.insert(reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i)));
-        }
-    }
-
     return availableExtensions.find(extension) != availableExtensions.end();
+}
+
+const std::unordered_set<std::string>& getSupportedExtensions() {
+    return availableExtensions;
 }
 
 }  // namespace OpenGL

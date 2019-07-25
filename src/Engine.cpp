@@ -35,6 +35,7 @@
 #include <thread>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 #include <unordered_map>
 
 namespace Graphene {
@@ -105,7 +106,9 @@ void Engine::exit(int result) {
 
 int Engine::exec() {
     std::chrono::time_point<std::chrono::steady_clock> timestamp;
+
     auto& config = GetEngineConfig();
+    LogInfo("Engine configuration:\n%s", config.toString().c_str());
 
     this->setupWindow();
     this->setupOpenGL();
@@ -174,10 +177,23 @@ void Engine::setupOpenGL() {
     OpenGL::loadCore();
     OpenGL::loadExtensions();
 
-    LogInfo("Vendor: %s", glGetString(GL_VENDOR));
-    LogInfo("Renderer: %s", glGetString(GL_RENDERER));
-    LogInfo("OpenGL Version: %s", glGetString(GL_VERSION));
-    LogInfo("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    LogInfo("OpenGL vendor: %s", glGetString(GL_VENDOR));
+    LogInfo("OpenGL renderer: %s", glGetString(GL_RENDERER));
+    LogInfo("OpenGL version: %s", glGetString(GL_VERSION));
+    LogInfo("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+    std::stringstream openglExtensions;
+    for (auto& extension: OpenGL::getSupportedExtensions()) {
+        openglExtensions << extension << '\n';
+    }
+
+    std::stringstream platformExtensions;
+    for (auto& extension: this->window->getSupportedExtensions()) {
+        platformExtensions << extension << '\n';
+    }
+
+    LogDebug("OpenGL extensions:\n%s", openglExtensions.str().c_str());
+    LogDebug("Platform extensions:\n%s", platformExtensions.str().c_str());
 
     if (GetEngineConfig().isDebug()) {
         if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {

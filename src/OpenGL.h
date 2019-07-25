@@ -28,6 +28,7 @@
 // Override vendor provided gl.h
 #include <GL/gl.h>  // Renamed glcorearb.h
 #include <string>
+#include <unordered_set>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -125,6 +126,7 @@ GRAPHENE_API void loadGlxExtensions();
 #endif
 
 GRAPHENE_API bool isExtensionSupported(const std::string& extension);
+GRAPHENE_API const std::unordered_set<std::string>& getSupportedExtensions();
 
 }  // namespace OpenGL
 

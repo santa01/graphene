@@ -76,9 +76,11 @@ std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
 }
 
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
+    LogDebug("Create entity from '%s'", name.c_str());
     std::unordered_set<std::shared_ptr<Mesh>> meshes;
 
     if (this->meshCache.find(name) != this->meshCache.end()) {
+        LogDebug("Found cached '%s' entity, use as-is", name.c_str());
         meshes = this->meshCache.at(name);
     } else {
         meshes = this->createMeshes(name);
@@ -94,12 +96,18 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
 }
 
 void ObjectManager::clearCache() {
+    LogDebug("Clear %d cached textures", this->textureCache.size());
     this->textureCache.clear();
+
+    LogDebug("Clear %d cached meshes", this->meshCache.size());
     this->meshCache.clear();
 }
 
 std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& name) {
+    LogDebug("Create texture from '%s'", name.c_str());
+
     if (this->textureCache.find(name) != this->textureCache.end()) {
+        LogDebug("Found cached '%s' texture, use as-is", name.c_str());
         return this->textureCache.at(name);
     }
 
@@ -122,6 +130,8 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
     if (magic != "GPHN") {
         throw std::runtime_error(LogFormat("Invalid magic number"));
     }
+
+    LogDebug("Create %d meshes from '%s'", entityHeader.objects, name.c_str());
 
     ObjectGeometry objectGeometry;
     ObjectMaterial objectMaterial;

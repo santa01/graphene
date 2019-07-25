@@ -21,12 +21,30 @@
  */
 
 #include <EngineConfig.h>
+#include <sstream>
+#include <iomanip>
 
 namespace Graphene {
 
 EngineConfig& EngineConfig::getInstance() {
     static EngineConfig instance;
     return instance;
+}
+
+std::string EngineConfig::toString() const {
+    std::stringstream configString;
+
+    configString << std::boolalpha << std::fixed << std::setprecision(3)
+                 << FormatOption(30, "Field of View", this->fov)
+                 << FormatOption(30, "Window Width", this->height)
+                 << FormatOption(30, "Window Height", this->width)
+                 << FormatOption(30, "Antialiasing Samples", this->samples)
+                 << FormatOption(30, "Anisotropic Filter Level", this->anisotropy)
+                 << FormatOption(30, "FPS Limit", this->maxFps)
+                 << FormatOption(30, "Vertical Synchronization", this->vsync)
+                 << FormatOption(30, "Debug Output", this->debug);
+
+    return configString.str();
 }
 
 float EngineConfig::getFov() const {
