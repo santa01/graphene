@@ -114,9 +114,22 @@ TgaImage::TgaImage(const std::string& filename):
     this->pixelsSize = this->height * pixelsRowSize;
     this->pixels.reset(new char[this->pixelsSize]);
 
+    /*
+     * Per glTexImage2D() documentation: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
+     *
+     * The first element corresponds to the lower left corner of the texture image. Subsequent elements progress
+     * left-to-right through the remaining texels in the lowest row of the texture image, and then in successively
+     * higher rows of the texture image. The final element corresponds to the upper right corner of the texture image.
+     *
+     * Per Truevision TGA FILE FORMAT SPECIFICATION Version 2.0:
+     *
+     * Image Specification - Field 5 (10 bytes):
+     * Bits 5 & 4: These bits are used to indicate the order in which pixel data is transferred from the file to the screen.
+     * Bit 4 is for left-to-right ordering and bit 5 is for top-to-bottom ordering as shown below.
+     */
     uint8_t rowOrdering = header.imageSpec.imageDescr.topToBottomOrdering;
     uint8_t columnOrdering = header.imageSpec.imageDescr.leftToRightOrdering;
-    bool flipRows = (static_cast<RowOrdering>(rowOrdering) == RowOrdering::BOTTOM_TO_TOP);
+    bool flipRows = (static_cast<RowOrdering>(rowOrdering) == RowOrdering::TOP_TO_BOTTOM);
     bool flipColumns = (static_cast<ColumnOrdering>(columnOrdering) == ColumnOrdering::RIGHT_TO_LEFT);
 
     std::ifstream::pos_type pixelsOffset = sizeof(header) + header.idLength +

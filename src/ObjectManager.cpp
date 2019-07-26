@@ -43,11 +43,6 @@ typedef struct {
 } EntityHeader;
 
 typedef struct {
-    int vertices;
-    int faces;
-} ObjectGeometry;
-
-typedef struct {
     float ambientIntensity;
     float diffuseIntensity;
     float diffuseColor[3];
@@ -56,6 +51,11 @@ typedef struct {
     float specularColor[3];
     char diffuseTexture[256];
 } ObjectMaterial;
+
+typedef struct {
+    int vertices;
+    int faces;
+} ObjectGeometry;
 
 #pragma pack(pop)
 
@@ -133,8 +133,8 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
 
     LogDebug("Create %d meshes from '%s'", entityHeader.objects, name.c_str());
 
-    ObjectGeometry objectGeometry;
     ObjectMaterial objectMaterial;
+    ObjectGeometry objectGeometry;
     std::unordered_set<std::shared_ptr<Mesh>> meshes;
 
     for (int i = 0; i < entityHeader.objects; i++) {

@@ -71,16 +71,23 @@ def write_entity(context, filepath, global_matrix):
         else:
             derived_objects = [(obj, obj.matrix_world)]
 
-        for object_derived, matrix in derived_objects:
+        for derived_object, local_matrix in derived_objects:
             try:
-                mesh = object_derived.to_mesh(context.scene, True, 'PREVIEW')
+                mesh = derived_object.to_mesh(context.scene, True, 'PREVIEW')
             except RuntimeError:
                 pass
             else:
-                mesh.transform(global_matrix * matrix)
                 triangulate(mesh)
-                mesh.calc_normals_split()
                 meshes.append(mesh)
+
+                # Modified global_matrix keeps X vector pointing right (see below), face winding
+                # becomes Counter Clock Wise with normals pointing the opposite direction.
+                # flip_normals() changes the face winding back to Clock Wise and fix normals direction.
+                mesh.transform(global_matrix * local_matrix)
+                mesh.flip_normals()
+
+                # Calculate split vertex normals, which preserve sharp edges.
+                mesh.calc_normals_split()
 
         if obj.dupli_type != 'NONE':
             obj.dupli_list_clear()
@@ -98,9 +105,9 @@ def write_entity(context, filepath, global_matrix):
             uvs = [(0.0, 0.0)] * loops_number
 
             polygons = mesh.polygons[:]
-            faces = [range(p.loop_start, p.loop_start + p.loop_total) for p in polygons]
+            faces = [p.loop_indices for p in polygons]
 
-            vertex_attrs = mesh.vertices[:]
+            mesh_vertices = mesh.vertices[:]
             materials = mesh.materials[:]  # TODO: Write more than one material
 
             try:
@@ -108,14 +115,16 @@ def write_entity(context, filepath, global_matrix):
             except AttributeError:
                 uv_loops = None
 
-            for face_index in [i for face in faces for i in face]:
-                vertex = vertex_attrs[loops[face_index].vertex_index]
+            for face_index in [i for p in polygons for i in p.loop_indices]:
+                vertex_index = loops[face_index].vertex_index
+
+                vertex = mesh_vertices[vertex_index]
                 vertices[face_index] = vertex.co
                 normals[face_index] = vertex.normal
 
-                if uv_loops is not None:  # Also flip vertical coordinate
+                if uv_loops is not None:
                     uv = uv_loops[face_index].uv
-                    uvs[face_index] = (uv[0], 1.0 - uv[1])
+                    uvs[face_index] = (uv[0], uv[1])
 
             try:
                 material = materials[0]
@@ -135,7 +144,7 @@ def write_entity(context, filepath, global_matrix):
             diffuse_texture += '\0' * (255 - len(diffuse_texture))
             f.write(struct.pack("<255s1b", bytearray(diffuse_texture, 'ASCII'), 0))
 
-            f.write(struct.pack("<1i1i", len(vertices), len(faces)))
+            f.write(struct.pack("<1i1i", len(vertices), len(polygons)))
             for vertex in vertices:
                 f.write(struct.pack("<3f", vertex[0], vertex[1], vertex[2]))
             for normal in normals:
@@ -158,30 +167,15 @@ class ExportEntity(Operator, ExportHelper):
     filename_ext = ".entity"
     filter_glob = StringProperty(default="*.entity", options={'HIDDEN'})
 
-    axis_forward = EnumProperty(
-        name="Forward", default='Z',
-        items=(
-            ('X', "X Forward", ""),
-            ('Y', "Y Forward", ""),
-            ('Z', "Z Forward", ""),
-            ('-X', "-X Forward", ""),
-            ('-Y', "-Y Forward", ""),
-            ('-Z', "-Z Forward", "")
-        ))
-
-    axis_up = EnumProperty(
-        name="Up", default='Y',
-        items=(
-            ('X', "X Up", ""),
-            ('Y', "Y Up", ""),
-            ('Z', "Z Up", ""),
-            ('-X', "-X Up", ""),
-            ('-Y', "-Y Up", ""),
-            ('-Z', "-Z Up", "")
-        ))
-
     def execute(self, context):
-        global_matrix = axis_conversion(to_forward=self.axis_forward, to_up=self.axis_up).to_4x4()
+        # Translate from Blender X(right), Y(forward), Z(up)
+        # to Graphene X(right), Y(up), Z(forward) coordinate system
+        global_matrix = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
+
+        # axis_conversion() issued matrix also flips X(right) to X(left),
+        # flip back manually
+        global_matrix[0][0] = 1.0
+
         return write_entity(context, self.filepath, global_matrix)
 
 
