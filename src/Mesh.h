@@ -32,30 +32,25 @@ namespace Graphene {
 
 class Mesh {
 public:
-    GRAPHENE_API Mesh(const void* data, int faces, int vertices);
+    GRAPHENE_API Mesh(const void* data, int vertices, int faces);
     GRAPHENE_API ~Mesh();
+
+    GRAPHENE_API int getVertices() const;
+    GRAPHENE_API int getFaces() const;
 
     GRAPHENE_API std::shared_ptr<Material> getMaterial() const;
     GRAPHENE_API void setMaterial(const std::shared_ptr<Material> material);
 
-    GRAPHENE_API int getFaces() const;
-    GRAPHENE_API int getVertices() const;
-
     GRAPHENE_API void render();
 
 private:
-    enum DataBuffer {
-        BUFFER_VERTICES,
-        BUFFER_ELEMENTS
-    };
+    GLuint vao = 0;
+    GLuint buffers[2] = { };
+
+    int vertices = 0;
+    int faces = 0;
 
     std::shared_ptr<Material> material;
-
-    GLuint buffers[2] = { };
-    GLuint vao = 0;
-
-    int faces = 0;
-    int vertices = 0;
 };
 
 }  // namespace Graphene

@@ -21,6 +21,7 @@
  */
 
 #include <RenderManager.h>
+#include <ObjectManager.h>
 #include <Logger.h>
 #include <Scene.h>
 #include <Object.h>
@@ -36,31 +37,12 @@ enum BindPoints {
     BIND_LIGHT = 0
 };
 
-#pragma pack(push, 1)
-
-typedef struct {
-    float positons[12];
-    float normals[12];
-    float uvs[8];
-    int faces[6];
-} FrameGeometry;
-
-#pragma pack(pop)
-
 RenderManager& RenderManager::getInstance() {
     static RenderManager instance;
     return instance;
 }
 
 RenderManager::RenderManager() {
-    FrameGeometry geometry = {
-        { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f },
-        {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
-        {  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f },
-        { 0, 1, 3, 1, 2, 3 }
-    };
-    this->frame = std::make_shared<Mesh>(&geometry, 2, 4);
-
     this->shaders = {
         { RenderStep::GEOMETRY, std::make_shared<Shader>("shaders/geometry_output.shader") },
         { RenderStep::FRAME,    std::make_shared<Shader>("shaders/ambient_lighting.shader") },
@@ -77,6 +59,7 @@ RenderManager::RenderManager() {
         { RenderStep::OVERLAY,  std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) }
     };
+    this->frame = GetObjectManager().createQuad();
 }
 
 bool RenderManager::hasShadowPass() const {

@@ -21,6 +21,7 @@
  */
 
 #include <Label.h>
+#include <ObjectManager.h>
 #include <Mesh.h>
 #include <ImageTexture.h>
 #include <RawImage.h>
@@ -29,30 +30,14 @@
 
 namespace Graphene {
 
-#pragma pack(push, 1)
-
-typedef struct {
-    float positons[12];
-    float normals[12];
-    float uvs[8];
-    int faces[6];
-} FrameGeometry;
-
-#pragma pack(pop)
-
 Label::Label(int width, int height, const std::shared_ptr<Font> font):
         font(font) {
-    FrameGeometry geometry = {
-        { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f },
-        {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f },
-        {  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f },
-        { 0, 1, 3, 1, 2, 3 }
-    };
-    auto mesh = std::make_shared<Mesh>(&geometry, 2, 4);
-    this->addMesh(mesh);
-
     RawImage image(width, height, 32);
+
+    auto mesh = GetObjectManager().createQuad();
     mesh->getMaterial()->setDiffuseTexture(std::make_shared<ImageTexture>(image));
+
+    this->addMesh(mesh);
 }
 
 int Label::getWidth() const {

@@ -45,6 +45,7 @@ public:
     GRAPHENE_API std::shared_ptr<Camera> createCamera(ProjectionType type) const;
     GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
+    GRAPHENE_API std::shared_ptr<Mesh> createQuad();
 
     GRAPHENE_API void clearCache();
 

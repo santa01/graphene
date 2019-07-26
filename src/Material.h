@@ -32,21 +32,6 @@
 
 namespace Graphene {
 
-#pragma pack(push, 1)
-
-/* std140 layout */
-typedef struct {
-    float ambientIntensity;
-    float diffuseIntensity;
-    float specularIntensity;
-    int specularHardness;
-    float diffuseColor[3];
-    int diffuseTexture;
-    float specularColor[3];
-} MaterialBuffer;
-
-#pragma pack(pop)
-
 class Material {
 public:
     GRAPHENE_API Material();

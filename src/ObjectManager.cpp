@@ -57,6 +57,13 @@ typedef struct {
     int faces;
 } ObjectGeometry;
 
+typedef struct {
+    float vertices[12] = { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f };
+    float normals[12]  = {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f };
+    float uvs[8]       = {  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f };
+    int faces[6]       = { 0, 1, 3, 1, 2, 3 };  // Clockwise face winding
+} QuadMesh;
+
 #pragma pack(pop)
 
 ObjectManager& ObjectManager::getInstance() {
@@ -93,6 +100,20 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     }
 
     return entity;
+}
+
+std::shared_ptr<Mesh> ObjectManager::createQuad() {
+    std::string name(typeid(QuadMesh).name());
+
+    if (this->meshCache.find(name) == this->meshCache.end()) {
+        QuadMesh meshData;
+        auto quadMesh = std::make_shared<Mesh>(&meshData, 4, 2);
+        std::unordered_set<std::shared_ptr<Mesh>> meshes = { quadMesh };
+
+        this->meshCache.insert(std::make_pair(name, meshes));
+    }
+
+    return *this->meshCache.at(name).begin();
 }
 
 void ObjectManager::clearCache() {
@@ -166,7 +187,7 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
         std::unique_ptr<char[]> meshData(new char[meshDataSize]);
         file.read(meshData.get(), meshDataSize);
 
-        auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.faces, objectGeometry.vertices);
+        auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
         mesh->setMaterial(material);
         meshes.insert(mesh);
     }
