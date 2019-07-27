@@ -108,12 +108,17 @@ std::shared_ptr<Mesh> ObjectManager::createQuad() {
     if (this->meshCache.find(name) == this->meshCache.end()) {
         QuadMesh meshData;
         auto quadMesh = std::make_shared<Mesh>(&meshData, 4, 2);
-        std::unordered_set<std::shared_ptr<Mesh>> meshes = { quadMesh };
 
+        std::unordered_set<std::shared_ptr<Mesh>> meshes = { quadMesh };
         this->meshCache.insert(std::make_pair(name, meshes));
     }
 
-    return *this->meshCache.at(name).begin();
+    // Return a Mesh copy (same OpenGL objects, different material)
+    auto meshTemplate = *this->meshCache.at(name).begin();
+    auto quadMesh = std::make_shared<Mesh>(*meshTemplate);
+
+    quadMesh->setMaterial(std::make_shared<Material>());
+    return quadMesh;
 }
 
 void ObjectManager::clearCache() {
@@ -189,6 +194,7 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
 
         auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
         mesh->setMaterial(material);
+
         meshes.insert(mesh);
     }
 

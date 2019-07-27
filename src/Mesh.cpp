@@ -39,8 +39,7 @@ enum VertexAttributes {
 
 Mesh::Mesh(const void* data, int vertices, int faces):
         vertices(vertices),
-        faces(faces),
-        material(new Material()) {
+        faces(faces) {
     const char* meshData = reinterpret_cast<const char*>(data);
 
     const void* vertexData = meshData;
