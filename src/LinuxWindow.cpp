@@ -202,9 +202,30 @@ void LinuxWindow::createWindow(const char* windowName) {
     XMapRaised(this->display, this->window);
     XFree(visualInfo);
 
-    // This actually registers WM_DELETE_WINDOW so we can intercept it
+    /*
+     * Per https://tronche.com/gui/x/icccm/sec-4.html#s-4.2.8.1
+     * 4.2.8.1. Window Deletion
+     *
+     * Clients receiving a WM_DELETE_WINDOW message should behave as if
+     * the user selected "delete window" from a hypothetical menu.
+     */
     this->wmDeleteWindow = XInternAtom(this->display, "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(this->display, this->window, &this->wmDeleteWindow, 1);
+    XSetWMProtocols(this->display, this->window, &this->wmDeleteWindow, True);
+
+    /*
+     * Per https://specifications.freedesktop.org/wm-spec/wm-spec-1.3.html#NORESIZE
+     * Fixed size windows
+     *
+     * Windows can indicate that they are non-resizable by setting minheight = maxheight
+     * and minwidth = maxwidth in the ICCCM WM_NORMAL_HINTS property.
+     */
+    XSizeHints* hints = XAllocSizeHints();
+    hints->flags = PMinSize | PMaxSize;
+    hints->min_width = hints->max_width = this->width;
+    hints->min_height = hints->max_height = this->height;
+
+    XSetWMNormalHints(this->display, this->window, hints);
+    XFree(hints);
 }
 
 void LinuxWindow::destroyWindow() {
