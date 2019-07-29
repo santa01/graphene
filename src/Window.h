@@ -24,33 +24,17 @@
 #define WINDOW_H
 
 #include <GrapheneApi.h>
+#include <Input.h>
 #include <RenderTarget.h>
 #include <GeometryBuffer.h>
 #include <Viewport.h>
 #include <Overlay.h>
 #include <Signals.h>
-#include <array>
-#include <utility>
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
 
 namespace Graphene {
-
-enum MouseButton {
-    LEFT,
-    MIDDLE,
-    RIGHT,
-    X1,     // Wheel up
-    X2      // Wheel down
-};
-
-constexpr int KeyboardScancodes = 256;
-constexpr int MouseButtons = 5;
-
-typedef std::array<bool, KeyboardScancodes> KeyboardState;
-typedef std::array<bool, MouseButtons> MouseState;
-typedef std::pair<int, int> MousePosition;
 
 class Window: public RenderTarget {
 public:
@@ -79,8 +63,8 @@ public:
 protected:
     friend class Engine;
     Signals::Signal<int, int> onMouseMotionSignal;
-    Signals::Signal<int, bool> onMouseButtonSignal;
-    Signals::Signal<int, bool> onKeyboardButtonSignal;
+    Signals::Signal<MouseButton, bool> onMouseButtonSignal;
+    Signals::Signal<KeyboardKey, bool> onKeyboardKeySignal;
 
     KeyboardState keyboardState = { };
     MouseState mouseState = { };

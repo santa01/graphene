@@ -23,6 +23,7 @@
 #if defined(_WIN32)
 
 #include <Win32Window.h>
+#include <Input.h>
 #include <Logger.h>
 #include <RenderTarget.h>
 #include <windowsx.h>
@@ -39,41 +40,48 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 
     switch (message) {
         case WM_KEYDOWN:
-        case WM_KEYUP: {
-            int scancode = HIWORD(lParam) & 0xFF;  // lParam 16-23 bits is the keyboard scancode
-            bool keyState = (message == WM_KEYDOWN);
-            self->keyboardState[scancode] = keyState;
-            self->onKeyboardButtonSignal(scancode, keyState);
+        case WM_KEYUP:
+        case WM_SYSKEYDOWN:
+        case WM_SYSKEYUP: {
+            int virtualKey = static_cast<int>(wParam);
+            KeyboardKey keyboardKey = Input::keycodeToKeyboardKey(virtualKey);
+
+            if (keyboardKey != KeyboardKey::KEY_UNMAPPED) {
+                bool keyState = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
+                self->keyboardState[keyboardKey] = keyState;
+                self->onKeyboardKeySignal(keyboardKey, keyState);
+            }
+
             return 0;
         }
 
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP: {
             bool mouseButtonState = (message == WM_LBUTTONDOWN);
-            self->mouseState[MouseButton::LEFT] = mouseButtonState;
-            self->onMouseButtonSignal(MouseButton::LEFT, mouseButtonState);
+            self->mouseState[MouseButton::BUTTON_LEFT] = mouseButtonState;
+            self->onMouseButtonSignal(MouseButton::BUTTON_LEFT, mouseButtonState);
             return 0;
         }
 
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP: {
             bool mouseButtonState = (message == WM_MBUTTONDOWN);
-            self->mouseState[MouseButton::MIDDLE] = mouseButtonState;
-            self->onMouseButtonSignal(MouseButton::MIDDLE, mouseButtonState);
+            self->mouseState[MouseButton::BUTTON_MIDDLE] = mouseButtonState;
+            self->onMouseButtonSignal(MouseButton::BUTTON_MIDDLE, mouseButtonState);
             return 0;
         }
 
         case WM_RBUTTONDOWN:
         case WM_RBUTTONUP: {
             bool mouseButtonState = (message == WM_RBUTTONDOWN);
-            self->mouseState[MouseButton::RIGHT] = mouseButtonState;
-            self->onMouseButtonSignal(MouseButton::RIGHT, mouseButtonState);
+            self->mouseState[MouseButton::BUTTON_RIGHT] = mouseButtonState;
+            self->onMouseButtonSignal(MouseButton::BUTTON_RIGHT, mouseButtonState);
             return 0;
         }
 
         case WM_XBUTTONDOWN:
         case WM_XBUTTONUP: {
-            MouseButton mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? MouseButton::X1 : MouseButton::X2;
+            MouseButton mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? MouseButton::BUTTON_X1 : MouseButton::BUTTON_X2;
             bool mouseButtonState = (message == WM_XBUTTONDOWN);
             self->mouseState[mouseButton] = mouseButtonState;
             self->onMouseButtonSignal(mouseButton, mouseButtonState);

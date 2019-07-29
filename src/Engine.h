@@ -28,6 +28,7 @@
 #include <FrameBuffer.h>
 #include <Window.h>
 #include <Scene.h>
+#include <Input.h>
 #include <Signals.h>
 #include <unordered_set>
 #include <memory>
@@ -53,8 +54,8 @@ public:
 
 protected:
     virtual void onMouseMotion(int /*x*/, int /*y*/) {}
-    virtual void onMouseButton(int /*button*/, bool /*state*/) {}
-    virtual void onKeyboardButton(int /*button*/, bool /*state*/) {}
+    virtual void onMouseButton(MouseButton /*button*/, bool /*state*/) {}
+    virtual void onKeyboardKey(KeyboardKey /*key*/, bool /*state*/) {}
     virtual void onSetup() {}
     virtual void onIdle() {}
     virtual void onQuit() {}

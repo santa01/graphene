@@ -25,7 +25,6 @@
 #include <Logger.h>
 #include <ObjectManager.h>
 #include <EngineConfig.h>
-#include <Shader.h>
 #if defined(_WIN32)
 #include <Win32Window.h>
 #elif defined(__linux__)
@@ -168,9 +167,9 @@ void Engine::setupWindow() {
     this->window->onMouseMotionSignal.connect(
             Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));
     this->window->onMouseButtonSignal.connect(
-            Signals::Slot<int, bool>(&Engine::onMouseButton, this, std::placeholders::_1, std::placeholders::_2));
-    this->window->onKeyboardButtonSignal.connect(
-            Signals::Slot<int, bool>(&Engine::onKeyboardButton, this, std::placeholders::_1, std::placeholders::_2));
+            Signals::Slot<MouseButton, bool>(&Engine::onMouseButton, this, std::placeholders::_1, std::placeholders::_2));
+    this->window->onKeyboardKeySignal.connect(
+            Signals::Slot<KeyboardKey, bool>(&Engine::onKeyboardKey, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void Engine::setupOpenGL() {

@@ -48,13 +48,13 @@ void Example::onMouseMotion(int x, int y) {
     }
 }
 
-void Example::onKeyboardButton(int button, bool state) {
+void Example::onKeyboardKey(Graphene::KeyboardKey key, bool state) {
     if (state) {
-        if (button == KEY_PLUS) {
+        if (key == Graphene::KeyboardKey::KEY_PLUS) {
             this->entity3->yaw(10.0f);
             this->node->pitch(10.0f);
         }
-        if (button == KEY_MINUS) {
+        if (key == Graphene::KeyboardKey::KEY_MINUS) {
             this->entity3->yaw(-10.0f);
             this->node->pitch(-10.0f);
         }
@@ -126,7 +126,7 @@ void Example::onSetup() {
 void Example::onIdle() {
     const Graphene::KeyboardState& keyStates = this->getWindow()->getKeyboardState();
 
-    if (keyStates[KEY_ESC]) {
+    if (keyStates[Graphene::KeyboardKey::KEY_ESCAPE]) {
         this->exit(0);
     }
 
@@ -134,19 +134,19 @@ void Example::onIdle() {
     Math::Vec3 forward(this->player->getTarget() * correction);
     Math::Vec3 right(this->player->getRight() * correction);
 
-    if (keyStates[KEY_W]) {
+    if (keyStates[Graphene::KeyboardKey::KEY_W]) {
         this->player->move(forward);
     }
 
-    if (keyStates[KEY_S]) {
+    if (keyStates[Graphene::KeyboardKey::KEY_S]) {
         this->player->move(-forward);
     }
 
-    if (keyStates[KEY_D]) {
+    if (keyStates[Graphene::KeyboardKey::KEY_D]) {
         this->player->move(right);
     }
 
-    if (keyStates[KEY_A]) {
+    if (keyStates[Graphene::KeyboardKey::KEY_A]) {
         this->player->move(-right);
     }
 }

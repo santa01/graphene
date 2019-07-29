@@ -49,6 +49,10 @@ private:
     void createContext();
     void destroyContext();
 
+    void createKeyboardMapping();
+    void destroyKeyboardMapping();
+    KeySym keycodeToKeysym(KeyCode keycode) const;
+
     Display* display = nullptr;
     int screen = 0;
     GLXFBConfig fbConfig = nullptr;
@@ -56,6 +60,10 @@ private:
     XID window = None;
     Atom wmDeleteWindow = None;
     GLXContext renderingContext = nullptr;
+
+    int firstKeycode = 0;
+    int keysymsPerKeycode = 0;
+    KeySym* keysymsMapping = nullptr;
 };
 
 }  // namespace Graphene

@@ -23,6 +23,7 @@
 #if defined(__linux__)
 
 #include <LinuxWindow.h>
+#include <Input.h>
 #include <Logger.h>
 #include <RenderTarget.h>
 #include <sstream>
@@ -33,11 +34,13 @@ namespace Graphene {
 LinuxWindow::LinuxWindow(int width, int height):
         Window(width, height) {
     this->createWindow("OpenGL Window");
+    this->createKeyboardMapping();
     this->createContext();
 }
 
 LinuxWindow::~LinuxWindow() {
     this->destroyContext();
+    this->destroyKeyboardMapping();
     this->destroyWindow();
 }
 
@@ -88,9 +91,15 @@ bool LinuxWindow::dispatchEvents() {
         switch (event.type) {
             case KeyPress:
             case KeyRelease: {
-                bool keyState = (event.type == KeyPress);
-                this->keyboardState[event.xkey.keycode] = keyState;
-                this->onKeyboardButtonSignal(event.xkey.keycode, keyState);
+                KeySym keysym = this->keycodeToKeysym(event.xkey.keycode);
+                KeyboardKey keyboardKey = Input::keycodeToKeyboardKey(static_cast<int>(keysym));
+
+                if (keyboardKey != KeyboardKey::KEY_UNMAPPED) {
+                    bool keyState = (event.type == KeyPress);
+                    this->keyboardState[keyboardKey] = keyState;
+                    this->onKeyboardKeySignal(keyboardKey, keyState);
+                }
+
                 break;
             }
 
@@ -285,6 +294,46 @@ void LinuxWindow::destroyContext() {
             this->renderingContext = nullptr;
         }
     }
+}
+
+void LinuxWindow::createKeyboardMapping() {
+    int maxKeycode;
+    XDisplayKeycodes(this->display, &this->firstKeycode, &maxKeycode);
+
+    /*
+     * Per https://tronche.com/gui/x/xlib/input/XGetKeyboardMapping.html
+     * Description:
+     *
+     * In addition, the following expression must be less than or equal to max_keycode
+     * as returned by XDisplayKeycodes():
+     *
+     * first_keycode + keycode_count - 1
+     */
+    int keycodeCount = maxKeycode - this->firstKeycode + 1;
+    this->keysymsMapping = XGetKeyboardMapping(this->display, this->firstKeycode, keycodeCount, &this->keysymsPerKeycode);
+}
+
+void LinuxWindow::destroyKeyboardMapping() {
+    if (this->display != nullptr) {
+        if (this->keysymsMapping != nullptr) {
+            XFree(this->keysymsMapping);
+            this->keysymsMapping = nullptr;
+        }
+    }
+}
+
+KeySym LinuxWindow::keycodeToKeysym(KeyCode keycode) const {
+    /*
+     * Per https://tronche.com/gui/x/xlib/input/XGetKeyboardMapping.html
+     * Description:
+     *
+     * KeySym number N, counting from zero, for KeyCode K has the following index in the list,
+     * counting from zero:
+     *
+     * (K - first_code) * keysyms_per_code_return + N
+     */
+    int index = 0;  // Shift/NumLock key released, 1 for a keysym after Shift+Key combination
+    return this->keysymsMapping[(keycode - this->firstKeycode) * this->keysymsPerKeycode + index];
 }
 
 }  // namespace Graphene
