@@ -64,6 +64,7 @@ PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLGETINTEGERVPROC glGetIntegerv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
+PFNGLREADPIXELSPROC glReadPixels;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETSTRINGPROC glGetString;
@@ -171,6 +172,7 @@ void loadCore() {
     LOAD_MANDATORY(glGetIntegerv);
     LOAD_MANDATORY(glGetProgramInfoLog);
     LOAD_MANDATORY(glGetProgramiv);
+    LOAD_MANDATORY(glReadPixels);
     LOAD_MANDATORY(glGetShaderInfoLog);
     LOAD_MANDATORY(glGetShaderiv);
     LOAD_MANDATORY(glGetString);
