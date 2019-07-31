@@ -15,7 +15,7 @@ smooth out vec3 fragmentPosition;
 smooth out vec3 fragmentNormal;
 smooth out vec2 fragmentUV;
 
-void main () {
+void main() {
     vec4 vertexWorldPosition = localWorld * vec4(vertexPosition, 1.0f);
     vec4 vertexWorldNormal = normalRotation * vec4(vertexNormal, 1.0f);
     gl_Position = modelViewProjection * vertexWorldPosition;
@@ -39,6 +39,7 @@ layout(std140) uniform Material {
     vec3 specularColor;
 } material;
 
+uniform int objectId;   // Unused
 uniform sampler2D diffuseSampler;
 
 smooth in vec3 fragmentPosition;

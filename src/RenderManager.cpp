@@ -118,6 +118,7 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
     this->shader->setUniform("modelViewProjection", modelViewProjection);
 
     scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld) {
+        this->shader->setUniform("objectId", entity->getId());
         this->shader->setUniform("normalRotation", entity->getRotation());
         this->shader->setUniform("localWorld", localWorld);
 

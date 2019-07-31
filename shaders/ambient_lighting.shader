@@ -8,7 +8,7 @@ layout(location = 2) in vec2 vertexUV;
 
 smooth out vec2 fragmentUV;
 
-void main () {
+void main() {
     gl_Position = vec4(vertexPosition, 1.0f);
     fragmentUV = vertexUV;
 }
