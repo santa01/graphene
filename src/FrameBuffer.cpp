@@ -22,16 +22,17 @@
 
 #include <FrameBuffer.h>
 #include <RenderManager.h>
-#include <OpenGL.h>
 
 namespace Graphene {
 
-FrameBuffer::FrameBuffer(int width, int height):
+FrameBuffer::FrameBuffer(int width, int height, GLenum outputFormat):
         RenderTarget(width, height),
-        colorTexture(new ImageTexture(width, height)) {
+        outputTexture(new Texture(width, height, 1, outputFormat)),
+        depthTexture(new DepthTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
-    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->colorTexture->getHandle(), 0);
+    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->outputTexture->getHandle(), 0);
+    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthTexture->getHandle(), 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
@@ -39,8 +40,18 @@ FrameBuffer::~FrameBuffer() {
     glDeleteFramebuffers(1, &this->fbo);
 }
 
-std::shared_ptr<ImageTexture> FrameBuffer::getColorTexture() const {
-    return this->colorTexture;
+std::shared_ptr<Texture> FrameBuffer::getOutputTexture() const {
+    return this->outputTexture;
+}
+
+std::shared_ptr<DepthTexture> FrameBuffer::getDepthTexture() const {
+    return this->depthTexture;
+}
+
+void FrameBuffer::getPixel(int x, int y, GLenum pixelFormat, GLenum pixelType, void* pixel) const {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, this->fbo);
+    glReadPixels(x, y, 1, 1, pixelFormat, pixelType, pixel);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
 
 void FrameBuffer::update() {
@@ -48,11 +59,11 @@ void FrameBuffer::update() {
 
     GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, drawBuffers);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     GetRenderManager().setRenderStep(RenderStep::BUFFER);
     for (auto& viewport: this->viewports) {

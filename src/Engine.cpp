@@ -21,7 +21,6 @@
  */
 
 #include <Engine.h>
-#include <OpenGL.h>
 #include <Logger.h>
 #include <ObjectManager.h>
 #include <EngineConfig.h>
@@ -72,8 +71,8 @@ const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers(
     return this->frameBuffers;
 }
 
-std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height) {
-    auto frameBuffer = std::make_shared<FrameBuffer>(width, height);
+std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height, GLenum outputFormat) {
+    auto frameBuffer = std::make_shared<FrameBuffer>(width, height, outputFormat);
     this->frameBuffers.insert(frameBuffer);
 
     return frameBuffer;

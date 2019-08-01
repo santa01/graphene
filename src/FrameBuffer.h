@@ -25,22 +25,26 @@
 
 #include <GrapheneApi.h>
 #include <RenderTarget.h>
-#include <ImageTexture.h>
+#include <Texture.h>
+#include <OpenGL.h>
 #include <memory>
 
 namespace Graphene {
 
 class FrameBuffer: public RenderTarget {
 public:
-    GRAPHENE_API FrameBuffer(int width, int height);
+    GRAPHENE_API FrameBuffer(int width, int height, GLenum outputFormat);
     GRAPHENE_API ~FrameBuffer();
 
-    GRAPHENE_API std::shared_ptr<ImageTexture> getColorTexture() const;
+    GRAPHENE_API std::shared_ptr<Texture> getOutputTexture() const;
+    GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture() const;
+    GRAPHENE_API void getPixel(int x, int y, GLenum pixelFormat, GLenum pixelType, void* pixel) const;
 
     GRAPHENE_API void update() override;
 
 private:
-    std::shared_ptr<ImageTexture> colorTexture;
+    std::shared_ptr<Texture> outputTexture;
+    std::shared_ptr<DepthTexture> depthTexture;
 };
 
 }  // namespace Graphene

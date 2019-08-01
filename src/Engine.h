@@ -29,6 +29,7 @@
 #include <Window.h>
 #include <Scene.h>
 #include <Input.h>
+#include <OpenGL.h>
 #include <Signals.h>
 #include <unordered_set>
 #include <memory>
@@ -41,7 +42,7 @@ public:
     GRAPHENE_API virtual ~Engine() = default;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
-    GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height);
+    GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height, GLenum outputFormat);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
     GRAPHENE_API std::shared_ptr<Scene> createScene();
