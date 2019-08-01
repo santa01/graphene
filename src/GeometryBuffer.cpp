@@ -22,6 +22,7 @@
 
 #include <GeometryBuffer.h>
 #include <RenderManager.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 

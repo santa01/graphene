@@ -24,10 +24,13 @@
 
 namespace Graphene {
 
-Texture::Texture(int width, int height):
+Texture::Texture(int width, int height, GLsizei mipmapLevels, GLenum storageFormat):
         width(width),
         height(height) {
     glGenTextures(1, &this->texture);
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexStorage2D(GL_TEXTURE_2D, mipmapLevels, storageFormat, this->width, this->height);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Texture::~Texture() {

@@ -34,10 +34,9 @@ ImageTexture::ImageTexture(const Image& image):
 }
 
 ImageTexture::ImageTexture(int width, int height):
-        Texture(width, height) {
+        RgbaTexture(width, height) {
     glBindTexture(GL_TEXTURE_2D, this->texture);
 
-    glTexStorage2D(GL_TEXTURE_2D, 4, GL_SRGB8_ALPHA8, this->width, this->height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

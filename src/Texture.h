@@ -31,7 +31,7 @@ namespace Graphene {
 
 class Texture: public NonCopyable {
 public:
-    GRAPHENE_API Texture(int width, int height);
+    GRAPHENE_API Texture(int width, int height, GLsizei mipmapLevels, GLenum storageFormat);
     GRAPHENE_API virtual ~Texture();
 
     GRAPHENE_API int getWidth() const;
@@ -41,11 +41,22 @@ public:
     GRAPHENE_API void bind(int textureUnit);
 
 protected:
-    GLuint texture = 0;
-
     int width = 0;
     int height = 0;
+    GLuint texture = 0;
 };
+
+template<GLsizei mipmapLevels, GLenum storageFormat>
+class TextureTemplate: public Texture {
+public:
+    GRAPHENE_API TextureTemplate(int width, int height):
+            Texture(width, height, mipmapLevels, storageFormat) {
+    }
+};
+
+typedef TextureTemplate<4, GL_SRGB8_ALPHA8> RgbaTexture;
+typedef TextureTemplate<1, GL_DEPTH_COMPONENT16> DepthTexture;
+typedef TextureTemplate<1, GL_RGBA16F> GeometryTexture;
 
 }  // namespace Graphene
 

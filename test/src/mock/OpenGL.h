@@ -23,7 +23,9 @@
 #ifndef OPENGL_H
 #define OPENGL_H
 
+#define GLsizei                     int
 #define GLuint                      unsigned int
+#define GLenum                      unsigned int
 
 #define GL_UNIFORM_BUFFER           0
 #define GL_DYNAMIC_DRAW             0
@@ -38,6 +40,9 @@
 #define GL_TEXTURE_MIN_FILTER       0
 #define GL_TEXTURE_MAG_FILTER       0
 #define GL_TEXTURE0                 0
+#define GL_SRGB8_ALPHA8             0
+#define GL_DEPTH_COMPONENT16        0
+#define GL_NONE                     0
 
 #define glGenBuffers(...)           mock(__VA_ARGS__)
 #define glDeleteBuffers(...)        mock(__VA_ARGS__)
