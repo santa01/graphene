@@ -44,6 +44,7 @@ void Layout::removeComponent(const std::shared_ptr<Label> component) {
 
     auto componentScaleFactorsIt = this->componentScaleFactors.find(component);
     if (componentScaleFactorsIt != this->componentScaleFactors.end()) {
+        // Restore component scale factors to initial values
         auto& scaleFactors = componentScaleFactorsIt->second;
         component->scale(1.0f / scaleFactors.first, 1.0f / scaleFactors.second, 1.0f);
 

@@ -28,7 +28,7 @@
 #include <string>
 
 #define GetEngineConfig() EngineConfig::getInstance()
-#define FormatOption(width, name, value) std::setw((width)) << std::left << (name) << " : " << (value) << '\n'
+#define FormatOption(width, name, value) std::setw((width)) << std::left << (name) << " : " << (value)
 
 namespace Graphene {
 

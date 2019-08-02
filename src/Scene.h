@@ -29,6 +29,7 @@
 #include <Camera.h>
 #include <Entity.h>
 #include <Light.h>
+#include <Mat4.h>
 #include <Vec3.h>
 #include <functional>
 #include <memory>
@@ -40,16 +41,14 @@ typedef std::function<void(const std::shared_ptr<Light>, const Math::Vec3&, cons
 
 class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
-    GRAPHENE_API Scene();
-
     GRAPHENE_API std::shared_ptr<SceneNode> createNode();
     GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
 
-    GRAPHENE_API const Math::Vec3& getAmbientColor() const;
     GRAPHENE_API void setAmbientColor(const Math::Vec3& ambientColor);
+    GRAPHENE_API const Math::Vec3& getAmbientColor() const;
 
-    GRAPHENE_API float getAmbientEnergy() const;
     GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
+    GRAPHENE_API float getAmbientEnergy() const;
 
     GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
     GRAPHENE_API void iterateEntities(EntityHandler handler);
@@ -58,7 +57,7 @@ public:
 private:
     std::shared_ptr<SceneNode> rootNode;
 
-    Math::Vec3 ambientColor;
+    Math::Vec3 ambientColor = { 1.0f, 1.0f, 1.0f };
     float ambientEnergy = 1.0f;
 };
 

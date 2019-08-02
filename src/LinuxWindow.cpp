@@ -332,7 +332,7 @@ KeySym LinuxWindow::keycodeToKeysym(KeyCode keycode) const {
      *
      * (K - first_code) * keysyms_per_code_return + N
      */
-    int index = 0;  // Shift/NumLock key released, 1 for a keysym after Shift+Key combination
+    int index = 0;  // Shift/NumLock modifier released, 1 for a keysym of the Mod+Key combination
     return this->keysymsMapping[(keycode - this->firstKeycode) * this->keysymsPerKeycode + index];
 }
 

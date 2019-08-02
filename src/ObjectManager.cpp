@@ -145,7 +145,7 @@ std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& na
 
 std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std::string& name) {
     std::ifstream file(name, std::ios::binary);
-    if (!file.good()) {
+    if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 

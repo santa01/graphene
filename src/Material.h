@@ -26,7 +26,6 @@
 #include <GrapheneApi.h>
 #include <ImageTexture.h>
 #include <UniformBuffer.h>
-#include <OpenGL.h>
 #include <Vec3.h>
 #include <memory>
 
@@ -35,7 +34,6 @@ namespace Graphene {
 class Material {
 public:
     GRAPHENE_API Material();
-    GRAPHENE_API ~Material();
 
     GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture() const;
     GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture);
@@ -60,8 +58,6 @@ public:
 
     GRAPHENE_API std::shared_ptr<UniformBuffer> getMaterialBuffer() const;
 
-    GRAPHENE_API void bind(int bindPoint);
-
 private:
     std::shared_ptr<ImageTexture> diffuseTexture;
     std::shared_ptr<UniformBuffer> materialBuffer;
@@ -73,8 +69,6 @@ private:
 
     Math::Vec3 diffuseColor = { 1.0f, 1.0f, 1.0f };
     Math::Vec3 specularColor = { 1.0f, 1.0f, 1.0f };
-
-    GLuint ubo = 0;
 };
 
 }  // namespace Graphene

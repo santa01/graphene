@@ -24,15 +24,15 @@
 #define UNIFORMBUFFER_H
 
 #include <GrapheneApi.h>
+#include <NonCopyable.h>
 #include <OpenGL.h>
 #include <cstddef>
 
 namespace Graphene {
 
-#define updateBuffer(buffer, type, member, data) \
-        buffer->update(data, sizeof(type::member), offsetof(type, member))
+#define updateBuffer(buffer, type, member, data) (buffer)->update((data), sizeof(type::member), offsetof(type, member))
 
-class UniformBuffer {
+class UniformBuffer: public NonCopyable {
 public:
     GRAPHENE_API UniformBuffer(const void* data, size_t dataSize);
     GRAPHENE_API ~UniformBuffer();

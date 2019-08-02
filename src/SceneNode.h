@@ -29,8 +29,6 @@
 #include <Movable.h>
 #include <NonCopyable.h>
 #include <Object.h>
-#include <Entity.h>
-#include <Light.h>
 #include <unordered_set>
 #include <memory>
 

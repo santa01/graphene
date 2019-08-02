@@ -23,15 +23,10 @@
 #include <Scene.h>
 #include <Logger.h>
 #include <Object.h>
-#include <Mat4.h>
 #include <algorithm>
 #include <stdexcept>
 
 namespace Graphene {
-
-Scene::Scene():
-        ambientColor(1.0f, 1.0f, 1.0f) {
-}
 
 std::shared_ptr<SceneNode> Scene::createNode() {
     /* const version of shared_from_this() is selected otherwise */
@@ -47,16 +42,12 @@ std::shared_ptr<SceneNode> Scene::getRootNode() {
     return this->rootNode;
 }
 
-const Math::Vec3& Scene::getAmbientColor() const {
-    return this->ambientColor;
-}
-
 void Scene::setAmbientColor(const Math::Vec3& ambientColor) {
     this->ambientColor = ambientColor;
 }
 
-float Scene::getAmbientEnergy() const {
-    return this->ambientEnergy;
+const Math::Vec3& Scene::getAmbientColor() const {
+    return this->ambientColor;
 }
 
 void Scene::setAmbientEnergy(float ambientEnergy) {
@@ -65,6 +56,10 @@ void Scene::setAmbientEnergy(float ambientEnergy) {
     }
 
     this->ambientEnergy = ambientEnergy;
+}
+
+float Scene::getAmbientEnergy() const {
+    return this->ambientEnergy;
 }
 
 Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {

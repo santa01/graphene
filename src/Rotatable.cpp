@@ -22,9 +22,7 @@
 
 #include <Rotatable.h>
 #include <Quaternion.h>
-#include <Mat4.h>
 #include <Mat3.h>
-#include <Vec3.h>
 #include <Logger.h>
 #include <stdexcept>
 #include <cmath>

@@ -37,7 +37,7 @@ namespace Graphene {
  * Tex1 (RGBA16F): | specular R | specular G | specular B | diffuse intensity  |
  * Tex2 (RGBA16F): | position X | position Y | position Z | specular intensity |
  * Tex3 (RGBA16F): | normal X   | normal Y   | normal Z   | specular hardness  |
- * Tex4 (D16):     | depth      |
+ * Tex4 (DEPTH16): | depth      |
  */
 
 class GeometryBuffer: public RenderTarget {

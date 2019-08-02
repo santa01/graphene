@@ -35,14 +35,14 @@ std::string EngineConfig::toString() const {
     std::stringstream configString;
 
     configString << std::boolalpha << std::fixed << std::setprecision(3)
-                 << FormatOption(30, "Field of View", this->fov)
-                 << FormatOption(30, "Window Width", this->height)
-                 << FormatOption(30, "Window Height", this->width)
-                 << FormatOption(30, "Antialiasing Samples", this->samples)
-                 << FormatOption(30, "Anisotropic Filter Level", this->anisotropy)
-                 << FormatOption(30, "FPS Limit", this->maxFps)
-                 << FormatOption(30, "Vertical Synchronization", this->vsync)
-                 << FormatOption(30, "Debug Output", this->debug);
+                 << FormatOption(30, "Field of view", this->fov)                   << "\n"
+                 << FormatOption(30, "Window width", this->height)                 << "\n"
+                 << FormatOption(30, "Window height", this->width)                 << "\n"
+                 << FormatOption(30, "Antialiasing samples", this->samples)        << "\n"
+                 << FormatOption(30, "Anisotropic filter level", this->anisotropy) << "\n"
+                 << FormatOption(30, "FPS limit", this->maxFps)                    << "\n"
+                 << FormatOption(30, "Vertical synchronization", this->vsync)      << "\n"
+                 << FormatOption(30, "Debug output", this->debug);
 
     return configString.str();
 }

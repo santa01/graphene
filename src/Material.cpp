@@ -57,10 +57,6 @@ Material::Material() {
     this->materialBuffer = std::make_shared<UniformBuffer>(&material, sizeof(material));
 }
 
-Material::~Material() {
-    glDeleteBuffers(1, &this->ubo);
-}
-
 std::shared_ptr<ImageTexture> Material::getDiffuseTexture() const {
     return this->diffuseTexture;
 }
@@ -147,10 +143,6 @@ void Material::setSpecularColor(const Math::Vec3& specularColor) {
 
 std::shared_ptr<UniformBuffer> Material::getMaterialBuffer() const {
     return this->materialBuffer;
-}
-
-void Material::bind(int bindPoint) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, bindPoint, this->ubo);
 }
 
 }  // namespace Graphene

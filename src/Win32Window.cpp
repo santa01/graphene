@@ -25,7 +25,6 @@
 #include <Win32Window.h>
 #include <Input.h>
 #include <Logger.h>
-#include <RenderTarget.h>
 #include <windowsx.h>
 #include <sstream>
 #include <stdexcept>

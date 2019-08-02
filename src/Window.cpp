@@ -55,15 +55,15 @@ const std::unordered_set<std::string>& Window::getSupportedExtensions() const {
     return this->availableExtensions;
 }
 
-const std::unordered_set<std::shared_ptr<Overlay>>& Window::getOverlays() const {
-    return this->overlays;
-}
-
 std::shared_ptr<Overlay> Window::createOverlay(int left, int top, int width, int height) {
     auto overlay = std::make_shared<Overlay>(left, top, width, height);
     this->overlays.insert(overlay);
 
     return overlay;
+}
+
+const std::unordered_set<std::shared_ptr<Overlay>>& Window::getOverlays() const {
+    return this->overlays;
 }
 
 std::shared_ptr<Viewport> Window::createViewport(int left, int top, int width, int height) {

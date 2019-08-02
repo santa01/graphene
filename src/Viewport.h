@@ -40,8 +40,8 @@ public:
     GRAPHENE_API int getWidth() const;
     GRAPHENE_API int getHeight() const;
 
-    GRAPHENE_API std::shared_ptr<Camera> getCamera() const;
     GRAPHENE_API void setCamera(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API std::shared_ptr<Camera> getCamera() const;
 
     GRAPHENE_API virtual void update();
 

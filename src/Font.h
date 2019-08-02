@@ -38,9 +38,9 @@ class Font {
 public:
     GRAPHENE_API Font(const std::string& filename, int size, int dpi = 72);
 
-    GRAPHENE_API int getDPI() const;
-    GRAPHENE_API int getSize() const;
     GRAPHENE_API const std::string& getFilename() const;
+    GRAPHENE_API int getSize() const;
+    GRAPHENE_API int getDPI() const;
 
     GRAPHENE_API std::shared_ptr<Image> renderChar(wchar_t charCode);
     GRAPHENE_API std::shared_ptr<Image> renderString(const std::wstring& stringText);

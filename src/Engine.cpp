@@ -31,7 +31,6 @@
 #endif
 #include <chrono>
 #include <thread>
-#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <unordered_map>
@@ -50,7 +49,7 @@ std::unordered_map<GLenum, std::string> sourceMap = {
 std::unordered_map<GLenum, std::string> typeMap = {
     { GL_DEBUG_TYPE_ERROR_ARB,               "Error" },
     { GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB, "Deprecated" },
-    { GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB,  "Indefined" },
+    { GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB,  "Undefined" },
     { GL_DEBUG_TYPE_PERFORMANCE_ARB,         "Performance" },
     { GL_DEBUG_TYPE_PORTABILITY_ARB,         "Portability" },
     { GL_DEBUG_TYPE_OTHER_ARB,               "Other" }
@@ -182,16 +181,16 @@ void Engine::setupOpenGL() {
 
     std::stringstream openglExtensions;
     for (auto& extension: OpenGL::getSupportedExtensions()) {
-        openglExtensions << extension << '\n';
+        openglExtensions << "\n" << extension;
     }
 
     std::stringstream platformExtensions;
     for (auto& extension: this->window->getSupportedExtensions()) {
-        platformExtensions << extension << '\n';
+        platformExtensions << "\n" << extension;
     }
 
-    LogDebug("OpenGL extensions:\n%s", openglExtensions.str().c_str());
-    LogDebug("Platform extensions:\n%s", platformExtensions.str().c_str());
+    LogDebug("OpenGL extensions: %s", openglExtensions.str().c_str());
+    LogDebug("Platform extensions: %s", platformExtensions.str().c_str());
 
     if (GetEngineConfig().isDebug()) {
         if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {

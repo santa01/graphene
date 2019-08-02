@@ -37,15 +37,15 @@ int RenderTarget::getHeight() const {
     return this->height;
 }
 
-const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getViewports() const {
-    return this->viewports;
-}
-
 std::shared_ptr<Viewport> RenderTarget::createViewport(int left, int top, int width, int height) {
     auto viewport = std::make_shared<Viewport>(left, top, width, height);
     this->viewports.insert(viewport);
 
     return viewport;
+}
+
+const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getViewports() const {
+    return this->viewports;
 }
 
 }  // namespace Graphene

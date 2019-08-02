@@ -24,7 +24,6 @@
 #include <ObjectManager.h>
 #include <Logger.h>
 #include <Scene.h>
-#include <Object.h>
 #include <Light.h>
 #include <Entity.h>
 #include <Mat4.h>
@@ -62,36 +61,36 @@ RenderManager::RenderManager() {
     this->frame = GetObjectManager().createQuad();
 }
 
-bool RenderManager::hasShadowPass() const {
-    return this->shadowPass;
-}
-
 void RenderManager::setShadowPass(bool shadowPass) {
     this->shadowPass = shadowPass;
 }
 
-bool RenderManager::hasLightPass() const {
-    return this->lightPass;
+bool RenderManager::hasShadowPass() const {
+    return this->shadowPass;
 }
 
 void RenderManager::setLightPass(bool lightPass) {
     this->lightPass = lightPass;
 }
 
-std::shared_ptr<Shader> RenderManager::getShader(RenderStep step) const {
-    return this->shaders.at(step);
+bool RenderManager::hasLightPass() const {
+    return this->lightPass;
 }
 
 void RenderManager::setShader(RenderStep step, std::shared_ptr<Shader> shader) {
     this->shaders.at(step) = shader;
 }
 
-RenderStep RenderManager::getRenderStep() const {
-    return this->step;
+std::shared_ptr<Shader> RenderManager::getShader(RenderStep step) const {
+    return this->shaders.at(step);
 }
 
 void RenderManager::setRenderStep(RenderStep step) {
     this->step = step;
+}
+
+RenderStep RenderManager::getRenderStep() const {
+    return this->step;
 }
 
 void RenderManager::render(const std::shared_ptr<Camera> camera) {

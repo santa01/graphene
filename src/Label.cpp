@@ -32,12 +32,11 @@ namespace Graphene {
 
 Label::Label(int width, int height, const std::shared_ptr<Font> font):
         font(font) {
-    RawImage textureImage(width, height, 32);  // Data zeroed
-
     auto mesh = GetObjectManager().createQuad();
-    mesh->getMaterial()->setDiffuseTexture(std::make_shared<ImageTexture>(textureImage));
-
     this->addMesh(mesh);
+
+    RawImage textureImage(width, height, 32);  // Data zeroed
+    mesh->getMaterial()->setDiffuseTexture(std::make_shared<ImageTexture>(textureImage));
 }
 
 int Label::getWidth() const {

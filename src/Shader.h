@@ -52,8 +52,8 @@ public:
     GRAPHENE_API void setUniform(const std::string& name, int value);
     GRAPHENE_API void setUniformBlock(const std::string& name, int bindPoint);
 
-    GRAPHENE_API const std::string& getSource() const;
     GRAPHENE_API GLuint getVersion() const;
+    GRAPHENE_API const std::string& getSource() const;
 
     GRAPHENE_API void enable();
 
@@ -67,10 +67,11 @@ private:
 
     std::unordered_map<std::string, GLint> uniforms;
     std::unordered_map<std::string, GLuint> uniformBlocks;
-    std::string source;
-
+    std::unordered_map<std::string, GLenum> shaderTypes;
+    
     GLuint program = 0;
     GLuint version = 330;
+    std::string source;
 };
 
 }  // namespace Graphene

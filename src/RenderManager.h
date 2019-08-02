@@ -50,17 +50,17 @@ class RenderManager: public NonCopyable {
 public:
     GRAPHENE_API static RenderManager& getInstance();
 
-    GRAPHENE_API bool hasShadowPass() const;
     GRAPHENE_API void setShadowPass(bool shadowPass);
+    GRAPHENE_API bool hasShadowPass() const;
 
-    GRAPHENE_API bool hasLightPass() const;
     GRAPHENE_API void setLightPass(bool lightPass);
+    GRAPHENE_API bool hasLightPass() const;
 
-    GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep step) const;
     GRAPHENE_API void setShader(RenderStep step, std::shared_ptr<Shader> shader);
+    GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep step) const;
 
-    GRAPHENE_API RenderStep getRenderStep() const;
     GRAPHENE_API void setRenderStep(RenderStep step);
+    GRAPHENE_API RenderStep getRenderStep() const;
 
     GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 

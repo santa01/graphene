@@ -22,18 +22,21 @@
 
 #include <Shader.h>
 #include <Logger.h>
-#include <unordered_map>
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
 #include <memory>
-#include <utility>
 
 namespace Graphene {
 
 Shader::Shader(const std::string& name) {
+    this->shaderTypes = {
+        { "#define TYPE_VERTEX\n",   GL_VERTEX_SHADER },
+        { "#define TYPE_FRAGMENT\n", GL_FRAGMENT_SHADER }
+    };
+
     std::ifstream file(name, std::ios::binary);
-    if (!file.good()) {
+    if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 
@@ -43,7 +46,6 @@ Shader::Shader(const std::string& name) {
 
     std::unique_ptr<char[]> source(new char[sourceLength]);
     file.read(source.get(), sourceLength);
-    file.close();
 
     this->source = std::string(source.get(), sourceLength);
     this->buildShader();
@@ -104,12 +106,12 @@ void Shader::setUniformBlock(const std::string& name, int bindPoint) {
     }
 }
 
-const std::string& Shader::getSource() const {
-    return this->source;
-}
-
 GLuint Shader::getVersion() const {
     return this->version;
+}
+
+const std::string& Shader::getSource() const {
+    return this->source;
 }
 
 void Shader::enable() {
@@ -120,7 +122,7 @@ GLint Shader::checkoutUniform(const std::string& name) {
     this->enable();
 
     if (this->uniforms.find(name) == this->uniforms.end()) {
-        this->uniforms.insert(std::make_pair(name, glGetUniformLocation(this->program, name.c_str())));
+        this->uniforms.emplace(name, glGetUniformLocation(this->program, name.c_str()));
     }
 
     return this->uniforms.at(name);
@@ -130,7 +132,7 @@ GLuint Shader::checkoutUniformBlock(const std::string& name) {
     this->enable();
 
     if (this->uniformBlocks.find(name) == this->uniformBlocks.end()) {
-        this->uniformBlocks.insert(std::make_pair(name, glGetUniformBlockIndex(this->program, name.c_str())));
+        this->uniformBlocks.emplace(name, glGetUniformBlockIndex(this->program, name.c_str()));
     }
 
     return this->uniformBlocks.at(name);
@@ -138,15 +140,11 @@ GLuint Shader::checkoutUniformBlock(const std::string& name) {
 
 void Shader::buildShader() {
     std::vector<GLuint> shaders;
-    std::unordered_map<std::string, GLenum> shaderTypes = {
-        { "#define TYPE_VERTEX\n",   GL_VERTEX_SHADER },
-        { "#define TYPE_FRAGMENT\n", GL_FRAGMENT_SHADER }
-    };
 
     std::stringstream version;
     version << "#version " << this->version << "\n";
 
-    for (auto& shaderType: shaderTypes) {
+    for (auto& shaderType: this->shaderTypes) {
         std::string modifiedSource(this->source);
         modifiedSource.replace(modifiedSource.find(TOKEN_VERSION), sizeof(TOKEN_VERSION), version.str());
         modifiedSource.replace(modifiedSource.find(TOKEN_TYPE), sizeof(TOKEN_TYPE), shaderType.first);

@@ -21,9 +21,6 @@
  */
 
 #include <Camera.h>
-#include <Logger.h>
-#include <Mat3.h>
-#include <stdexcept>
 #include <cmath>
 
 namespace Graphene {

@@ -25,8 +25,8 @@
 
 #include <GrapheneApi.h>
 #include <UniformBuffer.h>
-#include <Vec3.h>
 #include <Object.h>
+#include <Vec3.h>
 #include <memory>
 
 namespace Graphene {

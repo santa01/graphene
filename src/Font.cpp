@@ -62,16 +62,16 @@ Font::Font(const std::string& filename, int size, int dpi):
     }
 }
 
-int Font::getDPI() const {
-    return this->dpi;
+const std::string& Font::getFilename() const {
+    return this->filename;
 }
 
 int Font::getSize() const {
     return this->size;
 }
 
-const std::string& Font::getFilename() const {
-    return this->filename;
+int Font::getDPI() const {
+    return this->dpi;
 }
 
 std::shared_ptr<Image> Font::renderChar(wchar_t charCode) {
