@@ -93,7 +93,9 @@ void Scene::iterateEntities(EntityHandler handler) {
         std::for_each(objects.begin(), objects.end(), [&handler, &transformation](const std::shared_ptr<Object> object) {
             if (object->getType() == ObjectType::ENTITY) {
                 auto entity = std::dynamic_pointer_cast<Entity>(object);
-                handler(entity, transformation * entity->getTranslation() * entity->getRotation() * entity->getScaling());
+                if (entity->isVisible()) {
+                    handler(entity, transformation * entity->getTranslation() * entity->getRotation() * entity->getScaling());
+                }
             }
         });
 

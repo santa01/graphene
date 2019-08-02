@@ -37,10 +37,15 @@ public:
     GRAPHENE_API Entity();
     GRAPHENE_API virtual ~Entity() = default;
 
+    GRAPHENE_API void setVisible(bool visible);
+    GRAPHENE_API bool isVisible() const;
+
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes() const;
     GRAPHENE_API void addMesh(const std::shared_ptr<Mesh> mesh);
 
 protected:
+    bool visible = true;
+
     std::unordered_set<std::shared_ptr<Mesh>> meshes;
 };
 

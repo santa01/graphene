@@ -30,6 +30,14 @@ Entity::Entity():
         Object(ObjectType::ENTITY) {
 }
 
+void Entity::setVisible(bool visible) {
+    this->visible = visible;
+}
+
+bool Entity::isVisible() const {
+    return this->visible;
+}
+
 const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
     return this->meshes;
 }
