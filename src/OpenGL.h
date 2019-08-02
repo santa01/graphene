@@ -101,8 +101,8 @@ extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 extern PFNGLVIEWPORTPROC glViewport;
 
-extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // ARB_debug_output
-extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // ARB_debug_output
+extern PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;  // GL_ARB_debug_output
+extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;  // GL_ARB_debug_output
 
 #if defined(_WIN32)
 extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;  // WGL_ARB_pixel_format

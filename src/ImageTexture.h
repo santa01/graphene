@@ -32,8 +32,6 @@ namespace Graphene {
 class ImageTexture: public RgbaTexture {
 public:
     GRAPHENE_API ImageTexture(const Image& image);
-    GRAPHENE_API ImageTexture(int width, int height);
-
     GRAPHENE_API void update(const Image& image);
 };
 

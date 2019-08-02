@@ -29,12 +29,7 @@
 namespace Graphene {
 
 ImageTexture::ImageTexture(const Image& image):
-        ImageTexture(image.getWidth(), image.getHeight()) {
-    this->update(image);
-}
-
-ImageTexture::ImageTexture(int width, int height):
-        RgbaTexture(width, height) {
+        RgbaTexture(image.getWidth(), image.getHeight()) {
     glBindTexture(GL_TEXTURE_2D, this->texture);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -50,6 +45,8 @@ ImageTexture::ImageTexture(int width, int height):
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    this->update(image);
 }
 
 void ImageTexture::update(const Image& image) {
