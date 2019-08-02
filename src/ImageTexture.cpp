@@ -44,8 +44,6 @@ ImageTexture::ImageTexture(const Image& image):
         LogWarn("GL_ARB_texture_filter_anisotropic unavailable, anisotropic filtering disabled");
     }
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-
     this->update(image);
 }
 
@@ -55,8 +53,6 @@ void ImageTexture::update(const Image& image) {
     GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;  // Little-endian ARGB or RGB format
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
     glGenerateMipmap(GL_TEXTURE_2D);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 }  // namespace Graphene

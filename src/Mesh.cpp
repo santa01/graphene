@@ -68,8 +68,6 @@ Mesh::Mesh(const void* data, int vertices, int faces):
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[BUFFER_ELEMENTS]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceDataSize, faceData, GL_STATIC_DRAW);
-
-    glBindVertexArray(0);
 }
 
 Mesh::~Mesh() {
@@ -100,7 +98,6 @@ void Mesh::setMaterial(const std::shared_ptr<Material> material) {
 void Mesh::render() {
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->faces * 3, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
 }
 
 }  // namespace Graphene

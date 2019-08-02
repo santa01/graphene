@@ -30,10 +30,10 @@ FrameBuffer::FrameBuffer(int width, int height, GLenum outputFormat):
         outputTexture(new Texture(width, height, 1, outputFormat)),
         depthTexture(new DepthTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->outputTexture->getHandle(), 0);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthTexture->getHandle(), 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 FrameBuffer::~FrameBuffer() {
@@ -59,7 +59,6 @@ std::shared_ptr<DepthTexture> FrameBuffer::getDepthTexture() const {
 void FrameBuffer::getPixel(int x, int y, GLenum pixelFormat, GLenum pixelType, void* pixel) const {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, this->fbo);
     glReadPixels(x, y, 1, 1, pixelFormat, pixelType, pixel);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
 
 void FrameBuffer::update() {

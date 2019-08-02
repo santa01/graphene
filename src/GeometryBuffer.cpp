@@ -34,15 +34,13 @@ GeometryBuffer::GeometryBuffer(int width, int height):
         normalTexture(new GeometryTexture(width, height)),
         depthTexture(new DepthTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
 
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->diffuseTexture->getHandle(), 0);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, this->specularTexture->getHandle(), 0);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, this->positionTexture->getHandle(), 0);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, this->normalTexture->getHandle(), 0);
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthTexture->getHandle(), 0);
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 GeometryBuffer::~GeometryBuffer() {
