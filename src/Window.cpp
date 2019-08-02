@@ -79,6 +79,10 @@ std::shared_ptr<Viewport> Window::createViewport(int left, int top, int width, i
 void Window::update() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
     glDrawBuffer(GL_BACK);  // Double buffered
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (auto& viewport: this->viewports) {
@@ -96,17 +100,16 @@ void Window::update() {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
         glDrawBuffer(GL_BACK);  // Double buffered
 
+        // glBlendFunc() is already set
         glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
         glDisable(GL_DEPTH_TEST);
 
         GetRenderManager().setRenderStep(RenderStep::FRAME);
         viewport->update();
     }
 
-    glEnable(GL_BLEND);
+    // GL_BLEND, GL_DEPTH_TEST are already set
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_DEPTH_TEST);
 
     GetRenderManager().setRenderStep(RenderStep::OVERLAY);
     for (auto& overlay: this->overlays) {

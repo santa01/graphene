@@ -40,6 +40,14 @@ FrameBuffer::~FrameBuffer() {
     glDeleteFramebuffers(1, &this->fbo);
 }
 
+void FrameBuffer::setAlphaBlending(bool alphaBlending) {
+    this->alphaBlending = alphaBlending;
+}
+
+bool FrameBuffer::isAlphaBlending() const {
+    return this->alphaBlending;
+}
+
 std::shared_ptr<Texture> FrameBuffer::getOutputTexture() const {
     return this->outputTexture;
 }
@@ -59,11 +67,16 @@ void FrameBuffer::update() {
 
     GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, drawBuffers);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if (this->alphaBlending) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    } else {
+        glDisable(GL_BLEND);
+    }
+
     glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     GetRenderManager().setRenderStep(RenderStep::BUFFER);
     for (auto& viewport: this->viewports) {

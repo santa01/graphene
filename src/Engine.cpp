@@ -206,6 +206,9 @@ void Engine::setupOpenGL() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
+
+    // No visual effect for 32bit color bit context, not supported for non RGB frame buffers
+    glDisable(GL_DITHER);
 }
 
 void Engine::setupEngine() {
