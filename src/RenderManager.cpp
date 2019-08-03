@@ -43,18 +43,18 @@ RenderManager& RenderManager::getInstance() {
 
 RenderManager::RenderManager() {
     this->shaders = {
-        { RenderStep::GEOMETRY, std::make_shared<Shader>("shaders/geometry_output.shader") },
-        { RenderStep::FRAME,    std::make_shared<Shader>("shaders/ambient_lighting.shader") },
+        { RenderStep::GEOMETRY, nullptr },
+        { RenderStep::FRAME,    nullptr },
         { RenderStep::SHADOWS,  nullptr },
-        { RenderStep::LIGHTS,   std::make_shared<Shader>("shaders/deferred_lighting.shader") },
-        { RenderStep::OVERLAY,  std::make_shared<Shader>("shaders/overlay_output.shader") },
+        { RenderStep::LIGHTS,   nullptr },
+        { RenderStep::OVERLAY,  nullptr },
         { RenderStep::BUFFER,   nullptr },
     };
     this->renderers = {
         { RenderStep::GEOMETRY, std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
-        { RenderStep::FRAME,    std::bind(&RenderManager::renderFrame, this, std::placeholders::_1) },
-        { RenderStep::SHADOWS,  std::bind(&RenderManager::renderShadows, this, std::placeholders::_1) },
-        { RenderStep::LIGHTS,   std::bind(&RenderManager::renderLights, this, std::placeholders::_1) },
+        { RenderStep::FRAME,    std::bind(&RenderManager::renderFrame,    this, std::placeholders::_1) },
+        { RenderStep::SHADOWS,  std::bind(&RenderManager::renderShadows,  this, std::placeholders::_1) },
+        { RenderStep::LIGHTS,   std::bind(&RenderManager::renderLights,   this, std::placeholders::_1) },
         { RenderStep::OVERLAY,  std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) }
     };

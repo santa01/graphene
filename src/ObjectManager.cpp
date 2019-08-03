@@ -102,6 +102,20 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     return entity;
 }
 
+std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
+    LogDebug("Create shader from '%s'", name.c_str());
+
+    if (this->shaderCache.find(name) != this->shaderCache.end()) {
+        LogDebug("Found cached '%s' shader, use as-is", name.c_str());
+        return this->shaderCache.at(name);
+    }
+
+    auto shader = std::make_shared<Shader>(name);
+
+    this->shaderCache.insert(std::make_pair(name, shader));
+    return shader;
+}
+
 std::shared_ptr<Mesh> ObjectManager::createQuad() {
     std::string name(typeid(QuadMesh).name());
 
@@ -122,6 +136,9 @@ std::shared_ptr<Mesh> ObjectManager::createQuad() {
 }
 
 void ObjectManager::clearCache() {
+    LogDebug("Clear %d cached shaders", this->shaderCache.size());
+    this->shaderCache.clear();
+
     LogDebug("Clear %d cached textures", this->textureCache.size());
     this->textureCache.clear();
 
@@ -137,8 +154,9 @@ std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& na
         return this->textureCache.at(name);
     }
 
-    TgaImage image(name);
-    auto texture = std::make_shared<ImageTexture>(image);
+    TgaImage textureImage(name);
+    auto texture = std::make_shared<ImageTexture>(textureImage);
+
     this->textureCache.insert(std::make_pair(name, texture));
     return texture;
 }

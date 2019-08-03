@@ -27,6 +27,7 @@
 #include <Camera.h>
 #include <Light.h>
 #include <Entity.h>
+#include <Shader.h>
 #include <Mesh.h>
 #include <ImageTexture.h>
 #include <unordered_map>
@@ -45,6 +46,7 @@ public:
     GRAPHENE_API std::shared_ptr<Camera> createCamera(ProjectionType type) const;
     GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
+    GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
     GRAPHENE_API std::shared_ptr<Mesh> createQuad();
 
     GRAPHENE_API void clearCache();
@@ -55,6 +57,7 @@ private:
     std::shared_ptr<ImageTexture> createTexture(const std::string& name);
     std::unordered_set<std::shared_ptr<Mesh>> createMeshes(const std::string& name);
 
+    std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;
     std::unordered_map<std::string, std::unordered_set<std::shared_ptr<Mesh>>> meshCache;
 };

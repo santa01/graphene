@@ -23,6 +23,7 @@
 #include <Engine.h>
 #include <Logger.h>
 #include <ObjectManager.h>
+#include <RenderManager.h>
 #include <EngineConfig.h>
 #if defined(_WIN32)
 #include <Win32Window.h>
@@ -211,6 +212,14 @@ void Engine::setupOpenGL() {
 }
 
 void Engine::setupEngine() {
+    auto& renderManager = GetRenderManager();
+    auto& objectManager = GetObjectManager();
+
+    renderManager.setShader(RenderStep::GEOMETRY, objectManager.createShader("shaders/geometry_output.shader"));
+    renderManager.setShader(RenderStep::FRAME, objectManager.createShader("shaders/ambient_lighting.shader"));
+    renderManager.setShader(RenderStep::LIGHTS, objectManager.createShader("shaders/deferred_lighting.shader"));
+    renderManager.setShader(RenderStep::OVERLAY, objectManager.createShader("shaders/overlay_output.shader"));
+
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));
