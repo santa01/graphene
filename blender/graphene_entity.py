@@ -31,20 +31,13 @@ bl_info = {
 }
 
 import struct
+import os
 from collections import namedtuple
 import bmesh
 import bpy
-from bpy.types import Operator
+from bpy.types import Operator, Material
 from bpy.props import StringProperty, EnumProperty
 from bpy_extras.io_utils import ExportHelper, axis_conversion
-
-Material = namedtuple("Material", """
-    ambient
-    diffuse_intensity
-    diffuse_color
-    specular_intensity
-    specular_hardness
-    specular_color""")
 
 
 def triangulate(mesh):
@@ -62,7 +55,8 @@ def write_entity(context, filepath, global_matrix):
     meshes = []
 
     for obj in context.scene.objects:
-        if obj.parent and obj.parent.dupli_type in {'VERTS', 'FACES'}:
+        object_parent = obj.parent
+        if object_parent is not None and object_parent.dupli_type in {'VERTS', 'FACES'}:
             continue
 
         if obj.dupli_type != 'NONE':
@@ -72,22 +66,20 @@ def write_entity(context, filepath, global_matrix):
             derived_objects = [(obj, obj.matrix_world)]
 
         for derived_object, local_matrix in derived_objects:
-            try:
-                mesh = derived_object.to_mesh(context.scene, True, 'PREVIEW')
-            except RuntimeError:
-                pass
-            else:
-                triangulate(mesh)
-                meshes.append(mesh)
+            mesh = derived_object.to_mesh(context.scene, True, 'PREVIEW')
 
-                # Modified global_matrix keeps X vector pointing right (see below), face winding
-                # becomes Counter Clock Wise with normals pointing the opposite direction.
-                # flip_normals() changes the face winding back to Clock Wise and fix normals direction.
-                mesh.transform(global_matrix * local_matrix)
-                mesh.flip_normals()
+            # Renderer requires 3 vertex faces
+            triangulate(mesh)
+            meshes.append(mesh)
 
-                # Calculate split vertex normals, which preserve sharp edges.
-                mesh.calc_normals_split()
+            # Modified global_matrix keeps X vector pointing right (see below), face winding
+            # becomes Counter Clock Wise with normals pointing the opposite direction.
+            # flip_normals() changes the face winding back to Clock Wise and fix normals direction.
+            mesh.transform(global_matrix * local_matrix)
+            mesh.flip_normals()
+
+            # Calculate split vertex normals, which preserve sharp edges.
+            mesh.calc_normals_split()
 
         if obj.dupli_type != 'NONE':
             obj.dupli_list_clear()
@@ -98,60 +90,73 @@ def write_entity(context, filepath, global_matrix):
 
         for mesh in meshes:
             loops = mesh.loops[:]
-            loops_number = len(loops)
-
-            vertices = [(0.0, 0.0, 0.0)] * loops_number
-            normals = [(0.0, 0.0, 0.0)] * loops_number
-            uvs = [(0.0, 0.0)] * loops_number
-
             polygons = mesh.polygons[:]
-            faces = [p.loop_indices for p in polygons]
+            vertices = mesh.vertices[:]
+            materials = mesh.materials[:]
 
-            mesh_vertices = mesh.vertices[:]
-            materials = mesh.materials[:]  # TODO: Write more than one material
+            if mesh.uv_layers.active is not None:
+                uv_loop = mesh.uv_layers.active.data[:]
+            else:
+                uv_loop = None
 
-            try:
-                uv_loops = mesh.uv_layers.active.data[:]
-            except AttributeError:
-                uv_loops = None
+            export_vertices = [(0.0, 0.0, 0.0)] * len(loops)
+            export_normals = [(0.0, 0.0, 0.0)] * len(loops)
+            export_uvs = [(0.0, 0.0)] * len(loops)
+            export_faces = [p.loop_indices for p in polygons]
 
-            for face_index in [i for p in polygons for i in p.loop_indices]:
+            for face_index in [index for face in export_faces for index in face]:
                 vertex_index = loops[face_index].vertex_index
+                vertex = vertices[vertex_index]
 
-                vertex = mesh_vertices[vertex_index]
-                vertices[face_index] = vertex.co
-                normals[face_index] = vertex.normal
+                export_vertices[face_index] = vertex.co
+                export_normals[face_index] = vertex.normal
+                if uv_loop is not None:
+                    export_uvs[face_index] = uv_loop[face_index].uv
 
-                if uv_loops is not None:
-                    uv = uv_loops[face_index].uv
-                    uvs[face_index] = (uv[0], uv[1])
-
-            try:
+            # Materials list remains non empty after materials are removed
+            if materials and materials[0] is not None:
+                # TODO: Write more than one material
                 material = materials[0]
-            except IndexError:  # Create default material
-                material = Material(1.0, 0.8, (0.8, 0.8, 0.8), 0.5, 50, (1.0, 1.0, 1.0))
+            else:
+                material = bpy.data.materials.new(name="default")
+                material.ambient = 1.0
+                material.diffuse_intensity = 1.0
+                material.diffuse_color = (1.0, 0.0, 0.0)
+                material.specular_intensity = 0.5
+                material.specular_hardness = 50
+                material.specular_color = (1.0, 1.0, 1.0)
 
             f.write(struct.pack("<2f", material.ambient, material.diffuse_intensity))
-            f.write(struct.pack("<3f", *material.diffuse_color[:]))
+            f.write(struct.pack("<3f", *material.diffuse_color))
             f.write(struct.pack("<1f1i", material.specular_intensity, material.specular_hardness))
-            f.write(struct.pack("<3f", *material.specular_color[:]))
+            f.write(struct.pack("<3f", *material.specular_color))
 
-            try:
-                diffuse_texture = material.active_texture.image.filepath[2:257]
-            except AttributeError:
-                diffuse_texture = ''
+            diffuse_texture = material.active_texture
+            if diffuse_texture is not None and diffuse_texture.type == 'IMAGE':
+                # Per Blender Manual: Files & Data System - Blender File - Blend Files
+                # When relative paths are supported, the File Browser provides a Relative Path checkbox,
+                # when entering the path into a text field, use a double slash prefix (//) to make it so.
+                texture_filepath = diffuse_texture.image.filepath
+                if texture_filepath[0:2] == "//":
+                    blend_filedir = os.path.dirname(context.blend_data.filepath)
+                    texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
 
-            diffuse_texture += '\0' * (255 - len(diffuse_texture))
-            f.write(struct.pack("<255s1b", bytearray(diffuse_texture, 'ASCII'), 0))
+                export_filedir = os.path.dirname(filepath)
+                export_filename = os.path.relpath(texture_filepath, export_filedir)
+            else:
+                export_filename = ""
 
-            f.write(struct.pack("<1i1i", len(vertices), len(polygons)))
-            for vertex in vertices:
+            export_filename += "\0" * (255 - len(export_filename))
+            f.write(struct.pack("<255s1b", bytearray(export_filename, 'ASCII'), 0))
+
+            f.write(struct.pack("<1i1i", len(export_vertices), len(export_faces)))
+            for vertex in export_vertices:
                 f.write(struct.pack("<3f", vertex[0], vertex[1], vertex[2]))
-            for normal in normals:
+            for normal in export_normals:
                 f.write(struct.pack("<3f", normal[0], normal[1], normal[2]))
-            for uv in uvs:
+            for uv in export_uvs:
                 f.write(struct.pack("<2f", uv[0], uv[1]))
-            for face in faces:
+            for face in export_faces:
                 f.write(struct.pack("<3i", face[0], face[1], face[2]))
 
             bpy.data.meshes.remove(mesh)
