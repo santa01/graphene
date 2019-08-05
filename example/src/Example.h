@@ -34,6 +34,9 @@
 #define MOUSE_SPEED 0.1f
 
 class Example: public Graphene::Engine {
+public:
+    Example();
+
 private:
     void onMouseMotion(int x, int y);
     void onKeyboardKey(Graphene::KeyboardKey key, bool state);

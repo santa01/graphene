@@ -21,9 +21,14 @@
  */
 
 #include <Example.h>
+#include <EngineConfig.h>
 #include <ObjectManager.h>
 #include <RenderManager.h>
 #include <Vec3.h>
+
+Example::Example() {
+    Graphene::GetEngineConfig().setDataDirectory("example");
+}
 
 void Example::onMouseMotion(int x, int y) {
     // Window origin is at the top left corder
@@ -83,9 +88,9 @@ void Example::onSetup() {
     auto& objectManager = Graphene::GetObjectManager();
 
     this->camera = objectManager.createCamera(Graphene::ProjectionType::PERSPECTIVE);
-    this->entity1 = objectManager.createEntity("example/assets/example.entity");
-    this->entity2 = objectManager.createEntity("example/assets/example.entity");
-    this->entity3 = objectManager.createEntity("example/assets/example.entity");
+    this->entity1 = objectManager.createEntity("assets/example.entity");
+    this->entity2 = objectManager.createEntity("assets/example.entity");
+    this->entity3 = objectManager.createEntity("assets/example.entity");
 
     auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
     auto lightBulb = objectManager.createLight(Graphene::LightType::POINT);

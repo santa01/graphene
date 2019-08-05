@@ -83,13 +83,13 @@ std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
 }
 
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
-    LogDebug("Create entity from '%s'", name.c_str());
     std::unordered_set<std::shared_ptr<Mesh>> meshes;
 
     if (this->meshCache.find(name) != this->meshCache.end()) {
-        LogDebug("Found cached '%s' entity, use as-is", name.c_str());
+        LogDebug("Reuse cached '%s' entity", name.c_str());
         meshes = this->meshCache.at(name);
     } else {
+        LogDebug("Load entity from '%s'", name.c_str());
         meshes = this->createMeshes(name);
         this->meshCache.insert(std::make_pair(name, meshes));
     }
@@ -103,14 +103,13 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
 }
 
 std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
-    LogDebug("Create shader from '%s'", name.c_str());
-
     if (this->shaderCache.find(name) != this->shaderCache.end()) {
-        LogDebug("Found cached '%s' shader, use as-is", name.c_str());
+        LogDebug("Reuse cached '%s' shader", name.c_str());
         return this->shaderCache.at(name);
     }
 
-    auto shader = std::make_shared<Shader>(name);
+    LogDebug("Load shader from '%s'", name.c_str());
+    auto shader = std::make_shared<Shader>(GetEngineConfig().getDataDirectory() + '/' + name);
 
     this->shaderCache.insert(std::make_pair(name, shader));
     return shader;
@@ -136,25 +135,24 @@ std::shared_ptr<Mesh> ObjectManager::createQuad() {
 }
 
 void ObjectManager::clearCache() {
-    LogDebug("Clear %d cached shaders", this->shaderCache.size());
+    LogDebug("Clear shader cache (%d items)", this->shaderCache.size());
     this->shaderCache.clear();
 
-    LogDebug("Clear %d cached textures", this->textureCache.size());
+    LogDebug("Clear texture (%d items)", this->textureCache.size());
     this->textureCache.clear();
 
-    LogDebug("Clear %d cached meshes", this->meshCache.size());
+    LogDebug("Clear mesh (%d items)", this->meshCache.size());
     this->meshCache.clear();
 }
 
 std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& name) {
-    LogDebug("Create texture from '%s'", name.c_str());
-
     if (this->textureCache.find(name) != this->textureCache.end()) {
-        LogDebug("Found cached '%s' texture, use as-is", name.c_str());
+        LogDebug("Reuse cached '%s' texture", name.c_str());
         return this->textureCache.at(name);
     }
 
-    TgaImage textureImage(name);
+    LogDebug("Load texture from '%s'", name.c_str());
+    TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name);
     auto texture = std::make_shared<ImageTexture>(textureImage);
 
     this->textureCache.insert(std::make_pair(name, texture));
@@ -162,7 +160,7 @@ std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& na
 }
 
 std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std::string& name) {
-    std::ifstream file(name, std::ios::binary);
+    std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
@@ -175,7 +173,7 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
         throw std::runtime_error(LogFormat("Invalid magic number"));
     }
 
-    LogDebug("Create %d meshes from '%s'", entityHeader.objects, name.c_str());
+    LogDebug("Load %d meshes from '%s'", entityHeader.objects, name.c_str());
 
     ObjectMaterial objectMaterial;
     ObjectGeometry objectGeometry;

@@ -61,6 +61,9 @@ public:
     GRAPHENE_API bool isDebug() const;
     GRAPHENE_API void setDebug(bool debug);
 
+    GRAPHENE_API const std::string& getDataDirectory() const;
+    GRAPHENE_API void setDataDirectory(const std::string& directory);
+
 private:
     EngineConfig() = default;
 
@@ -72,6 +75,7 @@ private:
     float maxFps = 0.0f;
     bool vsync = false;
     bool debug = true;
+    std::string dataDirectory;
 };
 
 }  // namespace Graphene

@@ -42,7 +42,8 @@ std::string EngineConfig::toString() const {
                  << FormatOption(30, "Anisotropic filter level", this->anisotropy) << "\n"
                  << FormatOption(30, "FPS limit", this->maxFps)                    << "\n"
                  << FormatOption(30, "Vertical synchronization", this->vsync)      << "\n"
-                 << FormatOption(30, "Debug output", this->debug);
+                 << FormatOption(30, "Debug output", this->debug)                  << "\n"
+                 << FormatOption(30, "Data directory", this->dataDirectory);
 
     return configString.str();
 }
@@ -109,6 +110,14 @@ bool EngineConfig::isDebug() const {
 
 void EngineConfig::setDebug(bool debug) {
     this->debug = debug;
+}
+
+const std::string& EngineConfig::getDataDirectory() const {
+    return this->dataDirectory;
+}
+
+void EngineConfig::setDataDirectory(const std::string& directory) {
+    this->dataDirectory = directory;
 }
 
 }  // namespace Graphene
