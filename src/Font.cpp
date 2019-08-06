@@ -27,6 +27,9 @@
 #include <algorithm>
 #include <vector>
 #include <cstring>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 namespace Graphene {
 
@@ -41,7 +44,7 @@ void Font::initFreeType() {
     }
 }
 
-std::shared_ptr<Font::FT_LibraryRec> Font::library;
+std::shared_ptr<FT_LibraryRec> Font::library;
 
 Font::Font(const std::string& filename, int size, int dpi):
         filename(filename),
@@ -96,8 +99,8 @@ std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
             continue;
         }
 
-        stringBox.yMin = std::min<int>(stringBox.yMin, charGlyph->box.yMin);
-        stringBox.yMax = std::max<int>(stringBox.yMax, charGlyph->box.yMax);
+        stringBox.yMin = std::min<int>(stringBox.yMin, charGlyph->box->yMin);
+        stringBox.yMax = std::max<int>(stringBox.yMax, charGlyph->box->yMax);
         stringBox.xMax += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
 
         stringGlyphs.push_back(charGlyph);
@@ -114,7 +117,7 @@ std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
         FT_Bitmap charBitmap = bitmapGlyph->bitmap;
         char* charPixels = charGlyph->pixels.get();
 
-        int stringRow = stringBox.yMax - charGlyph->box.yMax;  // Character Y offset in string
+        int stringRow = stringBox.yMax - charGlyph->box->yMax;  // Character Y offset in string
         int charBitmapRowSize = charBitmap.width * pixelBytes;
 
         for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++, stringRow++) {
@@ -129,7 +132,7 @@ std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
     return stringImage;
 }
 
-std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(FT_ULong charCode) {
+std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
     auto charGlyphIt = this->charGlyphs.find(charCode);
     if (charGlyphIt != this->charGlyphs.end()) {
         return charGlyphIt->second;
@@ -150,11 +153,12 @@ std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(FT_ULong charCode) {
         return nullptr;
     }
 
-    std::shared_ptr<CharGlyph> charGlyph(new CharGlyph());
+    auto charGlyph = std::make_shared<CharGlyph>();
     this->charGlyphs.emplace(charCode, charGlyph);
 
+    charGlyph->box = std::make_shared<FT_BBox>();
     charGlyph->record = std::shared_ptr<FT_GlyphRec>(glyph, FT_Done_Glyph);
-    FT_Glyph_Get_CBox(glyph, FT_GLYPH_BBOX_PIXELS, &charGlyph->box);
+    FT_Glyph_Get_CBox(glyph, FT_GLYPH_BBOX_PIXELS, charGlyph->box.get());
 
     FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
     FT_Bitmap charBitmap = bitmapGlyph->bitmap;

@@ -28,9 +28,12 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
+
+// Avoid FreeType requirement for Graphene dependent projects
+typedef struct FT_LibraryRec_ FT_LibraryRec;
+typedef struct FT_BBox_ FT_BBox;
+typedef struct FT_GlyphRec_ FT_GlyphRec;
+typedef struct FT_FaceRec_ FT_FaceRec;
 
 namespace Graphene {
 
@@ -47,24 +50,22 @@ public:
 
 private:
     typedef struct {
-        FT_BBox box = { };
+        std::shared_ptr<FT_BBox> box;
         std::shared_ptr<FT_GlyphRec> record;
         std::shared_ptr<char[]> pixels;
     } CharGlyph;
 
-    std::shared_ptr<CharGlyph> getCharGlyph(FT_ULong charCode);
+    std::shared_ptr<CharGlyph> getCharGlyph(wchar_t charCode);
 
     std::string filename;
     int size;
     int dpi;
 
     std::shared_ptr<FT_FaceRec> face;
-    std::unordered_map<FT_ULong, std::shared_ptr<CharGlyph>> charGlyphs;
+    std::unordered_map<wchar_t, std::shared_ptr<CharGlyph>> charGlyphs;
 
 private:
     static void initFreeType();
-
-    typedef struct FT_LibraryRec_ FT_LibraryRec;
     static std::shared_ptr<FT_LibraryRec> library;
 };
 
