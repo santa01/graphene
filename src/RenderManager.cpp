@@ -175,11 +175,11 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->shader->setUniform("cameraPosition", camera->getPosition());
 
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
-    scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& rotation) {
+    scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& direction) {
         light->getLightBuffer()->bind(BIND_LIGHT);
 
         this->shader->setUniform("lightPosition", position);
-        this->shader->setUniform("lightDirection", rotation);
+        this->shader->setUniform("lightDirection", direction);
 
         this->frame->render();
     });
