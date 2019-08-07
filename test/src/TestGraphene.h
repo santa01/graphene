@@ -28,11 +28,11 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TextTestRunner.h>
 
-#define ASSERT_VECTORS_EQUAL(actual, expected) \
+#define ASSERT_VEC3_EQUAL(actual, expected) \
         do { \
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.get(Math::Vec3::X), actual.get(Math::Vec3::X), 0.0001f); \
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.get(Math::Vec3::Y), actual.get(Math::Vec3::Y), 0.0001f); \
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.get(Math::Vec3::Z), actual.get(Math::Vec3::Z), 0.0001f); \
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.get(Math::Vec3::X), actual.get(Math::Vec3::X), 0.001f); \
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.get(Math::Vec3::Y), actual.get(Math::Vec3::Y), 0.001f); \
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.get(Math::Vec3::Z), actual.get(Math::Vec3::Z), 0.001f); \
         } while (false)
 
 #endif  // TESTGRAPHENE_H

@@ -21,12 +21,38 @@
  */
 
 #include <TestGraphene.h>
-#include <Light.h>
+#include <Scalable.h>
+#include <Vec3.h>
 
-class TestLight: public CppUnit::TestFixture { };
+class TestScalable: public CppUnit::TestFixture {
+public:
+    void testScale() {
+        Graphene::Scalable scalable;
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(1.0f, 1.0f, 1.0f));
+
+        scalable.scaleX(2.4f);
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(2.4f, 1.0f, 1.0f));
+
+        scalable.scaleY(0.8f);
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(2.4f, 0.8f, 1.0f));
+
+        scalable.scaleZ(1.1f);
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(2.4f, 0.8f, 1.1f));
+
+        scalable.scale(0.2f, 0.3f, 0.4f);
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(0.48f, 0.24f, 0.44f));
+
+        scalable.scale(0.2f, 1.0f, 0.2f);
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(0.096f, 0.24f, 0.088f));
+
+        scalable.scale(1.0f, 1.0f, 1.0f);
+        ASSERT_VEC3_EQUAL(scalable.getScalingFactors(), Math::Vec3(0.096f, 0.24f, 0.088f));
+    }
+};
 
 int main() {
-    CppUnit::TestSuite* suite = new CppUnit::TestSuite("TestLight");
+    CppUnit::TestSuite* suite = new CppUnit::TestSuite("TestScalable");
+    suite->addTest(new CppUnit::TestCaller<TestScalable>("testScale", &TestScalable::testScale));
 
     CppUnit::TextTestRunner runner;
     runner.addTest(suite);
