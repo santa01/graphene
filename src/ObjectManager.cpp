@@ -138,10 +138,10 @@ void ObjectManager::clearCache() {
     LogDebug("Clear shader cache (%d items)", this->shaderCache.size());
     this->shaderCache.clear();
 
-    LogDebug("Clear texture (%d items)", this->textureCache.size());
+    LogDebug("Clear texture cache (%d items)", this->textureCache.size());
     this->textureCache.clear();
 
-    LogDebug("Clear mesh (%d items)", this->meshCache.size());
+    LogDebug("Clear mesh cache (%d items)", this->meshCache.size());
     this->meshCache.clear();
 }
 
