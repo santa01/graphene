@@ -88,9 +88,9 @@ void Example::onSetup() {
     auto& objectManager = Graphene::GetObjectManager();
 
     this->camera = objectManager.createCamera(Graphene::ProjectionType::PERSPECTIVE);
-    this->entity1 = objectManager.createEntity("assets/example.entity");
-    this->entity2 = objectManager.createEntity("assets/example.entity");
-    this->entity3 = objectManager.createEntity("assets/example.entity");
+    this->entity1 = objectManager.createEntity("assets/crate.entity");
+    this->entity2 = objectManager.createEntity("assets/crate.entity");
+    this->entity3 = objectManager.createEntity("assets/crate.entity");
 
     auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
     auto lightBulb = objectManager.createLight(Graphene::LightType::POINT);
