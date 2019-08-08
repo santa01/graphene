@@ -36,7 +36,7 @@
 
 namespace Graphene {
 
-typedef std::function<void(const std::shared_ptr<Entity>, const Math::Mat4&)> EntityHandler;
+typedef std::function<void(const std::shared_ptr<Entity>, const Math::Mat4&, const Math::Mat4&)> EntityHandler;
 typedef std::function<void(const std::shared_ptr<Light>, const Math::Vec3&, const Math::Vec3&)> LightHandler;
 
 class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {

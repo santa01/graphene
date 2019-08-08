@@ -78,30 +78,36 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
 }
 
 void Scene::iterateEntities(EntityHandler handler) {
-    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 transformation) {
+    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
         // Moving from the root node, current node's transformation matrix is the right operand
         // to be the first operation. Keep the root node's transformation the last one.
-        transformation = transformation * node->getTranslation() * node->getRotation() * node->getScaling();
+        localWorld = localWorld * node->getTranslation() * node->getRotation() * node->getScaling();
+        normalRotation = normalRotation * node->getRotation();
 
         auto objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &transformation](const std::shared_ptr<Object> object) {
+        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld, &normalRotation](const std::shared_ptr<Object> object) {
             if (object->getType() == ObjectType::ENTITY) {
                 auto entity = std::dynamic_pointer_cast<Entity>(object);
+
                 if (entity->isVisible()) {
-                    handler(entity, transformation * entity->getTranslation() * entity->getRotation() * entity->getScaling());
+                    Math::Mat4 entityModelView(localWorld * entity->getTranslation() * entity->getRotation() * entity->getScaling());
+                    Math::Mat4 entityNormalRotation(normalRotation * entity->getRotation());
+
+                    handler(entity, entityModelView, entityNormalRotation);
                 }
             }
         });
 
         auto nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &transformation](const std::shared_ptr<SceneNode> node) {
-            traverser(node, transformation);
+        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld, &normalRotation](const std::shared_ptr<SceneNode> node) {
+            traverser(node, localWorld, normalRotation);
         });
     };
 
-    Math::Mat4 transformation;
-    traverser(this->rootNode, transformation);
+    Math::Mat4 localWorld;
+    Math::Mat4 normalRotation;
+    traverser(this->rootNode, localWorld, normalRotation);
 }
 
 void Scene::iterateLights(LightHandler handler) {
