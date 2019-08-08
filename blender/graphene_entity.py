@@ -23,10 +23,10 @@
 bl_info = {
     "name": "Graphene entity format",
     "author": "Pavlo Lavrenenko",
-    "version": (0, 1, 5),
-    "blender": (2, 6, 0),
+    "version": (0, 2, 0),
+    "blender": (2, 7, 0),
     "location": "File > Import-Export",
-    "description": "Export entity for Graphene library",
+    "description": "Export entity for Graphene engine",
     "category": "Import-Export"
 }
 
