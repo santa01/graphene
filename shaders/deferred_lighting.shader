@@ -34,6 +34,7 @@ uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
 uniform vec3 lightDirection;
 
+uniform sampler2D diffuseSampler;
 uniform sampler2D specularSampler;
 uniform sampler2D positionSampler;
 uniform sampler2D normalSampler;
@@ -44,6 +45,7 @@ smooth in vec2 fragmentUV;
 layout(location = 0) out vec4 outputColor;
 
 void main() {
+    vec4 diffuseSample = texture(diffuseSampler, fragmentUV);
     vec4 specularSample = texture(specularSampler, fragmentUV);
     vec4 positionSample = texture(positionSampler, fragmentUV);
     vec4 normalSample = texture(normalSampler, fragmentUV);
@@ -54,15 +56,17 @@ void main() {
     vec3 direction = (light.type == TYPE_POINT) ? position - lightPosition : lightDirection;
     direction = normalize(direction);
 
-    float luminance = dot(normal, -direction);
+    float luminance = dot(-direction, normal);
     float diffuseIntensity = specularSample.a;
-    vec3 diffuseColor = light.color * (luminance > 0.0f ? luminance : 0.0f) * diffuseIntensity;
+    vec3 diffuseColor = diffuseSample.rgb * light.color * (luminance > 0.0f ? luminance : 0.0f) * diffuseIntensity;
 
     vec3 cameraDirection = normalize(position - cameraPosition);
-    vec3 reflection = normalize(reflect(direction, normal));
+    vec3 reflectedDirection = reflect(-direction, normal);
+
     float specularHardness = normalSample.a;
-    float specularIntensity = positionSample.a * pow(dot(-cameraDirection, reflection), specularHardness);
-    vec3 specularColor = specularSample.rgb * (specularIntensity > 0.0f ? specularIntensity : 0.0f);
+    float specularIntensity = positionSample.a;
+    float highlight = pow(dot(-cameraDirection, reflectedDirection), specularHardness);
+    vec3 specularColor = specularSample.rgb * (highlight > 0.0f ? highlight : 0.0f) * specularIntensity;
 
     float falloff = pow(light.falloff, 2);
     float distance = pow(distance(lightPosition, position), 2);
