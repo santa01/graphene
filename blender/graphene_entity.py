@@ -141,8 +141,9 @@ def write_entity(context, filepath, global_matrix):
                     blend_filedir = os.path.dirname(context.blend_data.filepath)
                     texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
 
+                # Use forward slash separator (works well on Win32/Linux platforms)
                 export_filedir = os.path.dirname(filepath)
-                export_filename = os.path.relpath(texture_filepath, export_filedir)
+                export_filename = os.path.relpath(texture_filepath, export_filedir).replace('\\', '/')
             else:
                 export_filename = ""
 
