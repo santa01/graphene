@@ -71,14 +71,14 @@ void Example::onSetup() {
     /* Setup scene */
 
     auto scene = this->createScene();
+    scene->setAmbientEnergy(0.3f);
 
-    auto sceneRoot = scene->getRootNode();
     this->player = scene->createNode();
     this->node = scene->createNode();
 
+    auto sceneRoot = scene->getRootNode();
     sceneRoot->attachNode(this->player);
     sceneRoot->attachNode(this->node);
-    scene->setAmbientEnergy(0.5f);
 
     auto& renderManager = Graphene::GetRenderManager();
     renderManager.setLightPass(true);
@@ -97,7 +97,6 @@ void Example::onSetup() {
 
     flashLight->setBlend(0.05f);
     flashLight->setAngle(20.0f);
-    flashLight->setEnergy(0.5f);
     flashLight->setFalloff(8.0f);
     flashLight->move((this->player->getRight() - this->player->getUp()) * 0.2f);
 
