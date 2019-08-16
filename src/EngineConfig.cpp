@@ -42,6 +42,7 @@ std::string EngineConfig::toString() const {
                  << FormatOption(30, "Anisotropic filter level", this->anisotropy) << "\n"
                  << FormatOption(30, "FPS limit", this->maxFps)                    << "\n"
                  << FormatOption(30, "Vertical synchronization", this->vsync)      << "\n"
+                 << FormatOption(30, "Fullscreen mode", this->fullscreen)          << "\n"
                  << FormatOption(30, "Debug output", this->debug)                  << "\n"
                  << FormatOption(30, "Data directory", this->dataDirectory);
 
@@ -102,6 +103,14 @@ bool EngineConfig::isVsync() const {
 
 void EngineConfig::setVsync(bool vsync) {
     this->vsync = vsync;
+}
+
+bool EngineConfig::isFullscreen() const {
+    return this->fullscreen;
+}
+
+void EngineConfig::setFullscreen(bool fullscreen) {
+    this->fullscreen = fullscreen;
 }
 
 bool EngineConfig::isDebug() const {

@@ -39,6 +39,8 @@ public:
 
     GRAPHENE_API void captureMouse(bool captured) override;
     GRAPHENE_API void setVsync(bool vsync) override;
+    GRAPHENE_API void setFullscreen(bool fullscreen) override;
+
     GRAPHENE_API bool dispatchEvents() override;
     GRAPHENE_API void swapBuffers() override;
 
@@ -54,6 +56,9 @@ private:
     void destroyContext();
 
     void warpMousePointer(int x, int y);
+
+    DWORD borderStyle = WS_CAPTION | WS_BORDER;
+    DWORD windowStyle = WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX;
 
     HINSTANCE instance = nullptr;
     HWND window = nullptr;

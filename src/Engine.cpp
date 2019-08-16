@@ -162,6 +162,7 @@ void Engine::setupWindow() {
     this->window = std::shared_ptr<Window>(new LinuxWindow(config.getWidth(), config.getHeight()));
 #endif
     this->window->setVsync(config.isVsync());
+    this->window->setFullscreen(config.isFullscreen());
 
     this->window->onMouseMotionSignal.connect(
             Signals::Slot<int, int>(&Engine::onMouseMotion, this, std::placeholders::_1, std::placeholders::_2));

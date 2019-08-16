@@ -51,6 +51,8 @@ public:
 
     GRAPHENE_API virtual void captureMouse(bool captured) = 0;
     GRAPHENE_API virtual void setVsync(bool vsync) = 0;
+    GRAPHENE_API virtual void setFullscreen(bool fullscreen) = 0;
+
     GRAPHENE_API virtual bool dispatchEvents() = 0;
     GRAPHENE_API virtual void swapBuffers() = 0;
 
@@ -69,7 +71,9 @@ protected:
     KeyboardState keyboardState = { };
     MouseState mouseState = { };
     MousePosition mousePosition = { };
+
     bool mouseCaptured = false;
+    bool fullscreen = false;
 
     std::unordered_set<std::string> availableExtensions;
 

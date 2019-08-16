@@ -58,6 +58,9 @@ public:
     GRAPHENE_API bool isVsync() const;
     GRAPHENE_API void setVsync(bool vsync);
 
+    GRAPHENE_API bool isFullscreen() const;
+    GRAPHENE_API void setFullscreen(bool fullscreen);
+
     GRAPHENE_API bool isDebug() const;
     GRAPHENE_API void setDebug(bool debug);
 
@@ -74,6 +77,7 @@ private:
     int anisotropy = 16;
     float maxFps = 0.0f;
     bool vsync = false;
+    bool fullscreen = false;
     bool debug = true;
     std::string dataDirectory;
 };

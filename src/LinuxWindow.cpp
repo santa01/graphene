@@ -39,6 +39,8 @@ LinuxWindow::LinuxWindow(int width, int height):
 }
 
 LinuxWindow::~LinuxWindow() {
+    this->setFullscreen(false);
+
     this->destroyContext();
     this->destroyKeyboardMapping();
     this->destroyWindow();
@@ -78,6 +80,14 @@ void LinuxWindow::setVsync(bool vsync) {
         glXSwapIntervalMESA(vsync ? 1 : 0);
     } else {
         LogWarn("GLX_EXT_swap_control, GLX_MESA_swap_control unavailable, leave vsync as-is");
+    }
+}
+
+void LinuxWindow::setFullscreen(bool fullscreen) {
+    if (fullscreen && !this->fullscreen) {
+
+    } else if (!fullscreen && this->fullscreen) {
+
     }
 }
 

@@ -139,6 +139,8 @@ Win32Window::Win32Window(int width, int height):
 }
 
 Win32Window::~Win32Window() {
+    this->setFullscreen(false);
+
     this->destroyContext();
     this->destroyWindow(this->window);
 
@@ -167,6 +169,60 @@ void Win32Window::setVsync(bool vsync) {
         wglSwapIntervalEXT(vsync ? (adaptive ? -1 : 1) : 0);
     } else {
         LogWarn("WGL_EXT_swap_control unavailable, leave vsync as-is");
+    }
+}
+
+void Win32Window::setFullscreen(bool fullscreen) {
+    static DWORD windowStyle = 0;
+    static RECT windowRect = { };
+
+    DEVMODE deviceMode = { };
+    deviceMode.dmSize = sizeof(deviceMode);
+    deviceMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;  // For ChangeDisplaySettings() only
+
+    if (fullscreen && !this->fullscreen) {
+        int modeNumber = 0;
+        bool resolutionSupported = false;
+
+        while (EnumDisplaySettings(nullptr, modeNumber++, &deviceMode) != 0) {
+            if (deviceMode.dmPelsWidth != this->width || deviceMode.dmPelsHeight != this->height) {
+                continue;
+            }
+
+            if (ChangeDisplaySettings(&deviceMode, CDS_TEST) != DISP_CHANGE_SUCCESSFUL) {
+                continue;
+            }
+
+            resolutionSupported = true;
+            break;
+        }
+
+        if (resolutionSupported) {
+            // Save current window parameters
+            windowStyle = static_cast<DWORD>(GetWindowLongPtr(this->window, GWL_STYLE));
+            GetWindowRect(this->window, &windowRect);
+
+            // Make window borderless
+            SetWindowLongPtr(this->window, GWL_STYLE, windowStyle & ~this->borderStyle);
+            SetWindowPos(this->window, HWND_TOP, 0, 0, this->width, this->height, 0);
+
+            // Adjust screen resolution
+            this->fullscreen = fullscreen;
+            ChangeDisplaySettings(&deviceMode, 0);
+        } else {
+            LogWarn("%dx%d resolution is unsupported in fullscreen mode", this->width, this->height);
+        }
+    } else if (!fullscreen && this->fullscreen) {
+        // Restore window parameters
+        int width = windowRect.right - windowRect.left;
+        int height = windowRect.bottom - windowRect.top;
+        SetWindowLongPtr(this->window, GWL_STYLE, windowStyle);
+        SetWindowPos(this->window, HWND_TOP, windowRect.left, windowRect.top, width, height, 0);
+
+        // Restore saved screen resolution
+        this->fullscreen = fullscreen;
+        EnumDisplaySettings(nullptr, ENUM_REGISTRY_SETTINGS, &deviceMode);
+        ChangeDisplaySettings(&deviceMode, 0);
     }
 }
 
@@ -204,19 +260,16 @@ HWND Win32Window::createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC wi
         throw std::runtime_error(LogFormat("RegisterClassEx()"));
     }
 
-    // AdjustWindowRect() doesn't recognize WS_OVERLAPPED
-    DWORD windowStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-
     RECT windowRectangle = { };
     windowRectangle.right = this->width;
     windowRectangle.bottom = this->height;
 
-    AdjustWindowRect(&windowRectangle, windowStyle, FALSE);
+    AdjustWindowRect(&windowRectangle, this->windowStyle, FALSE);
     int windowWidth = windowRectangle.right - windowRectangle.left;
     int windowHeight = windowRectangle.bottom - windowRectangle.top;
 
     HWND window = CreateWindow(
-            className, windowName, windowStyle | WS_OVERLAPPED,
+            className, windowName, this->windowStyle,
             CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
             nullptr, nullptr, this->instance, nullptr);
     if (window == nullptr) {

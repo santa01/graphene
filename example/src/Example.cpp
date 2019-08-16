@@ -63,6 +63,12 @@ void Example::onKeyboardKey(Graphene::KeyboardKey key, bool state) {
             this->entity3->yaw(-10.0f);
             this->node->pitch(-10.0f);
         }
+        if (key == Graphene::KeyboardKey::KEY_1) {
+            this->getWindow()->setFullscreen(true);
+        }
+        if (key == Graphene::KeyboardKey::KEY_2) {
+            this->getWindow()->setFullscreen(false);
+        }
     }
 }
 
