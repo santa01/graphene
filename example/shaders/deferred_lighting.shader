@@ -61,7 +61,7 @@ void main() {
     vec3 diffuseColor = diffuseSample.rgb * light.color * (luminance > 0.0f ? luminance : 0.0f) * diffuseIntensity;
 
     vec3 cameraDirection = normalize(position - cameraPosition);
-    vec3 reflectedDirection = reflect(-direction, normal);
+    vec3 reflectedDirection = reflect(direction, normal);
 
     float specularHardness = normalSample.a;
     float specularIntensity = positionSample.a;

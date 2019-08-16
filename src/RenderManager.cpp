@@ -113,7 +113,7 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
 
     // Modelview -> project
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
-    Math::Mat4 modelViewProjection = camera->getProjection() * scene->calculateModelView(camera);
+    Math::Mat4 modelViewProjection = camera->getProjection() * Scene::calculateModelView(camera);
     this->shader->setUniform("modelViewProjection", modelViewProjection);
 
     scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld, const Math::Mat4& normalRotation) {
@@ -172,7 +172,7 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->shader->setUniform("normalSampler", TEXTURE_NORMAL);
     this->shader->setUniform("depthSampler", TEXTURE_DEPTH);
 
-    this->shader->setUniform("cameraPosition", camera->getPosition());
+    this->shader->setUniform("cameraPosition", Scene::calculatePosition(camera));
 
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
     scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& direction) {

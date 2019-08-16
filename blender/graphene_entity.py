@@ -126,9 +126,13 @@ def write_entity(context, filepath, global_matrix):
                 material.specular_hardness = 50
                 material.specular_color = (1.0, 1.0, 1.0)
 
+            # Scale Blender [1..511] specular_hardness to approximately [1..100]
+            # range to make specular highlights look similar in Graphene
+            specular_hardness = material.specular_hardness // 5 + 1
+
             f.write(struct.pack("<2f", material.ambient, material.diffuse_intensity))
             f.write(struct.pack("<3f", *material.diffuse_color))
-            f.write(struct.pack("<1f1i", material.specular_intensity, material.specular_hardness))
+            f.write(struct.pack("<1f1i", material.specular_intensity, specular_hardness))
             f.write(struct.pack("<3f", *material.specular_color))
 
             diffuse_texture = material.active_texture

@@ -51,6 +51,8 @@ public:
     GRAPHENE_API float getAmbientEnergy() const;
 
     GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API static Math::Vec3 calculatePosition(const std::shared_ptr<Camera> camera);
+
     GRAPHENE_API void iterateEntities(EntityHandler handler);
     GRAPHENE_API void iterateLights(LightHandler handler);
 
