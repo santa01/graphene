@@ -28,6 +28,11 @@ find_package (Freetype REQUIRED)
 
 if (UNIX)
     find_package(X11 REQUIRED)
+    if (NOT X11_Xrandr_FOUND)
+        message (FATAL_ERROR "Could NOT find Xrandr")
+    endif ()
+
+    list (APPEND X11_LIBRARIES ${X11_Xrandr_LIB})
 endif ()
 
 find_path (MATH_INCLUDE_DIRS NAMES MathApi.h HINTS ENV MATH_DIR PATH_SUFFIXES include)

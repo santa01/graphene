@@ -28,6 +28,7 @@
 #include <RenderTarget.h>
 #include <sstream>
 #include <stdexcept>
+#include <X11/extensions/Xrandr.h>
 
 namespace Graphene {
 
@@ -84,11 +85,95 @@ void LinuxWindow::setVsync(bool vsync) {
 }
 
 void LinuxWindow::setFullscreen(bool fullscreen) {
-    if (fullscreen && !this->fullscreen) {
+    static int previousModeNumber = 0;
 
-    } else if (!fullscreen && this->fullscreen) {
-
+    XRRScreenConfiguration* screenConfig = XRRGetScreenInfo(this->display, this->rootWindow);
+    if (screenConfig == nullptr) {
+        throw std::runtime_error(LogFormat("XRRGetScreenInfo()"));
     }
+
+    /*
+     * Per https://specifications.freedesktop.org/wm-spec/wm-spec-1.3.html#idm140130317598336
+     * _NET_WM_STATE
+     *
+     * To change the state of a mapped window, a Client MUST send a _NET_WM_STATE client message to the root window:
+     *
+     *   window = the respective client window
+     *   message_type = _NET_WM_STATE
+     *   format = 32
+     *   data.l[0] = the action, as listed below
+     *   data.l[1] = first property to alter
+     *   data.l[2] = second property to alter
+     *   data.l[3] = source indication
+     *   other data.l[] elements = 0
+     */
+    XClientMessageEvent event = { };
+    event.type = ClientMessage;
+    event.window = this->window;
+    event.message_type = this->wmState;
+    event.format = 32;    // XEvent.data should be viewed as a list of longs
+    event.data.l[0] = 2;  // _NET_WM_STATE_TOGGLE
+    event.data.l[1] = this->wmStateFullscreen;
+    event.data.l[3] = 1;  // Source indication: normal application
+
+    /*
+     * https://specifications.freedesktop.org/wm-spec/wm-spec-1.3.html#idm140130317705584
+     * Root Window Properties (and Related Messages)
+     *
+     * Whenever this spec speaks about “sending a message to the root window”, it is understood
+     * that the client is supposed to create a ClientMessage event with the specified contents and
+     * send it by using a SendEvent request with the following arguments:
+     *
+     *  destination     root
+     *  propagate       False
+     *  event-mask      (SubstructureNotify|SubstructureRedirect)
+     *  event           the specified ClientMessage
+     */
+    long eventMask = SubstructureNotifyMask | SubstructureRedirectMask;
+
+    if (fullscreen && !this->fullscreen) {
+        int modeNumber = 0;
+        bool resolutionSupported = false;
+
+        int totalModes;
+        XRRScreenSize* screenSizes = XRRConfigSizes(screenConfig, &totalModes);
+        if (screenSizes == nullptr) {
+            throw std::runtime_error(LogFormat("XRRConfigSizes()"));
+        }
+
+        for (modeNumber = 0; modeNumber < totalModes; modeNumber++) {
+            if (screenSizes[modeNumber].width != this->width || screenSizes[modeNumber].height != this->height) {
+                continue;
+            }
+
+            resolutionSupported = true;
+            break;
+        }
+
+        if (resolutionSupported) {
+            // Adjust screen resolution
+            Rotation rotation;
+            previousModeNumber = XRRConfigCurrentConfiguration(screenConfig, &rotation);
+            XRRSetScreenConfig(this->display, screenConfig, this->rootWindow, modeNumber, rotation, CurrentTime);
+
+            // Make window occupy the whole screen
+            this->fullscreen = fullscreen;
+            XSendEvent(this->display, this->rootWindow, False, eventMask, reinterpret_cast<XEvent*>(&event));
+        } else {
+            LogWarn("%dx%d resolution is unsupported in fullscreen mode", this->width, this->height);
+        }
+    } else if (!fullscreen && this->fullscreen) {
+        // Restore saved screen resolution
+        Rotation rotation;
+        XRRConfigCurrentConfiguration(screenConfig, &rotation);
+        XRRSetScreenConfig(this->display, screenConfig, this->rootWindow, previousModeNumber, rotation, CurrentTime);
+
+        // Restore window parameters
+        this->fullscreen = fullscreen;
+        XSendEvent(this->display, this->rootWindow, False, eventMask, reinterpret_cast<XEvent*>(&event));
+    }
+
+    XRRFreeScreenConfigInfo(screenConfig);
 }
 
 bool LinuxWindow::dispatchEvents() {
@@ -150,13 +235,25 @@ bool LinuxWindow::dispatchEvents() {
             }
 
             case ClientMessage:
-                if (event.xclient.data.l[0] == (long)this->wmDeleteWindow) {
+                if (event.xclient.data.l[0] == static_cast<long>(this->wmDeleteWindow)) {
                     breakOrbit = true;
                 }
 
                 break;
 
             default:
+                if (event.type - this->xrandrEventBase == RRScreenChangeNotify) {
+                    /*
+                     * Per http://www.x.org/archive/X11R7.5/doc/man/man3/Xrandr.3.html#sect4
+                     * Xlib notification
+                     *
+                     * Clients must call back into Xlib using XRRUpdateConfiguration when screen configuration
+                     * change notify events are generated (or root window configuration changes occur, to update
+                     * Xlib's view of the resolution, size, rotation, reflection or subpixel order.
+                     */
+                    XRRUpdateConfiguration(&event);
+                }
+
                 break;
         }
     }
@@ -175,7 +272,7 @@ void LinuxWindow::createWindow(const char* windowName) {
     }
 
     this->screen = XDefaultScreen(this->display);
-    XID rootWindow = XRootWindow(this->display, this->screen);
+    this->rootWindow = XRootWindow(this->display, this->screen);
 
     const int fbAttribList[] = {
         GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -201,7 +298,7 @@ void LinuxWindow::createWindow(const char* windowName) {
     XFree(fbConfigs);
 
     XVisualInfo* visualInfo = glXGetVisualFromFBConfig(this->display, this->fbConfig);
-    this->colormap = XCreateColormap(this->display, rootWindow, visualInfo->visual, AllocNone);
+    this->colormap = XCreateColormap(this->display, this->rootWindow, visualInfo->visual, AllocNone);
     if (this->colormap == None) {
         throw std::runtime_error(LogFormat("XCreateColormap()"));
     }
@@ -211,7 +308,7 @@ void LinuxWindow::createWindow(const char* windowName) {
     windowAttributes.event_mask = PointerMotionMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask;
 
     this->window = XCreateWindow(
-            this->display, rootWindow, 0, 0, this->width, this->height, 0,
+            this->display, this->rootWindow, 0, 0, this->width, this->height, 0,
             visualInfo->depth, InputOutput, visualInfo->visual, CWColormap | CWEventMask, &windowAttributes);
     if (this->window == None) {
         throw std::runtime_error(LogFormat("XCreateWindow()"));
@@ -245,6 +342,29 @@ void LinuxWindow::createWindow(const char* windowName) {
 
     XSetWMNormalHints(this->display, this->window, hints);
     XFree(hints);
+
+    /*
+     * Per https://specifications.freedesktop.org/wm-spec/wm-spec-1.3.html#idm140130317598336
+     * _NET_WM_STATE
+     *
+     * _NET_WM_STATE_FULLSCREEN indicates that the window should fill the entire screen and have
+     * no window decorations. Additionally the Window Manager is responsible for restoring the
+     * original geometry after a switch from fullscreen back to normal window.
+     */
+    this->wmState = XInternAtom(this->display, "_NET_WM_STATE", False);
+    this->wmStateFullscreen = XInternAtom(this->display, "_NET_WM_STATE_FULLSCREEN", False);
+
+    /*
+     * Per 'man 3 xrandr' manual
+     * DATATYPES
+     *
+     * A XRRScreenChangeNotifyEvent is sent to a client that has requested notification whenever
+     * the screen configuration is changed. A client can perform this request by calling XRRSelectInput,
+     * passing the display, the root window, and the RRScreenChangeNotifyMask mask.
+     */
+    int xrandrErrorBase;
+    XRRQueryExtension(this->display, &this->xrandrEventBase, &xrandrErrorBase);
+    XRRSelectInput(this->display, this->rootWindow, RRScreenChangeNotifyMask);
 }
 
 void LinuxWindow::destroyWindow() {

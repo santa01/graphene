@@ -57,10 +57,14 @@ private:
 
     Display* display = nullptr;
     int screen = 0;
+    XID rootWindow = None;
     GLXFBConfig fbConfig = nullptr;
     Colormap colormap = None;
     XID window = None;
     Atom wmDeleteWindow = None;
+    Atom wmState = None;
+    Atom wmStateFullscreen = None;
+    int xrandrEventBase = 0;
     GLXContext renderingContext = nullptr;
 
     int firstKeycode = 0;
