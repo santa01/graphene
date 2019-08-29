@@ -40,62 +40,74 @@ from bpy.props import StringProperty, EnumProperty
 from bpy_extras.io_utils import ExportHelper, axis_conversion
 
 
-def triangulate(mesh):
+def triangulate(object_mesh):
     bm = bmesh.new()
-    bm.from_mesh(mesh)
+    bm.from_mesh(object_mesh)
     bmesh.ops.triangulate(bm, faces=bm.faces)
-    bm.to_mesh(mesh)
+    bm.to_mesh(object_mesh)
     bm.free()
 
 
 def write_entity(context, filepath, global_matrix):
+    default_material = bpy.data.materials.new(name="default")
+    default_material.ambient = 1.0
+    default_material.diffuse_intensity = 1.0
+    default_material.diffuse_color = (1.0, 0.0, 0.0)
+    default_material.specular_intensity = 0.5
+    default_material.specular_hardness = 50
+    default_material.specular_color = (1.0, 1.0, 1.0)
+
+    previous_mode = None
     if bpy.ops.object.mode_set.poll():
+        previous_mode = bpy.context.object.mode
         bpy.ops.object.mode_set(mode='OBJECT')
 
-    meshes = []
+    object_meshes = []
+    for scene_object in context.scene.objects:
+        if scene_object.type != 'MESH':
+            continue
 
-    for obj in context.scene.objects:
-        object_parent = obj.parent
+        object_parent = scene_object.parent
         if object_parent is not None and object_parent.dupli_type in {'VERTS', 'FACES'}:
             continue
 
-        if obj.dupli_type != 'NONE':
-            obj.dupli_list_create(context.scene)
-            derived_objects = [(dupli.object, dupli.matrix) for dupli in obj.dupli_list]
+        if scene_object.dupli_type != 'NONE':
+            scene_object.dupli_list_create(context.scene)
+            derived_objects = [(dupli.object, dupli.matrix) for dupli in scene_object.dupli_list]
         else:
-            derived_objects = [(obj, obj.matrix_world)]
+            derived_objects = [(scene_object, scene_object.matrix_world)]
 
         for derived_object, local_matrix in derived_objects:
-            mesh = derived_object.to_mesh(context.scene, True, 'PREVIEW')
+            object_mesh = derived_object.to_mesh(context.scene, True, 'PREVIEW')
 
             # Renderer requires 3 vertex faces
-            triangulate(mesh)
-            meshes.append(mesh)
+            triangulate(object_mesh)
+            object_meshes.append(object_mesh)
 
             # Modified global_matrix keeps X vector pointing right (see below), face winding
             # becomes Counter Clock Wise with normals pointing the opposite direction.
             # flip_normals() changes the face winding back to Clock Wise and fix normals direction.
-            mesh.transform(global_matrix * local_matrix)
-            mesh.flip_normals()
+            object_mesh.transform(global_matrix * local_matrix)
+            object_mesh.flip_normals()
 
             # Calculate split vertex normals, which preserve sharp edges.
-            mesh.calc_normals_split()
+            object_mesh.calc_normals_split()
 
-        if obj.dupli_type != 'NONE':
-            obj.dupli_list_clear()
+        if scene_object.dupli_type != 'NONE':
+            scene_object.dupli_list_clear()
 
     with open(filepath, "wb") as f:
         f.write(struct.pack("<4s", bytearray("GPHN", 'ASCII')))
-        f.write(struct.pack("<4b", *(bl_info["version"] + (len(meshes),))))
+        f.write(struct.pack("<4b", *(bl_info["version"] + (len(object_meshes),))))
 
-        for mesh in meshes:
-            loops = mesh.loops[:]
-            polygons = mesh.polygons[:]
-            vertices = mesh.vertices[:]
-            materials = mesh.materials[:]
+        for object_mesh in object_meshes:
+            loops = object_mesh.loops[:]
+            polygons = object_mesh.polygons[:]
+            vertices = object_mesh.vertices[:]
+            materials = object_mesh.materials[:]
 
-            if mesh.uv_layers.active is not None:
-                uv_loop = mesh.uv_layers.active.data[:]
+            if object_mesh.uv_layers.active is not None:
+                uv_loop = object_mesh.uv_layers.active.data[:]
             else:
                 uv_loop = None
 
@@ -118,13 +130,7 @@ def write_entity(context, filepath, global_matrix):
                 # TODO: Write more than one material
                 material = materials[0]
             else:
-                material = bpy.data.materials.new(name="default")
-                material.ambient = 1.0
-                material.diffuse_intensity = 1.0
-                material.diffuse_color = (1.0, 0.0, 0.0)
-                material.specular_intensity = 0.5
-                material.specular_hardness = 50
-                material.specular_color = (1.0, 1.0, 1.0)
+                material = default_material
 
             # Scale Blender [1..511] specular_hardness to approximately [1..100]
             # range to make specular highlights look similar in Graphene
@@ -164,7 +170,10 @@ def write_entity(context, filepath, global_matrix):
             for face in export_faces:
                 f.write(struct.pack("<3i", face[0], face[1], face[2]))
 
-            bpy.data.meshes.remove(mesh)
+            bpy.data.meshes.remove(object_mesh)
+
+    if previous_mode is not None and bpy.ops.object.mode_set.poll():
+        bpy.ops.object.mode_set(mode=previous_mode)
 
     return {'FINISHED'}
 
