@@ -1,9 +1,43 @@
+Entity definition:
+
 0        7       15       24       31
 +--------+--------+--------+--------+  <-- Header
 |           magic number            |
 +--------+--------+--------+--------+
 | major  | minor  | patch  |objects |
-+--------+--------+--------+--------+  <-- Object material
++--------+--------+--------+--------+
+~         Object definition         ~
++--------+--------+--------+--------+
+~               . . .               ~
++--------+--------+--------+--------+
+~         Object definition         ~
++--------+--------+--------+--------+
+
+
+Object definition:
+
+0        7       15       24       31
++--------+--------+--------+--------+
+|        material definition        |
++--------+--------+--------+--------+  <-- Object geometry
+|          vertices number          |
++--------+--------+--------+--------+
+|           faces number            |
++--------+--------+--------+--------+  <-- Object data
+~      vertex coordinates data      ~
++--------+--------+--------+--------+
+~        vertex normals data        ~
++--------+--------+--------+--------+
+~        uv coordinates data        ~
++--------+--------+--------+--------+
+~             faces data            ~
++--------+--------+--------+--------+
+
+
+Material definition:
+
+0        7       15       24       31
++--------+--------+--------+--------+
 |         ambient intensity         |
 +--------+--------+--------+--------+
 |         diffuse intensity         |
@@ -20,19 +54,7 @@
 |          specular color           |
 |                                   |
 +--------+--------+--------+--------+
-~       diffuse texture path        ~
-+--------+--------+--------+--------+  <-- Object geometry
-|          vertices number          |
-+--------+--------+--------+--------+
-|           faces number            |
-+--------+--------+--------+--------+  <-- Object data
-~      vertex coordinates data      ~
-+--------+--------+--------+--------+
-~        vertex normals data        ~
-+--------+--------+--------+--------+
-~        uv coordinates data        ~
-+--------+--------+--------+--------+
-~             faces data            ~
+~    diffuse texture path [256]     ~  <-- NULL terminated
 +--------+--------+--------+--------+
 
 File structure:
@@ -54,3 +76,8 @@ File structure:
 16. vertex normals         (variable length) - float tuples (x, y, z)
 17. uv coordinates         (variable length) - float tuples (u, v)
 18. faces                  (variable length) - integer tuples (v1, v3, v3)
+
+Structure export note:
+Objects are sub-divided during export the way single object uses only one
+material. Each Blender object with two or more materials in use (faces are
+assigned with different materials) is split on single material basis.

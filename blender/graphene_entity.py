@@ -32,7 +32,7 @@ bl_info = {
 
 import struct
 import os
-from collections import namedtuple
+from collections import defaultdict
 import bmesh
 import bpy
 from bpy.types import Operator, Material
@@ -84,9 +84,9 @@ def write_entity(context, filepath, global_matrix):
             triangulate(object_mesh)
             object_meshes.append(object_mesh)
 
-            # Modified global_matrix keeps X vector pointing right (see below), face winding
+            # Modified global_matrix keeps X vector pointing right (see below), loop winding
             # becomes Counter Clock Wise with normals pointing the opposite direction.
-            # flip_normals() changes the face winding back to Clock Wise and fix normals direction.
+            # flip_normals() changes the loop winding back to Clock Wise and fix normals direction.
             object_mesh.transform(global_matrix * local_matrix)
             object_mesh.flip_normals()
 
@@ -98,8 +98,9 @@ def write_entity(context, filepath, global_matrix):
 
     with open(filepath, "wb") as f:
         f.write(struct.pack("<4s", bytearray("GPHN", 'ASCII')))
-        f.write(struct.pack("<4b", *(bl_info["version"] + (len(object_meshes),))))
+        f.write(struct.pack("<3b1b", *bl_info["version"], 0))  # Write meshes count later
 
+        meshes_count = 0
         for object_mesh in object_meshes:
             loops = object_mesh.loops[:]
             polygons = object_mesh.polygons[:]
@@ -111,66 +112,80 @@ def write_entity(context, filepath, global_matrix):
             else:
                 uv_loop = None
 
-            export_vertices = [(0.0, 0.0, 0.0)] * len(loops)
-            export_normals = [(0.0, 0.0, 0.0)] * len(loops)
-            export_uvs = [(0.0, 0.0)] * len(loops)
-            export_faces = [p.loop_indices for p in polygons]
+            material_polygons = defaultdict(list)
+            for polygon in polygons:
+                material_polygons[polygon.material_index].append(polygon)
 
-            for face_index in [index for face in export_faces for index in face]:
-                vertex_index = loops[face_index].vertex_index
-                vertex = vertices[vertex_index]
+            meshes_count += len(material_polygons)
+            for material_index, export_polygons in material_polygons.items():
+                material_loops = [polygon.loop_indices for polygon in export_polygons]
+                material_indices = [loop_index for loop in material_loops for loop_index in loop]
 
-                export_vertices[face_index] = vertex.co
-                export_normals[face_index] = vertex.normal
-                if uv_loop is not None:
-                    export_uvs[face_index] = uv_loop[face_index].uv
+                indices_count = len(material_indices)
+                export_vertices = [(0.0, 0.0, 0.0)] * indices_count
+                export_normals = [(0.0, 0.0, 0.0)] * indices_count
+                export_uvs = [(0.0, 0.0)] * indices_count
 
-            # Materials list remains non empty after materials are removed
-            if materials and materials[0] is not None:
-                # TODO: Write more than one material
-                material = materials[0]
-            else:
-                material = default_material
+                # Verticies are contiguous, generate [(0, 1, 2), (3, 4, 5), ...]
+                export_loops = [range(start, start + 3) for start in range(0, indices_count, 3)]
 
-            # Scale Blender [1..511] specular_hardness to approximately [1..100]
-            # range to make specular highlights look similar in Graphene
-            specular_hardness = material.specular_hardness // 5 + 1
+                for mapped_index, loop_index in enumerate(material_indices):
+                    vertex_index = loops[loop_index].vertex_index
+                    vertex = vertices[vertex_index]
 
-            f.write(struct.pack("<2f", material.ambient, material.diffuse_intensity))
-            f.write(struct.pack("<3f", *material.diffuse_color))
-            f.write(struct.pack("<1f1i", material.specular_intensity, specular_hardness))
-            f.write(struct.pack("<3f", *material.specular_color))
+                    export_vertices[mapped_index] = vertex.co
+                    export_normals[mapped_index] = vertex.normal
 
-            diffuse_texture = material.active_texture
-            if diffuse_texture is not None and diffuse_texture.type == 'IMAGE':
-                # Per Blender Manual: Files & Data System - Blender File - Blend Files
-                # When relative paths are supported, the File Browser provides a Relative Path checkbox,
-                # when entering the path into a text field, use a double slash prefix (//) to make it so.
-                texture_filepath = diffuse_texture.image.filepath
-                if texture_filepath[0:2] == "//":
-                    blend_filedir = os.path.dirname(context.blend_data.filepath)
-                    texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
+                    if uv_loop is not None:
+                        export_uvs[mapped_index] = uv_loop[loop_index].uv
 
-                # Use forward slash separator (works well on Win32/Linux platforms)
-                export_filedir = os.path.dirname(filepath)
-                export_filename = os.path.relpath(texture_filepath, export_filedir).replace('\\', '/')
-            else:
-                export_filename = ""
+                if materials and materials[material_index] is not None:
+                    export_material = materials[material_index]
+                else:
+                    export_material = default_material
 
-            export_filename += "\0" * (255 - len(export_filename))
-            f.write(struct.pack("<255s1b", bytearray(export_filename, 'ASCII'), 0))
+                # Scale Blender [1..511] specular_hardness to approximately [1..100]
+                # range to make specular highlights look similar in Graphene
+                specular_hardness = export_material.specular_hardness // 5 + 1
 
-            f.write(struct.pack("<1i1i", len(export_vertices), len(export_faces)))
-            for vertex in export_vertices:
-                f.write(struct.pack("<3f", vertex[0], vertex[1], vertex[2]))
-            for normal in export_normals:
-                f.write(struct.pack("<3f", normal[0], normal[1], normal[2]))
-            for uv in export_uvs:
-                f.write(struct.pack("<2f", uv[0], uv[1]))
-            for face in export_faces:
-                f.write(struct.pack("<3i", face[0], face[1], face[2]))
+                f.write(struct.pack("<2f", export_material.ambient, export_material.diffuse_intensity))
+                f.write(struct.pack("<3f", *export_material.diffuse_color))
+                f.write(struct.pack("<1f1i", export_material.specular_intensity, specular_hardness))
+                f.write(struct.pack("<3f", *export_material.specular_color))
+
+                diffuse_texture = export_material.active_texture
+                if diffuse_texture is not None and diffuse_texture.type == 'IMAGE':
+                    # Per Blender Manual: Files & Data System - Blender File - Blend Files
+                    # When relative paths are supported, the File Browser provides a Relative Path checkbox,
+                    # when entering the path into a text field, use a double slash prefix (//) to make it so.
+                    texture_filepath = diffuse_texture.image.filepath
+                    if texture_filepath[0:2] == "//":
+                        blend_filedir = os.path.dirname(context.blend_data.filepath)
+                        texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
+
+                    # Use forward slash separator (works well on Win32/Linux platforms)
+                    export_filedir = os.path.dirname(filepath)
+                    export_filename = os.path.relpath(texture_filepath, export_filedir).replace('\\', '/')
+                else:
+                    export_filename = ""
+
+                export_filename += "\0" * (255 - len(export_filename))
+                f.write(struct.pack("<255s1b", bytearray(export_filename, 'ASCII'), 0))
+
+                f.write(struct.pack("<1i1i", len(export_vertices), len(export_loops)))
+                for vertex in export_vertices:
+                    f.write(struct.pack("<3f", vertex[0], vertex[1], vertex[2]))
+                for normal in export_normals:
+                    f.write(struct.pack("<3f", normal[0], normal[1], normal[2]))
+                for uv in export_uvs:
+                    f.write(struct.pack("<2f", uv[0], uv[1]))
+                for loop in export_loops:
+                    f.write(struct.pack("<3i", loop[0], loop[1], loop[2]))
 
             bpy.data.meshes.remove(object_mesh)
+
+        f.seek(7)  # 4 bytes for "GPHN", 3 bytes for version
+        f.write(struct.pack("<1b", meshes_count))
 
     if previous_mode is not None and bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode=previous_mode)
