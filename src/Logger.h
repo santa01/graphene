@@ -35,10 +35,11 @@
 #define LogWarn(...)            LogMessage(Graphene::LogLevel::LOG_WARN, __VA_ARGS__)
 #define LogInfo(...)            LogMessage(Graphene::LogLevel::LOG_INFO, __VA_ARGS__)
 #define LogDebug(...)           LogMessage(Graphene::LogLevel::LOG_DEBUG, __VA_ARGS__)
+#define LogTrace(...)           LogMessage(Graphene::LogLevel::LOG_TRACE, __VA_ARGS__)
 
 namespace Graphene {
 
-enum class LogLevel { LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DEBUG };
+enum class LogLevel { LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DEBUG, LOG_TRACE };
 
 class Logger: public NonCopyable {
 public:

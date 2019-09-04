@@ -38,7 +38,8 @@ std::unordered_map<LogLevel, std::string> levelNames = {
     { LogLevel::LOG_ERROR, "[E]" },
     { LogLevel::LOG_WARN,  "[W]" },
     { LogLevel::LOG_INFO,  "[I]" },
-    { LogLevel::LOG_DEBUG, "[D]" }
+    { LogLevel::LOG_DEBUG, "[D]" },
+    { LogLevel::LOG_TRACE, "[T]" }
 };
 
 Logger& Logger::getInstance() {

@@ -191,8 +191,8 @@ void Engine::setupOpenGL() {
         platformExtensions << "\n" << extension;
     }
 
-    LogDebug("OpenGL extensions: %s", openglExtensions.str().c_str());
-    LogDebug("Platform extensions: %s", platformExtensions.str().c_str());
+    LogTrace("OpenGL extensions: %s", openglExtensions.str().c_str());
+    LogTrace("Platform extensions: %s", platformExtensions.str().c_str());
 
     if (GetEngineConfig().isDebug()) {
         if (OpenGL::isExtensionSupported("GL_ARB_debug_output")) {
