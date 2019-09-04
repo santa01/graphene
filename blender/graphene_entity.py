@@ -153,21 +153,21 @@ def write_entity(context, filepath, global_matrix):
                 f.write(struct.pack("<1f1i", export_material.specular_intensity, specular_hardness))
                 f.write(struct.pack("<3f", *export_material.specular_color))
 
-                diffuse_texture = export_material.active_texture
-                if diffuse_texture is not None and diffuse_texture.type == 'IMAGE':
-                    # Per Blender Manual: Files & Data System - Blender File - Blend Files
-                    # When relative paths are supported, the File Browser provides a Relative Path checkbox,
-                    # when entering the path into a text field, use a double slash prefix (//) to make it so.
-                    texture_filepath = diffuse_texture.image.filepath
-                    if texture_filepath[0:2] == "//":
-                        blend_filedir = os.path.dirname(context.blend_data.filepath)
-                        texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
+                export_filename = ""
+                if export_material.active_texture is not None:
+                    diffuse_texture = export_material.active_texture
+                    if diffuse_texture.type == 'IMAGE' and diffuse_texture.image is not None:
+                        # Per Blender Manual: Files & Data System - Blender File - Blend Files
+                        # When relative paths are supported, the File Browser provides a Relative Path checkbox,
+                        # when entering the path into a text field, use a double slash prefix (//) to make it so.
+                        texture_filepath = diffuse_texture.image.filepath
+                        if texture_filepath[0:2] == "//":
+                            blend_filedir = os.path.dirname(context.blend_data.filepath)
+                            texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
 
-                    # Use forward slash separator (works well on Win32/Linux platforms)
-                    export_filedir = os.path.dirname(filepath)
-                    export_filename = os.path.relpath(texture_filepath, export_filedir).replace('\\', '/')
-                else:
-                    export_filename = ""
+                        # Use forward slash separator (works well on Win32/Linux platforms)
+                        export_filedir = os.path.dirname(filepath)
+                        export_filename = os.path.relpath(texture_filepath, export_filedir).replace('\\', '/')
 
                 export_filename += "\0" * (255 - len(export_filename))
                 f.write(struct.pack("<255s1b", bytearray(export_filename, 'ASCII'), 0))
