@@ -127,36 +127,36 @@ void Scene::iterateEntities(EntityHandler handler) {
 
 void Scene::iterateLights(LightHandler handler) {
     std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 translation, Math::Mat4 modelView) {
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 localWorld, Math::Mat4 rotation) {
         // Moving from the root node, current node's transformation matrix is the left operand
         // to be the last operation. Keep the root node's transformation the last one.
-        translation = translation * node->getTranslation();
-        modelView = modelView * node->getOppositeRotation() * node->getOppositeTranslation();
+        localWorld = localWorld * node->getTranslation() * node->getRotation();
+        rotation = rotation * node->getOppositeRotation();
 
         auto objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &translation, &modelView](const std::shared_ptr<Object> object) {
+        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld, &rotation](const std::shared_ptr<Object> object) {
             if (object->getType() == ObjectType::LIGHT) {
                 auto light = std::dynamic_pointer_cast<Light>(object);
 
-                Math::Mat4 lightTranslation(translation * light->getTranslation());
-                Math::Mat4 lightModelView(modelView * light->getOppositeRotation() * light->getOppositeTranslation());
+                Math::Mat4 lightLocalWorld(localWorld * light->getTranslation() * light->getRotation());
+                Math::Mat4 lightRotation(rotation * light->getOppositeRotation());
 
-                Math::Vec3 lightPosition(lightTranslation.get(0, 3), lightTranslation.get(1, 3), lightTranslation.get(2, 3));
-                Math::Vec3 lightDirection(lightModelView.get(2, 0), lightModelView.get(2, 1), lightModelView.get(2, 2));
+                Math::Vec3 lightPosition(lightLocalWorld.get(0, 3), lightLocalWorld.get(1, 3), lightLocalWorld.get(2, 3));
+                Math::Vec3 lightDirection(lightRotation.get(2, 0), lightRotation.get(2, 1), lightRotation.get(2, 2));
 
                 handler(light, lightPosition, lightDirection);
             }
         });
 
         auto nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &translation, &modelView](const std::shared_ptr<SceneNode> node) {
-            traverser(node, translation, modelView);
+        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld, &rotation](const std::shared_ptr<SceneNode> node) {
+            traverser(node, localWorld, rotation);
         });
     };
 
-    Math::Mat4 translation;
-    Math::Mat4 modelView;
-    traverser(this->rootNode, translation, modelView);
+    Math::Mat4 localWorld;
+    Math::Mat4 rotation;
+    traverser(this->rootNode, localWorld, rotation);
 }
 
 }  // namespace Graphene
