@@ -32,6 +32,7 @@
 #include <ImageTexture.h>
 #include <unordered_map>
 #include <unordered_set>
+#include <functional>
 #include <string>
 #include <memory>
 
@@ -47,15 +48,20 @@ public:
     GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
     GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
+
     GRAPHENE_API std::shared_ptr<Mesh> createQuad();
+    GRAPHENE_API std::shared_ptr<Mesh> createCube();
 
     GRAPHENE_API void clearCache();
 
 private:
     ObjectManager() = default;
 
-    std::shared_ptr<ImageTexture> createTexture(const std::string& name);
-    std::unordered_set<std::shared_ptr<Mesh>> createMeshes(const std::string& name);
+    std::shared_ptr<ImageTexture> loadTexture(const std::string& name);
+    std::unordered_set<std::shared_ptr<Mesh>> loadMeshes(const std::string& name);
+
+    typedef std::function<std::shared_ptr<Mesh>()> MeshFactory;
+    std::shared_ptr<Mesh> createMesh(const std::string& alias, MeshFactory factory);
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;

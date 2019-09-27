@@ -58,11 +58,66 @@ typedef struct {
 } ObjectGeometry;
 
 typedef struct {
-    float vertices[12] = { -1.0f, -1.0f,  0.0f, -1.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f, -1.0f,  0.0f };
-    float normals[12]  = {  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f };
-    float uvs[8]       = {  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f };
-    int faces[6]       = { 0, 1, 3, 1, 2, 3 };  // Clockwise face winding
+    float vertices[18] = {  1.0f, -1.0f,  0.0f, -1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,
+                            1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,  1.0f,  1.0f, -0.0f };
+    float normals[18]  = {  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,
+                            0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f };
+    float uvs[12]      = {  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+                            1.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f };
+    int faces[6]       = {  0,  1,  2,
+                            3,  4,  5 };  // Clockwise face winding
 } QuadMesh;
+
+typedef struct {
+    float vertices[108] = {  1.0, -1.0, -1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0,
+                            -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,
+                             1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,
+                             1.0,  1.0, -1.0,  1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+                            -1.0, -1.0, -1.0, -1.0, -1.0,  1.0, -1.0,  1.0,  1.0,
+                             1.0, -1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0,
+                             1.0, -1.0, -1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0,
+                            -1.0,  1.0,  1.0,  1.0,  1.0, -1.0, -1.0,  1.0, -1.0,
+                             1.0,  1.0,  1.0,  1.0, -1.0, -1.0,  1.0,  1.0, -1.0,
+                             1.0,  1.0, -1.0, -1.0, -1.0, -1.0, -1.0,  1.0, -1.0,
+                            -1.0, -1.0, -1.0, -1.0,  1.0,  1.0, -1.0,  1.0, -1.0,
+                             1.0, -1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0f };
+    float normals[108]  = {  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,
+                             0.0,  1.0,  0.0,  0.0,  1.0,  0.0,  0.0,  1.0,  0.0,
+                             1.0,  0.0,  0.0,  1.0,  0.0,  0.0,  1.0,  0.0,  0.0,
+                             0.0,  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,  0.0, -1.0,
+                            -1.0,  0.0,  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,  0.0,
+                             0.0,  0.0,  1.0,  0.0,  0.0,  1.0,  0.0,  0.0,  1.0,
+                             0.0, -1.0,  0.0,  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,
+                             0.0,  1.0,  0.0,  0.0,  1.0,  0.0,  0.0,  1.0,  0.0,
+                             1.0,  0.0,  0.0,  1.0,  0.0,  0.0,  1.0,  0.0,  0.0,
+                             0.0,  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,  0.0, -1.0,
+                            -1.0,  0.0,  0.0, -1.0,  0.0,  0.0, -1.0,  0.0,  0.0,
+                             0.0,  0.0,  1.0,  0.0,  0.0,  1.0,  0.0,  0.0,  1.0f };
+    float uvs[72]       = {  0.25, 0.50, 0.25, 0.75, 0.50, 0.75,
+                             0.50, 0.00, 0.25, 0.00, 0.25, 0.25,
+                             0.00, 0.75, 0.25, 0.75, 0.25, 0.50,
+                             0.25, 0.25, 0.25, 0.50, 0.50, 0.50,
+                             0.50, 0.50, 0.50, 0.75, 0.75, 0.75,
+                             0.25, 0.75, 0.25, 1.00, 0.50, 1.00,
+                             0.25, 0.50, 0.50, 0.75, 0.50, 0.50,
+                             0.50, 0.00, 0.25, 0.25, 0.50, 0.25,
+                             0.00, 0.75, 0.25, 0.50, 0.00, 0.50,
+                             0.25, 0.25, 0.50, 0.50, 0.50, 0.25,
+                             0.50, 0.50, 0.75, 0.75, 0.75, 0.50,
+                             0.25, 0.75, 0.50, 1.00, 0.50, 0.75f };
+    int faces[36]       = {  0,  1,  2,
+                             3,  4,  5,
+                             6,  7,  8,
+                             9, 10, 11,
+                            12, 13, 14,
+                            15, 16, 17,
+                            18, 19, 20,
+                            21, 22, 23,
+                            24, 25, 26,
+                            27, 28, 29,
+                            30, 31, 32,
+                            33, 34, 35 };  // Clockwise face winding
+} CubeMesh;
 
 #pragma pack(pop)
 
@@ -90,8 +145,8 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
         meshes = this->meshCache.at(name);
     } else {
         LogDebug("Load entity from '%s'", name.c_str());
-        meshes = this->createMeshes(name);
-        this->meshCache.insert(std::make_pair(name, meshes));
+        meshes = this->loadMeshes(name);
+        this->meshCache.emplace(name, meshes);
     }
 
     auto entity = std::make_shared<Entity>();
@@ -111,27 +166,26 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
     LogDebug("Load shader from '%s'", name.c_str());
     auto shader = std::make_shared<Shader>(GetEngineConfig().getDataDirectory() + '/' + name);
 
-    this->shaderCache.insert(std::make_pair(name, shader));
+    this->shaderCache.emplace(name, shader);
     return shader;
 }
 
 std::shared_ptr<Mesh> ObjectManager::createQuad() {
-    std::string name(typeid(QuadMesh).name());
-
-    if (this->meshCache.find(name) == this->meshCache.end()) {
+    return this->createMesh(typeid(QuadMesh).name(), []() {
         QuadMesh meshData;
-        auto quadMesh = std::make_shared<Mesh>(&meshData, 4, 2);
+        int meshVertices = sizeof(meshData.vertices) / sizeof(float) / 3;
+        int meshFaces = sizeof(meshData.faces) / sizeof(int) / 3;
+        return std::make_shared<Mesh>(&meshData, meshVertices, meshFaces);
+    });
+}
 
-        std::unordered_set<std::shared_ptr<Mesh>> meshes = { quadMesh };
-        this->meshCache.insert(std::make_pair(name, meshes));
-    }
-
-    // Return a Mesh copy (same OpenGL objects, different material)
-    auto meshTemplate = *this->meshCache.at(name).begin();
-    auto quadMesh = std::make_shared<Mesh>(*meshTemplate);
-
-    quadMesh->setMaterial(std::make_shared<Material>());
-    return quadMesh;
+std::shared_ptr<Mesh> ObjectManager::createCube() {
+    return this->createMesh(typeid(CubeMesh).name(), []() {
+        CubeMesh meshData;
+        int meshVertices = sizeof(meshData.vertices) / sizeof(float) / 3;
+        int meshFaces = sizeof(meshData.faces) / sizeof(int) / 3;
+        return std::make_shared<Mesh>(&meshData, meshVertices, meshFaces);
+    });
 }
 
 void ObjectManager::clearCache() {
@@ -145,7 +199,7 @@ void ObjectManager::clearCache() {
     this->meshCache.clear();
 }
 
-std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& name) {
+std::shared_ptr<ImageTexture> ObjectManager::loadTexture(const std::string& name) {
     if (this->textureCache.find(name) != this->textureCache.end()) {
         LogDebug("Reuse cached '%s' texture", name.c_str());
         return this->textureCache.at(name);
@@ -155,11 +209,11 @@ std::shared_ptr<ImageTexture> ObjectManager::createTexture(const std::string& na
     TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name);
     auto texture = std::make_shared<ImageTexture>(textureImage);
 
-    this->textureCache.insert(std::make_pair(name, texture));
+    this->textureCache.emplace(name, texture);
     return texture;
 }
 
-std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std::string& name) {
+std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& name) {
     std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
@@ -198,7 +252,7 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
         std::string diffuseTexture(objectMaterial.diffuseTexture);
         if (!diffuseTexture.empty()) {
             std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
-            material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
+            material->setDiffuseTexture(this->loadTexture(parentDirectory + diffuseTexture));
         }
 
         file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
@@ -215,6 +269,20 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::createMeshes(const std:
     }
 
     return meshes;
+}
+
+std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, MeshFactory factory) {
+    if (this->meshCache.find(alias) == this->meshCache.end()) {
+        std::unordered_set<std::shared_ptr<Mesh>> meshes = { factory() };
+        this->meshCache.emplace(alias, meshes);
+    }
+
+    // Return a Mesh copy (same OpenGL objects, different material)
+    auto mesh = *this->meshCache.at(alias).begin();
+    auto meshCopy = std::make_shared<Mesh>(*mesh);
+
+    meshCopy->setMaterial(std::make_shared<Material>());
+    return meshCopy;
 }
 
 }  // namespace Graphene
