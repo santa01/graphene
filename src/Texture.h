@@ -31,7 +31,7 @@ namespace Graphene {
 
 class Texture: public NonCopyable {
 public:
-    GRAPHENE_API Texture(int width, int height, GLsizei mipmapLevels, GLenum storageFormat);
+    GRAPHENE_API Texture(int width, int height, GLenum type, GLenum format, GLsizei mipmaps);
     GRAPHENE_API virtual ~Texture();
 
     GRAPHENE_API int getWidth() const;
@@ -43,20 +43,45 @@ public:
 protected:
     int width = 0;
     int height = 0;
+
+    GLenum target = 0;
     GLuint texture = 0;
 };
 
-template<GLsizei mipmapLevels, GLenum storageFormat>
-class TextureTemplate: public Texture {
+class Texture2D: public Texture {
 public:
-    GRAPHENE_API TextureTemplate(int width, int height):
-            Texture(width, height, mipmapLevels, storageFormat) {
+    GRAPHENE_API Texture2D(int width, int height, GLenum format, GLsizei mipmaps):
+            Texture(width, height, GL_TEXTURE_2D, format, mipmaps) {
     }
 };
 
-typedef TextureTemplate<4, GL_SRGB8_ALPHA8> RgbaTexture;
-typedef TextureTemplate<1, GL_DEPTH_COMPONENT16> DepthTexture;
-typedef TextureTemplate<1, GL_RGBA16F> GeometryTexture;
+class TextureCubeMap: public Texture {
+public:
+    GRAPHENE_API TextureCubeMap(int width, int height, GLenum format, GLsizei mipmaps):
+            Texture(width, height, GL_TEXTURE_CUBE_MAP, format, mipmaps) {
+    }
+};
+
+template<GLenum format, GLsizei mipmaps>
+class Texture2DTemplate: public Texture2D {
+public:
+    GRAPHENE_API Texture2DTemplate(int width, int height):
+            Texture2D(width, height, format, mipmaps) {
+    }
+};
+
+template<GLenum format, GLsizei mipmaps>
+class TextureCubeMapTemplate: public TextureCubeMap {
+public:
+    GRAPHENE_API TextureCubeMapTemplate(int width, int height):
+            TextureCubeMap(width, height, format, mipmaps) {
+    }
+};
+
+typedef Texture2DTemplate<GL_RGBA16F, 1>           GeometryTexture;
+typedef Texture2DTemplate<GL_DEPTH_COMPONENT16, 1> DepthTexture;
+typedef Texture2DTemplate<GL_SRGB8_ALPHA8, 4>      RgbaTexture;
+typedef TextureCubeMapTemplate<GL_SRGB8_ALPHA8, 4> RgbaCubeTexture;
 
 }  // namespace Graphene
 

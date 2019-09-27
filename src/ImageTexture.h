@@ -35,6 +35,12 @@ public:
     GRAPHENE_API void update(const Image& image);
 };
 
+class ImageCubeTexture: public RgbaCubeTexture {
+public:
+    GRAPHENE_API ImageCubeTexture(const CubeImage& cubeImage);
+    GRAPHENE_API void update(const CubeImage& cubeImage);
+};
+
 }  // namespace Graphene
 
 #endif  // IMAGETEXTURE_H

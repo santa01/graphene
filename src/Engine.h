@@ -42,7 +42,7 @@ public:
     GRAPHENE_API virtual ~Engine() = default;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
-    GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height, GLenum outputFormat);
+    GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height, GLenum format);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
     GRAPHENE_API std::shared_ptr<Scene> createScene();

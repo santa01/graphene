@@ -25,9 +25,9 @@
 
 namespace Graphene {
 
-FrameBuffer::FrameBuffer(int width, int height, GLenum outputFormat):
+FrameBuffer::FrameBuffer(int width, int height, GLenum format):
         RenderTarget(width, height),
-        outputTexture(new Texture(width, height, 1, outputFormat)),
+        outputTexture(new Texture2D(width, height, format, 1)),
         depthTexture(new DepthTexture(width, height)) {
     glGenFramebuffers(1, &this->fbo);
 

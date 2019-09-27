@@ -33,7 +33,7 @@ namespace Graphene {
 
 class FrameBuffer: public RenderTarget {
 public:
-    GRAPHENE_API FrameBuffer(int width, int height, GLenum outputFormat);
+    GRAPHENE_API FrameBuffer(int width, int height, GLenum format);
     GRAPHENE_API ~FrameBuffer();
 
     GRAPHENE_API void setAlphaBlending(bool alphaBlending);

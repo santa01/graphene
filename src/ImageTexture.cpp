@@ -30,16 +30,16 @@ namespace Graphene {
 
 ImageTexture::ImageTexture(const Image& image):
         RgbaTexture(image.getWidth(), image.getHeight()) {
-    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glBindTexture(this->target, this->texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int anisotropy = GetEngineConfig().getAnisotropy();
     if (anisotropy > 0 && OpenGL::isExtensionSupported("GL_ARB_texture_filter_anisotropic")) {
         GLint maxAnisotropy;
         glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAnisotropy);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, std::min<int>(anisotropy, maxAnisotropy));
+        glTexParameteri(this->target, GL_TEXTURE_MAX_ANISOTROPY, std::min<int>(anisotropy, maxAnisotropy));
     } else {
         LogWarn("GL_ARB_texture_filter_anisotropic unavailable, anisotropic filtering disabled");
     }
@@ -48,11 +48,43 @@ ImageTexture::ImageTexture(const Image& image):
 }
 
 void ImageTexture::update(const Image& image) {
-    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glBindTexture(this->target, this->texture);
 
     GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;  // Little-endian ARGB or RGB format
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexSubImage2D(this->target, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
+    glGenerateMipmap(this->target);
+}
+
+ImageCubeTexture::ImageCubeTexture(const CubeImage& cubeImage):
+        RgbaCubeTexture(cubeImage[0]->getWidth(), cubeImage[0]->getHeight()) {
+    glBindTexture(this->target, this->texture);
+
+    glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int anisotropy = GetEngineConfig().getAnisotropy();
+    if (anisotropy > 0 && OpenGL::isExtensionSupported("GL_ARB_texture_filter_anisotropic")) {
+        GLint maxAnisotropy;
+        glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAnisotropy);
+        glTexParameteri(this->target, GL_TEXTURE_MAX_ANISOTROPY, std::min<int>(anisotropy, maxAnisotropy));
+    } else {
+        LogWarn("GL_ARB_texture_filter_anisotropic unavailable, anisotropic filtering disabled");
+    }
+
+    this->update(cubeImage);
+}
+
+void ImageCubeTexture::update(const CubeImage& cubeImage) {
+    glBindTexture(this->target, this->texture);
+
+    for (int faceOffset = 0; faceOffset < 6; faceOffset++) {
+        auto faceImage = cubeImage[faceOffset];
+        GLenum faceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceOffset;
+        GLenum faceFormat = (faceImage->getPixelDepth() == 32) ? GL_BGRA : GL_BGR;  // Little-endian ARGB or RGB format
+        glTexSubImage2D(faceTarget, 0, 0, 0, faceImage->getWidth(), faceImage->getHeight(), faceFormat, GL_UNSIGNED_BYTE, faceImage->getPixels());
+    }
+
+    glGenerateMipmap(this->target);
 }
 
 }  // namespace Graphene

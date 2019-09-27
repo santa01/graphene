@@ -71,8 +71,8 @@ const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers(
     return this->frameBuffers;
 }
 
-std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height, GLenum outputFormat) {
-    auto frameBuffer = std::make_shared<FrameBuffer>(width, height, outputFormat);
+std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height, GLenum format) {
+    auto frameBuffer = std::make_shared<FrameBuffer>(width, height, format);
     this->frameBuffers.insert(frameBuffer);
 
     return frameBuffer;
@@ -202,6 +202,12 @@ void Engine::setupOpenGL() {
         } else {
             LogWarn("GL_ARB_debug_output unavailable, OpenGL debug disabled");
         }
+    }
+
+    if (OpenGL::isExtensionSupported("GL_ARB_seamless_cube_map")) {
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    } else {
+        LogWarn("GL_ARB_seamless_cube_map unavailable, skybox may expose seams across faces");
     }
 
     glEnable(GL_CULL_FACE);

@@ -25,6 +25,7 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <array>
 #include <memory>
 
 namespace Graphene {
@@ -48,6 +49,8 @@ protected:
     int pixelsSize = 0;
     std::unique_ptr<char[]> pixels;
 };
+
+typedef std::array<std::shared_ptr<Image>, 6> CubeImage;
 
 }  // namespace Graphene
 

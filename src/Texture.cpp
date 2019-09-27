@@ -24,13 +24,14 @@
 
 namespace Graphene {
 
-Texture::Texture(int width, int height, GLsizei mipmapLevels, GLenum storageFormat):
+Texture::Texture(int width, int height, GLenum type, GLenum format, GLsizei mipmaps):
         width(width),
-        height(height) {
+        height(height),
+        target(type) {
     glGenTextures(1, &this->texture);
 
-    glBindTexture(GL_TEXTURE_2D, this->texture);
-    glTexStorage2D(GL_TEXTURE_2D, mipmapLevels, storageFormat, this->width, this->height);
+    glBindTexture(this->target, this->texture);
+    glTexStorage2D(this->target, mipmaps, format, this->width, this->height);
 }
 
 Texture::~Texture() {
@@ -51,7 +52,7 @@ GLuint Texture::getHandle() const {
 
 void Texture::bind(int textureUnit) {
     glActiveTexture(GL_TEXTURE0 + textureUnit);
-    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glBindTexture(this->target, this->texture);
 }
 
 }  // namespace Graphene

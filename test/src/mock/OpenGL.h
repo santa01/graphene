@@ -23,26 +23,28 @@
 #ifndef OPENGL_H
 #define OPENGL_H
 
-#define GLsizei                     int
-#define GLuint                      unsigned int
-#define GLenum                      unsigned int
+#define GLsizei     int
+#define GLuint      unsigned int
+#define GLenum      unsigned int
 
-#define GL_UNIFORM_BUFFER           0
-#define GL_DYNAMIC_DRAW             0
-#define GL_TRIANGLES                0
-#define GL_TEXTURE_2D               0
-#define GL_UNSIGNED_INT             0
-#define GL_UNSIGNED_BYTE            0
-#define GL_RGBA                     0
-#define GL_RGBA16F                  0
-#define GL_LINEAR                   0
-#define GL_LINEAR_MIPMAP_LINEAR     0
-#define GL_TEXTURE_MIN_FILTER       0
-#define GL_TEXTURE_MAG_FILTER       0
-#define GL_TEXTURE0                 0
-#define GL_SRGB8_ALPHA8             0
-#define GL_DEPTH_COMPONENT16        0
-#define GL_NONE                     0
+#define GL_UNIFORM_BUFFER               0
+#define GL_DYNAMIC_DRAW                 0
+#define GL_TRIANGLES                    0
+#define GL_TEXTURE_2D                   0
+#define GL_TEXTURE_CUBE_MAP             0
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X  0
+#define GL_UNSIGNED_INT                 0
+#define GL_UNSIGNED_BYTE                0
+#define GL_RGBA                         0
+#define GL_RGBA16F                      0
+#define GL_LINEAR                       0
+#define GL_LINEAR_MIPMAP_LINEAR         0
+#define GL_TEXTURE_MIN_FILTER           0
+#define GL_TEXTURE_MAG_FILTER           0
+#define GL_TEXTURE0                     0
+#define GL_SRGB8_ALPHA8                 0
+#define GL_DEPTH_COMPONENT16            0
+#define GL_NONE                         0
 
 #define glGenBuffers(...)           mock(__VA_ARGS__)
 #define glDeleteBuffers(...)        mock(__VA_ARGS__)
@@ -61,10 +63,10 @@
 #define glGenerateMipmap(...)       mock(__VA_ARGS__)
 #define glTexStorage2D(...)         mock(__VA_ARGS__)
 
-template <typename T>
+template<typename T>
 void mock(T arg) { (void)arg; }
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 void mock(T arg, Args... args) { mock(arg); mock(args...); }
 
 #endif  // OPENGL_H
