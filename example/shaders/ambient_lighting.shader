@@ -4,6 +4,7 @@
 #ifdef TYPE_VERTEX
 
 layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec3 vertexNormal;   // Unused
 layout(location = 2) in vec2 vertexUV;
 
 smooth out vec2 fragmentUV;
@@ -21,7 +22,6 @@ uniform vec3 ambientColor;
 uniform float ambientEnergy;
 
 uniform sampler2D diffuseSampler;
-uniform sampler2D normalSampler;
 
 smooth in vec2 fragmentUV;
 

@@ -3,13 +3,13 @@
 
 #ifdef TYPE_VERTEX
 
-uniform mat4 modelViewProjection;
-uniform mat4 normalRotation;
-uniform mat4 localWorld;
-
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec2 vertexUV;
+
+uniform mat4 modelViewProjection;
+uniform mat4 normalRotation;
+uniform mat4 localWorld;
 
 smooth out vec3 fragmentPosition;
 smooth out vec3 fragmentNormal;
