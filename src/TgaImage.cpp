@@ -80,7 +80,7 @@ typedef struct {
 
 #pragma pack(pop)
 
-TgaImage::TgaImage(const std::string& filename):
+TgaImage::TgaImage(const std::string& filename, bool bottomToTop):
         filename(filename) {
     std::ifstream image(this->filename.c_str(), std::ios::binary);
     if (!image) {
@@ -129,8 +129,10 @@ TgaImage::TgaImage(const std::string& filename):
      */
     uint8_t rowOrdering = header.imageSpec.imageDescr.topToBottomOrdering;
     uint8_t columnOrdering = header.imageSpec.imageDescr.leftToRightOrdering;
-    bool flipRows = (static_cast<RowOrdering>(rowOrdering) == RowOrdering::TOP_TO_BOTTOM);
-    bool flipColumns = (static_cast<ColumnOrdering>(columnOrdering) == ColumnOrdering::RIGHT_TO_LEFT);
+
+    RowOrdering expectedRowOrdering = bottomToTop ? RowOrdering::BOTTOM_TO_TOP : RowOrdering::TOP_TO_BOTTOM;
+    bool flipRows = (static_cast<RowOrdering>(rowOrdering) != expectedRowOrdering);
+    bool flipColumns = (static_cast<ColumnOrdering>(columnOrdering) != ColumnOrdering::LEFT_TO_RIGHT);
 
     std::ifstream::pos_type pixelsOffset = sizeof(header) + header.idLength +
         (header.colorMapSpec.colorMapLength * header.colorMapSpec.colorMapEntrySize);

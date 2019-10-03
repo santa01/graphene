@@ -27,11 +27,14 @@
 #include <Camera.h>
 #include <Light.h>
 #include <Entity.h>
+#include <Skybox.h>
+#include <Shader.h>
 #include <Shader.h>
 #include <Mesh.h>
+#include <Texture.h>
 #include <ImageTexture.h>
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
 #include <functional>
 #include <string>
 #include <memory>
@@ -40,17 +43,20 @@
 
 namespace Graphene {
 
+enum MeshWinding { WINDING_CLOCKWISE, WINDING_COUNTER_CLOCKWISE };
+
 class ObjectManager: public NonCopyable {
 public:
     GRAPHENE_API static ObjectManager& getInstance();
 
     GRAPHENE_API std::shared_ptr<Camera> createCamera(ProjectionType type) const;
     GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
+    GRAPHENE_API std::shared_ptr<Skybox> createSkybox(const std::string& name);
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
     GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
 
-    GRAPHENE_API std::shared_ptr<Mesh> createQuad();
-    GRAPHENE_API std::shared_ptr<Mesh> createCube();
+    GRAPHENE_API std::shared_ptr<Mesh> createQuad(MeshWinding winding);
+    GRAPHENE_API std::shared_ptr<Mesh> createCube(MeshWinding winding);
 
     GRAPHENE_API void clearCache();
 
@@ -58,14 +64,15 @@ private:
     ObjectManager() = default;
 
     std::shared_ptr<ImageTexture> loadTexture(const std::string& name);
-    std::unordered_set<std::shared_ptr<Mesh>> loadMeshes(const std::string& name);
+    std::shared_ptr<ImageCubeTexture> loadCubeTexture(const std::string& name);
+    std::vector<std::shared_ptr<Mesh>> loadMeshes(const std::string& name);
 
     typedef std::function<std::shared_ptr<Mesh>()> MeshFactory;
-    std::shared_ptr<Mesh> createMesh(const std::string& alias, MeshFactory factory);
+    std::shared_ptr<Mesh> createMesh(const std::string& alias, MeshWinding winding, MeshFactory factory);
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
-    std::unordered_map<std::string, std::shared_ptr<ImageTexture>> textureCache;
-    std::unordered_map<std::string, std::unordered_set<std::shared_ptr<Mesh>>> meshCache;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Mesh>>> meshCache;
 };
 
 }  // namespace Graphene

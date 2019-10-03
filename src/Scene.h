@@ -28,6 +28,7 @@
 #include <SceneNode.h>
 #include <Camera.h>
 #include <Entity.h>
+#include <Skybox.h>
 #include <Light.h>
 #include <Mat4.h>
 #include <Vec3.h>
@@ -43,6 +44,10 @@ class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
     GRAPHENE_API std::shared_ptr<SceneNode> createNode();
     GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
+    GRAPHENE_API std::shared_ptr<SceneNode> getPlayer();
+
+    GRAPHENE_API void setSkybox(const std::shared_ptr<Skybox> skybox);
+    GRAPHENE_API std::shared_ptr<Skybox> getSkybox() const;
 
     GRAPHENE_API void setAmbientColor(const Math::Vec3& ambientColor);
     GRAPHENE_API const Math::Vec3& getAmbientColor() const;
@@ -58,6 +63,8 @@ public:
 
 private:
     std::shared_ptr<SceneNode> rootNode;
+    std::shared_ptr<SceneNode> player;
+    std::shared_ptr<Skybox> skybox;
 
     Math::Vec3 ambientColor = { 1.0f, 1.0f, 1.0f };
     float ambientEnergy = 1.0f;

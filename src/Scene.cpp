@@ -42,6 +42,29 @@ std::shared_ptr<SceneNode> Scene::getRootNode() {
     return this->rootNode;
 }
 
+std::shared_ptr<SceneNode> Scene::getPlayer() {
+    /* shared_from_this() cannot be called from constructor */
+    if (this->player == nullptr) {
+        this->player = this->createNode();
+        this->getRootNode()->attachNode(this->player);
+    }
+
+    return this->player;
+}
+
+void Scene::setSkybox(const std::shared_ptr<Skybox> skybox) {
+    if (this->skybox != nullptr) {
+        this->getPlayer()->detachObject(this->skybox);
+    }
+
+    this->skybox = skybox;
+    this->getPlayer()->attachObject(this->skybox);
+}
+
+std::shared_ptr<Skybox> Scene::getSkybox() const {
+    return this->skybox;
+}
+
 void Scene::setAmbientColor(const Math::Vec3& ambientColor) {
     this->ambientColor = ambientColor;
 }
@@ -105,7 +128,7 @@ void Scene::iterateEntities(EntityHandler handler) {
             if (object->getType() == ObjectType::ENTITY) {
                 auto entity = std::dynamic_pointer_cast<Entity>(object);
 
-                if (entity->isVisible()) {
+                if (entity->isVisible() && !entity->isSkybox()) {
                     Math::Mat4 entityModelView(localWorld * entity->getTranslation() * entity->getRotation() * entity->getScaling());
                     Math::Mat4 entityNormalRotation(normalRotation * entity->getRotation());
 

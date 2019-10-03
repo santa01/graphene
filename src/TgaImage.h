@@ -31,7 +31,7 @@ namespace Graphene {
 
 class TgaImage: public Image {
 public:
-    GRAPHENE_API TgaImage(const std::string& filename);
+    GRAPHENE_API TgaImage(const std::string& filename, bool bottomToTop);
     GRAPHENE_API const std::string& getFilename() const;
 
 private:

@@ -35,8 +35,8 @@ class Material {
 public:
     GRAPHENE_API Material();
 
-    GRAPHENE_API std::shared_ptr<ImageTexture> getDiffuseTexture() const;
-    GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture);
+    GRAPHENE_API std::shared_ptr<Texture> getDiffuseTexture() const;
+    GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<Texture> diffuseTexture);
 
     GRAPHENE_API float getAmbientIntensity() const;
     GRAPHENE_API void setAmbientIntensity(float ambientIntensity);
@@ -59,7 +59,7 @@ public:
     GRAPHENE_API std::shared_ptr<UniformBuffer> getMaterialBuffer() const;
 
 private:
-    std::shared_ptr<ImageTexture> diffuseTexture;
+    std::shared_ptr<Texture> diffuseTexture;
     std::shared_ptr<UniformBuffer> materialBuffer;
 
     float ambientIntensity = 1.0f;

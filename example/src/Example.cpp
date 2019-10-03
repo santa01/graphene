@@ -74,22 +74,12 @@ void Example::onKeyboardKey(Graphene::KeyboardKey key, bool state) {
 
 void Example::onSetup() {
 
-    /* Setup scene */
-
-    auto scene = this->createScene();
-    scene->setAmbientEnergy(0.3f);
-
-    this->player = scene->createNode();
-    this->node = scene->createNode();
-
-    auto sceneRoot = scene->getRootNode();
-    sceneRoot->attachNode(this->player);
-    sceneRoot->attachNode(this->node);
+    /* Setup render */
 
     auto& renderManager = Graphene::GetRenderManager();
     renderManager.setLightPass(true);
 
-    /* Populate scene with objects */
+    /* Create objects */
 
     auto& objectManager = Graphene::GetObjectManager();
 
@@ -100,27 +90,39 @@ void Example::onSetup() {
 
     auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
     auto lightBulb = objectManager.createLight(Graphene::LightType::POINT);
-
-    flashLight->setBlend(0.05f);
-    flashLight->setAngle(20.0f);
-    flashLight->setFalloff(8.0f);
-    flashLight->move((this->player->getRight() - this->player->getUp()) * 0.2f);
-
-    lightBulb->setEnergy(0.8f);
-    lightBulb->move(5.0f, 20.0f, 0.0f);
+    auto skybox = objectManager.createSkybox("textures/skybox");
 
     this->entity2->move(1.25f, 0.0f, 0.0f);
     this->entity3->move(0.5f, 1.0f, 0.0f);
     this->entity3->yaw(30.0f);
 
+    flashLight->setBlend(0.05f);
+    flashLight->setAngle(20.0f);
+    flashLight->setFalloff(8.0f);
+    flashLight->move(0.2f, -0.2f, 0.0f);
+
+    lightBulb->setEnergy(0.8f);
+    lightBulb->move(5.0f, 20.0f, 0.0f);
+
+    /* Populate scene with objects */
+
+    auto scene = this->createScene();
+    scene->setAmbientEnergy(0.3f);
+    scene->setSkybox(skybox);
+
+    this->player = scene->getPlayer();
     this->player->attachObject(this->camera);
     this->player->attachObject(flashLight);
     this->player->move(0.0f, 1.0f, -3.0f);
 
+    this->node = scene->createNode();
     this->node->attachObject(this->entity1);
     this->node->attachObject(this->entity2);
     this->node->attachObject(this->entity3);
     this->node->attachObject(lightBulb);
+
+    auto sceneRoot = scene->getRootNode();
+    sceneRoot->attachNode(this->node);
 
     /* Keep mouse inside the window */
 

@@ -121,6 +121,28 @@ typedef struct {
 
 #pragma pack(pop)
 
+template<typename T>
+std::shared_ptr<Mesh> geometryToMesh(bool flipGeometry) {
+    T geometry;
+    int vertexElements = sizeof(geometry.vertices) / sizeof(float);
+    int vertexIndices = sizeof(geometry.faces) / sizeof(int);
+
+    if (flipGeometry) {
+        // Flip normals
+        for (int i = 0; i < vertexElements; i += 3) {
+            geometry.normals[i + 0] = -geometry.normals[i + 0];
+            geometry.normals[i + 1] = -geometry.normals[i + 1];
+            geometry.normals[i + 2] = -geometry.normals[i + 2];
+        }
+        // Flip face winding
+        for (int i = 0; i < vertexIndices; i += 3) {
+            std::swap(geometry.faces[i + 0], geometry.faces[i + 2]);
+        }
+    }
+
+    return std::make_shared<Mesh>(&geometry, vertexElements / 3, vertexIndices / 3);
+}
+
 ObjectManager& ObjectManager::getInstance() {
     static ObjectManager instance;
     return instance;
@@ -137,8 +159,12 @@ std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
     return std::make_shared<Light>(type);
 }
 
+std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& name) {
+    return std::make_shared<Skybox>(this->loadCubeTexture(name));
+}
+
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
-    std::unordered_set<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
 
     if (this->meshCache.find(name) != this->meshCache.end()) {
         LogDebug("Reuse cached '%s' entity", name.c_str());
@@ -170,21 +196,15 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
     return shader;
 }
 
-std::shared_ptr<Mesh> ObjectManager::createQuad() {
-    return this->createMesh(typeid(QuadMesh).name(), []() {
-        QuadMesh meshData;
-        int meshVertices = sizeof(meshData.vertices) / sizeof(float) / 3;
-        int meshFaces = sizeof(meshData.faces) / sizeof(int) / 3;
-        return std::make_shared<Mesh>(&meshData, meshVertices, meshFaces);
+std::shared_ptr<Mesh> ObjectManager::createQuad(MeshWinding winding) {
+    return this->createMesh("QuadMesh", winding, [winding]() {
+        return geometryToMesh<QuadMesh>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
-std::shared_ptr<Mesh> ObjectManager::createCube() {
-    return this->createMesh(typeid(CubeMesh).name(), []() {
-        CubeMesh meshData;
-        int meshVertices = sizeof(meshData.vertices) / sizeof(float) / 3;
-        int meshFaces = sizeof(meshData.faces) / sizeof(int) / 3;
-        return std::make_shared<Mesh>(&meshData, meshVertices, meshFaces);
+std::shared_ptr<Mesh> ObjectManager::createCube(MeshWinding winding) {
+    return this->createMesh("CubeMesh", winding, [winding]() {
+        return geometryToMesh<CubeMesh>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
@@ -202,18 +222,41 @@ void ObjectManager::clearCache() {
 std::shared_ptr<ImageTexture> ObjectManager::loadTexture(const std::string& name) {
     if (this->textureCache.find(name) != this->textureCache.end()) {
         LogDebug("Reuse cached '%s' texture", name.c_str());
-        return this->textureCache.at(name);
+        return std::dynamic_pointer_cast<ImageTexture>(this->textureCache.at(name));
     }
 
     LogDebug("Load texture from '%s'", name.c_str());
-    TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name);
+    TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name, true);
     auto texture = std::make_shared<ImageTexture>(textureImage);
 
     this->textureCache.emplace(name, texture);
     return texture;
 }
 
-std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& name) {
+std::shared_ptr<ImageCubeTexture> ObjectManager::loadCubeTexture(const std::string& name) {
+    if (this->textureCache.find(name) != this->textureCache.end()) {
+        LogDebug("Reuse cached '%s/*.tga' textures", name.c_str());
+        return std::dynamic_pointer_cast<ImageCubeTexture>(this->textureCache.at(name));
+    }
+
+    LogDebug("Load textures from '%s/*.tga'", name.c_str());
+
+    std::string textureRoot(GetEngineConfig().getDataDirectory() + '/' + name);
+    CubeImage textureCubeImage = {
+        std::make_shared<TgaImage>(textureRoot + "/positive_x.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/negative_x.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/positive_y.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/negative_y.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/positive_z.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/negative_z.tga", false)
+    };
+
+    auto texture = std::make_shared<ImageCubeTexture>(textureCubeImage);
+    this->textureCache.emplace(name, texture);
+    return texture;
+}
+
+std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& name) {
     std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
@@ -231,7 +274,7 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::s
 
     ObjectMaterial objectMaterial;
     ObjectGeometry objectGeometry;
-    std::unordered_set<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
 
     for (int i = 0; i < entityHeader.objects; i++) {
         auto material = std::make_shared<Material>();
@@ -265,24 +308,28 @@ std::unordered_set<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::s
         auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
         mesh->setMaterial(material);
 
-        meshes.insert(mesh);
+        meshes.push_back(mesh);
     }
 
     return meshes;
 }
 
-std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, MeshFactory factory) {
+std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, MeshWinding winding, MeshFactory factory) {
     if (this->meshCache.find(alias) == this->meshCache.end()) {
-        std::unordered_set<std::shared_ptr<Mesh>> meshes = { factory() };
+        std::vector<std::shared_ptr<Mesh>> meshes = { nullptr, nullptr };
         this->meshCache.emplace(alias, meshes);
     }
 
-    // Return a Mesh copy (same OpenGL objects, different material)
-    auto mesh = *this->meshCache.at(alias).begin();
-    auto meshCopy = std::make_shared<Mesh>(*mesh);
+    auto& meshes = this->meshCache.at(alias);
+    if (meshes.at(winding) == nullptr) {
+        meshes.at(winding) = factory();
+    }
 
-    meshCopy->setMaterial(std::make_shared<Material>());
-    return meshCopy;
+    // Return a Mesh copy (same OpenGL objects, different material)
+    auto mesh = std::make_shared<Mesh>(*meshes.at(winding));
+    mesh->setMaterial(std::make_shared<Material>());
+
+    return mesh;
 }
 
 }  // namespace Graphene

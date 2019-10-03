@@ -57,17 +57,14 @@ Material::Material() {
     this->materialBuffer = std::make_shared<UniformBuffer>(&material, sizeof(material));
 }
 
-std::shared_ptr<ImageTexture> Material::getDiffuseTexture() const {
+std::shared_ptr<Texture> Material::getDiffuseTexture() const {
     return this->diffuseTexture;
 }
 
-void Material::setDiffuseTexture(const std::shared_ptr<ImageTexture> diffuseTexture) {
-    if (diffuseTexture == nullptr) {
-        throw std::invalid_argument(LogFormat("ImageTexture cannot be nullptr"));
-    }
-
+void Material::setDiffuseTexture(const std::shared_ptr<Texture> diffuseTexture) {
     this->diffuseTexture = diffuseTexture;
-    bool diffuseTextureAvailable = true;
+
+    bool diffuseTextureAvailable = (this->diffuseTexture != nullptr);
     updateBuffer(this->materialBuffer, MaterialBuffer, diffuseTexture, &diffuseTextureAvailable);
 }
 

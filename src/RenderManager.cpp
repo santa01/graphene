@@ -58,7 +58,7 @@ RenderManager::RenderManager() {
         { RenderStep::OVERLAY,  std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) }
     };
-    this->frame = GetObjectManager().createQuad();
+    this->frame = GetObjectManager().createQuad(MeshWinding::WINDING_CLOCKWISE);
 }
 
 void RenderManager::setShadowPass(bool shadowPass) {

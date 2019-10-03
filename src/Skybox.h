@@ -20,38 +20,20 @@
  * SOFTWARE.
  */
 
+#ifndef SKYBOX_H
+#define SKYBOX_H
+
+#include <GrapheneApi.h>
 #include <Entity.h>
-#include <Logger.h>
-#include <stdexcept>
+#include <ImageTexture.h>
 
 namespace Graphene {
 
-Entity::Entity():
-        Object(ObjectType::ENTITY) {
-}
-
-void Entity::setVisible(bool visible) {
-    this->visible = visible;
-}
-
-bool Entity::isVisible() const {
-    return this->visible;
-}
-
-bool Entity::isSkybox() const {
-    return this->skybox;
-}
-
-const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
-    return this->meshes;
-}
-
-void Entity::addMesh(const std::shared_ptr<Mesh> mesh) {
-    if (mesh == nullptr) {
-        throw std::invalid_argument(LogFormat("Mesh cannot be nullptr"));
-    }
-
-    this->meshes.insert(mesh);
-}
+class Skybox: public Entity {
+public:
+    GRAPHENE_API Skybox(const std::shared_ptr<ImageCubeTexture> cubeTexture);
+};
 
 }  // namespace Graphene
+
+#endif  // SKYBOX_H

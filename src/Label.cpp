@@ -32,7 +32,7 @@ namespace Graphene {
 
 Label::Label(int width, int height, const std::shared_ptr<Font> font):
         font(font) {
-    auto mesh = GetObjectManager().createQuad();
+    auto mesh = GetObjectManager().createQuad(MeshWinding::WINDING_CLOCKWISE);
     this->addMesh(mesh);
 
     RawImage textureImage(width, height, 32);  // Data zeroed
@@ -93,7 +93,9 @@ void Label::renderText() {
     }
 
     auto mesh = *this->meshes.begin();
-    mesh->getMaterial()->getDiffuseTexture()->update(textureImage);
+    auto texture = std::dynamic_pointer_cast<ImageTexture>(mesh->getMaterial()->getDiffuseTexture());
+
+    texture->update(textureImage);
 }
 
 }  // namespace Graphene
