@@ -44,7 +44,7 @@ enum TextureUnits {
     TEXTURE_DEPTH
 };
 
-enum class RenderStep { GEOMETRY, FRAME, SHADOWS, LIGHTS, OVERLAY, BUFFER, NONE };
+enum class RenderStep { GEOMETRY, SKYBOX, FRAME, SHADOWS, LIGHTS, OVERLAY, BUFFER, NONE };
 
 class RenderManager: public NonCopyable {
 public:
@@ -68,6 +68,7 @@ private:
     RenderManager();
 
     RenderStep renderEntities(const std::shared_ptr<Camera> camera);
+    RenderStep renderSkybox(const std::shared_ptr<Camera> camera);
     RenderStep renderFrame(const std::shared_ptr<Camera> camera);
     RenderStep renderShadows(const std::shared_ptr<Camera> camera);
     RenderStep renderLights(const std::shared_ptr<Camera> camera);

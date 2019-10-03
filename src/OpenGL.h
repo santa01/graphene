@@ -62,6 +62,7 @@ extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
 extern PFNGLDELETESHADERPROC glDeleteShader;
 extern PFNGLDELETETEXTURESPROC glDeleteTextures;
 extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+extern PFNGLDEPTHFUNCPROC glDepthFunc;
 extern PFNGLDISABLEPROC glDisable;
 extern PFNGLDRAWBUFFERPROC glDrawBuffer;
 extern PFNGLDRAWBUFFERSPROC glDrawBuffers;

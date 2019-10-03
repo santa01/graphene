@@ -29,6 +29,7 @@
 #include <Camera.h>
 #include <Entity.h>
 #include <Skybox.h>
+#include <Object.h>
 #include <Light.h>
 #include <Mat4.h>
 #include <Vec3.h>
@@ -57,6 +58,7 @@ public:
 
     GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
     GRAPHENE_API static Math::Vec3 calculatePosition(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API static Math::Mat4 calculateTranslation(const std::shared_ptr<Object> object);
 
     GRAPHENE_API void iterateEntities(EntityHandler handler);
     GRAPHENE_API void iterateLights(LightHandler handler);

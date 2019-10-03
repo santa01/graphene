@@ -48,6 +48,7 @@ PFNGLDELETEPROGRAMPROC glDeleteProgram;
 PFNGLDELETESHADERPROC glDeleteShader;
 PFNGLDELETETEXTURESPROC glDeleteTextures;
 PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+PFNGLDEPTHFUNCPROC glDepthFunc;
 PFNGLDISABLEPROC glDisable;
 PFNGLDRAWBUFFERPROC glDrawBuffer;
 PFNGLDRAWBUFFERSPROC glDrawBuffers;
@@ -156,6 +157,7 @@ void loadCore() {
     LOAD_MANDATORY(glDeleteShader);
     LOAD_MANDATORY(glDeleteTextures);
     LOAD_MANDATORY(glDeleteVertexArrays);
+    LOAD_MANDATORY(glDepthFunc);
     LOAD_MANDATORY(glDisable);
     LOAD_MANDATORY(glDrawBuffer);
     LOAD_MANDATORY(glDrawBuffers);

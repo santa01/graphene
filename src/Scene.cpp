@@ -115,6 +115,20 @@ Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera> camera) {
     return Math::Vec3(translation.get(0, 3), translation.get(1, 3), translation.get(2, 3));
 }
 
+Math::Mat4 Scene::calculateTranslation(const std::shared_ptr<Object> object) {
+    std::shared_ptr<SceneNode> node = object->getParent();
+    Math::Mat4 translation = object->getTranslation();
+
+    while (node != nullptr) {
+        // Moving to the root node, current node's transformation matrix is the left operand
+        // to be the last operation. Eventually root node's transformation will be the last one.
+        translation = node->getTranslation() * translation;
+        node = node->getParent();
+    }
+
+    return translation;
+}
+
 void Scene::iterateEntities(EntityHandler handler) {
     std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
     traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 localWorld, Math::Mat4 normalRotation) {

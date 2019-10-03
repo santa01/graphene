@@ -44,6 +44,7 @@ RenderManager& RenderManager::getInstance() {
 RenderManager::RenderManager() {
     this->shaders = {
         { RenderStep::GEOMETRY, nullptr },
+        { RenderStep::SKYBOX,   nullptr },
         { RenderStep::FRAME,    nullptr },
         { RenderStep::SHADOWS,  nullptr },
         { RenderStep::LIGHTS,   nullptr },
@@ -52,6 +53,7 @@ RenderManager::RenderManager() {
     };
     this->renderers = {
         { RenderStep::GEOMETRY, std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
+        { RenderStep::SKYBOX,   std::bind(&RenderManager::renderSkybox,   this, std::placeholders::_1) },
         { RenderStep::FRAME,    std::bind(&RenderManager::renderFrame,    this, std::placeholders::_1) },
         { RenderStep::SHADOWS,  std::bind(&RenderManager::renderShadows,  this, std::placeholders::_1) },
         { RenderStep::LIGHTS,   std::bind(&RenderManager::renderLights,   this, std::placeholders::_1) },
@@ -133,6 +135,39 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
             mesh->render();
         }
     });
+
+    return RenderStep::SKYBOX;
+}
+
+RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
+    std::shared_ptr<Scene> scene = camera->getParent()->getScene();
+    std::shared_ptr<Skybox> skybox = scene->getSkybox();
+
+    if (skybox == nullptr) {
+        return RenderStep::NONE;
+    }
+
+    this->shader->setUniformBlock("Material", BIND_MATERIAL);
+    this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+
+    // Modelview -> project
+    Math::Mat4 modelViewProjection = camera->getProjection() * Scene::calculateModelView(camera);
+    this->shader->setUniform("modelViewProjection", modelViewProjection);
+
+    Math::Mat4 translation = Scene::calculateTranslation(skybox);
+    this->shader->setUniform("translation", translation);
+
+    for (auto& mesh: skybox->getMeshes()) {
+        auto material = mesh->getMaterial();
+        material->getMaterialBuffer()->bind(BIND_MATERIAL);
+
+        auto diffuseTexture = material->getDiffuseTexture();
+        if (diffuseTexture != nullptr) {
+            diffuseTexture->bind(TEXTURE_DIFFUSE);
+        }
+
+        mesh->render();
+    }
 
     return RenderStep::NONE;
 }

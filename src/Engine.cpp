@@ -216,6 +216,9 @@ void Engine::setupOpenGL() {
 
     // No visual effect for 32bit color bit context, not supported for non RGB frame buffers
     glDisable(GL_DITHER);
+
+    // Skybox rendering, see skybox_output.shader
+    glDepthFunc(GL_LEQUAL);
 }
 
 void Engine::setupEngine() {
@@ -223,6 +226,7 @@ void Engine::setupEngine() {
     auto& objectManager = GetObjectManager();
 
     renderManager.setShader(RenderStep::GEOMETRY, objectManager.createShader("shaders/geometry_output.shader"));
+    renderManager.setShader(RenderStep::SKYBOX, objectManager.createShader("shaders/skybox_output.shader"));
     renderManager.setShader(RenderStep::FRAME, objectManager.createShader("shaders/ambient_lighting.shader"));
     renderManager.setShader(RenderStep::LIGHTS, objectManager.createShader("shaders/deferred_lighting.shader"));
     renderManager.setShader(RenderStep::OVERLAY, objectManager.createShader("shaders/overlay_output.shader"));
