@@ -26,11 +26,10 @@
 #include <Engine.h>
 #include <Input.h>
 #include <SceneNode.h>
-#include <Camera.h>
 #include <Entity.h>
 #include <memory>
 
-#define MOVE_SPEED  6.0f
+#define MOVE_SPEED  4.0f
 #define MOUSE_SPEED 0.1f
 
 class Example: public Graphene::Engine {
@@ -44,12 +43,11 @@ private:
     void onIdle();
 
     std::shared_ptr<Graphene::SceneNode> player;
-    std::shared_ptr<Graphene::Camera> camera;
+    std::shared_ptr<Graphene::SceneNode> crates;
 
-    std::shared_ptr<Graphene::SceneNode> node;
-    std::shared_ptr<Graphene::Entity> entity1;
-    std::shared_ptr<Graphene::Entity> entity2;
-    std::shared_ptr<Graphene::Entity> entity3;
+    std::shared_ptr<Graphene::Entity> crate1;
+    std::shared_ptr<Graphene::Entity> crate2;
+    std::shared_ptr<Graphene::Entity> crate3;
 };
 
 #endif  // EXAMPLE_H
