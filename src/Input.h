@@ -43,7 +43,7 @@ enum KeyboardKey {
     KEY_NUMLOCK,
     KEY_ESCAPE,
     KEY_PAGEUP,
-    KEY_PAGWDOWN,
+    KEY_PAGEDOWN,
     KEY_END,
     KEY_HOME,
     KEY_LEFT,
