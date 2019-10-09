@@ -151,11 +151,8 @@ RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
     // Modelview -> project
-    Math::Mat4 modelViewProjection = camera->getProjection() * Scene::calculateModelView(camera);
+    Math::Mat4 modelViewProjection = camera->getProjection() * Scene::calculateView(camera);
     this->shader->setUniform("modelViewProjection", modelViewProjection);
-
-    Math::Mat4 translation = Scene::calculateTranslation(skybox);
-    this->shader->setUniform("translation", translation);
 
     for (auto& mesh: skybox->getMeshes()) {
         auto material = mesh->getMaterial();

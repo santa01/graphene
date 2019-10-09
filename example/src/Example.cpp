@@ -112,7 +112,7 @@ void Example::onSetup() {
     scene->setAmbientEnergy(0.3f);
     scene->setSkybox(skybox);
 
-    this->player = scene->getPlayer();
+    this->player = scene->createNode();
     this->player->attachObject(camera);
     this->player->attachObject(flashLight);
     this->player->move(0.0f, 1.0f, -3.0f);
@@ -125,6 +125,7 @@ void Example::onSetup() {
     this->crates->move(0.0f, 0.5f, 0.0f);
 
     auto sceneRoot = scene->getRootNode();
+    sceneRoot->attachNode(this->player);
     sceneRoot->attachNode(this->crates);
     sceneRoot->attachObject(ground);
 

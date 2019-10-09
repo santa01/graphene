@@ -9,7 +9,7 @@ layout(location = 2) in vec2 vertexUV;        // Unused
 
 uniform mat4 modelViewProjection;
 uniform mat4 normalRotation;       // Unused
-uniform mat4 translation;
+uniform mat4 localWorld;           // Unused
 
 smooth out vec3 fragmentUV;
 
@@ -17,7 +17,7 @@ void main() {
     // Make Z equal W. During the perspective divide Z / W produces 1.0 depth (Z) value,
     // skybox fragments appear the farthest on the scene (requires glDepthFunc(GL_LEQUAL)
     // to pass the depth test on the depth farVal​ value (1.0)).
-    vec4 vertexWorldPosition = translation * vec4(vertexPosition, 1.0f);
+    vec4 vertexWorldPosition = vec4(vertexPosition, 1.0f);
     gl_Position = vec4(modelViewProjection * vertexWorldPosition).xyww;
 
     fragmentUV = vertexPosition;

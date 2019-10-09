@@ -57,15 +57,14 @@ public:
     GRAPHENE_API float getAmbientEnergy() const;
 
     GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API static Math::Mat4 calculateView(const std::shared_ptr<Camera> camera);
     GRAPHENE_API static Math::Vec3 calculatePosition(const std::shared_ptr<Camera> camera);
-    GRAPHENE_API static Math::Mat4 calculateTranslation(const std::shared_ptr<Object> object);
 
     GRAPHENE_API void iterateEntities(EntityHandler handler);
     GRAPHENE_API void iterateLights(LightHandler handler);
 
 private:
     std::shared_ptr<SceneNode> rootNode;
-    std::shared_ptr<SceneNode> player;
     std::shared_ptr<Skybox> skybox;
 
     Math::Vec3 ambientColor = { 1.0f, 1.0f, 1.0f };

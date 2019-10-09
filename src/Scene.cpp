@@ -42,23 +42,8 @@ std::shared_ptr<SceneNode> Scene::getRootNode() {
     return this->rootNode;
 }
 
-std::shared_ptr<SceneNode> Scene::getPlayer() {
-    /* shared_from_this() cannot be called from constructor */
-    if (this->player == nullptr) {
-        this->player = this->createNode();
-        this->getRootNode()->attachNode(this->player);
-    }
-
-    return this->player;
-}
-
 void Scene::setSkybox(const std::shared_ptr<Skybox> skybox) {
-    if (this->skybox != nullptr) {
-        this->getPlayer()->detachObject(this->skybox);
-    }
-
     this->skybox = skybox;
-    this->getPlayer()->attachObject(this->skybox);
 }
 
 std::shared_ptr<Skybox> Scene::getSkybox() const {
@@ -100,6 +85,21 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
     return modelView;
 }
 
+Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera> camera) {
+    std::shared_ptr<SceneNode> node = camera->getParent();
+    Math::Mat4 view;
+
+    while (node != nullptr) {
+        // Moving to the root node, current node's transformation matrix is the left operand
+        // to be the last operation. Eventually root node's transformation will be the last one.
+        view = node->getOppositeRotation() * view;
+        node = node->getParent();
+    }
+
+    view = camera->getOppositeRotation() * view;
+    return view;
+}
+
 Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera> camera) {
     std::shared_ptr<SceneNode> node = camera->getParent();
     Math::Mat4 translation;
@@ -115,20 +115,6 @@ Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera> camera) {
     return Math::Vec3(translation.get(0, 3), translation.get(1, 3), translation.get(2, 3));
 }
 
-Math::Mat4 Scene::calculateTranslation(const std::shared_ptr<Object> object) {
-    std::shared_ptr<SceneNode> node = object->getParent();
-    Math::Mat4 translation = object->getTranslation();
-
-    while (node != nullptr) {
-        // Moving to the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Eventually root node's transformation will be the last one.
-        translation = node->getTranslation() * translation;
-        node = node->getParent();
-    }
-
-    return translation;
-}
-
 void Scene::iterateEntities(EntityHandler handler) {
     std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
     traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
@@ -142,7 +128,7 @@ void Scene::iterateEntities(EntityHandler handler) {
             if (object->getType() == ObjectType::ENTITY) {
                 auto entity = std::dynamic_pointer_cast<Entity>(object);
 
-                if (entity->isVisible() && !entity->isSkybox()) {
+                if (entity->isVisible()) {
                     Math::Mat4 entityModelView(localWorld * entity->getTranslation() * entity->getRotation() * entity->getScaling());
                     Math::Mat4 entityNormalRotation(normalRotation * entity->getRotation());
 

@@ -38,10 +38,6 @@ bool Entity::isVisible() const {
     return this->visible;
 }
 
-bool Entity::isSkybox() const {
-    return this->skybox;
-}
-
 const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
     return this->meshes;
 }

@@ -28,10 +28,9 @@ namespace Graphene {
 
 Skybox::Skybox(const std::shared_ptr<ImageCubeTexture> cubeTexture) {
     auto mesh = GetObjectManager().createCube(MeshWinding::WINDING_COUNTER_CLOCKWISE);
-    mesh->getMaterial()->setDiffuseTexture(cubeTexture);
-
     this->addMesh(mesh);
-    this->skybox = true;
+
+    mesh->getMaterial()->setDiffuseTexture(cubeTexture);
 }
 
 }  // namespace Graphene
