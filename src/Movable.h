@@ -41,13 +41,11 @@ public:
 
     GRAPHENE_API Math::Vec3 getPosition() const;
     GRAPHENE_API const Math::Mat4& getTranslation() const;
-    GRAPHENE_API const Math::Mat4& getOppositeTranslation() const;
+    GRAPHENE_API const Math::Mat4& getCameraTranslation() const;
 
 private:
-    void updateTranslation(Math::Mat4& translation, const Math::Vec3& position);
-
     Math::Mat4 translation;
-    Math::Mat4 oppositeTranslation;
+    Math::Mat4 cameraTranslation;
 };
 
 }  // namespace Graphene

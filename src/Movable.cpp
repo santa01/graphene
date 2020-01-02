@@ -29,10 +29,13 @@ void Movable::translate(float x, float y, float z) {
 }
 
 void Movable::translate(const Math::Vec3& position) {
-    Math::Vec3 oppositePosition = -position;
+    this->translation.set(0, 3, position.get(Math::Vec3::X));
+    this->translation.set(1, 3, position.get(Math::Vec3::Y));
+    this->translation.set(2, 3, position.get(Math::Vec3::Z));
 
-    this->updateTranslation(this->translation, position);
-    this->updateTranslation(this->oppositeTranslation, oppositePosition);
+    this->cameraTranslation.set(0, 3, -position.get(Math::Vec3::X));
+    this->cameraTranslation.set(1, 3, -position.get(Math::Vec3::Y));
+    this->cameraTranslation.set(2, 3, -position.get(Math::Vec3::Z));
 }
 
 void Movable::move(float x, float y, float z) {
@@ -51,14 +54,8 @@ const Math::Mat4& Movable::getTranslation() const {
     return this->translation;
 }
 
-const Math::Mat4& Movable::getOppositeTranslation() const {
-    return this->oppositeTranslation;
-}
-
-void Movable::updateTranslation(Math::Mat4& translation, const Math::Vec3& position) {
-    translation.set(0, 3, position.get(Math::Vec3::X));
-    translation.set(1, 3, position.get(Math::Vec3::Y));
-    translation.set(2, 3, position.get(Math::Vec3::Z));
+const Math::Mat4& Movable::getCameraTranslation() const {
+    return this->cameraTranslation;
 }
 
 }  // namespace Graphene

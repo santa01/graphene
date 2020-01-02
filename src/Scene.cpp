@@ -78,11 +78,11 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
     while (node != nullptr) {
         // Moving to the root node, current node's transformation matrix is the left operand
         // to be the last operation. Eventually root node's transformation will be the last one.
-        modelView = node->getOppositeRotation() * node->getOppositeTranslation() * modelView;
+        modelView = node->getCameraRotation() * node->getCameraTranslation() * modelView;
         node = node->getParent();
     }
 
-    modelView = camera->getOppositeRotation() * camera->getOppositeTranslation() * modelView;
+    modelView = camera->getCameraRotation() * camera->getCameraTranslation() * modelView;
     return modelView;
 }
 
@@ -93,11 +93,11 @@ Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera> camera) {
     while (node != nullptr) {
         // Moving to the root node, current node's transformation matrix is the left operand
         // to be the last operation. Eventually root node's transformation will be the last one.
-        view = node->getOppositeRotation() * view;
+        view = node->getCameraRotation() * view;
         node = node->getParent();
     }
 
-    view = camera->getOppositeRotation() * view;
+    view = camera->getCameraRotation() * view;
     return view;
 }
 

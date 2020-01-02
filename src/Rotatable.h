@@ -45,14 +45,12 @@ public:
 
     GRAPHENE_API Math::Vec3 getRotationAngles() const;
     GRAPHENE_API const Math::Mat4& getRotation() const;
-    GRAPHENE_API const Math::Mat4& getOppositeRotation() const;
+    GRAPHENE_API const Math::Mat4& getCameraRotation() const;
 
 private:
-    Math::Vec3 updateRotation(Math::Mat4& rotation, const Math::Vec3& axis, float angle);
-
     Math::Vec3 rotationAngles;
     Math::Mat4 rotation;
-    Math::Mat4 oppositeRotation;
+    Math::Mat4 cameraRotation;
 };
 
 }  // namespace Graphene
