@@ -49,13 +49,13 @@ public:
         ASSERT_VEC3_EQUAL(object.getRight(), Math::Vec3(-0.5f, 0.7071f, -0.5f));
         ASSERT_VEC3_EQUAL(object.getUp(), Math::Vec3(-0.5f, -0.7071f, -0.5f));
         ASSERT_VEC3_EQUAL(object.getTarget(), Math::Vec3(-0.7071f, 0.0f, 0.7071f));
-        ASSERT_VEC3_EQUAL(object.getRotationAngles(), Math::Vec3(35.2739f, 108.4430f, 134.9517f));
+        ASSERT_VEC3_EQUAL(object.getRotationAngles(), Math::Vec3(35.2548f, 71.5812f, 134.9922f));
 
         object.targetAt(1.0f, 2.0f, 3.0f);
         ASSERT_VEC3_EQUAL(object.getRight(), Math::Vec3(-0.6617f, 0.6412f, -0.3884f));
-        ASSERT_VEC3_EQUAL(object.getUp(), Math::Vec3(-0.6356f, -0.3534f, 0.4993f));
-        ASSERT_VEC3_EQUAL(object.getTarget(), Math::Vec3(0.0473f, 0.5345f, 0.8017f));
-        ASSERT_VEC3_EQUAL(object.getRotationAngles(), Math::Vec3(4.9330f, 159.7304f, 125.1279f));
+        ASSERT_VEC3_EQUAL(object.getUp(), Math::Vec3(-0.7205f, -0.4006f, 0.5659f));
+        ASSERT_VEC3_EQUAL(object.getTarget(), Math::Vec3(0.0490f, 0.5540f, 0.8310f));
+        ASSERT_VEC3_EQUAL(object.getRotationAngles(), Math::Vec3(25.5723f, 115.0127f, 99.1674f));
     }
 };
 

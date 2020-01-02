@@ -136,20 +136,20 @@ public:
         rotatable.rotate(Math::Vec3(1.0f, 2.0f, 3.0f), 30.0f);
         ASSERT_VEC3_EQUAL(rotatable.getRight(), Math::Vec3(0.8780f, 0.4193f, -0.2305f));
         ASSERT_VEC3_EQUAL(rotatable.getUp(), Math::Vec3(-0.3817f, 0.9043f, 0.1910f));
-        ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3(0.2864f, -0.0762f, 0.9521f));
-        ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(10.0630f, 15.7726f, 22.4422f));
+        ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3(0.2864f, -0.0762f, 0.9548f));
+        ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(4.0493f, 12.8253f, 24.8365f));
 
         rotatable.rotate(Math::Vec3(-2.0f, 1.0f, 2.5f), 45.0f);
         ASSERT_VEC3_EQUAL(rotatable.getRight(), Math::Vec3(0.4441f, 0.5901f, -0.6740f));
-        ASSERT_VEC3_EQUAL(rotatable.getUp(), Math::Vec3(-0.8030f, 0.5746f, -0.0260f));
-        ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3(0.4276f, 0.5435f, 0.7577f));
-        ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(-8.5514f, 19.8307f, 57.8306f));
+        ASSERT_VEC3_EQUAL(rotatable.getUp(), Math::Vec3(-0.8129f, 0.5817f, -0.0260f));
+        ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3(0.4168f, 0.5298f, 0.7385f));
+        ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(-20.6431f, 29.5240f, 53.1943f));
 
         rotatable.rotate(Math::Vec3(2.0f, -7.3f, -1.8f), 20.0f);
         ASSERT_VEC3_EQUAL(rotatable.getRight(), Math::Vec3(0.6769f, 0.5971f, -0.4302f));
-        ASSERT_VEC3_EQUAL(rotatable.getUp(), Math::Vec3(-0.7119f, 0.6476f, -0.2213f));
-        ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3(0.1844f, 0.4429f, 0.9050f));
-        ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(-2.7790f, 0.9740f, 54.1277f));
+        ASSERT_VEC3_EQUAL(rotatable.getUp(), Math::Vec3(-0.7208f, 0.6557f, -0.2241f));
+        ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3(0.1800f, 0.4323f, 0.8835f));
+        ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(-16.3604f, 11.0556f, 47.8192f));
     }
 };
 
