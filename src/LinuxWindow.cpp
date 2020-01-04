@@ -186,10 +186,10 @@ bool LinuxWindow::dispatchEvents() {
         switch (event.type) {
             case KeyPress:
             case KeyRelease: {
-                KeySym keysym = this->keycodeToKeysym(event.xkey.keycode);
+                KeySym keysym = this->keycodeToKeysym(event.xkey.keycode, event.xkey.state);
                 KeyboardKey keyboardKey = Input::keycodeToKeyboardKey(static_cast<int>(keysym));
 
-                if (keyboardKey != KeyboardKey::KEY_UNMAPPED) {
+                if (keyboardKey != KeyboardKey::KEY_UNKNOWN) {
                     bool keyState = (event.type == KeyPress);
                     this->keyboardState[keyboardKey] = keyState;
                     this->onKeyboardKeySignal(keyboardKey, keyState);
@@ -452,7 +452,7 @@ void LinuxWindow::destroyKeyboardMapping() {
     }
 }
 
-KeySym LinuxWindow::keycodeToKeysym(KeyCode keycode) const {
+KeySym LinuxWindow::keycodeToKeysym(KeyCode keycode, int modifiers) const {
     /*
      * Per https://tronche.com/gui/x/xlib/input/XGetKeyboardMapping.html
      * Description:
@@ -461,9 +461,27 @@ KeySym LinuxWindow::keycodeToKeysym(KeyCode keycode) const {
      * counting from zero:
      *
      * (K - first_code) * keysyms_per_code_return + N
+     *
+     * Per https://tronche.com/gui/x/xlib/input/keyboard-encoding.html
+     * Within a group, the choice of KeySym is determined by applying the first rule that is
+     * satisfied from the following list:
+     *
+     * The numlock modifier is on and the second KeySym is a keypad KeySym. In this case,
+     * if the Shift modifier is on, or if the Lock modifier is on and is interpreted as ShiftLock,
+     * then the first KeySym is used, otherwise the second KeySym is used.
      */
-    int index = 0;  // Shift/NumLock modifier released, 1 for a keysym of the Mod+Key combination
-    return this->keysymsMapping[(keycode - this->firstKeycode) * this->keysymsPerKeycode + index];
+    int keysymOffset = (keycode - this->firstKeycode) * this->keysymsPerKeycode;
+    KeySym keysym = this->keysymsMapping[keysymOffset];
+
+    int numpadModifiers = modifiers & (ShiftMask | Mod2Mask);
+    if (numpadModifiers == ShiftMask || numpadModifiers == Mod2Mask) {
+        KeySym numpadKeysym = this->keysymsMapping[keysymOffset + 1];
+        if (numpadKeysym >= XK_KP_Space && numpadKeysym <= XK_KP_9) {
+            keysym = numpadKeysym;
+        }
+    }
+
+    return keysym;
 }
 
 }  // namespace Graphene

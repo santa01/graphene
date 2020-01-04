@@ -45,7 +45,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
             int virtualKey = static_cast<int>(wParam);
             KeyboardKey keyboardKey = Input::keycodeToKeyboardKey(virtualKey);
 
-            if (keyboardKey != KeyboardKey::KEY_UNMAPPED) {
+            if (keyboardKey != KeyboardKey::KEY_UNKNOWN) {
                 bool keyState = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
                 self->keyboardState[keyboardKey] = keyState;
                 self->onKeyboardKeySignal(keyboardKey, keyState);

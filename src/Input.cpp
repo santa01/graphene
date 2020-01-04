@@ -185,7 +185,7 @@ std::unordered_map<int, KeyboardKey> Input::keyboardMapping = {
 KeyboardKey Input::keycodeToKeyboardKey(int keycode) {
     auto keyboardKeyIt = Input::keyboardMapping.find(keycode);
     if (keyboardKeyIt == Input::keyboardMapping.end()) {
-        return KeyboardKey::KEY_UNMAPPED;
+        return KeyboardKey::KEY_UNKNOWN;
     }
 
     return keyboardKeyIt->second;

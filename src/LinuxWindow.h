@@ -53,7 +53,7 @@ private:
 
     void createKeyboardMapping();
     void destroyKeyboardMapping();
-    KeySym keycodeToKeysym(KeyCode keycode) const;
+    KeySym keycodeToKeysym(KeyCode keycode, int modifiers) const;
 
     Display* display = nullptr;
     int screen = 0;

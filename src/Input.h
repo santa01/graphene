@@ -105,7 +105,7 @@ enum KeyboardKey {
     KEY_F11,
     KEY_F12,
     KEYBOARD_KEYS,
-    KEY_UNMAPPED = 0xFF
+    KEY_UNKNOWN = 0xFF
 };
 
 enum MouseButton {
@@ -115,7 +115,7 @@ enum MouseButton {
     BUTTON_X1,     // Wheel up
     BUTTON_X2,     // Wheel down,
     MOUSE_BUTTONS,
-    BUTTON_UNMAPPED = 0xFF
+    BUTTON_UNKNOWN = 0xFF
 };
 
 typedef std::array<bool, KeyboardKey::KEYBOARD_KEYS> KeyboardState;
