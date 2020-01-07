@@ -32,7 +32,7 @@ EngineConfig& EngineConfig::getInstance() {
 }
 
 std::string EngineConfig::toString() const {
-    std::stringstream configString;
+    std::ostringstream configString;
 
     configString << std::boolalpha << std::fixed << std::setprecision(3)
                  << FormatOption(30, "Field of view", this->fov)                   << "\n"

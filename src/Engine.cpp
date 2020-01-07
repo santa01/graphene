@@ -181,12 +181,12 @@ void Engine::setupOpenGL() {
     LogInfo("OpenGL version: %s", glGetString(GL_VERSION));
     LogInfo("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    std::stringstream openglExtensions;
+    std::ostringstream openglExtensions;
     for (auto& extension: OpenGL::getSupportedExtensions()) {
         openglExtensions << "\n" << extension;
     }
 
-    std::stringstream platformExtensions;
+    std::ostringstream platformExtensions;
     for (auto& extension: this->window->getSupportedExtensions()) {
         platformExtensions << "\n" << extension;
     }

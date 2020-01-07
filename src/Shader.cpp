@@ -141,7 +141,7 @@ GLuint Shader::checkoutUniformBlock(const std::string& name) {
 void Shader::buildShader() {
     std::vector<GLuint> shaders;
 
-    std::stringstream version;
+    std::ostringstream version;
     version << "#version " << this->version << "\n";
 
     for (auto& shaderType: this->shaderTypes) {
