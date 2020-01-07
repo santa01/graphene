@@ -39,7 +39,6 @@ layout(std140) uniform Material {
     vec3 specularColor;
 } material;     // Unused
 
-uniform int objectId;   // Unused
 uniform sampler2D diffuseSampler;
 
 smooth in vec3 fragmentPosition;    // Unused

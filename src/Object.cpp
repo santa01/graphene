@@ -27,15 +27,8 @@
 
 namespace Graphene {
 
-int Object::nextId = 0;
-
 Object::Object(ObjectType objectType):
-        objectId(Object::nextId++),
         objectType(objectType) {
-}
-
-int Object::getId() const {
-    return this->objectId;
 }
 
 ObjectType Object::getType() const {

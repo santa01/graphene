@@ -39,7 +39,6 @@ public:
     GRAPHENE_API Object(ObjectType objectType);
     GRAPHENE_API virtual ~Object() = default;
 
-    GRAPHENE_API int getId() const;
     GRAPHENE_API ObjectType getType() const;
     GRAPHENE_API std::shared_ptr<class SceneNode> getParent() const;
 
@@ -47,9 +46,6 @@ public:
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
 
 private:
-    static int nextId;
-
-    int objectId = 0;
     ObjectType objectType = ObjectType::ENTITY;
 
     friend class SceneNode;
