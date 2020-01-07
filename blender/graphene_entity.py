@@ -36,7 +36,7 @@ from collections import defaultdict
 import bmesh
 import bpy
 from bpy.types import Operator, Material
-from bpy.props import StringProperty, EnumProperty
+from bpy.props import StringProperty
 from bpy_extras.io_utils import ExportHelper, axis_conversion
 
 
@@ -48,7 +48,20 @@ def triangulate(object_mesh):
     bm.free()
 
 
-def write_entity(context, filepath, global_matrix):
+def make_relative(context, entity_filepath, target_filepath):
+    # Per Blender Manual: Files & Data System - Blender File - Blend Files
+    # When relative paths are supported, the File Browser provides a Relative Path checkbox,
+    # when entering the path into a text field, use a double slash prefix (//) to make it so.
+    if target_filepath[0:2] == "//":
+        blend_filedir = os.path.dirname(context.blend_data.filepath)
+        target_filepath = os.path.join(blend_filedir, target_filepath[2:])
+
+    # Use forward slash separator (works well on Win32/Linux platforms)
+    entity_filedir = os.path.dirname(entity_filepath)
+    return os.path.relpath(target_filepath, entity_filedir).replace('\\', '/')
+
+
+def write_entity(context, entity_filepath, global_matrix):
     default_material = bpy.data.materials.new(name="default")
     default_material.ambient = 1.0
     default_material.diffuse_intensity = 1.0
@@ -59,7 +72,7 @@ def write_entity(context, filepath, global_matrix):
 
     previous_mode = None
     if bpy.ops.object.mode_set.poll():
-        previous_mode = bpy.context.object.mode
+        previous_mode = context.object.mode
         bpy.ops.object.mode_set(mode='OBJECT')
 
     object_meshes = []
@@ -96,9 +109,10 @@ def write_entity(context, filepath, global_matrix):
         if scene_object.dupli_type != 'NONE':
             scene_object.dupli_list_clear()
 
-    with open(filepath, "wb") as f:
-        f.write(struct.pack("<4s", bytearray("GPHN", 'ASCII')))
-        f.write(struct.pack("<3b1b", *bl_info["version"], 0))  # Write meshes count later
+    with open(entity_filepath, "wb") as f:
+        f.write(struct.pack("<4s", bytearray("GPNE", 'ASCII')))
+        f.write(struct.pack("<3b1b", *bl_info["version"], 0))
+        f.write(struct.pack("<1i", 0))  # Write meshes count later
 
         meshes_count = 0
         for object_mesh in object_meshes:
@@ -157,17 +171,7 @@ def write_entity(context, filepath, global_matrix):
                 if export_material.active_texture is not None:
                     diffuse_texture = export_material.active_texture
                     if diffuse_texture.type == 'IMAGE' and diffuse_texture.image is not None:
-                        # Per Blender Manual: Files & Data System - Blender File - Blend Files
-                        # When relative paths are supported, the File Browser provides a Relative Path checkbox,
-                        # when entering the path into a text field, use a double slash prefix (//) to make it so.
-                        texture_filepath = diffuse_texture.image.filepath
-                        if texture_filepath[0:2] == "//":
-                            blend_filedir = os.path.dirname(context.blend_data.filepath)
-                            texture_filepath = os.path.join(blend_filedir, texture_filepath[2:])
-
-                        # Use forward slash separator (works well on Win32/Linux platforms)
-                        export_filedir = os.path.dirname(filepath)
-                        export_filename = os.path.relpath(texture_filepath, export_filedir).replace('\\', '/')
+                        export_filename = make_relative(context, entity_filepath, diffuse_texture.image.filepath)
 
                 export_filename += "\0" * (255 - len(export_filename))
                 f.write(struct.pack("<255s1b", bytearray(export_filename, 'ASCII'), 0))
@@ -184,8 +188,8 @@ def write_entity(context, filepath, global_matrix):
 
             bpy.data.meshes.remove(object_mesh)
 
-        f.seek(7)  # 4 bytes for "GPHN", 3 bytes for version
-        f.write(struct.pack("<1b", meshes_count))
+        f.seek(8)  # 4 bytes for "GPHN", 3 bytes for version, 1 byte unused
+        f.write(struct.pack("<1i", meshes_count))
 
     if previous_mode is not None and bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode=previous_mode)

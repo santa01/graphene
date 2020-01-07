@@ -4,13 +4,13 @@ Entity definition:
 +--------+--------+--------+--------+  <-- Header
 |           magic number            |
 +--------+--------+--------+--------+
-| major  | minor  | patch  |objects |
+| major  | minor  | patch  | unused |
 +--------+--------+--------+--------+
-~         Object definition         ~
+|              objects              |
++--------+--------+--------+--------+
+~         object definition         ~
 +--------+--------+--------+--------+
 ~               . . .               ~
-+--------+--------+--------+--------+
-~         Object definition         ~
 +--------+--------+--------+--------+
 
 
@@ -57,8 +57,9 @@ Material definition:
 ~    diffuse texture path [256]     ~  <-- NULL terminated
 +--------+--------+--------+--------+
 
+
 File structure:
- 1. magic number           (4 bytes) - 47 50 48 4E bytes sequence ("GPHN")
+ 1. magic number           (4 bytes) - 47 50 4E 45 bytes sequence ("GPNE")
  2. version major number   (1 bytes) - format major version
  3. version minor number   (1 bytes) - format minor version
  4. version patch number   (1 bytes) - format patch version
@@ -76,6 +77,7 @@ File structure:
 16. vertex normals         (variable length) - float tuples (x, y, z)
 17. uv coordinates         (variable length) - float tuples (u, v)
 18. faces                  (variable length) - integer tuples (v1, v3, v3)
+
 
 Structure export note:
 Objects are sub-divided during export the way single object uses only one

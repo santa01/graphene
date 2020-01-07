@@ -39,8 +39,8 @@ typedef struct {
     char major;
     char minor;
     char patch;
-    char objects;
-} EntityHeader;
+    char unused;
+} GrapheneHeader;
 
 typedef struct {
     float ambientIntensity;
@@ -262,21 +262,24 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 
-    EntityHeader entityHeader;
-    file.read(reinterpret_cast<char*>(&entityHeader), sizeof(entityHeader));
+    GrapheneHeader header;
+    file.read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    std::string magic(entityHeader.magic, 4);
-    if (magic != "GPHN") {
-        throw std::runtime_error(LogFormat("Invalid magic number"));
+    std::string magic(header.magic, 4);
+    if (magic != "GPNE") {
+        throw std::runtime_error(LogFormat("Invalid magic number '%s'", magic));
     }
 
-    LogDebug("Load %d meshes from '%s'", entityHeader.objects, name.c_str());
+    int meshesCount;
+    file.read(reinterpret_cast<char*>(&meshesCount), sizeof(meshesCount));
+
+    LogDebug("Load %d meshes from '%s'", meshesCount, name.c_str());
 
     ObjectMaterial objectMaterial;
     ObjectGeometry objectGeometry;
     std::vector<std::shared_ptr<Mesh>> meshes;
 
-    for (int i = 0; i < entityHeader.objects; i++) {
+    for (int i = 0; i < meshesCount; i++) {
         auto material = std::make_shared<Material>();
 
         file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
