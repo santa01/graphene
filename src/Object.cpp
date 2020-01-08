@@ -23,12 +23,16 @@
 #include <Object.h>
 #include <Logger.h>
 #include <stdexcept>
+#include <sstream>
 #include <cmath>
 
 namespace Graphene {
 
 Object::Object(ObjectType objectType):
         objectType(objectType) {
+    std::ostringstream defaultName;
+    defaultName << std::hex << this;
+    this->objectName = defaultName.str();
 }
 
 ObjectType Object::getType() const {
@@ -37,6 +41,14 @@ ObjectType Object::getType() const {
 
 std::shared_ptr<class SceneNode> Object::getParent() const {
     return this->parent.lock();
+}
+
+const std::string& Object::getName() const {
+    return this->objectName;
+}
+
+void Object::setName(const std::string& objectName) {
+    this->objectName = objectName;
 }
 
 void Object::targetAt(float x, float y, float z) {

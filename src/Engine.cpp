@@ -32,7 +32,6 @@
 #endif
 #include <chrono>
 #include <thread>
-#include <string>
 #include <sstream>
 #include <unordered_map>
 
@@ -80,6 +79,13 @@ std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height, GL
 
 const std::unordered_set<std::shared_ptr<Scene>>& Engine::getScenes() const {
     return this->scenes;
+}
+
+std::shared_ptr<Scene> Engine::createScene(const std::string& name) {
+    auto scene = GetObjectManager().createScene(name);
+    this->scenes.insert(scene);
+
+    return scene;
 }
 
 std::shared_ptr<Scene> Engine::createScene() {

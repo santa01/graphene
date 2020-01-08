@@ -29,7 +29,7 @@
 #include <Entity.h>
 #include <Skybox.h>
 #include <Shader.h>
-#include <Shader.h>
+#include <Scene.h>
 #include <Mesh.h>
 #include <Texture.h>
 #include <ImageTexture.h>
@@ -53,6 +53,7 @@ public:
     GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
     GRAPHENE_API std::shared_ptr<Skybox> createSkybox(const std::string& name);
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
+    GRAPHENE_API std::shared_ptr<Scene> createScene(const std::string& name);
     GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
 
     GRAPHENE_API std::shared_ptr<Mesh> createQuad(MeshWinding winding);

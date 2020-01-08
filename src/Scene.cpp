@@ -26,8 +26,15 @@
 #include <Vec4.h>
 #include <algorithm>
 #include <stdexcept>
+#include <sstream>
 
 namespace Graphene {
+
+Scene::Scene() {
+    std::ostringstream defaultName;
+    defaultName << std::hex << this;
+    this->sceneName = defaultName.str();
+}
 
 std::shared_ptr<SceneNode> Scene::createNode() {
     /* const version of shared_from_this() is selected otherwise */
@@ -43,6 +50,16 @@ std::shared_ptr<SceneNode> Scene::getRootNode() {
     return this->rootNode;
 }
 
+std::shared_ptr<SceneNode> Scene::getPlayer() {
+    /* shared_from_this() cannot be called from constructor */
+    if (this->player == nullptr) {
+        this->player = this->createNode();
+        this->getRootNode()->attachNode(this->player);
+    }
+
+    return this->player;
+}
+
 void Scene::setSkybox(const std::shared_ptr<Skybox> skybox) {
     this->skybox = skybox;
 }
@@ -51,8 +68,20 @@ std::shared_ptr<Skybox> Scene::getSkybox() const {
     return this->skybox;
 }
 
+const std::string& Scene::getName() const {
+    return this->sceneName;
+}
+
+void Scene::setName(const std::string& sceneName) {
+    this->sceneName = sceneName;
+}
+
 void Scene::setAmbientColor(const Math::Vec3& ambientColor) {
     this->ambientColor = ambientColor;
+}
+
+void Scene::setAmbientColor(float red, float green, float blue) {
+    this->setAmbientColor(Math::Vec3(red, green, blue));
 }
 
 const Math::Vec3& Scene::getAmbientColor() const {

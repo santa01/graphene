@@ -27,6 +27,7 @@
 #include <Rotatable.h>
 #include <Movable.h>
 #include <memory>
+#include <string>
 
 namespace Graphene {
 
@@ -42,11 +43,15 @@ public:
     GRAPHENE_API ObjectType getType() const;
     GRAPHENE_API std::shared_ptr<class SceneNode> getParent() const;
 
+    GRAPHENE_API const std::string& getName() const;
+    GRAPHENE_API void setName(const std::string& objectName);
+
     GRAPHENE_API void targetAt(float x, float y, float z);
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
 
 private:
     ObjectType objectType = ObjectType::ENTITY;
+    std::string objectName;
 
     friend class SceneNode;
     std::weak_ptr<class SceneNode> parent;

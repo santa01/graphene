@@ -35,6 +35,7 @@
 #include <Vec3.h>
 #include <functional>
 #include <memory>
+#include <string>
 
 namespace Graphene {
 
@@ -43,6 +44,8 @@ typedef std::function<void(const std::shared_ptr<Light>, const Math::Vec3&, cons
 
 class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
+    GRAPHENE_API Scene();
+
     GRAPHENE_API std::shared_ptr<SceneNode> createNode();
     GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
     GRAPHENE_API std::shared_ptr<SceneNode> getPlayer();
@@ -50,7 +53,11 @@ public:
     GRAPHENE_API void setSkybox(const std::shared_ptr<Skybox> skybox);
     GRAPHENE_API std::shared_ptr<Skybox> getSkybox() const;
 
+    GRAPHENE_API const std::string& getName() const;
+    GRAPHENE_API void setName(const std::string& sceneName);
+
     GRAPHENE_API void setAmbientColor(const Math::Vec3& ambientColor);
+    GRAPHENE_API void setAmbientColor(float red, float green, float blue);
     GRAPHENE_API const Math::Vec3& getAmbientColor() const;
 
     GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
@@ -65,8 +72,10 @@ public:
 
 private:
     std::shared_ptr<SceneNode> rootNode;
+    std::shared_ptr<SceneNode> player;
     std::shared_ptr<Skybox> skybox;
 
+    std::string sceneName;
     Math::Vec3 ambientColor = { 1.0f, 1.0f, 1.0f };
     float ambientEnergy = 1.0f;
 };

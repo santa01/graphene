@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <utility>
 #include <fstream>
+#include <cmath>
 
 namespace Graphene {
 
@@ -56,6 +57,37 @@ typedef struct {
     int vertices;
     int faces;
 } ObjectGeometry;
+
+typedef struct {
+    char name[256];
+    float ambientColor[3];
+    float ambientEnergy;
+    float playerRotation[3];
+    float playerPosition[3];
+    char skyboxTexture[256];
+    int entities;
+    int lights;
+} SceneDefinition;
+
+typedef struct {
+    char name[256];
+    char filepath[256];
+    float scaling[3];
+    float rotation[3];
+    float position[3];
+} EntityDefinition;
+
+typedef struct {
+    char name[256];
+    int type;
+    float energy;
+    float falloff;
+    float spotAngle;
+    float spotBlend;
+    float color[3];
+    float rotation[3];
+    float position[3];
+} LightDefinition;
 
 typedef struct {
     float vertices[18] = {  1.0f, -1.0f,  0.0f, -1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,
@@ -181,6 +213,105 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     }
 
     return entity;
+}
+
+std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
+    std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
+    }
+
+    GrapheneHeader header;
+    file.read(reinterpret_cast<char*>(&header), sizeof(header));
+
+    std::string magic(header.magic, 4);
+    if (magic != "GPNW") {
+        throw std::runtime_error(LogFormat("Invalid magic number '%s'", magic));
+    }
+
+    SceneDefinition sceneDefinition;
+    file.read(reinterpret_cast<char*>(&sceneDefinition), sizeof(sceneDefinition));
+
+    LogDebug("Load world from '%s'", name.c_str());
+    std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
+
+    auto scene = std::make_shared<Scene>();
+    scene->setName(sceneDefinition.name);
+    scene->setAmbientColor(sceneDefinition.ambientColor[0],
+                           sceneDefinition.ambientColor[1],
+                           sceneDefinition.ambientColor[2]);
+    scene->setAmbientEnergy(sceneDefinition.ambientEnergy);
+
+    auto player = scene->getPlayer();
+    player->translate(sceneDefinition.playerPosition[0],
+                      sceneDefinition.playerPosition[1],
+                      sceneDefinition.playerPosition[2]);
+    player->rotate(Math::Vec3::UNIT_X, sceneDefinition.playerRotation[0]);
+    player->rotate(Math::Vec3::UNIT_Y, sceneDefinition.playerRotation[1]);
+    player->rotate(Math::Vec3::UNIT_Z, sceneDefinition.playerRotation[2]);
+
+    std::string skyboxTexture(sceneDefinition.skyboxTexture);
+    if (!skyboxTexture.empty()) {
+        scene->setSkybox(this->createSkybox(parentDirectory + skyboxTexture));
+    }
+
+    auto sceneRoot = scene->getRootNode();
+    sceneRoot->attachNode(player);
+
+    float pi = static_cast<float>(M_PI);
+
+    for (int i = 0; i < sceneDefinition.entities; i++) {
+        EntityDefinition entityDefinition;
+        file.read(reinterpret_cast<char*>(&entityDefinition), sizeof(entityDefinition));
+
+        auto entity = this->createEntity(parentDirectory + std::string(entityDefinition.filepath));
+        entity->setName(entityDefinition.name);
+
+        entity->scale(entityDefinition.scaling[0],
+                      entityDefinition.scaling[1],
+                      entityDefinition.scaling[2]);
+        entity->translate(entityDefinition.position[0],
+                          entityDefinition.position[1],
+                          entityDefinition.position[2]);
+        entity->rotate(Math::Vec3::UNIT_X, entityDefinition.rotation[0] * 180.0f / pi);
+        entity->rotate(Math::Vec3::UNIT_Y, entityDefinition.rotation[1] * 180.0f / pi);
+        entity->rotate(Math::Vec3::UNIT_Z, entityDefinition.rotation[2] * 180.0f / pi);
+
+        auto node = scene->createNode();
+        node->attachObject(entity);
+
+        sceneRoot->attachNode(node);
+    }
+
+    for (int i = 0; i < sceneDefinition.lights; i++) {
+        LightDefinition lightDefinition;
+        file.read(reinterpret_cast<char*>(&lightDefinition), sizeof(lightDefinition));
+
+        auto light = this->createLight(static_cast<LightType>(lightDefinition.type));
+        light->setName(lightDefinition.name);
+
+        light->setEnergy(lightDefinition.energy);
+        light->setFalloff(lightDefinition.falloff);
+        light->setAngle(lightDefinition.spotAngle * 180.0f / pi);
+        light->setBlend(lightDefinition.spotBlend);
+        light->setColor(lightDefinition.color[0],
+                        lightDefinition.color[1],
+                        lightDefinition.color[2]);
+
+        light->translate(lightDefinition.position[0],
+                         lightDefinition.position[1],
+                         lightDefinition.position[2]);
+        light->rotate(Math::Vec3::UNIT_X, lightDefinition.rotation[0] * 180.0f / pi);
+        light->rotate(Math::Vec3::UNIT_Y, lightDefinition.rotation[1] * 180.0f / pi);
+        light->rotate(Math::Vec3::UNIT_Z, lightDefinition.rotation[2] * 180.0f / pi);
+
+        auto node = scene->createNode();
+        node->attachObject(light);
+
+        sceneRoot->attachNode(node);
+    }
+
+    return scene;
 }
 
 std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
