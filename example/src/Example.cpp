@@ -79,8 +79,8 @@ void Example::onSetup() {
     auto camera = objectManager.createCamera(Graphene::ProjectionType::PERSPECTIVE);
     auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
 
-    flashLight->setBlend(0.03f);
-    flashLight->setAngle(12.0f);
+    flashLight->setBlend(0.25f);
+    flashLight->setAngle(20.0f);
     flashLight->setFalloff(8.0f);
     flashLight->move(0.2f, -0.2f, 0.0f);
 

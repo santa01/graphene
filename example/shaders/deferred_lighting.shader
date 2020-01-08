@@ -73,10 +73,10 @@ void main() {
     float distance = pow(distance(lightPosition, position), 2);
     float attenuation = (light.type == TYPE_DIRECTED) ? 1.0f : (falloff / (falloff + distance));
 
-    float softBorder = cos(radians(light.angle));
-    float hardBorder = cos(radians(90.0f - light.angle * light.blend));
+    float softBorder = cos(radians(light.angle) / 2.0);
+    float hardBorder = cos(radians(light.angle * (1.0 - light.blend)) / 2.0);
     float lightAngle = dot(direction, normalize(position - lightPosition));
-    float borderIntensity = clamp((lightAngle - softBorder) / hardBorder - 1.0f, 0.0f, 1.0f);
+    float borderIntensity = clamp((lightAngle - softBorder) / (hardBorder - softBorder), 0.0f, 1.0f);
     float lightClip = (light.type == TYPE_SPOT) ? borderIntensity : 1.0f;
 
     outputColor = vec4(diffuseColor + specularColor, 0.0f) * light.energy * attenuation * lightClip;
