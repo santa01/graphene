@@ -26,7 +26,6 @@
 #include <Engine.h>
 #include <Input.h>
 #include <SceneNode.h>
-#include <Entity.h>
 #include <memory>
 
 #define MOVE_SPEED  4.0f
@@ -43,11 +42,6 @@ private:
     void onIdle();
 
     std::shared_ptr<Graphene::SceneNode> player;
-    std::shared_ptr<Graphene::SceneNode> crates;
-
-    std::shared_ptr<Graphene::Entity> crate1;
-    std::shared_ptr<Graphene::Entity> crate2;
-    std::shared_ptr<Graphene::Entity> crate3;
 };
 
 #endif  // EXAMPLE_H

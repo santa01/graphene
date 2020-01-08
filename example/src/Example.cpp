@@ -56,14 +56,6 @@ void Example::onMouseMotion(int x, int y) {
 
 void Example::onKeyboardKey(Graphene::KeyboardKey key, bool state) {
     if (state) {
-        if (key == Graphene::KeyboardKey::KEY_PLUS) {
-            this->crate3->yaw(10.0f);
-            this->crates->pitch(10.0f);
-        }
-        if (key == Graphene::KeyboardKey::KEY_MINUS) {
-            this->crate3->yaw(-10.0f);
-            this->crates->pitch(-10.0f);
-        }
         if (key == Graphene::KeyboardKey::KEY_1) {
             this->getWindow()->setFullscreen(true);
         }
@@ -84,50 +76,21 @@ void Example::onSetup() {
 
     auto& objectManager = Graphene::GetObjectManager();
 
-    this->crate1 = objectManager.createEntity("assets/crate.entity");
-    this->crate2 = objectManager.createEntity("assets/crate.entity");
-    this->crate3 = objectManager.createEntity("assets/crate.entity");
-    auto ground = objectManager.createEntity("assets/ground.entity");
-    auto skybox = objectManager.createSkybox("textures/skybox");
-
-    auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
-    auto lightBulb = objectManager.createLight(Graphene::LightType::POINT);
     auto camera = objectManager.createCamera(Graphene::ProjectionType::PERSPECTIVE);
+    auto flashLight = objectManager.createLight(Graphene::LightType::SPOT);
 
-    this->crate2->move(1.25f, 0.0f, 0.0f);
-    this->crate3->move(0.5f, 1.0f, 0.0f);
-    this->crate3->yaw(30.0f);
-
-    flashLight->setBlend(0.05f);
-    flashLight->setAngle(15.0f);
+    flashLight->setBlend(0.03f);
+    flashLight->setAngle(12.0f);
     flashLight->setFalloff(8.0f);
     flashLight->move(0.2f, -0.2f, 0.0f);
 
-    lightBulb->setEnergy(0.8f);
-    lightBulb->move(5.0f, 20.0f, 0.0f);
-
     /* Populate scene with objects */
 
-    auto scene = this->createScene();
-    scene->setAmbientEnergy(0.3f);
-    scene->setSkybox(skybox);
+    auto scene = this->createScene("worlds/desert.scene");
 
-    this->player = scene->createNode();
+    this->player = scene->getPlayer();
     this->player->attachObject(camera);
     this->player->attachObject(flashLight);
-    this->player->move(0.0f, 1.0f, -3.0f);
-
-    this->crates = scene->createNode();
-    this->crates->attachObject(this->crate1);
-    this->crates->attachObject(this->crate2);
-    this->crates->attachObject(this->crate3);
-    this->crates->attachObject(lightBulb);
-    this->crates->move(0.0f, 0.5f, 0.0f);
-
-    auto sceneRoot = scene->getRootNode();
-    sceneRoot->attachNode(this->player);
-    sceneRoot->attachNode(this->crates);
-    sceneRoot->attachObject(ground);
 
     /* Keep mouse inside the window */
 
