@@ -28,7 +28,7 @@
 #include <Vec3.h>
 #include <stdexcept>
 #include <utility>
-#include <fstream>
+#include <sstream>
 #include <cmath>
 
 namespace Graphene {
@@ -221,19 +221,11 @@ std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 
-    GrapheneHeader header;
-    file.read(reinterpret_cast<char*>(&header), sizeof(header));
-
-    std::string magic(header.magic, 4);
-    if (magic != "GPNW") {
-        throw std::runtime_error(LogFormat("Invalid magic number '%s'", magic));
-    }
+    this->validateHeader(file, "GPNW");
+    LogDebug("Load world from '%s'", name.c_str());
 
     SceneDefinition sceneDefinition;
     file.read(reinterpret_cast<char*>(&sceneDefinition), sizeof(sceneDefinition));
-
-    LogDebug("Load world from '%s'", name.c_str());
-    std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
 
     auto scene = std::make_shared<Scene>();
     scene->setName(sceneDefinition.name);
@@ -250,6 +242,7 @@ std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
     player->rotate(Math::Vec3::UNIT_Y, sceneDefinition.playerRotation[1]);
     player->rotate(Math::Vec3::UNIT_Z, sceneDefinition.playerRotation[2]);
 
+    std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
     std::string skyboxTexture(sceneDefinition.skyboxTexture);
     if (!skyboxTexture.empty()) {
         scene->setSkybox(this->createSkybox(parentDirectory + skyboxTexture));
@@ -350,6 +343,26 @@ void ObjectManager::clearCache() {
     this->meshCache.clear();
 }
 
+void ObjectManager::validateHeader(std::ifstream& file, const std::string& magic) {
+    GrapheneHeader header;
+    file.read(reinterpret_cast<char*>(&header), sizeof(header));
+
+    std::string headerMagic(header.magic, 4);
+    if (headerMagic != magic) {
+        throw std::runtime_error(LogFormat("Invalid magic number '%s', expected '%s'", headerMagic, magic));
+    }
+
+    std::ostringstream headerVersion;
+    headerVersion << static_cast<int>(header.major)
+           << "." << static_cast<int>(header.minor)
+           << "." << static_cast<int>(header.patch);
+
+    std::string grapheneVersion(GRAPHENE_VERSION);
+    if (headerVersion.str() != grapheneVersion) {
+        throw std::runtime_error(LogFormat("Invalid version '%s', expected '%s'", headerVersion.str(), grapheneVersion));
+    }
+}
+
 std::shared_ptr<ImageTexture> ObjectManager::loadTexture(const std::string& name) {
     if (this->textureCache.find(name) != this->textureCache.end()) {
         LogDebug("Reuse cached '%s' texture", name.c_str());
@@ -393,13 +406,7 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 
-    GrapheneHeader header;
-    file.read(reinterpret_cast<char*>(&header), sizeof(header));
-
-    std::string magic(header.magic, 4);
-    if (magic != "GPNE") {
-        throw std::runtime_error(LogFormat("Invalid magic number '%s'", magic));
-    }
+    this->validateHeader(file, "GPNE");
 
     int meshesCount;
     file.read(reinterpret_cast<char*>(&meshesCount), sizeof(meshesCount));

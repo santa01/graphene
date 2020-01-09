@@ -36,6 +36,7 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
+#include <fstream>
 #include <string>
 #include <memory>
 
@@ -63,6 +64,7 @@ public:
 
 private:
     ObjectManager() = default;
+    void validateHeader(std::ifstream& file, const std::string& magic);
 
     std::shared_ptr<ImageTexture> loadTexture(const std::string& name);
     std::shared_ptr<ImageCubeTexture> loadCubeTexture(const std::string& name);

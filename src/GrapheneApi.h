@@ -35,4 +35,8 @@
 #define GRAPHENE_API
 #endif
 
+#ifndef GRAPHENE_VERSION
+#define GRAPHENE_VERSION "99.99.9999"
+#endif
+
 #endif  // GRAPHENEAPI_H
