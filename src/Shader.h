@@ -65,11 +65,16 @@ private:
     GLuint compile(const std::string& source, GLenum type);
     GLuint link(const std::vector<GLuint>& shaders);
 
+    void queryUniforms();
+    void queryUniformBlocks();
+
     std::unordered_map<std::string, GLint> uniforms;
     std::unordered_map<std::string, GLuint> uniformBlocks;
     std::unordered_map<std::string, GLenum> shaderTypes;
-    
+
     GLuint program = 0;
+    static GLuint activeProgram;
+
     GLuint version = 330;
     std::string source;
 };

@@ -184,11 +184,11 @@ std::unordered_map<int, KeyboardKey> Input::keyboardMapping = {
 
 KeyboardKey Input::keycodeToKeyboardKey(int keycode) {
     auto keyboardKeyIt = Input::keyboardMapping.find(keycode);
-    if (keyboardKeyIt == Input::keyboardMapping.end()) {
-        return KeyboardKey::KEY_UNKNOWN;
+    if (keyboardKeyIt != Input::keyboardMapping.end()) {
+        return keyboardKeyIt->second;
     }
 
-    return keyboardKeyIt->second;
+    return KeyboardKey::KEY_UNKNOWN;
 }
 
 }  // namespace Graphene

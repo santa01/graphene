@@ -198,9 +198,10 @@ std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& name) {
 std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     std::vector<std::shared_ptr<Mesh>> meshes;
 
-    if (this->meshCache.find(name) != this->meshCache.end()) {
+    auto meshesIt = this->meshCache.find(name);
+    if (meshesIt != this->meshCache.end()) {
         LogDebug("Reuse cached '%s' entity", name.c_str());
-        meshes = this->meshCache.at(name);
+        meshes = meshesIt->second;
     } else {
         LogDebug("Load entity from '%s'", name.c_str());
         meshes = this->loadMeshes(name);
@@ -308,9 +309,10 @@ std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
 }
 
 std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
-    if (this->shaderCache.find(name) != this->shaderCache.end()) {
+    auto shaderIt = this->shaderCache.find(name);
+    if (shaderIt != this->shaderCache.end()) {
         LogDebug("Reuse cached '%s' shader", name.c_str());
-        return this->shaderCache.at(name);
+        return shaderIt->second;
     }
 
     LogDebug("Load shader from '%s'", name.c_str());
@@ -364,9 +366,10 @@ void ObjectManager::validateHeader(std::ifstream& file, const std::string& magic
 }
 
 std::shared_ptr<ImageTexture> ObjectManager::loadTexture(const std::string& name) {
-    if (this->textureCache.find(name) != this->textureCache.end()) {
+    auto textureIt = this->textureCache.find(name);
+    if (textureIt != this->textureCache.end()) {
         LogDebug("Reuse cached '%s' texture", name.c_str());
-        return std::dynamic_pointer_cast<ImageTexture>(this->textureCache.at(name));
+        return std::dynamic_pointer_cast<ImageTexture>(textureIt->second);
     }
 
     LogDebug("Load texture from '%s'", name.c_str());
@@ -378,9 +381,10 @@ std::shared_ptr<ImageTexture> ObjectManager::loadTexture(const std::string& name
 }
 
 std::shared_ptr<ImageCubeTexture> ObjectManager::loadCubeTexture(const std::string& name) {
-    if (this->textureCache.find(name) != this->textureCache.end()) {
+    auto textureIt = this->textureCache.find(name);
+    if (textureIt != this->textureCache.end()) {
         LogDebug("Reuse cached '%s/*.tga' textures", name.c_str());
-        return std::dynamic_pointer_cast<ImageCubeTexture>(this->textureCache.at(name));
+        return std::dynamic_pointer_cast<ImageCubeTexture>(textureIt->second);
     }
 
     LogDebug("Load textures from '%s/*.tga'", name.c_str());
@@ -456,12 +460,13 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
 }
 
 std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, MeshWinding winding, MeshFactory factory) {
-    if (this->meshCache.find(alias) == this->meshCache.end()) {
+    auto meshesIt = this->meshCache.find(alias);
+    if (meshesIt == this->meshCache.end()) {
         std::vector<std::shared_ptr<Mesh>> meshes = { nullptr, nullptr };
-        this->meshCache.emplace(alias, meshes);
+        meshesIt = this->meshCache.emplace(alias, meshes).first;
     }
 
-    auto& meshes = this->meshCache.at(alias);
+    std::vector<std::shared_ptr<Mesh>>& meshes = meshesIt->second;
     if (meshes.at(winding) == nullptr) {
         meshes.at(winding) = factory();
     }

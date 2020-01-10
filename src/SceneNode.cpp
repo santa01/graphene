@@ -58,8 +58,9 @@ void SceneNode::detachNode(std::shared_ptr<SceneNode> node) {
         throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
     }
 
-    if (this->nodes.find(node) != this->nodes.end()) {
-        this->nodes.erase(node);
+    auto nodeIt = this->nodes.find(node);
+    if (nodeIt != this->nodes.end()) {
+        this->nodes.erase(nodeIt);
     }
 }
 
@@ -87,8 +88,9 @@ void SceneNode::detachObject(std::shared_ptr<Object> object) {
         throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
     }
 
-    if (this->objects.find(object) != this->objects.end()) {
-        object->getParent()->objects.erase(object);
+    auto objectIt = this->objects.find(object);
+    if (objectIt != this->objects.end()) {
+        object->getParent()->objects.erase(objectIt);
     }
 }
 

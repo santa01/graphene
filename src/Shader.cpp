@@ -26,8 +26,11 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
+#include <cassert>
 
 namespace Graphene {
+
+GLuint Shader::activeProgram = 0;
 
 Shader::Shader(const std::string& name) {
     this->shaderTypes = {
@@ -49,6 +52,9 @@ Shader::Shader(const std::string& name) {
 
     this->source = std::string(source.get(), sourceLength);
     this->buildShader();
+
+    this->queryUniforms();
+    this->queryUniformBlocks();
 }
 
 Shader::~Shader() {
@@ -116,25 +122,16 @@ const std::string& Shader::getSource() const {
 
 void Shader::enable() {
     glUseProgram(this->program);
+    Shader::activeProgram = this->program;
 }
 
 GLint Shader::checkoutUniform(const std::string& name) {
-    this->enable();
-
-    if (this->uniforms.find(name) == this->uniforms.end()) {
-        this->uniforms.emplace(name, glGetUniformLocation(this->program, name.c_str()));
-    }
-
+    assert(Shader::activeProgram == this->program);
     return this->uniforms.at(name);
 }
 
 GLuint Shader::checkoutUniformBlock(const std::string& name) {
-    this->enable();
-
-    if (this->uniformBlocks.find(name) == this->uniformBlocks.end()) {
-        this->uniformBlocks.emplace(name, glGetUniformBlockIndex(this->program, name.c_str()));
-    }
-
+    assert(Shader::activeProgram == this->program);
     return this->uniformBlocks.at(name);
 }
 
@@ -204,6 +201,60 @@ GLuint Shader::link(const std::vector<GLuint>& shaders) {
     }
 
     return program;
+}
+
+void Shader::queryUniforms() {
+    GLint activeUniforms = 0;
+    glGetProgramiv(this->program, GL_ACTIVE_UNIFORMS, &activeUniforms);
+
+    GLint uniformNameMaxLength = 0;
+    glGetProgramiv(this->program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformNameMaxLength);
+
+    uniformNameMaxLength++;
+    std::unique_ptr<GLchar[]> uniformName(new GLchar[uniformNameMaxLength]);
+
+    for (int i = 0; i < activeUniforms; i++) {
+        GLsizei uniformNameLength = 0;
+
+        glGetActiveUniformName(this->program, i, uniformNameMaxLength, &uniformNameLength, uniformName.get());
+        if (uniformNameLength == 0) {
+            continue;
+        }
+
+        GLint uniformLocation = glGetUniformLocation(this->program, uniformName.get());
+        if (uniformLocation < 0) {
+            continue;
+        }
+
+        this->uniforms.emplace(uniformName.get(), uniformLocation);
+    }
+}
+
+void Shader::queryUniformBlocks() {
+    GLint activeUniformBlocks = 0;
+    glGetProgramiv(this->program, GL_ACTIVE_UNIFORM_BLOCKS, &activeUniformBlocks);
+
+    GLint uniformBlockNameMaxLength = 0;
+    glGetProgramiv(this->program, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &uniformBlockNameMaxLength);
+
+    uniformBlockNameMaxLength++;
+    std::unique_ptr<GLchar[]> uniformBlockName(new GLchar[uniformBlockNameMaxLength]);
+
+    for (int i = 0; i < activeUniformBlocks; i++) {
+        GLsizei uniformBlockNameLength = 0;
+
+        glGetActiveUniformBlockName(this->program, i, uniformBlockNameMaxLength, &uniformBlockNameLength, uniformBlockName.get());
+        if (uniformBlockNameLength == 0) {
+            continue;
+        }
+
+        GLuint uniformBlockIndex = glGetUniformBlockIndex(this->program, uniformBlockName.get());
+        if (uniformBlockIndex == GL_INVALID_INDEX) {
+            continue;
+        }
+
+        this->uniformBlocks.emplace(uniformBlockName.get(), uniformBlockIndex);
+    }
 }
 
 }  // namespace Graphene

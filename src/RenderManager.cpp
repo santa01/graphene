@@ -201,7 +201,6 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->shader->setUniform("specularSampler", TEXTURE_SPECULAR);
     this->shader->setUniform("positionSampler", TEXTURE_POSITION);
     this->shader->setUniform("normalSampler", TEXTURE_NORMAL);
-    this->shader->setUniform("depthSampler", TEXTURE_DEPTH);
 
     this->shader->setUniform("cameraPosition", Scene::calculatePosition(camera));
 
