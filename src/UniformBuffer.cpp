@@ -26,13 +26,16 @@ namespace Graphene {
 
 UniformBuffer::UniformBuffer(const void* data, size_t dataSize) {
     glGenBuffers(1, &this->ubo);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
-    glBufferData(GL_UNIFORM_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
+    this->update(data, dataSize);
 }
 
 UniformBuffer::~UniformBuffer() {
     glDeleteBuffers(1, &this->ubo);
+}
+
+void UniformBuffer::update(const void* data, size_t dataSize) {
+    glBindBuffer(GL_UNIFORM_BUFFER, this->ubo);
+    glBufferData(GL_UNIFORM_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
 }
 
 void UniformBuffer::update(const void* data, size_t dataSize, size_t dataOffset) {

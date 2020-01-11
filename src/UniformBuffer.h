@@ -30,13 +30,12 @@
 
 namespace Graphene {
 
-#define updateBuffer(buffer, type, member, data) (buffer)->update((data), sizeof(type::member), offsetof(type, member))
-
 class UniformBuffer: public NonCopyable {
 public:
     GRAPHENE_API UniformBuffer(const void* data, size_t dataSize);
     GRAPHENE_API ~UniformBuffer();
 
+    GRAPHENE_API void update(const void* data, size_t dataSize);
     GRAPHENE_API void update(const void* data, size_t dataSize, size_t dataOffset);
     GRAPHENE_API void bind(int bindPoint);
 

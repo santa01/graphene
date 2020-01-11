@@ -35,10 +35,10 @@ enum LightType { POINT, SPOT, DIRECTED };
 
 class Light: public Object {
 public:
-    GRAPHENE_API Light(LightType type);
+    GRAPHENE_API Light(LightType lightType);
 
     GRAPHENE_API LightType getLightType() const;
-    GRAPHENE_API void setLightType(LightType type);
+    GRAPHENE_API void setLightType(LightType lightType);
 
     GRAPHENE_API float getEnergy() const;
     GRAPHENE_API void setEnergy(float energy);
@@ -60,18 +60,18 @@ public:
     GRAPHENE_API void setDirection(float x, float y, float z);
     GRAPHENE_API void setDirection(const Math::Vec3& direction);
 
-    GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer() const;
+    GRAPHENE_API std::shared_ptr<UniformBuffer> getLightBuffer();
 
 private:
-    std::shared_ptr<UniformBuffer> lightBuffer;
-
-    LightType type = LightType::POINT;
+    LightType lightType = LightType::POINT;
     float energy = 1.0f;
     float falloff = 25.0f;
     float angle = 45.0f;  // TYPE_SPOT
     float blend = 0.15f;  // TYPE_SPOT
-
     Math::Vec3 color = { 1.0f, 1.0f, 1.0f };
+
+    std::shared_ptr<UniformBuffer> lightBuffer;
+    bool parametersDirty = true;
 };
 
 }  // namespace Graphene

@@ -44,27 +44,20 @@ typedef struct {
 
 #pragma pack(pop)
 
-Light::Light(LightType type):
+Light::Light(LightType lightType):
         Object(ObjectType::LIGHT),
-        type(type) {
+        lightType(lightType) {
     LightBuffer buffer = { };
-    buffer.type = this->type;
-    buffer.energy = this->energy;
-    buffer.falloff = this->falloff;
-    buffer.angle = this->angle;
-    buffer.blend = this->blend;
-
-    std::copy(this->color.data(), this->color.data() + 3, buffer.color);
     this->lightBuffer = std::make_shared<UniformBuffer>(&buffer, sizeof(buffer));
 }
 
 LightType Light::getLightType() const {
-    return this->type;
+    return this->lightType;
 }
 
-void Light::setLightType(LightType type) {
-    this->type = type;
-    updateBuffer(this->lightBuffer, LightBuffer, type, &this->type);
+void Light::setLightType(LightType lightType) {
+    this->lightType = lightType;
+    this->parametersDirty = true;
 }
 
 float Light::getEnergy() const {
@@ -73,7 +66,7 @@ float Light::getEnergy() const {
 
 void Light::setEnergy(float energy) {
     this->energy = energy;
-    updateBuffer(this->lightBuffer, LightBuffer, energy, &this->energy);
+    this->parametersDirty = true;
 }
 
 float Light::getFalloff() const {
@@ -82,7 +75,7 @@ float Light::getFalloff() const {
 
 void Light::setFalloff(float falloff) {
     this->falloff = falloff;
-    updateBuffer(this->lightBuffer, LightBuffer, falloff, &this->falloff);
+    this->parametersDirty = true;
 }
 
 float Light::getAngle() const {
@@ -91,7 +84,7 @@ float Light::getAngle() const {
 
 void Light::setAngle(float angle) {
     this->angle = angle;
-    updateBuffer(this->lightBuffer, LightBuffer, angle, &this->angle);
+    this->parametersDirty = true;
 }
 
 float Light::getBlend() const {
@@ -104,7 +97,7 @@ void Light::setBlend(float blend) {
     }
 
     this->blend = blend;
-    updateBuffer(this->lightBuffer, LightBuffer, blend, &this->blend);
+    this->parametersDirty = true;
 }
 
 const Math::Vec3& Light::getColor() const {
@@ -117,7 +110,7 @@ void Light::setColor(float red, float green, float blue) {
 
 void Light::setColor(const Math::Vec3& color) {
     this->color = color;
-    updateBuffer(this->lightBuffer, LightBuffer, color, this->color.data());
+    this->parametersDirty = true;
 }
 
 const Math::Vec3 Light::getDirection() const {
@@ -132,7 +125,21 @@ void Light::setDirection(const Math::Vec3& direction) {
     this->targetAt(direction);
 }
 
-std::shared_ptr<UniformBuffer> Light::getLightBuffer() const {
+std::shared_ptr<UniformBuffer> Light::getLightBuffer() {
+    if (this->parametersDirty) {
+        LightBuffer buffer = { };
+        std::copy(this->color.data(), this->color.data() + 3, buffer.color);
+
+        buffer.type = this->lightType;
+        buffer.energy = this->energy;
+        buffer.falloff = this->falloff;
+        buffer.angle = this->angle;
+        buffer.blend = this->blend;
+
+        this->lightBuffer->update(&buffer, sizeof(buffer));
+        this->parametersDirty = false;
+    }
+
     return this->lightBuffer;
 }
 

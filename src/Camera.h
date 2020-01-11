@@ -59,7 +59,7 @@ public:
 private:
     void updateProjection();
 
-    ProjectionType type = ProjectionType::PERSPECTIVE;
+    ProjectionType projectionType = ProjectionType::PERSPECTIVE;
     Math::Mat4 projection;
 
     float aspectRatio = 1.3333f;

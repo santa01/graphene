@@ -25,18 +25,18 @@
 
 namespace Graphene {
 
-Camera::Camera(ProjectionType type):
+Camera::Camera(ProjectionType projectionType):
         Object(ObjectType::CAMERA),
-        type(type) {
+        projectionType(projectionType) {
     this->updateProjection();
 }
 
 ProjectionType Camera::getProjectionType() const {
-    return this->type;
+    return this->projectionType;
 }
 
-void Camera::setProjectionType(ProjectionType type) {
-    this->type = type;
+void Camera::setProjectionType(ProjectionType projectionType) {
+    this->projectionType = projectionType;
     this->updateProjection();
 }
 
@@ -143,7 +143,7 @@ void Camera::updateProjection() {
     float pi = static_cast<float>(M_PI);
     float fovRadian = this->fov * pi / 180.0f;
 
-    switch (this->type) {
+    switch (this->projectionType) {
         case ProjectionType::PERSPECTIVE:
             this->projection.set(0, 0, 1.0f / (tanf(fovRadian / 2.0f) * this->aspectRatio));
             this->projection.set(1, 1, 1.0f / (tanf(fovRadian / 2.0f)));
