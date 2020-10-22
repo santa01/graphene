@@ -89,7 +89,7 @@ typedef struct {
     float position[3];
 } LightDefinition;
 
-typedef struct {
+struct QuadGeometry {
     float vertices[18] = {  1.0f, -1.0f,  0.0f, -1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,
                             1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,  1.0f,  1.0f, -0.0f };
     float normals[18]  = {  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,
@@ -98,9 +98,9 @@ typedef struct {
                             1.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f };
     int faces[6]       = {  0,  1,  2,
                             3,  4,  5 };  // Clockwise face winding
-} QuadMesh;
+};
 
-typedef struct {
+struct CubeGeometry {
     float vertices[108] = {  1.0, -1.0, -1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0,
                             -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,
                              1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,
@@ -149,7 +149,7 @@ typedef struct {
                             27, 28, 29,
                             30, 31, 32,
                             33, 34, 35 };  // Clockwise face winding
-} CubeMesh;
+};
 
 #pragma pack(pop)
 
@@ -324,13 +324,13 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
 
 std::shared_ptr<Mesh> ObjectManager::createQuad(MeshWinding winding) {
     return this->createMesh("QuadMesh", winding, [winding]() {
-        return geometryToMesh<QuadMesh>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
+        return geometryToMesh<QuadGeometry>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
 std::shared_ptr<Mesh> ObjectManager::createCube(MeshWinding winding) {
     return this->createMesh("CubeMesh", winding, [winding]() {
-        return geometryToMesh<CubeMesh>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
+        return geometryToMesh<CubeGeometry>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
