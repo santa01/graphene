@@ -33,6 +33,7 @@ namespace Graphene {
 
 class SceneNode;
 
+typedef int ObjectId;
 enum class ObjectType { ENTITY, LIGHT, CAMERA };
 
 class Object: public Rotatable, public Movable {
@@ -40,6 +41,7 @@ public:
     GRAPHENE_API Object(ObjectType objectType);
     GRAPHENE_API virtual ~Object() = default;
 
+    GRAPHENE_API ObjectId getId() const;
     GRAPHENE_API ObjectType getType() const;
     GRAPHENE_API std::shared_ptr<class SceneNode> getParent() const;
 
@@ -50,6 +52,7 @@ public:
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
 
 private:
+    ObjectId objectId = 0;
     ObjectType objectType = ObjectType::ENTITY;
     std::string objectName;
 

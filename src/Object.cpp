@@ -24,15 +24,25 @@
 #include <Logger.h>
 #include <stdexcept>
 #include <sstream>
+#include <cassert>
+#include <climits>
 #include <cmath>
 
 namespace Graphene {
 
 Object::Object(ObjectType objectType):
         objectType(objectType) {
+    static ObjectId nextObjectId = 0;
+    assert(nextObjectId < INT_MAX);
+    this->objectId = nextObjectId++;
+
     std::ostringstream defaultName;
     defaultName << std::hex << this;
     this->objectName = defaultName.str();
+}
+
+ObjectId Object::getId() const {
+    return this->objectId;
 }
 
 ObjectType Object::getType() const {
