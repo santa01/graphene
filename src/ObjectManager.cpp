@@ -317,6 +317,7 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
 
     LogDebug("Load shader from '%s'", name.c_str());
     auto shader = std::make_shared<Shader>(GetEngineConfig().getDataDirectory() + '/' + name);
+    shader->setName(name);
 
     this->shaderCache.emplace(name, shader);
     return shader;

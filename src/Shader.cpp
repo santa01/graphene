@@ -50,9 +50,13 @@ Shader::Shader(const std::string& name) {
     std::unique_ptr<char[]> source(new char[sourceLength]);
     file.read(source.get(), sourceLength);
 
-    this->source = std::string(source.get(), sourceLength);
-    this->buildShader();
+    this->shaderSource = std::string(source.get(), sourceLength);
 
+    std::ostringstream defaultName;
+    defaultName << std::hex << this;
+    this->shaderName = defaultName.str();
+
+    this->buildShader();
     this->queryUniforms();
     this->queryUniformBlocks();
 }
@@ -117,7 +121,15 @@ GLuint Shader::getVersion() const {
 }
 
 const std::string& Shader::getSource() const {
-    return this->source;
+    return this->shaderSource;
+}
+
+const std::string& Shader::getName() const {
+    return this->shaderName;
+}
+
+void Shader::setName(const std::string& shaderName) {
+    this->shaderName = shaderName;
 }
 
 void Shader::enable() {
@@ -127,12 +139,26 @@ void Shader::enable() {
 
 GLint Shader::checkoutUniform(const std::string& name) {
     assert(Shader::activeProgram == this->program);
-    return this->uniforms.at(name);
+
+    auto uniformIt = this->uniforms.find(name);
+    if (uniformIt == this->uniforms.end()) {
+        LogWarn("Shader '%s' was unable to retrieve uniform '%s'", this->shaderName.c_str(), name.c_str());
+        uniformIt = this->uniforms.emplace(name, -1).first;
+    }
+
+    return uniformIt->second;
 }
 
 GLuint Shader::checkoutUniformBlock(const std::string& name) {
     assert(Shader::activeProgram == this->program);
-    return this->uniformBlocks.at(name);
+
+    auto uniformBlockIt = this->uniformBlocks.find(name);
+    if (uniformBlockIt == this->uniformBlocks.end()) {
+        LogWarn("Shader '%s' was unable to retrieve uniform block '%s'", this->shaderName.c_str(), name.c_str());
+        uniformBlockIt = this->uniformBlocks.emplace(name, GL_INVALID_INDEX).first;
+    }
+
+    return uniformBlockIt->second;
 }
 
 void Shader::buildShader() {
@@ -142,7 +168,7 @@ void Shader::buildShader() {
     version << "#version " << this->version << "\n";
 
     for (auto& shaderType: this->shaderTypes) {
-        std::string modifiedSource(this->source);
+        std::string modifiedSource(this->shaderSource);
         modifiedSource.replace(modifiedSource.find(TOKEN_VERSION), sizeof(TOKEN_VERSION), version.str());
         modifiedSource.replace(modifiedSource.find(TOKEN_TYPE), sizeof(TOKEN_TYPE), shaderType.first);
 

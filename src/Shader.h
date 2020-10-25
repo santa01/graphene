@@ -55,6 +55,9 @@ public:
     GRAPHENE_API GLuint getVersion() const;
     GRAPHENE_API const std::string& getSource() const;
 
+    GRAPHENE_API const std::string& getName() const;
+    GRAPHENE_API void setName(const std::string& shaderName);
+
     GRAPHENE_API void enable();
 
 private:
@@ -76,7 +79,8 @@ private:
     static GLuint activeProgram;
 
     GLuint version = 330;
-    std::string source;
+    std::string shaderSource;
+    std::string shaderName;
 };
 
 }  // namespace Graphene
