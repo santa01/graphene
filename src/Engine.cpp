@@ -155,7 +155,9 @@ int Engine::exec() {
         }
     }
 
-    GetObjectManager().clearCache();
+    this->onTeardownSignal();
+    this->teardownEngine();
+
     return this->result;
 }
 
@@ -238,8 +240,27 @@ void Engine::setupEngine() {
     renderManager.setShader(RenderStep::OVERLAY, objectManager.createShader("shaders/overlay_output.shader"));
 
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
+    this->onTeardownSignal.connect(Signals::Slot<>(&Engine::onTeardown, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));
+}
+
+void Engine::teardownEngine() {
+    this->onQuitSignal.disconnectAll();
+    this->onIdleSignal.disconnectAll();
+    this->onTeardownSignal.disconnectAll();
+    this->onSetupSignal.disconnectAll();
+
+    auto& renderManager = GetRenderManager();
+    auto& objectManager = GetObjectManager();
+
+    renderManager.setShader(RenderStep::OVERLAY, nullptr);
+    renderManager.setShader(RenderStep::LIGHTS, nullptr);
+    renderManager.setShader(RenderStep::FRAME, nullptr);
+    renderManager.setShader(RenderStep::SKYBOX, nullptr);
+    renderManager.setShader(RenderStep::GEOMETRY, nullptr);
+
+    objectManager.clearCache();
 }
 
 void Engine::update() {

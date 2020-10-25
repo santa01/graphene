@@ -60,6 +60,7 @@ protected:
     virtual void onMouseButton(MouseButton /*button*/, bool /*state*/) {}
     virtual void onKeyboardKey(KeyboardKey /*key*/, bool /*state*/) {}
     virtual void onSetup() {}
+    virtual void onTeardown() {}
     virtual void onIdle() {}
     virtual void onQuit() {}
 
@@ -67,11 +68,13 @@ private:
     void setupWindow();
     void setupOpenGL();
     void setupEngine();
+    void teardownEngine();
     void update();
 
-    Signals::Signal<> onSetupSignal;  // Once before event loop
-    Signals::Signal<> onIdleSignal;   // Empty event queue
-    Signals::Signal<> onQuitSignal;   // User-requested quit
+    Signals::Signal<> onSetupSignal;     // Once before event loop
+    Signals::Signal<> onTeardownSignal;  // Once after event loop
+    Signals::Signal<> onIdleSignal;      // Empty event queue
+    Signals::Signal<> onQuitSignal;      // User-requested quit
 
     std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::unordered_set<std::shared_ptr<Scene>> scenes;
