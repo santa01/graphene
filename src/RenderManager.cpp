@@ -49,8 +49,19 @@ RenderManager::RenderManager() {
         { RenderStep::SHADOWS,  nullptr },
         { RenderStep::LIGHTS,   nullptr },
         { RenderStep::OVERLAY,  nullptr },
-        { RenderStep::BUFFER,   nullptr },
+        { RenderStep::BUFFER,   nullptr }
     };
+
+    this->callbacks = {
+        { RenderStep::GEOMETRY, nullptr },
+        { RenderStep::SKYBOX,   nullptr },
+        { RenderStep::FRAME,    nullptr },
+        { RenderStep::SHADOWS,  nullptr },
+        { RenderStep::LIGHTS,   nullptr },
+        { RenderStep::OVERLAY,  nullptr },
+        { RenderStep::BUFFER,   nullptr }
+    };
+
     this->renderers = {
         { RenderStep::GEOMETRY, std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::SKYBOX,   std::bind(&RenderManager::renderSkybox,   this, std::placeholders::_1) },
@@ -60,6 +71,7 @@ RenderManager::RenderManager() {
         { RenderStep::OVERLAY,  std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) },
         { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) }
     };
+
     this->frame = GetObjectManager().createQuad(MeshWinding::WINDING_CLOCKWISE);
 }
 
@@ -87,6 +99,14 @@ std::shared_ptr<Shader> RenderManager::getShader(RenderStep step) const {
     return this->shaders.at(step);
 }
 
+void RenderManager::setRenderCallback(RenderStep step, RenderCallback callback) {
+    this->callbacks.at(step) = callback;
+}
+
+const RenderCallback& RenderManager::getRenderCallback(RenderStep step) const {
+    return this->callbacks.at(step);
+}
+
 void RenderManager::setRenderStep(RenderStep step) {
     this->step = step;
 }
@@ -104,8 +124,15 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
         this->shader = this->shaders.at(this->step);
         this->shader->enable();
 
-        auto renderer = this->renderers.at(this->step);
+        Renderer& renderer = this->renderers.at(this->step);
         this->step = renderer(camera);
+    }
+}
+
+void RenderManager::renderCallback(const std::shared_ptr<Object> object) {
+    RenderCallback& renderCallback = this->callbacks.at(this->step);
+    if (renderCallback) {
+        renderCallback(object);
     }
 }
 
@@ -119,6 +146,8 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
     this->shader->setUniform("modelViewProjection", modelViewProjection);
 
     scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld, const Math::Mat4& normalRotation) {
+        this->renderCallback(entity);
+
         this->shader->setUniform("localWorld", localWorld);
         this->shader->setUniform("normalRotation", normalRotation);
 
@@ -146,6 +175,8 @@ RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
         return RenderStep::NONE;
     }
 
+    this->renderCallback(skybox);
+
     this->shader->setUniformBlock("Material", BIND_MATERIAL);
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
@@ -171,6 +202,8 @@ RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
 RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
 
+    this->renderCallback(nullptr);
+
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->shader->setUniform("ambientColor", scene->getAmbientColor());
     this->shader->setUniform("ambientEnergy", scene->getAmbientEnergy());
@@ -188,6 +221,8 @@ RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
 }
 
 RenderStep RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/) {
+    this->renderCallback(nullptr);
+
     if (this->lightPass) {
         return RenderStep::LIGHTS;
     }
@@ -206,10 +241,12 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
 
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
     scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& direction) {
-        light->getLightBuffer()->bind(BIND_LIGHT);
+        this->renderCallback(light);
 
         this->shader->setUniform("lightPosition", position);
         this->shader->setUniform("lightDirection", direction);
+
+        light->getLightBuffer()->bind(BIND_LIGHT);
 
         this->frame->render();
     });

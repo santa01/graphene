@@ -45,6 +45,7 @@ enum TextureUnits {
 };
 
 enum class RenderStep { GEOMETRY, SKYBOX, FRAME, SHADOWS, LIGHTS, OVERLAY, BUFFER, NONE };
+typedef std::function<void(const std::shared_ptr<Object>)> RenderCallback;
 
 class RenderManager: public NonCopyable {
 public:
@@ -59,6 +60,9 @@ public:
     GRAPHENE_API void setShader(RenderStep step, std::shared_ptr<Shader> shader);
     GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep step) const;
 
+    GRAPHENE_API void setRenderCallback(RenderStep step, RenderCallback callback);
+    GRAPHENE_API const RenderCallback& getRenderCallback(RenderStep step) const;
+
     GRAPHENE_API void setRenderStep(RenderStep step);
     GRAPHENE_API RenderStep getRenderStep() const;
 
@@ -67,16 +71,21 @@ public:
 private:
     RenderManager();
 
+    void renderCallback(const std::shared_ptr<Object> object);
+
     RenderStep renderEntities(const std::shared_ptr<Camera> camera);
     RenderStep renderSkybox(const std::shared_ptr<Camera> camera);
     RenderStep renderFrame(const std::shared_ptr<Camera> camera);
     RenderStep renderShadows(const std::shared_ptr<Camera> camera);
     RenderStep renderLights(const std::shared_ptr<Camera> camera);
 
-    RenderStep step = RenderStep::NONE;
     std::unordered_map<RenderStep, std::shared_ptr<Shader>> shaders;
-    std::unordered_map<RenderStep, std::function<RenderStep(const std::shared_ptr<Camera>)>> renderers;
+    std::unordered_map<RenderStep, RenderCallback> callbacks;
 
+    typedef std::function<RenderStep(const std::shared_ptr<Camera>)> Renderer;
+    std::unordered_map<RenderStep, Renderer> renderers;
+
+    RenderStep step = RenderStep::NONE;
     std::shared_ptr<Shader> shader;
     std::shared_ptr<Mesh> frame;
 
