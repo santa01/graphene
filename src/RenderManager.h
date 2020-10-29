@@ -36,14 +36,6 @@
 
 namespace Graphene {
 
-enum TextureUnits {
-    TEXTURE_DIFFUSE,
-    TEXTURE_SPECULAR,
-    TEXTURE_POSITION,
-    TEXTURE_NORMAL,
-    TEXTURE_DEPTH
-};
-
 enum class RenderStep { GEOMETRY, SKYBOX, FRAME, SHADOWS, LIGHTS, OVERLAY, BUFFER, NONE };
 typedef std::function<void(const std::shared_ptr<Object>)> RenderCallback;
 

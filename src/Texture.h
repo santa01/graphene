@@ -29,6 +29,14 @@
 
 namespace Graphene {
 
+enum TextureUnit {
+    TEXTURE_DIFFUSE,   // GL_TEXTURE0
+    TEXTURE_SPECULAR,  // GL_TEXTURE1
+    TEXTURE_POSITION,  // GL_TEXTURE2
+    TEXTURE_NORMAL,    // GL_TEXTURE3
+    TEXTURE_DEPTH      // GL_TEXTURE4
+};
+
 class Texture: public NonCopyable {
 public:
     GRAPHENE_API Texture(int width, int height, GLenum type, GLenum format, GLsizei mipmaps);
@@ -38,7 +46,8 @@ public:
     GRAPHENE_API int getHeight() const;
     GRAPHENE_API GLuint getHandle() const;
 
-    GRAPHENE_API void bind(int textureUnit);
+    GRAPHENE_API void bind();
+    GRAPHENE_API void bind(TextureUnit textureUnit);
 
 protected:
     int width = 0;
@@ -46,6 +55,9 @@ protected:
 
     GLenum target = 0;
     GLuint texture = 0;
+
+    static TextureUnit activeUnit;
+    static GLuint activeTexture;
 };
 
 class Texture2D: public Texture {

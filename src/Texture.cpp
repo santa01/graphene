@@ -24,13 +24,16 @@
 
 namespace Graphene {
 
+TextureUnit Texture::activeUnit = TEXTURE_DIFFUSE;
+GLuint Texture::activeTexture = 0;
+
 Texture::Texture(int width, int height, GLenum type, GLenum format, GLsizei mipmaps):
         width(width),
         height(height),
         target(type) {
     glGenTextures(1, &this->texture);
 
-    glBindTexture(this->target, this->texture);
+    this->bind();
     glTexStorage2D(this->target, mipmaps, format, this->width, this->height);
 }
 
@@ -50,9 +53,20 @@ GLuint Texture::getHandle() const {
     return this->texture;
 }
 
-void Texture::bind(int textureUnit) {
-    glActiveTexture(GL_TEXTURE0 + textureUnit);
-    glBindTexture(this->target, this->texture);
+void Texture::bind() {
+    this->bind(TEXTURE_DIFFUSE);
+}
+
+void Texture::bind(TextureUnit textureUnit) {
+    if (Texture::activeUnit != textureUnit) {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        Texture::activeUnit = textureUnit;
+    }
+
+    if (Texture::activeTexture != this->texture) {
+        glBindTexture(this->target, this->texture);
+        Texture::activeTexture = this->texture;
+    }
 }
 
 }  // namespace Graphene

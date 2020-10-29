@@ -30,8 +30,6 @@ namespace Graphene {
 
 ImageTexture::ImageTexture(const Image& image):
         RgbaTexture(image.getWidth(), image.getHeight()) {
-    glBindTexture(this->target, this->texture);
-
     glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -48,7 +46,7 @@ ImageTexture::ImageTexture(const Image& image):
 }
 
 void ImageTexture::update(const Image& image) {
-    glBindTexture(this->target, this->texture);
+    this->bind();
 
     GLenum format = (image.getPixelDepth() == 32) ? GL_BGRA : GL_BGR;  // Little-endian ARGB or RGB format
     glTexSubImage2D(this->target, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, image.getPixels());
@@ -57,8 +55,6 @@ void ImageTexture::update(const Image& image) {
 
 ImageCubeTexture::ImageCubeTexture(const CubeImage& cubeImage):
         RgbaCubeTexture(cubeImage[0]->getWidth(), cubeImage[0]->getHeight()) {
-    glBindTexture(this->target, this->texture);
-
     glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -75,7 +71,7 @@ ImageCubeTexture::ImageCubeTexture(const CubeImage& cubeImage):
 }
 
 void ImageCubeTexture::update(const CubeImage& cubeImage) {
-    glBindTexture(this->target, this->texture);
+    this->bind();
 
     for (int faceOffset = 0; faceOffset < 6; faceOffset++) {
         auto faceImage = cubeImage[faceOffset];
