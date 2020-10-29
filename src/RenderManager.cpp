@@ -53,13 +53,13 @@ RenderManager::RenderManager() {
     };
 
     this->callbacks = {
-        { RenderStep::GEOMETRY, nullptr },
-        { RenderStep::SKYBOX,   nullptr },
-        { RenderStep::FRAME,    nullptr },
-        { RenderStep::SHADOWS,  nullptr },
-        { RenderStep::LIGHTS,   nullptr },
-        { RenderStep::OVERLAY,  nullptr },
-        { RenderStep::BUFFER,   nullptr }
+        { RenderStep::GEOMETRY, [](const std::shared_ptr<Object> object) { } },
+        { RenderStep::SKYBOX,   [](const std::shared_ptr<Object> object) { } },
+        { RenderStep::FRAME,    [](const std::shared_ptr<Object> object) { } },
+        { RenderStep::SHADOWS,  [](const std::shared_ptr<Object> object) { } },
+        { RenderStep::LIGHTS,   [](const std::shared_ptr<Object> object) { } },
+        { RenderStep::OVERLAY,  [](const std::shared_ptr<Object> object) { } },
+        { RenderStep::BUFFER,   [](const std::shared_ptr<Object> object) { } }
     };
 
     this->renderers = {
@@ -91,28 +91,28 @@ bool RenderManager::hasLightPass() const {
     return this->lightPass;
 }
 
-void RenderManager::setShader(RenderStep step, std::shared_ptr<Shader> shader) {
-    this->shaders.at(step) = shader;
+void RenderManager::setShader(RenderStep renderStep, std::shared_ptr<Shader> shader) {
+    this->shaders.at(renderStep) = shader;
 }
 
-std::shared_ptr<Shader> RenderManager::getShader(RenderStep step) const {
-    return this->shaders.at(step);
+std::shared_ptr<Shader> RenderManager::getShader(RenderStep renderStep) const {
+    return this->shaders.at(renderStep);
 }
 
-void RenderManager::setRenderCallback(RenderStep step, RenderCallback callback) {
-    this->callbacks.at(step) = callback;
+void RenderManager::setRenderCallback(RenderStep renderStep, RenderCallback callback) {
+    this->callbacks.at(renderStep) = callback;
 }
 
-const RenderCallback& RenderManager::getRenderCallback(RenderStep step) const {
-    return this->callbacks.at(step);
+const RenderCallback& RenderManager::getRenderCallback(RenderStep renderStep) const {
+    return this->callbacks.at(renderStep);
 }
 
-void RenderManager::setRenderStep(RenderStep step) {
-    this->step = step;
+void RenderManager::setRenderStep(RenderStep renderStep) {
+    this->renderStep = renderStep;
 }
 
 RenderStep RenderManager::getRenderStep() const {
-    return this->step;
+    return this->renderStep;
 }
 
 void RenderManager::render(const std::shared_ptr<Camera> camera) {
@@ -120,20 +120,16 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    while (this->step != RenderStep::NONE) {
-        this->shader = this->shaders.at(this->step);
+    while (this->renderStep != RenderStep::NONE) {
+        this->renderCallback = this->callbacks.at(this->renderStep);
+
+        this->shader = this->shaders.at(this->renderStep);
         this->shader->enable();
 
-        Renderer& renderer = this->renderers.at(this->step);
-        this->step = renderer(camera);
+        Renderer& renderer = this->renderers.at(this->renderStep);
+        this->renderStep = renderer(camera);
     }
-}
 
-void RenderManager::renderCallback(const std::shared_ptr<Object> object) {
-    RenderCallback& renderCallback = this->callbacks.at(this->step);
-    if (renderCallback) {
-        renderCallback(object);
-    }
 }
 
 RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {

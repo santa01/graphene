@@ -49,21 +49,19 @@ public:
     GRAPHENE_API void setLightPass(bool lightPass);
     GRAPHENE_API bool hasLightPass() const;
 
-    GRAPHENE_API void setShader(RenderStep step, std::shared_ptr<Shader> shader);
-    GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep step) const;
+    GRAPHENE_API void setShader(RenderStep renderStep, std::shared_ptr<Shader> shader);
+    GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep renderStep) const;
 
-    GRAPHENE_API void setRenderCallback(RenderStep step, RenderCallback callback);
-    GRAPHENE_API const RenderCallback& getRenderCallback(RenderStep step) const;
+    GRAPHENE_API void setRenderCallback(RenderStep renderStep, RenderCallback callback);
+    GRAPHENE_API const RenderCallback& getRenderCallback(RenderStep renderStep) const;
 
-    GRAPHENE_API void setRenderStep(RenderStep step);
+    GRAPHENE_API void setRenderStep(RenderStep renderStep);
     GRAPHENE_API RenderStep getRenderStep() const;
 
     GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
 
 private:
     RenderManager();
-
-    void renderCallback(const std::shared_ptr<Object> object);
 
     RenderStep renderEntities(const std::shared_ptr<Camera> camera);
     RenderStep renderSkybox(const std::shared_ptr<Camera> camera);
@@ -77,7 +75,9 @@ private:
     typedef std::function<RenderStep(const std::shared_ptr<Camera>)> Renderer;
     std::unordered_map<RenderStep, Renderer> renderers;
 
-    RenderStep step = RenderStep::NONE;
+    RenderStep renderStep = RenderStep::NONE;
+    RenderCallback renderCallback;
+
     std::shared_ptr<Shader> shader;
     std::shared_ptr<Mesh> frame;
 
