@@ -46,7 +46,7 @@ public:
     GRAPHENE_API void update() override;
 
 private:
-    bool alphaBlending = true;
+    bool alphaBlending = false;
 
     std::shared_ptr<Texture> outputTexture;
     std::shared_ptr<DepthTexture> depthTexture;
