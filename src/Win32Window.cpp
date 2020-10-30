@@ -141,6 +141,9 @@ Win32Window::Win32Window(int width, int height):
 Win32Window::~Win32Window() {
     this->setFullscreen(false);
 
+    this->overlays.clear();
+    this->geometryBuffers.clear();
+
     this->destroyContext();
     this->destroyWindow(this->window);
 

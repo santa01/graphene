@@ -59,6 +59,7 @@ public:
     GRAPHENE_API RenderStep getRenderStep() const;
 
     GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void teardown();
 
 private:
     RenderManager();

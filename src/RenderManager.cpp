@@ -139,6 +139,18 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
     this->renderShader->enable();
 }
 
+void RenderManager::teardown() {
+    this->frame = nullptr;
+    this->defaultShader = nullptr;
+
+    this->renderShader = nullptr;
+    this->renderCallback = nullptr;
+
+    this->renderers.clear();
+    this->callbacks.clear();
+    this->shaders.clear();
+}
+
 RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
     this->renderShader->setUniformBlock("Material", BIND_MATERIAL);
     this->renderShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);

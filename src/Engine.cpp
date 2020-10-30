@@ -246,21 +246,16 @@ void Engine::setupEngine() {
 }
 
 void Engine::teardownEngine() {
+    this->frameBuffers.clear();
+    this->scenes.clear();
+
     this->onQuitSignal.disconnectAll();
     this->onIdleSignal.disconnectAll();
     this->onTeardownSignal.disconnectAll();
     this->onSetupSignal.disconnectAll();
 
-    auto& renderManager = GetRenderManager();
-    auto& objectManager = GetObjectManager();
-
-    renderManager.setRenderShader(RenderStep::OVERLAY, nullptr);
-    renderManager.setRenderShader(RenderStep::LIGHTS, nullptr);
-    renderManager.setRenderShader(RenderStep::FRAME, nullptr);
-    renderManager.setRenderShader(RenderStep::SKYBOX, nullptr);
-    renderManager.setRenderShader(RenderStep::GEOMETRY, nullptr);
-
-    objectManager.clearCache();
+    GetRenderManager().teardown();
+    GetObjectManager().teardown();
 }
 
 void Engine::update() {

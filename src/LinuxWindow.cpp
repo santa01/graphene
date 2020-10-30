@@ -42,6 +42,9 @@ LinuxWindow::LinuxWindow(int width, int height):
 LinuxWindow::~LinuxWindow() {
     this->setFullscreen(false);
 
+    this->overlays.clear();
+    this->geometryBuffers.clear();
+
     this->destroyContext();
     this->destroyKeyboardMapping();
     this->destroyWindow();

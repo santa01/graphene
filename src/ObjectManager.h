@@ -60,7 +60,7 @@ public:
     GRAPHENE_API std::shared_ptr<Mesh> createQuad(MeshWinding winding);
     GRAPHENE_API std::shared_ptr<Mesh> createCube(MeshWinding winding);
 
-    GRAPHENE_API void clearCache();
+    GRAPHENE_API void teardown();
 
 private:
     ObjectManager() = default;

@@ -349,7 +349,7 @@ std::shared_ptr<Mesh> ObjectManager::createCube(MeshWinding winding) {
     });
 }
 
-void ObjectManager::clearCache() {
+void ObjectManager::teardown() {
     LogDebug("Clear shader cache (%d items)", this->shaderCache.size());
     this->shaderCache.clear();
 
