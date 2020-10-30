@@ -53,13 +53,13 @@ RenderManager::RenderManager() {
     };
 
     this->callbacks = {
-        { RenderStep::GEOMETRY, [](const std::shared_ptr<Object> object) { } },
-        { RenderStep::SKYBOX,   [](const std::shared_ptr<Object> object) { } },
-        { RenderStep::FRAME,    [](const std::shared_ptr<Object> object) { } },
-        { RenderStep::SHADOWS,  [](const std::shared_ptr<Object> object) { } },
-        { RenderStep::LIGHTS,   [](const std::shared_ptr<Object> object) { } },
-        { RenderStep::OVERLAY,  [](const std::shared_ptr<Object> object) { } },
-        { RenderStep::BUFFER,   [](const std::shared_ptr<Object> object) { } }
+        { RenderStep::GEOMETRY, [](const std::shared_ptr<Object> /*object*/) { } },
+        { RenderStep::SKYBOX,   [](const std::shared_ptr<Object> /*object*/) { } },
+        { RenderStep::FRAME,    [](const std::shared_ptr<Object> /*object*/) { } },
+        { RenderStep::SHADOWS,  [](const std::shared_ptr<Object> /*object*/) { } },
+        { RenderStep::LIGHTS,   [](const std::shared_ptr<Object> /*object*/) { } },
+        { RenderStep::OVERLAY,  [](const std::shared_ptr<Object> /*object*/) { } },
+        { RenderStep::BUFFER,   [](const std::shared_ptr<Object> /*object*/) { } }
     };
 
     this->renderers = {
