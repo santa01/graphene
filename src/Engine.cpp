@@ -233,11 +233,11 @@ void Engine::setupEngine() {
     auto& renderManager = GetRenderManager();
     auto& objectManager = GetObjectManager();
 
-    renderManager.setShader(RenderStep::GEOMETRY, objectManager.createShader("shaders/geometry_output.shader"));
-    renderManager.setShader(RenderStep::SKYBOX, objectManager.createShader("shaders/skybox_output.shader"));
-    renderManager.setShader(RenderStep::FRAME, objectManager.createShader("shaders/ambient_lighting.shader"));
-    renderManager.setShader(RenderStep::LIGHTS, objectManager.createShader("shaders/deferred_lighting.shader"));
-    renderManager.setShader(RenderStep::OVERLAY, objectManager.createShader("shaders/overlay_output.shader"));
+    renderManager.setRenderShader(RenderStep::GEOMETRY, objectManager.createShader("shaders/geometry_output.shader"));
+    renderManager.setRenderShader(RenderStep::SKYBOX, objectManager.createShader("shaders/skybox_output.shader"));
+    renderManager.setRenderShader(RenderStep::FRAME, objectManager.createShader("shaders/ambient_lighting.shader"));
+    renderManager.setRenderShader(RenderStep::LIGHTS, objectManager.createShader("shaders/deferred_lighting.shader"));
+    renderManager.setRenderShader(RenderStep::OVERLAY, objectManager.createShader("shaders/overlay_output.shader"));
 
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onTeardownSignal.connect(Signals::Slot<>(&Engine::onTeardown, this));
@@ -254,11 +254,11 @@ void Engine::teardownEngine() {
     auto& renderManager = GetRenderManager();
     auto& objectManager = GetObjectManager();
 
-    renderManager.setShader(RenderStep::OVERLAY, nullptr);
-    renderManager.setShader(RenderStep::LIGHTS, nullptr);
-    renderManager.setShader(RenderStep::FRAME, nullptr);
-    renderManager.setShader(RenderStep::SKYBOX, nullptr);
-    renderManager.setShader(RenderStep::GEOMETRY, nullptr);
+    renderManager.setRenderShader(RenderStep::OVERLAY, nullptr);
+    renderManager.setRenderShader(RenderStep::LIGHTS, nullptr);
+    renderManager.setRenderShader(RenderStep::FRAME, nullptr);
+    renderManager.setRenderShader(RenderStep::SKYBOX, nullptr);
+    renderManager.setRenderShader(RenderStep::GEOMETRY, nullptr);
 
     objectManager.clearCache();
 }

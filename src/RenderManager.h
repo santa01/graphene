@@ -49,8 +49,8 @@ public:
     GRAPHENE_API void setLightPass(bool lightPass);
     GRAPHENE_API bool hasLightPass() const;
 
-    GRAPHENE_API void setShader(RenderStep renderStep, std::shared_ptr<Shader> shader);
-    GRAPHENE_API std::shared_ptr<Shader> getShader(RenderStep renderStep) const;
+    GRAPHENE_API void setRenderShader(RenderStep renderStep, std::shared_ptr<Shader> renderShader);
+    GRAPHENE_API std::shared_ptr<Shader> getRenderShader(RenderStep renderStep) const;
 
     GRAPHENE_API void setRenderCallback(RenderStep renderStep, RenderCallback callback);
     GRAPHENE_API const RenderCallback& getRenderCallback(RenderStep renderStep) const;
@@ -78,7 +78,8 @@ private:
     RenderStep renderStep = RenderStep::NONE;
     RenderCallback renderCallback;
 
-    std::shared_ptr<Shader> shader;
+    std::shared_ptr<Shader> renderShader;
+    std::shared_ptr<Shader> defaultShader;
     std::shared_ptr<Mesh> frame;
 
     bool shadowPass = false;

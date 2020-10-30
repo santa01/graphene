@@ -72,6 +72,11 @@ RenderManager::RenderManager() {
         { RenderStep::BUFFER,   std::bind(&RenderManager::renderEntities, this, std::placeholders::_1) }
     };
 
+    this->defaultShader = std::make_shared<Shader>("{SHADER_VERSION}\n{SHADER_TYPE}\nvoid main() { }\n");
+
+    this->renderShader = this->defaultShader;
+    this->renderShader->enable();
+
     this->frame = GetObjectManager().createQuad(MeshWinding::WINDING_CLOCKWISE);
 }
 
@@ -91,11 +96,11 @@ bool RenderManager::hasLightPass() const {
     return this->lightPass;
 }
 
-void RenderManager::setShader(RenderStep renderStep, std::shared_ptr<Shader> shader) {
-    this->shaders.at(renderStep) = shader;
+void RenderManager::setRenderShader(RenderStep renderStep, std::shared_ptr<Shader> renderShader) {
+    this->shaders.at(renderStep) = renderShader;
 }
 
-std::shared_ptr<Shader> RenderManager::getShader(RenderStep renderStep) const {
+std::shared_ptr<Shader> RenderManager::getRenderShader(RenderStep renderStep) const {
     return this->shaders.at(renderStep);
 }
 
@@ -123,29 +128,31 @@ void RenderManager::render(const std::shared_ptr<Camera> camera) {
     while (this->renderStep != RenderStep::NONE) {
         this->renderCallback = this->callbacks.at(this->renderStep);
 
-        this->shader = this->shaders.at(this->renderStep);
-        this->shader->enable();
+        this->renderShader = this->shaders.at(this->renderStep);
+        this->renderShader->enable();
 
         Renderer& renderer = this->renderers.at(this->renderStep);
         this->renderStep = renderer(camera);
     }
 
+    this->renderShader = this->defaultShader;
+    this->renderShader->enable();
 }
 
 RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
-    this->shader->setUniformBlock("Material", BIND_MATERIAL);
-    this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->renderShader->setUniformBlock("Material", BIND_MATERIAL);
+    this->renderShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
     // Modelview -> project
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
     Math::Mat4 modelViewProjection = camera->getProjection() * Scene::calculateModelView(camera);
-    this->shader->setUniform("modelViewProjection", modelViewProjection);
+    this->renderShader->setUniform("modelViewProjection", modelViewProjection);
 
     scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld, const Math::Mat4& normalRotation) {
         this->renderCallback(entity);
 
-        this->shader->setUniform("localWorld", localWorld);
-        this->shader->setUniform("normalRotation", normalRotation);
+        this->renderShader->setUniform("localWorld", localWorld);
+        this->renderShader->setUniform("normalRotation", normalRotation);
 
         for (auto& mesh: entity->getMeshes()) {
             auto material = mesh->getMaterial();
@@ -173,12 +180,12 @@ RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
 
     this->renderCallback(skybox);
 
-    this->shader->setUniformBlock("Material", BIND_MATERIAL);
-    this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->renderShader->setUniformBlock("Material", BIND_MATERIAL);
+    this->renderShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
 
     // Modelview -> project
     Math::Mat4 modelViewProjection = camera->getProjection() * Scene::calculateView(camera);
-    this->shader->setUniform("modelViewProjection", modelViewProjection);
+    this->renderShader->setUniform("modelViewProjection", modelViewProjection);
 
     for (auto& mesh: skybox->getMeshes()) {
         auto material = mesh->getMaterial();
@@ -200,9 +207,9 @@ RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
 
     this->renderCallback(nullptr);
 
-    this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
-    this->shader->setUniform("ambientColor", scene->getAmbientColor());
-    this->shader->setUniform("ambientEnergy", scene->getAmbientEnergy());
+    this->renderShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
+    this->renderShader->setUniform("ambientColor", scene->getAmbientColor());
+    this->renderShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
 
     this->frame->render();
 
@@ -227,20 +234,20 @@ RenderStep RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/
 }
 
 RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
-    this->shader->setUniformBlock("Light", BIND_LIGHT);
+    this->renderShader->setUniformBlock("Light", BIND_LIGHT);
 
-    this->shader->setUniform("specularSampler", TEXTURE_SPECULAR);
-    this->shader->setUniform("positionSampler", TEXTURE_POSITION);
-    this->shader->setUniform("normalSampler", TEXTURE_NORMAL);
+    this->renderShader->setUniform("specularSampler", TEXTURE_SPECULAR);
+    this->renderShader->setUniform("positionSampler", TEXTURE_POSITION);
+    this->renderShader->setUniform("normalSampler", TEXTURE_NORMAL);
 
-    this->shader->setUniform("cameraPosition", Scene::calculatePosition(camera));
+    this->renderShader->setUniform("cameraPosition", Scene::calculatePosition(camera));
 
     std::shared_ptr<Scene> scene = camera->getParent()->getScene();
     scene->iterateLights([this](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& direction) {
         this->renderCallback(light);
 
-        this->shader->setUniform("lightPosition", position);
-        this->shader->setUniform("lightDirection", direction);
+        this->renderShader->setUniform("lightPosition", position);
+        this->renderShader->setUniform("lightDirection", direction);
 
         light->getLightBuffer()->bind(BIND_LIGHT);
 
