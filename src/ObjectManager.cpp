@@ -316,7 +316,21 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
     }
 
     LogDebug("Load shader from '%s'", name.c_str());
-    auto shader = std::make_shared<Shader>(GetEngineConfig().getDataDirectory() + '/' + name);
+
+    std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
+    }
+
+    file.seekg(0, std::ios::end);
+    std::ifstream::pos_type sourceLength = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::unique_ptr<char[]> source(new char[sourceLength]);
+    file.read(source.get(), sourceLength);
+
+    std::string shaderSource(source.get(), sourceLength);
+    auto shader = std::make_shared<Shader>(shaderSource);
     shader->setName(name);
 
     this->shaderCache.emplace(name, shader);

@@ -41,7 +41,7 @@ namespace Graphene {
 
 class Shader: public NonCopyable {
 public:
-    GRAPHENE_API Shader(const std::string& name);
+    GRAPHENE_API Shader(const std::string& shaderSource);
     GRAPHENE_API ~Shader();
 
     GRAPHENE_API void setUniform(const std::string& name, const Math::Mat4& value);

@@ -32,29 +32,16 @@ namespace Graphene {
 
 GLuint Shader::activeProgram = 0;
 
-Shader::Shader(const std::string& name) {
+Shader::Shader(const std::string& shaderSource):
+        shaderSource(shaderSource) {
+    std::ostringstream defaultName;
+    defaultName << std::hex << this;
+    this->shaderName = defaultName.str();
+
     this->shaderTypes = {
         { "#define TYPE_VERTEX\n",   GL_VERTEX_SHADER },
         { "#define TYPE_FRAGMENT\n", GL_FRAGMENT_SHADER }
     };
-
-    std::ifstream file(name, std::ios::binary);
-    if (!file) {
-        throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
-    }
-
-    file.seekg(0, std::ios::end);
-    std::ifstream::pos_type sourceLength = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    std::unique_ptr<char[]> source(new char[sourceLength]);
-    file.read(source.get(), sourceLength);
-
-    this->shaderSource = std::string(source.get(), sourceLength);
-
-    std::ostringstream defaultName;
-    defaultName << std::hex << this;
-    this->shaderName = defaultName.str();
 
     this->buildShader();
     this->queryUniforms();
@@ -133,12 +120,14 @@ void Shader::setName(const std::string& shaderName) {
 }
 
 void Shader::enable() {
-    glUseProgram(this->program);
-    Shader::activeProgram = this->program;
+    if (Shader::activeProgram != this->program) {
+        glUseProgram(this->program);
+        Shader::activeProgram = this->program;
+    }
 }
 
 GLint Shader::checkoutUniform(const std::string& name) {
-    assert(Shader::activeProgram == this->program);
+    this->enable();
 
     auto uniformIt = this->uniforms.find(name);
     if (uniformIt == this->uniforms.end()) {
@@ -150,7 +139,7 @@ GLint Shader::checkoutUniform(const std::string& name) {
 }
 
 GLuint Shader::checkoutUniformBlock(const std::string& name) {
-    assert(Shader::activeProgram == this->program);
+    this->enable();
 
     auto uniformBlockIt = this->uniformBlocks.find(name);
     if (uniformBlockIt == this->uniformBlocks.end()) {
