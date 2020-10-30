@@ -64,6 +64,7 @@ PFNGLGENTEXTURESPROC glGenTextures;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLGETACTIVEUNIFORMNAMEPROC glGetActiveUniformName;
 PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC glGetActiveUniformBlockName;
+PFNGLGETERRORPROC glGetError;
 PFNGLGETINTEGERVPROC glGetIntegerv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
@@ -175,6 +176,7 @@ void loadCore() {
     LOAD_MANDATORY(glGenVertexArrays);
     LOAD_MANDATORY(glGetActiveUniformName);
     LOAD_MANDATORY(glGetActiveUniformBlockName);
+    LOAD_MANDATORY(glGetError);
     LOAD_MANDATORY(glGetIntegerv);
     LOAD_MANDATORY(glGetProgramInfoLog);
     LOAD_MANDATORY(glGetProgramiv);
