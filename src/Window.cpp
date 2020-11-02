@@ -111,8 +111,8 @@ void Window::update() {
     // GL_BLEND, GL_DEPTH_TEST are already set
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    GetRenderManager().setRenderStep(RenderStep::OVERLAY);
     for (auto& overlay: this->overlays) {
+        GetRenderManager().setRenderStep(RenderStep::OVERLAY);
         overlay->update();
     }
 
