@@ -24,6 +24,7 @@
 #define OBJECT_H
 
 #include <GrapheneApi.h>
+#include <NonCopyable.h>
 #include <Rotatable.h>
 #include <Movable.h>
 #include <memory>
@@ -36,7 +37,7 @@ class SceneNode;
 typedef int ObjectId;
 enum class ObjectType { ENTITY, LIGHT, CAMERA };
 
-class Object: public Rotatable, public Movable {
+class Object: public Rotatable, public Movable, public NonCopyable {
 public:
     GRAPHENE_API Object(ObjectType objectType);
     GRAPHENE_API virtual ~Object() = default;

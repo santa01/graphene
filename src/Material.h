@@ -24,6 +24,7 @@
 #define MATERIAL_H
 
 #include <GrapheneApi.h>
+#include <NonCopyable.h>
 #include <ImageTexture.h>
 #include <UniformBuffer.h>
 #include <Vec3.h>
@@ -31,7 +32,7 @@
 
 namespace Graphene {
 
-class Material {
+class Material: public NonCopyable {
 public:
     GRAPHENE_API Material();
 
