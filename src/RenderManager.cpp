@@ -31,11 +31,6 @@
 
 namespace Graphene {
 
-enum BindPoints {
-    BIND_MATERIAL = 0,
-    BIND_LIGHT = 0
-};
-
 RenderManager& RenderManager::getInstance() {
     static RenderManager instance;
     return instance;
@@ -168,14 +163,14 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
 
         for (auto& mesh: entity->getMeshes()) {
             auto material = mesh->getMaterial();
-            material->getMaterialBuffer()->bind(BIND_MATERIAL);
+            material->bind(BIND_MATERIAL);
 
-            auto diffuseTexture = material->getDiffuseTexture();
-            if (diffuseTexture != nullptr) {
-                diffuseTexture->bind(TEXTURE_DIFFUSE);
+            auto texture = material->getDiffuseTexture();
+            if (texture != nullptr) {
+                texture->bind(TEXTURE_DIFFUSE);
             }
 
-            mesh->getGeometry()->render();
+            mesh->render();
         }
     });
 
@@ -201,14 +196,14 @@ RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
 
     for (auto& mesh: skybox->getMeshes()) {
         auto material = mesh->getMaterial();
-        material->getMaterialBuffer()->bind(BIND_MATERIAL);
+        material->bind(BIND_MATERIAL);
 
-        auto diffuseTexture = material->getDiffuseTexture();
-        if (diffuseTexture != nullptr) {
-            diffuseTexture->bind(TEXTURE_DIFFUSE);
+        auto texture = material->getDiffuseTexture();
+        if (texture != nullptr) {
+            texture->bind(TEXTURE_DIFFUSE);
         }
 
-        mesh->getGeometry()->render();
+        mesh->render();
     }
 
     return RenderStep::NONE;
@@ -223,7 +218,7 @@ RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
     this->renderShader->setUniform("ambientColor", scene->getAmbientColor());
     this->renderShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
 
-    this->frame->getGeometry()->render();
+    this->frame->render();
 
     if (this->shadowPass) {
         return RenderStep::SHADOWS;
@@ -248,6 +243,7 @@ RenderStep RenderManager::renderShadows(const std::shared_ptr<Camera> /*camera*/
 RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
     this->renderShader->setUniformBlock("Light", BIND_LIGHT);
 
+    this->renderShader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->renderShader->setUniform("specularSampler", TEXTURE_SPECULAR);
     this->renderShader->setUniform("positionSampler", TEXTURE_POSITION);
     this->renderShader->setUniform("normalSampler", TEXTURE_NORMAL);
@@ -261,9 +257,9 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
         this->renderShader->setUniform("lightPosition", position);
         this->renderShader->setUniform("lightDirection", direction);
 
-        light->getLightBuffer()->bind(BIND_LIGHT);
+        light->bind(BIND_LIGHT);
 
-        this->frame->getGeometry()->render();
+        this->frame->render();
     });
 
     return RenderStep::NONE;

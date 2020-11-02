@@ -23,6 +23,7 @@
 #include <Skybox.h>
 #include <ObjectManager.h>
 #include <Mesh.h>
+#include <Material.h>
 
 namespace Graphene {
 
@@ -30,7 +31,10 @@ Skybox::Skybox(const std::shared_ptr<ImageCubeTexture> cubeTexture) {
     auto mesh = GetObjectManager().createCube(FaceWinding::WINDING_COUNTER_CLOCKWISE);
     this->addMesh(mesh);
 
-    mesh->getMaterial()->setDiffuseTexture(cubeTexture);
+    auto material = std::make_shared<Material>();
+    mesh->setMaterial(material);
+
+    material->setDiffuseTexture(cubeTexture);
 }
 
 }  // namespace Graphene

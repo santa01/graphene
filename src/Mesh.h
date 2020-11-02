@@ -32,6 +32,7 @@ namespace Graphene {
 
 class Mesh {
 public:
+    GRAPHENE_API Mesh(const std::shared_ptr<Geometry> geometry);
     GRAPHENE_API Mesh(const std::shared_ptr<Material> material, const std::shared_ptr<Geometry> geometry);
 
     GRAPHENE_API std::shared_ptr<Material> getMaterial() const;
@@ -39,6 +40,8 @@ public:
 
     GRAPHENE_API std::shared_ptr<Geometry> getGeometry() const;
     GRAPHENE_API void setGeometry(const std::shared_ptr<Geometry> geometry);
+
+    GRAPHENE_API void render();
 
 private:
     std::shared_ptr<Material> material;

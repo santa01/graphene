@@ -24,16 +24,8 @@
 
 namespace Graphene {
 
-enum DataBuffer {
-    BUFFER_VERTICES,
-    BUFFER_FACES
-};
-
-enum VertexAttribute {
-    ATTRIBUTE_POSITION,
-    ATTRIBUTE_NORMAL,
-    ATTRIBUTE_UV
-};
+enum DataBuffer { BUFFER_VERTICES, BUFFER_FACES };
+enum VertexAttribute { ATTRIBUTE_POSITION, ATTRIBUTE_NORMAL, ATTRIBUTE_UV };
 
 Geometry::Geometry(const void* data, int vertices, int faces):
         vertices(vertices),

@@ -23,6 +23,7 @@
 #include <Label.h>
 #include <ObjectManager.h>
 #include <Mesh.h>
+#include <Material.h>
 #include <ImageTexture.h>
 #include <RawImage.h>
 #include <algorithm>
@@ -35,8 +36,11 @@ Label::Label(int width, int height, const std::shared_ptr<Font> font):
     auto mesh = GetObjectManager().createQuad(FaceWinding::WINDING_CLOCKWISE);
     this->addMesh(mesh);
 
+    auto material = std::make_shared<Material>();
+    mesh->setMaterial(material);
+
     RawImage textureImage(width, height, 32);  // Data zeroed
-    mesh->getMaterial()->setDiffuseTexture(std::make_shared<ImageTexture>(textureImage));
+    material->setDiffuseTexture(std::make_shared<ImageTexture>(textureImage));
 }
 
 int Label::getWidth() const {

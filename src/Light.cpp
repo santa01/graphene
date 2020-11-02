@@ -125,22 +125,27 @@ void Light::setDirection(const Math::Vec3& direction) {
     this->targetAt(direction);
 }
 
-std::shared_ptr<UniformBuffer> Light::getLightBuffer() {
+void Light::bind(BindPoint bindPoint) {
     if (this->parametersDirty) {
-        LightBuffer buffer = { };
-        std::copy(this->color.data(), this->color.data() + 3, buffer.color);
-
-        buffer.type = this->lightType;
-        buffer.energy = this->energy;
-        buffer.falloff = this->falloff;
-        buffer.angle = this->angle;
-        buffer.blend = this->blend;
-
-        this->lightBuffer->update(&buffer, sizeof(buffer));
         this->parametersDirty = false;
+        this->updateLightBuffer();
     }
 
-    return this->lightBuffer;
+    this->lightBuffer->bind(bindPoint);
+}
+
+void Light::updateLightBuffer() {
+    LightBuffer buffer = { };
+
+    std::copy(this->color.data(), this->color.data() + 3, buffer.color);
+
+    buffer.type = this->lightType;
+    buffer.energy = this->energy;
+    buffer.falloff = this->falloff;
+    buffer.angle = this->angle;
+    buffer.blend = this->blend;
+
+    this->lightBuffer->update(&buffer, sizeof(buffer));
 }
 
 }  // namespace Graphene

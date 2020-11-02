@@ -35,7 +35,7 @@ layout(std140) uniform Material {
     float specularIntensity;
     int specularHardness;
     vec3 diffuseColor;
-    bool diffuseTexture;
+    bool hasDiffuseTexture;
     vec3 specularColor;
 } material;     // Unused
 

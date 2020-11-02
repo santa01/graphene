@@ -35,7 +35,7 @@ layout(std140) uniform Material {
     float specularIntensity;
     int specularHardness;
     vec3 diffuseColor;
-    bool diffuseTexture;
+    bool hasDiffuseTexture;
     vec3 specularColor;
 } material;
 
@@ -51,7 +51,7 @@ layout(location = 2) out vec4 outputPosition;
 layout(location = 3) out vec4 outputNormal;
 
 void main() {
-    vec3 diffuseColor = material.diffuseTexture ? texture(diffuseSampler, fragmentUV).rgb : material.diffuseColor;
+    vec3 diffuseColor = material.hasDiffuseTexture ? texture(diffuseSampler, fragmentUV).rgb : material.diffuseColor;
 
     outputDiffuse = vec4(diffuseColor, material.ambientIntensity);
     outputSpecular = vec4(material.specularColor, material.diffuseIntensity);

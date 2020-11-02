@@ -36,7 +36,7 @@ typedef struct {
     float specularIntensity;
     int specularHardness;
     float diffuseColor[3];
-    int diffuseTexture;
+    int hasDiffuseTexture;
     float specularColor[3];
 } MaterialBuffer;
 
@@ -126,23 +126,28 @@ void Material::setSpecularColor(const Math::Vec3& specularColor) {
     this->parametersDirty = true;
 }
 
-std::shared_ptr<UniformBuffer> Material::getMaterialBuffer() {
+void Material::bind(BindPoint bindPoint) {
     if (this->parametersDirty) {
-        MaterialBuffer material = { };
-        std::copy(this->diffuseColor.data(), this->diffuseColor.data() + 3, material.diffuseColor);
-        std::copy(this->specularColor.data(), this->specularColor.data() + 3, material.specularColor);
-
-        material.ambientIntensity = this->ambientIntensity;
-        material.diffuseIntensity = this->diffuseIntensity;
-        material.specularIntensity = this->specularIntensity;
-        material.specularHardness = this->specularHardness;
-        material.diffuseTexture = (this->diffuseTexture != nullptr);
-
-        this->materialBuffer->update(&material, sizeof(material));
         this->parametersDirty = false;
+        this->updateMaterialBuffer();
     }
 
-    return this->materialBuffer;
+    this->materialBuffer->bind(bindPoint);
+}
+
+void Material::updateMaterialBuffer() {
+    MaterialBuffer material = { };
+
+    std::copy(this->diffuseColor.data(), this->diffuseColor.data() + 3, material.diffuseColor);
+    std::copy(this->specularColor.data(), this->specularColor.data() + 3, material.specularColor);
+
+    material.ambientIntensity = this->ambientIntensity;
+    material.diffuseIntensity = this->diffuseIntensity;
+    material.specularIntensity = this->specularIntensity;
+    material.specularHardness = this->specularHardness;
+    material.hasDiffuseTexture = (this->diffuseTexture != nullptr);
+
+    this->materialBuffer->update(&material, sizeof(material));
 }
 
 }  // namespace Graphene

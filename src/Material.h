@@ -57,20 +57,21 @@ public:
     GRAPHENE_API const Math::Vec3& getSpecularColor() const;
     GRAPHENE_API void setSpecularColor(const Math::Vec3& specularColor);
 
-    GRAPHENE_API std::shared_ptr<UniformBuffer> getMaterialBuffer();
+    GRAPHENE_API void bind(BindPoint bindPoint);
 
 private:
+    void updateMaterialBuffer();
+
+    std::shared_ptr<UniformBuffer> materialBuffer;
     std::shared_ptr<Texture> diffuseTexture;
 
     float ambientIntensity = 1.0f;
     float diffuseIntensity = 1.0f;
     float specularIntensity = 0.5f;
     int specularHardness = 50;
-
     Math::Vec3 diffuseColor = { 1.0f, 1.0f, 1.0f };
     Math::Vec3 specularColor = { 1.0f, 1.0f, 1.0f };
 
-    std::shared_ptr<UniformBuffer> materialBuffer;
     bool parametersDirty = true;
 };
 

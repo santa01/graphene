@@ -43,7 +43,7 @@ void UniformBuffer::update(const void* data, size_t dataSize, size_t dataOffset)
     glBufferSubData(GL_UNIFORM_BUFFER, dataOffset, dataSize, data);
 }
 
-void UniformBuffer::bind(int bindPoint) {
+void UniformBuffer::bind(BindPoint bindPoint) {
     glBindBufferBase(GL_UNIFORM_BUFFER, bindPoint, this->ubo);
 }
 

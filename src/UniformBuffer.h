@@ -30,6 +30,8 @@
 
 namespace Graphene {
 
+enum BindPoint { BIND_MATERIAL, BIND_LIGHT };
+
 class UniformBuffer: public NonCopyable {
 public:
     GRAPHENE_API UniformBuffer(const void* data, size_t dataSize);
@@ -37,7 +39,7 @@ public:
 
     GRAPHENE_API void update(const void* data, size_t dataSize);
     GRAPHENE_API void update(const void* data, size_t dataSize, size_t dataOffset);
-    GRAPHENE_API void bind(int bindPoint);
+    GRAPHENE_API void bind(BindPoint bindPoint);
 
 private:
     GLuint ubo = 0;

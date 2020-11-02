@@ -95,7 +95,6 @@ void Window::update() {
         geometryBuffer->getSpecularTexture()->bind(TEXTURE_SPECULAR);
         geometryBuffer->getPositionTexture()->bind(TEXTURE_POSITION);
         geometryBuffer->getNormalTexture()->bind(TEXTURE_NORMAL);
-        geometryBuffer->getDepthTexture()->bind(TEXTURE_DEPTH);
 
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo);
         glDrawBuffer(GL_BACK);  // Double buffered

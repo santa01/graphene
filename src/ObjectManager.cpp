@@ -484,14 +484,11 @@ std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, FaceWi
 
     std::vector<std::shared_ptr<Mesh>>& meshes = meshesIt->second;
     if (meshes.at(winding) == nullptr) {
-        meshes.at(winding) = std::make_shared<Mesh>(nullptr, factory());
+        meshes.at(winding) = std::make_shared<Mesh>(factory());
     }
 
-    // Return a Mesh copy (same geometry, different material)
-    auto mesh = std::make_shared<Mesh>(*meshes.at(winding));
-    mesh->setMaterial(std::make_shared<Material>());
-
-    return mesh;
+    // Return a Mesh copy (same geometry, different materials)
+    return std::make_shared<Mesh>(*meshes.at(winding));
 }
 
 }  // namespace Graphene
