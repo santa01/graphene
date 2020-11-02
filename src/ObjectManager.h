@@ -44,7 +44,7 @@
 
 namespace Graphene {
 
-enum MeshWinding { WINDING_CLOCKWISE, WINDING_COUNTER_CLOCKWISE };
+enum FaceWinding { WINDING_CLOCKWISE, WINDING_COUNTER_CLOCKWISE };
 
 class ObjectManager: public NonCopyable {
 public:
@@ -57,8 +57,8 @@ public:
     GRAPHENE_API std::shared_ptr<Scene> createScene(const std::string& name);
     GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
 
-    GRAPHENE_API std::shared_ptr<Mesh> createQuad(MeshWinding winding);
-    GRAPHENE_API std::shared_ptr<Mesh> createCube(MeshWinding winding);
+    GRAPHENE_API std::shared_ptr<Mesh> createQuad(FaceWinding winding);
+    GRAPHENE_API std::shared_ptr<Mesh> createCube(FaceWinding winding);
 
     GRAPHENE_API void teardown();
 
@@ -70,8 +70,8 @@ private:
     std::shared_ptr<ImageCubeTexture> loadCubeTexture(const std::string& name);
     std::vector<std::shared_ptr<Mesh>> loadMeshes(const std::string& name);
 
-    typedef std::function<std::shared_ptr<Mesh>()> MeshFactory;
-    std::shared_ptr<Mesh> createMesh(const std::string& alias, MeshWinding winding, MeshFactory factory);
+    typedef std::function<std::shared_ptr<Geometry>()> GeometryFactory;
+    std::shared_ptr<Mesh> createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory);
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;

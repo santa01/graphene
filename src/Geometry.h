@@ -20,17 +20,33 @@
  * SOFTWARE.
  */
 
-#include <Skybox.h>
-#include <ObjectManager.h>
-#include <Mesh.h>
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
+#include <GrapheneApi.h>
+#include <NonCopyable.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 
-Skybox::Skybox(const std::shared_ptr<ImageCubeTexture> cubeTexture) {
-    auto mesh = GetObjectManager().createCube(FaceWinding::WINDING_COUNTER_CLOCKWISE);
-    this->addMesh(mesh);
+class Geometry: public NonCopyable {
+public:
+    GRAPHENE_API Geometry(const void* data, int vertices, int faces);
+    GRAPHENE_API ~Geometry();
 
-    mesh->getMaterial()->setDiffuseTexture(cubeTexture);
-}
+    GRAPHENE_API int getVertices() const;
+    GRAPHENE_API int getFaces() const;
+
+    GRAPHENE_API void render();
+
+private:
+    GLuint vao = 0;
+    GLuint buffers[2] = { };
+
+    int vertices = 0;
+    int faces = 0;
+};
 
 }  // namespace Graphene
+
+#endif  // GEOMETRY_H

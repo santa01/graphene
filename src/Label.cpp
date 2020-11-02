@@ -32,7 +32,7 @@ namespace Graphene {
 
 Label::Label(int width, int height, const std::shared_ptr<Font> font):
         font(font) {
-    auto mesh = GetObjectManager().createQuad(MeshWinding::WINDING_CLOCKWISE);
+    auto mesh = GetObjectManager().createQuad(FaceWinding::WINDING_CLOCKWISE);
     this->addMesh(mesh);
 
     RawImage textureImage(width, height, 32);  // Data zeroed

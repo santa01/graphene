@@ -77,7 +77,7 @@ RenderManager::RenderManager() {
     this->renderShader = this->defaultShader;
     this->renderShader->enable();
 
-    this->frame = GetObjectManager().createQuad(MeshWinding::WINDING_CLOCKWISE);
+    this->frame = GetObjectManager().createQuad(FaceWinding::WINDING_CLOCKWISE);
 }
 
 void RenderManager::setShadowPass(bool shadowPass) {
@@ -175,7 +175,7 @@ RenderStep RenderManager::renderEntities(const std::shared_ptr<Camera> camera) {
                 diffuseTexture->bind(TEXTURE_DIFFUSE);
             }
 
-            mesh->render();
+            mesh->getGeometry()->render();
         }
     });
 
@@ -208,7 +208,7 @@ RenderStep RenderManager::renderSkybox(const std::shared_ptr<Camera> camera) {
             diffuseTexture->bind(TEXTURE_DIFFUSE);
         }
 
-        mesh->render();
+        mesh->getGeometry()->render();
     }
 
     return RenderStep::NONE;
@@ -223,7 +223,7 @@ RenderStep RenderManager::renderFrame(const std::shared_ptr<Camera> camera) {
     this->renderShader->setUniform("ambientColor", scene->getAmbientColor());
     this->renderShader->setUniform("ambientEnergy", scene->getAmbientEnergy());
 
-    this->frame->render();
+    this->frame->getGeometry()->render();
 
     if (this->shadowPass) {
         return RenderStep::SHADOWS;
@@ -263,7 +263,7 @@ RenderStep RenderManager::renderLights(const std::shared_ptr<Camera> camera) {
 
         light->getLightBuffer()->bind(BIND_LIGHT);
 
-        this->frame->render();
+        this->frame->getGeometry()->render();
     });
 
     return RenderStep::NONE;

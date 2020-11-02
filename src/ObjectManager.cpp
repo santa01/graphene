@@ -24,6 +24,7 @@
 #include <EngineConfig.h>
 #include <Logger.h>
 #include <Material.h>
+#include <Geometry.h>
 #include <TgaImage.h>
 #include <Vec3.h>
 #include <stdexcept>
@@ -154,7 +155,7 @@ struct CubeGeometry {
 #pragma pack(pop)
 
 template<typename T>
-std::shared_ptr<Mesh> geometryToMesh(bool flipGeometry) {
+std::shared_ptr<Geometry> createGeometry(bool flipGeometry) {
     T geometry;
     int vertexElements = sizeof(geometry.vertices) / sizeof(float);
     int vertexIndices = sizeof(geometry.faces) / sizeof(int);
@@ -172,7 +173,7 @@ std::shared_ptr<Mesh> geometryToMesh(bool flipGeometry) {
         }
     }
 
-    return std::make_shared<Mesh>(&geometry, vertexElements / 3, vertexIndices / 3);
+    return std::make_shared<Geometry>(&geometry, vertexElements / 3, vertexIndices / 3);
 }
 
 ObjectManager& ObjectManager::getInstance() {
@@ -337,15 +338,15 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
     return shader;
 }
 
-std::shared_ptr<Mesh> ObjectManager::createQuad(MeshWinding winding) {
+std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
     return this->createMesh("QuadMesh", winding, [winding]() {
-        return geometryToMesh<QuadGeometry>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
+        return createGeometry<QuadGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
-std::shared_ptr<Mesh> ObjectManager::createCube(MeshWinding winding) {
+std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
     return this->createMesh("CubeMesh", winding, [winding]() {
-        return geometryToMesh<CubeGeometry>(winding == MeshWinding::WINDING_COUNTER_CLOCKWISE);
+        return createGeometry<CubeGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
@@ -437,9 +438,9 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
     std::vector<std::shared_ptr<Mesh>> meshes;
 
     for (int i = 0; i < meshesCount; i++) {
-        auto material = std::make_shared<Material>();
-
         file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
+
+        auto material = std::make_shared<Material>();
         material->setAmbientIntensity(objectMaterial.ambientIntensity);
         material->setDiffuseIntensity(objectMaterial.diffuseIntensity);
         material->setDiffuseColor(Math::Vec3(objectMaterial.diffuseColor[0],
@@ -465,8 +466,8 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
         std::unique_ptr<char[]> meshData(new char[meshDataSize]);
         file.read(meshData.get(), meshDataSize);
 
-        auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
-        mesh->setMaterial(material);
+        auto geometry = std::make_shared<Geometry>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
+        auto mesh = std::make_shared<Mesh>(material, geometry);
 
         meshes.push_back(mesh);
     }
@@ -474,7 +475,7 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
     return meshes;
 }
 
-std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, MeshWinding winding, MeshFactory factory) {
+std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory) {
     auto meshesIt = this->meshCache.find(alias);
     if (meshesIt == this->meshCache.end()) {
         std::vector<std::shared_ptr<Mesh>> meshes = { nullptr, nullptr };
@@ -483,10 +484,10 @@ std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, MeshWi
 
     std::vector<std::shared_ptr<Mesh>>& meshes = meshesIt->second;
     if (meshes.at(winding) == nullptr) {
-        meshes.at(winding) = factory();
+        meshes.at(winding) = std::make_shared<Mesh>(nullptr, factory());
     }
 
-    // Return a Mesh copy (same OpenGL objects, different material)
+    // Return a Mesh copy (same geometry, different material)
     auto mesh = std::make_shared<Mesh>(*meshes.at(winding));
     mesh->setMaterial(std::make_shared<Material>());
 
