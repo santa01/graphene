@@ -56,7 +56,6 @@ void Viewport::setCamera(const std::shared_ptr<Camera> camera) {
     }
 
     this->camera = camera;
-    this->camera->setAspectRatio(static_cast<float>(this->width) / static_cast<float>(this->height));
 }
 
 std::shared_ptr<Camera> Viewport::getCamera() const {
@@ -66,6 +65,12 @@ std::shared_ptr<Camera> Viewport::getCamera() const {
 void Viewport::update() {
     if (this->camera == nullptr) {
         return;
+    }
+
+    // If camera is shared between multiple viewports
+    float aspectRatio = static_cast<float>(this->width) / static_cast<float>(this->height);
+    if (this->camera->getAspectRatio() != aspectRatio) {
+        this->camera->setAspectRatio(aspectRatio);
     }
 
     glViewport(this->left, this->top, this->width, this->height);
