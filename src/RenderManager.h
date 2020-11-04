@@ -25,19 +25,15 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <RenderState.h>
 #include <Camera.h>
-#include <Shader.h>
 #include <Mesh.h>
-#include <utility>
+#include <unordered_map>
 #include <memory>
-#include <functional>
 
 #define GetRenderManager() RenderManager::getInstance()
 
 namespace Graphene {
-
-enum class RenderStep { GEOMETRY, SKYBOX, FRAME, SHADOWS, LIGHTS, OVERLAY, BUFFER, NONE };
-typedef std::function<void(const std::shared_ptr<Object>)> RenderCallback;
 
 class RenderManager: public NonCopyable {
 public:
@@ -49,42 +45,25 @@ public:
     GRAPHENE_API void setLightPass(bool lightPass);
     GRAPHENE_API bool hasLightPass() const;
 
-    GRAPHENE_API void setRenderShader(RenderStep renderStep, std::shared_ptr<Shader> renderShader);
-    GRAPHENE_API std::shared_ptr<Shader> getRenderShader(RenderStep renderStep) const;
+    GRAPHENE_API std::shared_ptr<Mesh> getFrame() const;
 
-    GRAPHENE_API void setRenderCallback(RenderStep renderStep, RenderCallback callback);
-    GRAPHENE_API const RenderCallback& getRenderCallback(RenderStep renderStep) const;
+    GRAPHENE_API void setRenderState(RenderStateType stateType);
+    GRAPHENE_API std::shared_ptr<RenderState> getRenderState(RenderStateType stateType) const;
 
-    GRAPHENE_API void setRenderStep(RenderStep renderStep);
-    GRAPHENE_API RenderStep getRenderStep() const;
+    GRAPHENE_API void update(const std::shared_ptr<Camera> camera);
 
-    GRAPHENE_API void render(const std::shared_ptr<Camera> camera);
     GRAPHENE_API void teardown();
 
 private:
     RenderManager();
 
-    RenderStep renderEntities(const std::shared_ptr<Camera> camera);
-    RenderStep renderSkybox(const std::shared_ptr<Camera> camera);
-    RenderStep renderFrame(const std::shared_ptr<Camera> camera);
-    RenderStep renderShadows(const std::shared_ptr<Camera> camera);
-    RenderStep renderLights(const std::shared_ptr<Camera> camera);
-
-    std::unordered_map<RenderStep, std::shared_ptr<Shader>> shaders;
-    std::unordered_map<RenderStep, RenderCallback> callbacks;
-
-    typedef std::function<RenderStep(const std::shared_ptr<Camera>)> Renderer;
-    std::unordered_map<RenderStep, Renderer> renderers;
-
-    RenderStep renderStep = RenderStep::NONE;
-    RenderCallback renderCallback;
-
-    std::shared_ptr<Shader> renderShader;
-    std::shared_ptr<Shader> defaultShader;
-    std::shared_ptr<Mesh> frame;
-
     bool shadowPass = false;
     bool lightPass = false;
+
+    std::shared_ptr<Mesh> frame;
+
+    std::unordered_map<RenderStateType, std::shared_ptr<RenderState>> renderStates;
+    std::shared_ptr<RenderState> renderState;
 };
 
 }  // namespace Graphene

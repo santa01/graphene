@@ -26,7 +26,6 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
-#include <cassert>
 
 namespace Graphene {
 

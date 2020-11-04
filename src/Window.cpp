@@ -103,7 +103,7 @@ void Window::update() {
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
 
-        GetRenderManager().setRenderStep(RenderStep::FRAME);
+        GetRenderManager().setRenderState(RenderStateType::FRAME);
         viewport->update();
     }
 
@@ -111,7 +111,7 @@ void Window::update() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     for (auto& overlay: this->overlays) {
-        GetRenderManager().setRenderStep(RenderStep::OVERLAY);
+        GetRenderManager().setRenderState(RenderStateType::OVERLAY);
         overlay->update();
     }
 

@@ -55,7 +55,9 @@ public:
     GRAPHENE_API std::shared_ptr<Skybox> createSkybox(const std::string& name);
     GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
     GRAPHENE_API std::shared_ptr<Scene> createScene(const std::string& name);
+
     GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
+    GRAPHENE_API std::shared_ptr<Shader> createShader();
 
     GRAPHENE_API std::shared_ptr<Mesh> createQuad(FaceWinding winding);
     GRAPHENE_API std::shared_ptr<Mesh> createCube(FaceWinding winding);

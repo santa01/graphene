@@ -338,6 +338,22 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
     return shader;
 }
 
+std::shared_ptr<Shader> ObjectManager::createShader() {
+    static const std::string shaderName("dummy");
+    static const std::string shaderSource("{SHADER_VERSION}\n{SHADER_TYPE}\nvoid main() { }\n");
+
+    auto shaderIt = this->shaderCache.find(shaderName);
+    if (shaderIt != this->shaderCache.end()) {
+        return shaderIt->second;
+    }
+
+    auto shader = std::make_shared<Shader>(shaderSource);
+    shader->setName(shaderName);
+
+    this->shaderCache.emplace(shaderName, shader);
+    return shader;
+}
+
 std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
     return this->createMesh("QuadMesh", winding, [winding]() {
         return createGeometry<QuadGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);

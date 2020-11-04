@@ -74,7 +74,7 @@ void Viewport::update() {
     }
 
     glViewport(this->left, this->top, this->width, this->height);
-    GetRenderManager().render(this->camera);
+    GetRenderManager().update(this->camera);
 }
 
 }  // namespace Graphene

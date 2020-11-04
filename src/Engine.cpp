@@ -233,11 +233,11 @@ void Engine::setupEngine() {
     auto& renderManager = GetRenderManager();
     auto& objectManager = GetObjectManager();
 
-    renderManager.setRenderShader(RenderStep::GEOMETRY, objectManager.createShader("shaders/geometry_output.shader"));
-    renderManager.setRenderShader(RenderStep::SKYBOX, objectManager.createShader("shaders/skybox_output.shader"));
-    renderManager.setRenderShader(RenderStep::FRAME, objectManager.createShader("shaders/ambient_lighting.shader"));
-    renderManager.setRenderShader(RenderStep::LIGHTS, objectManager.createShader("shaders/deferred_lighting.shader"));
-    renderManager.setRenderShader(RenderStep::OVERLAY, objectManager.createShader("shaders/overlay_output.shader"));
+    renderManager.getRenderState(RenderStateType::GEOMETRY)->setShader(objectManager.createShader("shaders/geometry_output.shader"));
+    renderManager.getRenderState(RenderStateType::OVERLAY)->setShader(objectManager.createShader("shaders/overlay_output.shader"));
+    renderManager.getRenderState(RenderStateType::SKYBOX)->setShader(objectManager.createShader("shaders/skybox_output.shader"));
+    renderManager.getRenderState(RenderStateType::FRAME)->setShader(objectManager.createShader("shaders/ambient_lighting.shader"));
+    renderManager.getRenderState(RenderStateType::LIGHTS)->setShader(objectManager.createShader("shaders/deferred_lighting.shader"));
 
     this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetup, this));
     this->onTeardownSignal.connect(Signals::Slot<>(&Engine::onTeardown, this));
