@@ -49,7 +49,7 @@ const RenderCallback& RenderState::getCallback() const {
     return this->callback;
 }
 
-void RenderState::enter(RenderManager* renderManager) {
+void RenderState::enter(RenderManager* /*renderManager*/) {
     this->shader->enable();
 }
 
@@ -134,7 +134,7 @@ RenderStateType RenderFrame::update(RenderManager* renderManager, const std::sha
     return RenderStateType::NONE;
 }
 
-RenderStateType RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) {
+RenderStateType RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera> /*camera*/) {
     if (renderManager->hasLightPass()) {
         return RenderStateType::LIGHTS;
     }
