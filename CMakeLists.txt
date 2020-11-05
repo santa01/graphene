@@ -48,7 +48,7 @@ endif ()
 
 set (GRAPHENE_NAME Graphene)
 set (GRAPHENE_DESCRIPTION "OpenGL-based Graphics Engine")
-set (GRAPHENE_VERSION 0.2.0)
+set (GRAPHENE_VERSION 0.2.1)
 
 set (GRAPHENE_LIBRARY graphene)
 set (GRAPHENE_STATIC ${GRAPHENE_LIBRARY}-static)

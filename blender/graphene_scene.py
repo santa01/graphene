@@ -23,7 +23,7 @@
 bl_info = {
     "name": "Graphene scene format",
     "author": "Pavlo Lavrenenko",
-    "version": (0, 2, 0),
+    "version": (0, 2, 1),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Export scene for Graphene engine",
