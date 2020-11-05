@@ -59,7 +59,7 @@ protected:
 
 class RenderGeometry: public RenderState {
 public:
-    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera);
+    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) override;
 };
 
 class RenderOverlay: public RenderGeometry { };
@@ -67,27 +67,27 @@ class RenderBuffer: public RenderGeometry { };
 
 class RenderSkybox: public RenderState {
 public:
-    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera);
+    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) override;
 };
 
 class RenderFrame: public RenderState {
 public:
-    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera);
+    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) override;
 };
 
 class RenderShadows: public RenderState {
 public:
-    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera);
+    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) override;
 };
 
 class RenderLights: public RenderState {
 public:
-    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera);
+    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) override;
 };
 
 class RenderNone: public RenderState {
 public:
-    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera);
+    GRAPHENE_API RenderStateType update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) override;
 };
 
 }  // namespace Graphene
