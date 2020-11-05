@@ -23,6 +23,7 @@
 #if defined(_WIN32)
 
 #include <Win32Window.h>
+#include <EngineConfig.h>
 #include <Input.h>
 #include <Logger.h>
 #include <windowsx.h>
@@ -374,10 +375,16 @@ void Win32Window::createExtContext(HWND window) {
         throw std::runtime_error(LogFormat("SetPixelFormat()"));
     }
 
+    int contextFlags = 0;
+    if (GetEngineConfig().isDebug()) {
+        contextFlags |= WGL_CONTEXT_DEBUG_BIT_ARB;
+    }
+
     const int contextAttribList[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | WGL_CONTEXT_DEBUG_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        WGL_CONTEXT_FLAGS_ARB, contextFlags,
         0
     };
 
