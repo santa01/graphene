@@ -48,11 +48,11 @@ bool FrameBuffer::isAlphaBlending() const {
     return this->alphaBlending;
 }
 
-std::shared_ptr<Texture> FrameBuffer::getOutputTexture() const {
+const std::shared_ptr<Texture>& FrameBuffer::getOutputTexture() const {
     return this->outputTexture;
 }
 
-std::shared_ptr<DepthTexture> FrameBuffer::getDepthTexture() const {
+const std::shared_ptr<DepthTexture>& FrameBuffer::getDepthTexture() const {
     return this->depthTexture;
 }
 

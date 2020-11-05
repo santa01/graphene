@@ -39,8 +39,8 @@ public:
     GRAPHENE_API void setAlphaBlending(bool alphaBlending);
     GRAPHENE_API bool isAlphaBlending() const;
 
-    GRAPHENE_API std::shared_ptr<Texture> getOutputTexture() const;
-    GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture() const;
+    GRAPHENE_API const std::shared_ptr<Texture>& getOutputTexture() const;
+    GRAPHENE_API const std::shared_ptr<DepthTexture>& getDepthTexture() const;
 
     GRAPHENE_API void getPixel(int x, int y, GLenum pixelFormat, GLenum pixelType, void* pixel) const;
     GRAPHENE_API void update() override;

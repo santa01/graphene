@@ -31,7 +31,7 @@ namespace Graphene {
 
 class Skybox: public Entity {
 public:
-    GRAPHENE_API Skybox(const std::shared_ptr<ImageCubeTexture> cubeTexture);
+    GRAPHENE_API Skybox(const std::shared_ptr<ImageCubeTexture>& cubeTexture);
 };
 
 }  // namespace Graphene

@@ -55,25 +55,21 @@ const std::unordered_set<std::string>& Window::getSupportedExtensions() const {
     return this->availableExtensions;
 }
 
-std::shared_ptr<Overlay> Window::createOverlay(int left, int top, int width, int height) {
+const std::shared_ptr<Overlay>& Window::createOverlay(int left, int top, int width, int height) {
     auto overlay = std::make_shared<Overlay>(left, top, width, height);
-    this->overlays.insert(overlay);
-
-    return overlay;
+    return *this->overlays.insert(overlay).first;
 }
 
 const std::unordered_set<std::shared_ptr<Overlay>>& Window::getOverlays() const {
     return this->overlays;
 }
 
-std::shared_ptr<Viewport> Window::createViewport(int left, int top, int width, int height) {
+const std::shared_ptr<Viewport>& Window::createViewport(int left, int top, int width, int height) {
     auto geometryBuffer = std::make_shared<GeometryBuffer>(width, height);
-    auto geometryViewport = geometryBuffer->createViewport(0, 0, width, height);
+    geometryBuffer->createViewport(0, 0, width, height);
 
-    auto viewport = RenderTarget::createViewport(left, top, width, height);
-    this->geometryBuffers.emplace(viewport, geometryBuffer);
-
-    return viewport;
+    auto& viewport = RenderTarget::createViewport(left, top, width, height);
+    return this->geometryBuffers.emplace(viewport, geometryBuffer).first->first;
 }
 
 void Window::update() {
@@ -86,8 +82,8 @@ void Window::update() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (auto& viewport: this->viewports) {
-        auto geometryBuffer = this->geometryBuffers.at(viewport);
-        auto geometryViewport = *geometryBuffer->getViewports().begin();
+        auto& geometryBuffer = this->geometryBuffers.at(viewport);
+        auto& geometryViewport = *geometryBuffer->getViewports().begin();
         geometryViewport->setCamera(viewport->getCamera());
 
         geometryBuffer->update();

@@ -33,13 +33,13 @@ namespace Graphene {
 
 class Label: public Entity {
 public:
-    GRAPHENE_API Label(int width, int height, const std::shared_ptr<Font> font);
+    GRAPHENE_API Label(int width, int height, const std::shared_ptr<Font>& font);
 
     GRAPHENE_API int getWidth() const;
     GRAPHENE_API int getHeight() const;
 
-    GRAPHENE_API void setFont(const std::shared_ptr<Font> font);
-    GRAPHENE_API const std::shared_ptr<Font> getFont() const;
+    GRAPHENE_API void setFont(const std::shared_ptr<Font>& font);
+    GRAPHENE_API const std::shared_ptr<Font>& getFont() const;
 
     GRAPHENE_API void setText(const std::wstring& text);
     GRAPHENE_API const std::wstring& getText() const;

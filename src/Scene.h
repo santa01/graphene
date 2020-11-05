@@ -46,12 +46,12 @@ class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
     GRAPHENE_API Scene();
 
-    GRAPHENE_API std::shared_ptr<SceneNode> createNode();
-    GRAPHENE_API std::shared_ptr<SceneNode> getRootNode();
-    GRAPHENE_API std::shared_ptr<SceneNode> getPlayer();
+    GRAPHENE_API const std::shared_ptr<SceneNode> createNode();
+    GRAPHENE_API const std::shared_ptr<SceneNode>& getRootNode();
+    GRAPHENE_API const std::shared_ptr<SceneNode>& getPlayer();
 
-    GRAPHENE_API void setSkybox(const std::shared_ptr<Skybox> skybox);
-    GRAPHENE_API std::shared_ptr<Skybox> getSkybox() const;
+    GRAPHENE_API void setSkybox(const std::shared_ptr<Skybox>& skybox);
+    GRAPHENE_API const std::shared_ptr<Skybox>& getSkybox() const;
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& sceneName);
@@ -63,9 +63,9 @@ public:
     GRAPHENE_API void setAmbientEnergy(float ambientEnergy);
     GRAPHENE_API float getAmbientEnergy() const;
 
-    GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera> camera);
-    GRAPHENE_API static Math::Mat4 calculateView(const std::shared_ptr<Camera> camera);
-    GRAPHENE_API static Math::Vec3 calculatePosition(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API static Math::Mat4 calculateModelView(const std::shared_ptr<Camera>& camera);
+    GRAPHENE_API static Math::Mat4 calculateView(const std::shared_ptr<Camera>& camera);
+    GRAPHENE_API static Math::Vec3 calculatePosition(const std::shared_ptr<Camera>& camera);
 
     GRAPHENE_API void iterateEntities(EntityHandler handler);
     GRAPHENE_API void iterateLights(LightHandler handler);

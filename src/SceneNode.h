@@ -39,18 +39,18 @@ class Scene;
 class SceneNode: public std::enable_shared_from_this<SceneNode>,
         public Rotatable, public Scalable, public Movable, public NonCopyable {
 public:
-    GRAPHENE_API SceneNode(const std::shared_ptr<Scene> scene);
+    GRAPHENE_API SceneNode(const std::shared_ptr<Scene>& scene);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes() const;
-    GRAPHENE_API void attachNode(std::shared_ptr<SceneNode> node);
-    GRAPHENE_API void detachNode(std::shared_ptr<SceneNode> node);
+    GRAPHENE_API void attachNode(const std::shared_ptr<SceneNode>& node);
+    GRAPHENE_API void detachNode(const std::shared_ptr<SceneNode>& node);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Object>>& getObjects() const;
-    GRAPHENE_API void attachObject(std::shared_ptr<Object> object);
-    GRAPHENE_API void detachObject(std::shared_ptr<Object> object);
+    GRAPHENE_API void attachObject(const std::shared_ptr<Object>& object);
+    GRAPHENE_API void detachObject(const std::shared_ptr<Object>& object);
 
-    GRAPHENE_API std::shared_ptr<Scene> getScene() const;
-    GRAPHENE_API std::shared_ptr<SceneNode> getParent() const;
+    GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
+    GRAPHENE_API const std::shared_ptr<SceneNode> getParent() const;
 
 private:
     std::unordered_set<std::shared_ptr<SceneNode>> nodes;

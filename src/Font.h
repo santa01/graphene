@@ -45,8 +45,8 @@ public:
     GRAPHENE_API int getSize() const;
     GRAPHENE_API int getDPI() const;
 
-    GRAPHENE_API std::shared_ptr<Image> renderChar(wchar_t charCode);
-    GRAPHENE_API std::shared_ptr<Image> renderString(const std::wstring& stringText);
+    GRAPHENE_API const std::shared_ptr<Image> renderChar(wchar_t charCode);
+    GRAPHENE_API const std::shared_ptr<Image> renderString(const std::wstring& stringText);
 
 private:
     typedef struct {

@@ -40,7 +40,7 @@ public:
     GRAPHENE_API int getWidth() const;
     GRAPHENE_API int getHeight() const;
 
-    GRAPHENE_API virtual std::shared_ptr<Viewport> createViewport(int left, int top, int width, int height);
+    GRAPHENE_API virtual const std::shared_ptr<Viewport>& createViewport(int left, int top, int width, int height);
     GRAPHENE_API virtual const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() const;
 
     GRAPHENE_API virtual void update() = 0;

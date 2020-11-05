@@ -47,23 +47,23 @@ GeometryBuffer::~GeometryBuffer() {
     glDeleteFramebuffers(1, &this->fbo);
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getDiffuseTexture() const {
+const std::shared_ptr<GeometryTexture>& GeometryBuffer::getDiffuseTexture() const {
     return this->diffuseTexture;
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getSpecularTexture() const {
+const std::shared_ptr<GeometryTexture>& GeometryBuffer::getSpecularTexture() const {
     return this->specularTexture;
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getPositionTexture() const {
+const std::shared_ptr<GeometryTexture>& GeometryBuffer::getPositionTexture() const {
     return this->positionTexture;
 }
 
-std::shared_ptr<GeometryTexture> GeometryBuffer::getNormalTexture() const {
+const std::shared_ptr<GeometryTexture>& GeometryBuffer::getNormalTexture() const {
     return this->normalTexture;
 }
 
-std::shared_ptr<DepthTexture> GeometryBuffer::getDepthTexture() const {
+const std::shared_ptr<DepthTexture>& GeometryBuffer::getDepthTexture() const {
     return this->depthTexture;
 }
 

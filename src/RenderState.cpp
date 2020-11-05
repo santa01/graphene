@@ -33,11 +33,11 @@
 
 namespace Graphene {
 
-void RenderState::setShader(const std::shared_ptr<Shader> shader) {
+void RenderState::setShader(const std::shared_ptr<Shader>& shader) {
     this->shader = shader;
 }
 
-std::shared_ptr<Shader> RenderState::getShader() const {
+const std::shared_ptr<Shader>& RenderState::getShader() const {
     return this->shader;
 }
 
@@ -53,24 +53,24 @@ void RenderState::enter(RenderManager* /*renderManager*/) {
     this->shader->enable();
 }
 
-RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera> camera) {
+RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getParent()->getScene();
 
     this->shader->setUniformBlock("Material", BIND_MATERIAL);
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->shader->setUniform("modelViewProjection", camera->getProjection() * Scene::calculateModelView(camera));
 
-    scene->iterateEntities([this](const std::shared_ptr<Entity> entity, const Math::Mat4& localWorld, const Math::Mat4& normalRotation) {
+    scene->iterateEntities([this](const std::shared_ptr<Entity>& entity, const Math::Mat4& localWorld, const Math::Mat4& normalRotation) {
         this->callback(this, entity);
 
         this->shader->setUniform("localWorld", localWorld);
         this->shader->setUniform("normalRotation", normalRotation);
 
         for (auto& mesh: entity->getMeshes()) {
-            auto material = mesh->getMaterial();
+            auto& material = mesh->getMaterial();
             material->bind(BIND_MATERIAL);
 
-            auto texture = material->getDiffuseTexture();
+            auto& texture = material->getDiffuseTexture();
             if (texture != nullptr) {
                 texture->bind(TEXTURE_DIFFUSE);
             }
@@ -82,9 +82,9 @@ RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const s
     return RenderStateType::SKYBOX;
 }
 
-RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera> camera) {
+RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getParent()->getScene();
-    auto skybox = scene->getSkybox();
+    auto& skybox = scene->getSkybox();
 
     if (skybox == nullptr) {
         return RenderStateType::NONE;
@@ -97,10 +97,10 @@ RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std
     this->shader->setUniform("modelViewProjection", camera->getProjection() * Scene::calculateView(camera));
 
     for (auto& mesh: skybox->getMeshes()) {
-        auto material = mesh->getMaterial();
+        auto& material = mesh->getMaterial();
         material->bind(BIND_MATERIAL);
 
-        auto texture = material->getDiffuseTexture();
+        auto& texture = material->getDiffuseTexture();
         if (texture != nullptr) {
             texture->bind(TEXTURE_DIFFUSE);
         }
@@ -111,9 +111,9 @@ RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std
     return RenderStateType::NONE;
 }
 
-RenderStateType RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) {
+RenderStateType RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getParent()->getScene();
-    auto frame = renderManager->getFrame();
+    auto& frame = renderManager->getFrame();
 
     this->callback(this, nullptr);
 
@@ -134,7 +134,7 @@ RenderStateType RenderFrame::update(RenderManager* renderManager, const std::sha
     return RenderStateType::NONE;
 }
 
-RenderStateType RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera> /*camera*/) {
+RenderStateType RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera>& /*camera*/) {
     if (renderManager->hasLightPass()) {
         return RenderStateType::LIGHTS;
     }
@@ -142,9 +142,9 @@ RenderStateType RenderShadows::update(RenderManager* renderManager, const std::s
     return RenderStateType::NONE;
 }
 
-RenderStateType RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera> camera) {
+RenderStateType RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getParent()->getScene();
-    auto frame = renderManager->getFrame();
+    auto& frame = renderManager->getFrame();
 
     this->shader->setUniformBlock("Light", BIND_LIGHT);
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
@@ -153,7 +153,7 @@ RenderStateType RenderLights::update(RenderManager* renderManager, const std::sh
     this->shader->setUniform("normalSampler", TEXTURE_NORMAL);
     this->shader->setUniform("cameraPosition", Scene::calculatePosition(camera));
 
-    scene->iterateLights([this, &frame](const std::shared_ptr<Light> light, const Math::Vec3& position, const Math::Vec3& direction) {
+    scene->iterateLights([this, &frame](const std::shared_ptr<Light>& light, const Math::Vec3& position, const Math::Vec3& direction) {
         this->callback(this, light);
 
         this->shader->setUniform("lightPosition", position);
@@ -167,7 +167,7 @@ RenderStateType RenderLights::update(RenderManager* renderManager, const std::sh
     return RenderStateType::NONE;
 }
 
-RenderStateType RenderNone::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera> /*camera*/) {
+RenderStateType RenderNone::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& /*camera*/) {
     throw std::runtime_error(LogFormat("RenderNone state cannot be updated"));
 }
 

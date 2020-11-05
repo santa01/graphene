@@ -155,7 +155,7 @@ struct CubeGeometry {
 #pragma pack(pop)
 
 template<typename T>
-std::shared_ptr<Geometry> createGeometry(bool flipGeometry) {
+const std::shared_ptr<Geometry> createGeometry(bool flipGeometry) {
     T geometry;
     int vertexElements = sizeof(geometry.vertices) / sizeof(float);
     int vertexIndices = sizeof(geometry.faces) / sizeof(int);
@@ -181,22 +181,22 @@ ObjectManager& ObjectManager::getInstance() {
     return instance;
 }
 
-std::shared_ptr<Camera> ObjectManager::createCamera(ProjectionType type) const {
+const std::shared_ptr<Camera> ObjectManager::createCamera(ProjectionType type) const {
     auto camera = std::make_shared<Camera>(type);
     camera->setFov(GetEngineConfig().getFov());
 
     return camera;
 }
 
-std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
+const std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
     return std::make_shared<Light>(type);
 }
 
-std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& name) {
-    return std::make_shared<Skybox>(this->loadCubeTexture(name));
+const std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& name) {
+    return std::make_shared<Skybox>(std::dynamic_pointer_cast<ImageCubeTexture>(this->loadCubeTexture(name)));
 }
 
-std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
+const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     std::vector<std::shared_ptr<Mesh>> meshes;
 
     auto meshesIt = this->meshCache.find(name);
@@ -206,7 +206,6 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     } else {
         LogDebug("Load entity from '%s'", name.c_str());
         meshes = this->loadMeshes(name);
-        this->meshCache.emplace(name, meshes);
     }
 
     auto entity = std::make_shared<Entity>();
@@ -217,7 +216,7 @@ std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     return entity;
 }
 
-std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
+const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
     std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
@@ -236,7 +235,7 @@ std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
                            sceneDefinition.ambientColor[2]);
     scene->setAmbientEnergy(sceneDefinition.ambientEnergy);
 
-    auto player = scene->getPlayer();
+    auto& player = scene->getPlayer();
     player->translate(sceneDefinition.playerPosition[0],
                       sceneDefinition.playerPosition[1],
                       sceneDefinition.playerPosition[2]);
@@ -250,7 +249,7 @@ std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
         scene->setSkybox(this->createSkybox(parentDirectory + skyboxTexture));
     }
 
-    auto sceneRoot = scene->getRootNode();
+    auto& sceneRoot = scene->getRootNode();
     sceneRoot->attachNode(player);
 
     float pi = static_cast<float>(M_PI);
@@ -309,7 +308,7 @@ std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
     return scene;
 }
 
-std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
+const std::shared_ptr<Shader>& ObjectManager::createShader(const std::string& name) {
     auto shaderIt = this->shaderCache.find(name);
     if (shaderIt != this->shaderCache.end()) {
         LogDebug("Reuse cached '%s' shader", name.c_str());
@@ -334,11 +333,10 @@ std::shared_ptr<Shader> ObjectManager::createShader(const std::string& name) {
     auto shader = std::make_shared<Shader>(shaderSource);
     shader->setName(name);
 
-    this->shaderCache.emplace(name, shader);
-    return shader;
+    return this->shaderCache.emplace(name, shader).first->second;
 }
 
-std::shared_ptr<Shader> ObjectManager::createShader() {
+const std::shared_ptr<Shader>& ObjectManager::createShader() {
     static const std::string shaderName("dummy");
     static const std::string shaderSource("{SHADER_VERSION}\n{SHADER_TYPE}\nvoid main() { }\n");
 
@@ -350,17 +348,16 @@ std::shared_ptr<Shader> ObjectManager::createShader() {
     auto shader = std::make_shared<Shader>(shaderSource);
     shader->setName(shaderName);
 
-    this->shaderCache.emplace(shaderName, shader);
-    return shader;
+    return this->shaderCache.emplace(shaderName, shader).first->second;
 }
 
-std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
+const std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
     return this->createMesh("QuadMesh", winding, [winding]() {
         return createGeometry<QuadGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);
     });
 }
 
-std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
+const std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
     return this->createMesh("CubeMesh", winding, [winding]() {
         return createGeometry<CubeGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);
     });
@@ -397,26 +394,25 @@ void ObjectManager::validateHeader(std::ifstream& file, const std::string& magic
     }
 }
 
-std::shared_ptr<ImageTexture> ObjectManager::loadTexture(const std::string& name) {
+const std::shared_ptr<Texture>& ObjectManager::loadImageTexture(const std::string& name) {
     auto textureIt = this->textureCache.find(name);
     if (textureIt != this->textureCache.end()) {
         LogDebug("Reuse cached '%s' texture", name.c_str());
-        return std::dynamic_pointer_cast<ImageTexture>(textureIt->second);
+        return textureIt->second;
     }
 
     LogDebug("Load texture from '%s'", name.c_str());
     TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name, true);
     auto texture = std::make_shared<ImageTexture>(textureImage);
 
-    this->textureCache.emplace(name, texture);
-    return texture;
+    return this->textureCache.emplace(name, texture).first->second;
 }
 
-std::shared_ptr<ImageCubeTexture> ObjectManager::loadCubeTexture(const std::string& name) {
+const std::shared_ptr<Texture>& ObjectManager::loadCubeTexture(const std::string& name) {
     auto textureIt = this->textureCache.find(name);
     if (textureIt != this->textureCache.end()) {
         LogDebug("Reuse cached '%s/*.tga' textures", name.c_str());
-        return std::dynamic_pointer_cast<ImageCubeTexture>(textureIt->second);
+        return textureIt->second;
     }
 
     LogDebug("Load textures from '%s/*.tga'", name.c_str());
@@ -432,11 +428,10 @@ std::shared_ptr<ImageCubeTexture> ObjectManager::loadCubeTexture(const std::stri
     };
 
     auto texture = std::make_shared<ImageCubeTexture>(textureCubeImage);
-    this->textureCache.emplace(name, texture);
-    return texture;
+    return this->textureCache.emplace(name, texture).first->second;
 }
 
-std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& name) {
+const std::vector<std::shared_ptr<Mesh>>& ObjectManager::loadMeshes(const std::string& name) {
     std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
@@ -451,7 +446,7 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
 
     ObjectMaterial objectMaterial;
     ObjectGeometry objectGeometry;
-    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Mesh>>& meshes = this->meshCache[name];
 
     for (int i = 0; i < meshesCount; i++) {
         file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
@@ -472,7 +467,7 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
         std::string diffuseTexture(objectMaterial.diffuseTexture);
         if (!diffuseTexture.empty()) {
             std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
-            material->setDiffuseTexture(this->loadTexture(parentDirectory + diffuseTexture));
+            material->setDiffuseTexture(this->loadImageTexture(parentDirectory + diffuseTexture));
         }
 
         file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
@@ -491,7 +486,7 @@ std::vector<std::shared_ptr<Mesh>> ObjectManager::loadMeshes(const std::string& 
     return meshes;
 }
 
-std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory) {
+const std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory) {
     auto meshesIt = this->meshCache.find(alias);
     if (meshesIt == this->meshCache.end()) {
         std::vector<std::shared_ptr<Mesh>> meshes = { nullptr, nullptr };

@@ -36,8 +36,8 @@ class Material: public NonCopyable {
 public:
     GRAPHENE_API Material();
 
-    GRAPHENE_API std::shared_ptr<Texture> getDiffuseTexture() const;
-    GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<Texture> diffuseTexture);
+    GRAPHENE_API const std::shared_ptr<Texture>& getDiffuseTexture() const;
+    GRAPHENE_API void setDiffuseTexture(const std::shared_ptr<Texture>& diffuseTexture);
 
     GRAPHENE_API float getAmbientIntensity() const;
     GRAPHENE_API void setAmbientIntensity(float ambientIntensity);

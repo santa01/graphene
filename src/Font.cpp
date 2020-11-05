@@ -77,8 +77,8 @@ int Font::getDPI() const {
     return this->dpi;
 }
 
-std::shared_ptr<Image> Font::renderChar(wchar_t charCode) {
-    std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(charCode);
+const std::shared_ptr<Image> Font::renderChar(wchar_t charCode) {
+    auto charGlyph = this->getCharGlyph(charCode);
     if (charGlyph == nullptr) {
         return nullptr;
     }
@@ -89,12 +89,12 @@ std::shared_ptr<Image> Font::renderChar(wchar_t charCode) {
     return std::make_shared<RawImage>(charBitmap.width, charBitmap.rows, 32, charGlyph->pixels.get());
 }
 
-std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
+const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
     FT_BBox stringBox = { };
     std::vector<std::shared_ptr<CharGlyph>> stringGlyphs;
 
     for (auto charCode: stringText) {
-        std::shared_ptr<CharGlyph> charGlyph = this->getCharGlyph(charCode);
+        auto charGlyph = this->getCharGlyph(charCode);
         if (charGlyph == nullptr) {
             continue;
         }
@@ -112,7 +112,7 @@ std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
     int pixelBytes = stringImage->getPixelDepth() >> 3;
     char* pixels = stringImage->getRawData();
 
-    for (auto charGlyph: stringGlyphs) {
+    for (auto& charGlyph: stringGlyphs) {
         FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
         FT_Bitmap charBitmap = bitmapGlyph->bitmap;
         char* charPixels = charGlyph->pixels.get();

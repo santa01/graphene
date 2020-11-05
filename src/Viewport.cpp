@@ -50,7 +50,7 @@ int Viewport::getHeight() const {
     return this->height;
 }
 
-void Viewport::setCamera(const std::shared_ptr<Camera> camera) {
+void Viewport::setCamera(const std::shared_ptr<Camera>& camera) {
     if (camera == nullptr) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
@@ -58,7 +58,7 @@ void Viewport::setCamera(const std::shared_ptr<Camera> camera) {
     this->camera = camera;
 }
 
-std::shared_ptr<Camera> Viewport::getCamera() const {
+const std::shared_ptr<Camera>& Viewport::getCamera() const {
     return this->camera;
 }
 

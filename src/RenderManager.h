@@ -45,12 +45,12 @@ public:
     GRAPHENE_API void setLightPass(bool lightPass);
     GRAPHENE_API bool hasLightPass() const;
 
-    GRAPHENE_API std::shared_ptr<Mesh> getFrame() const;
+    GRAPHENE_API const std::shared_ptr<Mesh>& getFrame() const;
 
     GRAPHENE_API void setRenderState(RenderStateType stateType);
-    GRAPHENE_API std::shared_ptr<RenderState> getRenderState(RenderStateType stateType) const;
+    GRAPHENE_API const std::shared_ptr<RenderState>& getRenderState(RenderStateType stateType) const;
 
-    GRAPHENE_API void update(const std::shared_ptr<Camera> camera);
+    GRAPHENE_API void update(const std::shared_ptr<Camera>& camera);
 
     GRAPHENE_API void teardown();
 

@@ -50,17 +50,17 @@ class ObjectManager: public NonCopyable {
 public:
     GRAPHENE_API static ObjectManager& getInstance();
 
-    GRAPHENE_API std::shared_ptr<Camera> createCamera(ProjectionType type) const;
-    GRAPHENE_API std::shared_ptr<Light> createLight(LightType type) const;
-    GRAPHENE_API std::shared_ptr<Skybox> createSkybox(const std::string& name);
-    GRAPHENE_API std::shared_ptr<Entity> createEntity(const std::string& name);
-    GRAPHENE_API std::shared_ptr<Scene> createScene(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Camera> createCamera(ProjectionType type) const;
+    GRAPHENE_API const std::shared_ptr<Light> createLight(LightType type) const;
+    GRAPHENE_API const std::shared_ptr<Skybox> createSkybox(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Entity> createEntity(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Scene> createScene(const std::string& name);
 
-    GRAPHENE_API std::shared_ptr<Shader> createShader(const std::string& name);
-    GRAPHENE_API std::shared_ptr<Shader> createShader();
+    GRAPHENE_API const std::shared_ptr<Shader>& createShader(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Shader>& createShader();
 
-    GRAPHENE_API std::shared_ptr<Mesh> createQuad(FaceWinding winding);
-    GRAPHENE_API std::shared_ptr<Mesh> createCube(FaceWinding winding);
+    GRAPHENE_API const std::shared_ptr<Mesh> createQuad(FaceWinding winding);
+    GRAPHENE_API const std::shared_ptr<Mesh> createCube(FaceWinding winding);
 
     GRAPHENE_API void teardown();
 
@@ -68,12 +68,12 @@ private:
     ObjectManager() = default;
     void validateHeader(std::ifstream& file, const std::string& magic);
 
-    std::shared_ptr<ImageTexture> loadTexture(const std::string& name);
-    std::shared_ptr<ImageCubeTexture> loadCubeTexture(const std::string& name);
-    std::vector<std::shared_ptr<Mesh>> loadMeshes(const std::string& name);
+    const std::shared_ptr<Texture>& loadImageTexture(const std::string& name);
+    const std::shared_ptr<Texture>& loadCubeTexture(const std::string& name);
+    const std::vector<std::shared_ptr<Mesh>>& loadMeshes(const std::string& name);
 
     typedef std::function<std::shared_ptr<Geometry>()> GeometryFactory;
-    std::shared_ptr<Mesh> createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory);
+    const std::shared_ptr<Mesh> createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory);
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;

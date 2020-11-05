@@ -47,11 +47,11 @@ Material::Material() {
     this->materialBuffer = std::make_shared<UniformBuffer>(&material, sizeof(material));
 }
 
-std::shared_ptr<Texture> Material::getDiffuseTexture() const {
+const std::shared_ptr<Texture>& Material::getDiffuseTexture() const {
     return this->diffuseTexture;
 }
 
-void Material::setDiffuseTexture(const std::shared_ptr<Texture> diffuseTexture) {
+void Material::setDiffuseTexture(const std::shared_ptr<Texture>& diffuseTexture) {
     this->diffuseTexture = diffuseTexture;
     this->parametersDirty = true;
 }

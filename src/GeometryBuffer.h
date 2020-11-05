@@ -45,11 +45,11 @@ public:
     GRAPHENE_API GeometryBuffer(int width, int height);
     GRAPHENE_API ~GeometryBuffer();
 
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getDiffuseTexture() const;
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getSpecularTexture() const;
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getPositionTexture() const;
-    GRAPHENE_API std::shared_ptr<GeometryTexture> getNormalTexture() const;
-    GRAPHENE_API std::shared_ptr<DepthTexture> getDepthTexture() const;
+    GRAPHENE_API const std::shared_ptr<GeometryTexture>& getDiffuseTexture() const;
+    GRAPHENE_API const std::shared_ptr<GeometryTexture>& getSpecularTexture() const;
+    GRAPHENE_API const std::shared_ptr<GeometryTexture>& getPositionTexture() const;
+    GRAPHENE_API const std::shared_ptr<GeometryTexture>& getNormalTexture() const;
+    GRAPHENE_API const std::shared_ptr<DepthTexture>& getDepthTexture() const;
 
     GRAPHENE_API void update() override;
 

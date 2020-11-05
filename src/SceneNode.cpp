@@ -26,7 +26,7 @@
 
 namespace Graphene {
 
-SceneNode::SceneNode(const std::shared_ptr<Scene> scene) {
+SceneNode::SceneNode(const std::shared_ptr<Scene>& scene) {
     if (scene == nullptr) {
         throw std::invalid_argument(LogFormat("Scene cannot be nullptr"));
     }
@@ -38,7 +38,7 @@ const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() cons
     return this->nodes;
 }
 
-void SceneNode::attachNode(std::shared_ptr<SceneNode> node) {
+void SceneNode::attachNode(const std::shared_ptr<SceneNode>& node) {
     if (node == nullptr) {
         throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
     }
@@ -53,7 +53,7 @@ void SceneNode::attachNode(std::shared_ptr<SceneNode> node) {
     }
 }
 
-void SceneNode::detachNode(std::shared_ptr<SceneNode> node) {
+void SceneNode::detachNode(const std::shared_ptr<SceneNode>& node) {
     if (node == nullptr) {
         throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
     }
@@ -68,7 +68,7 @@ const std::unordered_set<std::shared_ptr<Object>>& SceneNode::getObjects() const
     return this->objects;
 }
 
-void SceneNode::attachObject(std::shared_ptr<Object> object) {
+void SceneNode::attachObject(const std::shared_ptr<Object>& object) {
     if (object == nullptr) {
         throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
     }
@@ -83,7 +83,7 @@ void SceneNode::attachObject(std::shared_ptr<Object> object) {
     }
 }
 
-void SceneNode::detachObject(std::shared_ptr<Object> object) {
+void SceneNode::detachObject(const std::shared_ptr<Object>& object) {
     if (object == nullptr) {
         throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
     }
@@ -94,11 +94,11 @@ void SceneNode::detachObject(std::shared_ptr<Object> object) {
     }
 }
 
-std::shared_ptr<Scene> SceneNode::getScene() const {
+const std::shared_ptr<Scene> SceneNode::getScene() const {
     return this->scene.lock();
 }
 
-std::shared_ptr<SceneNode> SceneNode::getParent() const {
+const std::shared_ptr<SceneNode> SceneNode::getParent() const {
     return this->parent.lock();
 }
 

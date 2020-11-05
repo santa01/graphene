@@ -43,13 +43,13 @@ public:
     GRAPHENE_API virtual ~Engine() = default;
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
-    GRAPHENE_API std::shared_ptr<FrameBuffer> createFrameBuffer(int width, int height, GLenum format);
+    GRAPHENE_API const std::shared_ptr<FrameBuffer>& createFrameBuffer(int width, int height, GLenum format);
 
     GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
-    GRAPHENE_API std::shared_ptr<Scene> createScene(const std::string& name);
-    GRAPHENE_API std::shared_ptr<Scene> createScene();
+    GRAPHENE_API const std::shared_ptr<Scene>& createScene(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Scene>& createScene();
 
-    GRAPHENE_API std::shared_ptr<Window> getWindow() const;
+    GRAPHENE_API const std::shared_ptr<Window>& getWindow() const;
     GRAPHENE_API float getFrameTime() const;
 
     GRAPHENE_API void exit(int result);

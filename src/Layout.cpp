@@ -28,15 +28,15 @@
 
 namespace Graphene {
 
-std::shared_ptr<Overlay> Layout::getOverlay() const {
+const std::shared_ptr<Overlay> Layout::getOverlay() const {
     return this->overlay.lock();
 }
 
-void Layout::addComponent(const std::shared_ptr<Label> component, int x, int y) {
+void Layout::addComponent(const std::shared_ptr<Label>& component, int x, int y) {
     this->componentPositions.emplace(component, std::make_pair(x, y));
 }
 
-void Layout::removeComponent(const std::shared_ptr<Label> component) {
+void Layout::removeComponent(const std::shared_ptr<Label>& component) {
     auto componentPositionsIt = this->componentPositions.find(component);
     if (componentPositionsIt != this->componentPositions.end()) {
         this->componentPositions.erase(componentPositionsIt);
@@ -74,7 +74,7 @@ void Layout::arrangeComponents() {
         return;
     }
 
-    auto camera = overlay->getCamera();
+    auto& camera = overlay->getCamera();
     if (camera == nullptr) {
         return;
     }

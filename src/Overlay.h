@@ -34,8 +34,8 @@ class Overlay: public std::enable_shared_from_this<Overlay>, public Viewport {
 public:
     GRAPHENE_API Overlay(int left, int top, int width, int height);
 
-    GRAPHENE_API std::shared_ptr<Layout> getLayout() const;
-    GRAPHENE_API void setLayout(const std::shared_ptr<Layout> layout);
+    GRAPHENE_API const std::shared_ptr<Layout>& getLayout() const;
+    GRAPHENE_API void setLayout(const std::shared_ptr<Layout>& layout);
 
     GRAPHENE_API void update() override;
 

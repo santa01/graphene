@@ -37,7 +37,7 @@ RenderManager::RenderManager() {
     auto& objectManager = GetObjectManager();
 
     this->frame = objectManager.createQuad(FaceWinding::WINDING_CLOCKWISE);
-    auto shader = objectManager.createShader();
+    auto& shader = objectManager.createShader();
 
     this->renderStates = {
         { RenderStateType::GEOMETRY, std::make_shared<RenderGeometry>() },
@@ -70,7 +70,7 @@ bool RenderManager::hasLightPass() const {
     return this->lightPass;
 }
 
-std::shared_ptr<Mesh> RenderManager::getFrame() const {
+const std::shared_ptr<Mesh>& RenderManager::getFrame() const {
     return this->frame;
 }
 
@@ -79,16 +79,16 @@ void RenderManager::setRenderState(RenderStateType stateType) {
     this->renderState->enter(this);
 }
 
-std::shared_ptr<RenderState> RenderManager::getRenderState(RenderStateType stateType) const {
+const std::shared_ptr<RenderState>& RenderManager::getRenderState(RenderStateType stateType) const {
     return this->renderStates.at(stateType);
 }
 
-void RenderManager::update(const std::shared_ptr<Camera> camera) {
+void RenderManager::update(const std::shared_ptr<Camera>& camera) {
     if (camera == nullptr) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    std::shared_ptr<RenderState> renderNone = this->renderStates.at(RenderStateType::NONE);
+    auto renderNone = this->renderStates.at(RenderStateType::NONE);
     while (this->renderState != renderNone) {
         this->setRenderState(this->renderState->update(this, camera));
     }

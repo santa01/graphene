@@ -86,7 +86,7 @@ void Example::onSetup() {
 
     /* Populate scene with objects */
 
-    auto scene = this->createScene("worlds/desert.scene");
+    auto& scene = this->createScene("worlds/desert.scene");
 
     this->player = scene->getPlayer();
     this->player->attachObject(camera);
@@ -94,12 +94,12 @@ void Example::onSetup() {
 
     /* Keep mouse inside the window */
 
-    auto window = this->getWindow();
+    auto& window = this->getWindow();
     window->captureMouse(true);
 
     /* Update default viewport with camera */
 
-    auto viewport = window->createViewport(0, 0, window->getWidth(), window->getHeight());
+    auto& viewport = window->createViewport(0, 0, window->getWidth(), window->getHeight());
     viewport->setCamera(camera);
 }
 

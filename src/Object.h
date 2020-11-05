@@ -44,7 +44,7 @@ public:
 
     GRAPHENE_API ObjectId getId() const;
     GRAPHENE_API ObjectType getType() const;
-    GRAPHENE_API std::shared_ptr<SceneNode> getParent() const;
+    GRAPHENE_API const std::shared_ptr<SceneNode> getParent() const;
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& objectName);

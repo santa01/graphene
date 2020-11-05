@@ -32,14 +32,14 @@ namespace Graphene {
 
 class Mesh {
 public:
-    GRAPHENE_API Mesh(const std::shared_ptr<Geometry> geometry);
-    GRAPHENE_API Mesh(const std::shared_ptr<Material> material, const std::shared_ptr<Geometry> geometry);
+    GRAPHENE_API Mesh(const std::shared_ptr<Geometry>& geometry);
+    GRAPHENE_API Mesh(const std::shared_ptr<Material>& material, const std::shared_ptr<Geometry>& geometry);
 
-    GRAPHENE_API std::shared_ptr<Material> getMaterial() const;
-    GRAPHENE_API void setMaterial(const std::shared_ptr<Material> material);
+    GRAPHENE_API const std::shared_ptr<Material>& getMaterial() const;
+    GRAPHENE_API void setMaterial(const std::shared_ptr<Material>& material);
 
-    GRAPHENE_API std::shared_ptr<Geometry> getGeometry() const;
-    GRAPHENE_API void setGeometry(const std::shared_ptr<Geometry> geometry);
+    GRAPHENE_API const std::shared_ptr<Geometry>& getGeometry() const;
+    GRAPHENE_API void setGeometry(const std::shared_ptr<Geometry>& geometry);
 
     GRAPHENE_API void render();
 

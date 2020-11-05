@@ -70,32 +70,26 @@ const std::unordered_set<std::shared_ptr<FrameBuffer>>& Engine::getFrameBuffers(
     return this->frameBuffers;
 }
 
-std::shared_ptr<FrameBuffer> Engine::createFrameBuffer(int width, int height, GLenum format) {
+const std::shared_ptr<FrameBuffer>& Engine::createFrameBuffer(int width, int height, GLenum format) {
     auto frameBuffer = std::make_shared<FrameBuffer>(width, height, format);
-    this->frameBuffers.insert(frameBuffer);
-
-    return frameBuffer;
+    return *this->frameBuffers.insert(frameBuffer).first;
 }
 
 const std::unordered_set<std::shared_ptr<Scene>>& Engine::getScenes() const {
     return this->scenes;
 }
 
-std::shared_ptr<Scene> Engine::createScene(const std::string& name) {
+const std::shared_ptr<Scene>& Engine::createScene(const std::string& name) {
     auto scene = GetObjectManager().createScene(name);
-    this->scenes.insert(scene);
-
-    return scene;
+    return *this->scenes.insert(scene).first;
 }
 
-std::shared_ptr<Scene> Engine::createScene() {
+const std::shared_ptr<Scene>& Engine::createScene() {
     auto scene = std::make_shared<Scene>();
-    this->scenes.insert(scene);
-
-    return scene;
+    return *this->scenes.insert(scene).first;
 }
 
-std::shared_ptr<Window> Engine::getWindow() const {
+const std::shared_ptr<Window>& Engine::getWindow() const {
     return this->window;
 }
 

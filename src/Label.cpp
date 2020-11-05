@@ -31,7 +31,7 @@
 
 namespace Graphene {
 
-Label::Label(int width, int height, const std::shared_ptr<Font> font):
+Label::Label(int width, int height, const std::shared_ptr<Font>& font):
         font(font) {
     auto mesh = GetObjectManager().createQuad(FaceWinding::WINDING_CLOCKWISE);
     this->addMesh(mesh);
@@ -44,23 +44,23 @@ Label::Label(int width, int height, const std::shared_ptr<Font> font):
 }
 
 int Label::getWidth() const {
-    auto mesh = *this->meshes.begin();
+    auto& mesh = *this->meshes.begin();
     return mesh->getMaterial()->getDiffuseTexture()->getWidth();
 }
 
 int Label::getHeight() const {
-    auto mesh = *this->meshes.begin();
+    auto& mesh = *this->meshes.begin();
     return mesh->getMaterial()->getDiffuseTexture()->getHeight();
 }
 
-void Label::setFont(const std::shared_ptr<Font> font) {
+void Label::setFont(const std::shared_ptr<Font>& font) {
     if (this->font != font) {
         this->font = font;
         this->renderText();
     }
 }
 
-const std::shared_ptr<Font> Label::getFont() const {
+const std::shared_ptr<Font>& Label::getFont() const {
     return this->font;
 }
 
@@ -96,7 +96,7 @@ void Label::renderText() {
         memcpy(imagePixels + imageRowOffset, textPixels + textRowOffset, minRowSize);
     }
 
-    auto mesh = *this->meshes.begin();
+    auto& mesh = *this->meshes.begin();
     auto texture = std::dynamic_pointer_cast<ImageTexture>(mesh->getMaterial()->getDiffuseTexture());
 
     texture->update(textureImage);

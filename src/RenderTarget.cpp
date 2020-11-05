@@ -37,11 +37,9 @@ int RenderTarget::getHeight() const {
     return this->height;
 }
 
-std::shared_ptr<Viewport> RenderTarget::createViewport(int left, int top, int width, int height) {
+const std::shared_ptr<Viewport>& RenderTarget::createViewport(int left, int top, int width, int height) {
     auto viewport = std::make_shared<Viewport>(left, top, width, height);
-    this->viewports.insert(viewport);
-
-    return viewport;
+    return *this->viewports.insert(viewport).first;
 }
 
 const std::unordered_set<std::shared_ptr<Viewport>>& RenderTarget::getViewports() const {

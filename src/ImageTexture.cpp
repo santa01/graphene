@@ -74,7 +74,7 @@ void ImageCubeTexture::update(const CubeImage& cubeImage) {
     this->bind();
 
     for (int faceOffset = 0; faceOffset < 6; faceOffset++) {
-        auto faceImage = cubeImage[faceOffset];
+        auto& faceImage = cubeImage[faceOffset];
         GLenum faceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceOffset;
         GLenum faceFormat = (faceImage->getPixelDepth() == 32) ? GL_BGRA : GL_BGR;  // Little-endian ARGB or RGB format
         glTexSubImage2D(faceTarget, 0, 0, 0, faceImage->getWidth(), faceImage->getHeight(), faceFormat, GL_UNSIGNED_BYTE, faceImage->getPixels());

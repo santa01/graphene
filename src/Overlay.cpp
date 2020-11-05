@@ -30,11 +30,11 @@ Overlay::Overlay(int left, int top, int width, int height):
         Viewport(left, top, width, height) {
 }
 
-std::shared_ptr<Layout> Overlay::getLayout() const {
+const std::shared_ptr<Layout>& Overlay::getLayout() const {
     return this->layout;
 }
 
-void Overlay::setLayout(const std::shared_ptr<Layout> layout) {
+void Overlay::setLayout(const std::shared_ptr<Layout>& layout) {
     if (layout == nullptr) {
         throw std::invalid_argument(LogFormat("Layout cannot be nullptr"));
     }

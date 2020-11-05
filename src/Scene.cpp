@@ -36,12 +36,12 @@ Scene::Scene() {
     this->sceneName = defaultName.str();
 }
 
-std::shared_ptr<SceneNode> Scene::createNode() {
+const std::shared_ptr<SceneNode> Scene::createNode() {
     /* const version of shared_from_this() is selected otherwise */
     return std::make_shared<SceneNode>(this->shared_from_this());
 }
 
-std::shared_ptr<SceneNode> Scene::getRootNode() {
+const std::shared_ptr<SceneNode>& Scene::getRootNode() {
     /* shared_from_this() cannot be called from constructor */
     if (this->rootNode == nullptr) {
         this->rootNode = this->createNode();
@@ -50,7 +50,7 @@ std::shared_ptr<SceneNode> Scene::getRootNode() {
     return this->rootNode;
 }
 
-std::shared_ptr<SceneNode> Scene::getPlayer() {
+const std::shared_ptr<SceneNode>& Scene::getPlayer() {
     /* shared_from_this() cannot be called from constructor */
     if (this->player == nullptr) {
         this->player = this->createNode();
@@ -60,11 +60,11 @@ std::shared_ptr<SceneNode> Scene::getPlayer() {
     return this->player;
 }
 
-void Scene::setSkybox(const std::shared_ptr<Skybox> skybox) {
+void Scene::setSkybox(const std::shared_ptr<Skybox>& skybox) {
     this->skybox = skybox;
 }
 
-std::shared_ptr<Skybox> Scene::getSkybox() const {
+const std::shared_ptr<Skybox>& Scene::getSkybox() const {
     return this->skybox;
 }
 
@@ -100,8 +100,8 @@ float Scene::getAmbientEnergy() const {
     return this->ambientEnergy;
 }
 
-Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
-    std::shared_ptr<SceneNode> node = camera->getParent();
+Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera>& camera) {
+    auto node = camera->getParent();
     Math::Mat4 modelView;
 
     while (node != nullptr) {
@@ -115,8 +115,8 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera> camera) {
     return modelView;
 }
 
-Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera> camera) {
-    std::shared_ptr<SceneNode> node = camera->getParent();
+Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera>& camera) {
+    auto node = camera->getParent();
     Math::Mat4 view;
 
     while (node != nullptr) {
@@ -130,8 +130,8 @@ Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera> camera) {
     return view;
 }
 
-Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera> camera) {
-    std::shared_ptr<SceneNode> node = camera->getParent();
+Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera>& camera) {
+    auto node = camera->getParent();
     Math::Mat4 translation;
 
     while (node != nullptr) {
@@ -147,14 +147,14 @@ Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera> camera) {
 
 void Scene::iterateEntities(EntityHandler handler) {
     std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode>& node, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
         // Moving from the root node, current node's transformation matrix is the right operand
         // to be the first operation. Keep the root node's transformation the last one.
         localWorld = localWorld * node->getTranslation() * node->getRotation() * node->getScaling();
         normalRotation = normalRotation * node->getRotation();
 
-        auto objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld, &normalRotation](const std::shared_ptr<Object> object) {
+        auto& objects = node->getObjects();
+        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld, &normalRotation](const std::shared_ptr<Object>& object) {
             if (object->getType() == ObjectType::ENTITY) {
                 auto entity = std::dynamic_pointer_cast<Entity>(object);
 
@@ -167,8 +167,8 @@ void Scene::iterateEntities(EntityHandler handler) {
             }
         });
 
-        auto nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld, &normalRotation](const std::shared_ptr<SceneNode> node) {
+        auto& nodes = node->getNodes();
+        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld, &normalRotation](const std::shared_ptr<SceneNode>& node) {
             traverser(node, localWorld, normalRotation);
         });
     };
@@ -180,13 +180,13 @@ void Scene::iterateEntities(EntityHandler handler) {
 
 void Scene::iterateLights(LightHandler handler) {
     std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode> node, Math::Mat4 localWorld) {
+    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode>& node, Math::Mat4 localWorld) {
         // Moving from the root node, current node's transformation matrix is the left operand
         // to be the last operation. Keep the root node's transformation the last one.
         localWorld = localWorld * node->getTranslation() * node->getRotation();
 
-        auto objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld](const std::shared_ptr<Object> object) {
+        auto& objects = node->getObjects();
+        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld](const std::shared_ptr<Object>& object) {
             if (object->getType() == ObjectType::LIGHT) {
                 auto light = std::dynamic_pointer_cast<Light>(object);
 
@@ -196,8 +196,8 @@ void Scene::iterateLights(LightHandler handler) {
             }
         });
 
-        auto nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld](const std::shared_ptr<SceneNode> node) {
+        auto& nodes = node->getNodes();
+        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld](const std::shared_ptr<SceneNode>& node) {
             traverser(node, localWorld);
         });
     };

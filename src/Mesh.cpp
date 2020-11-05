@@ -26,28 +26,28 @@
 
 namespace Graphene {
 
-Mesh::Mesh(const std::shared_ptr<Geometry> geometry) {
+Mesh::Mesh(const std::shared_ptr<Geometry>& geometry) {
     this->setGeometry(geometry);
 }
 
-Mesh::Mesh(const std::shared_ptr<Material> material, const std::shared_ptr<Geometry> geometry):
+Mesh::Mesh(const std::shared_ptr<Material>& material, const std::shared_ptr<Geometry>& geometry):
         Mesh(geometry) {
     this->setMaterial(material);
 }
 
-std::shared_ptr<Material> Mesh::getMaterial() const {
+const std::shared_ptr<Material>& Mesh::getMaterial() const {
     return this->material;
 }
 
-void Mesh::setMaterial(const std::shared_ptr<Material> material) {
+void Mesh::setMaterial(const std::shared_ptr<Material>& material) {
     this->material = material;
 }
 
-std::shared_ptr<Geometry> Mesh::getGeometry() const {
+const std::shared_ptr<Geometry>& Mesh::getGeometry() const {
     return this->geometry;
 }
 
-void Mesh::setGeometry(const std::shared_ptr<Geometry> geometry) {
+void Mesh::setGeometry(const std::shared_ptr<Geometry>& geometry) {
     if (geometry == nullptr) {
         throw std::invalid_argument(LogFormat("Geometry cannot be nullptr"));
     }

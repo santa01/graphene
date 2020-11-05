@@ -42,7 +42,7 @@ const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
     return this->meshes;
 }
 
-void Entity::addMesh(const std::shared_ptr<Mesh> mesh) {
+void Entity::addMesh(const std::shared_ptr<Mesh>& mesh) {
     if (mesh == nullptr) {
         throw std::invalid_argument(LogFormat("Mesh cannot be nullptr"));
     }
