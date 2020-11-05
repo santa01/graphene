@@ -124,16 +124,18 @@ int Engine::exec() {
             this->update();
         }
 
-        std::chrono::duration<float> duration = std::chrono::steady_clock::now() - timestamp;
-        this->frameTime = duration.count();
+        std::chrono::duration<float> frameDuration = std::chrono::steady_clock::now() - timestamp;
+        this->frameTime = frameDuration.count();
+
         float maxFps = config.getMaxFps();
-
-        if (!config.isVsync() && maxFps > 0.0f) {
+        if (maxFps > 0.0f && !config.isVsync()) {
             float maxFrameTime = 1.0f / maxFps;
-
             if (this->frameTime < maxFrameTime) {
                 std::this_thread::sleep_for(std::chrono::duration<float>(maxFrameTime - this->frameTime));
-                this->frameTime = maxFrameTime;
+
+                // Recalculate duration if std::this_thread::sleep_for() was unreliable
+                std::chrono::duration<float> finalDuration = std::chrono::steady_clock::now() - timestamp;
+                this->frameTime = finalDuration.count();
             }
         }
 
