@@ -94,7 +94,7 @@ void SceneNode::detachObject(std::shared_ptr<Object> object) {
     }
 }
 
-std::shared_ptr<class Scene> SceneNode::getScene() const {
+std::shared_ptr<Scene> SceneNode::getScene() const {
     return this->scene.lock();
 }
 
