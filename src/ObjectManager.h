@@ -62,14 +62,15 @@ public:
     GRAPHENE_API const std::shared_ptr<Mesh> createQuad(FaceWinding winding);
     GRAPHENE_API const std::shared_ptr<Mesh> createCube(FaceWinding winding);
 
+    GRAPHENE_API const std::shared_ptr<Texture>& createTexture(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Texture>& createCubeTexture(const std::string& name);
+
     GRAPHENE_API void teardown();
 
 private:
     ObjectManager() = default;
     void validateHeader(std::ifstream& file, const std::string& magic);
 
-    const std::shared_ptr<Texture>& loadImageTexture(const std::string& name);
-    const std::shared_ptr<Texture>& loadCubeTexture(const std::string& name);
     const std::vector<std::shared_ptr<Mesh>>& loadMeshes(const std::string& name);
 
     typedef std::function<std::shared_ptr<Geometry>()> GeometryFactory;

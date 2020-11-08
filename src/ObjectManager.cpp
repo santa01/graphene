@@ -193,7 +193,8 @@ const std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
 }
 
 const std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& name) {
-    return std::make_shared<Skybox>(std::dynamic_pointer_cast<ImageCubeTexture>(this->loadCubeTexture(name)));
+    auto& texture = this->createCubeTexture(name);
+    return std::make_shared<Skybox>(std::dynamic_pointer_cast<TextureCubeMap>(texture));
 }
 
 const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
@@ -363,6 +364,43 @@ const std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
     });
 }
 
+const std::shared_ptr<Texture>& ObjectManager::createTexture(const std::string& name) {
+    auto textureIt = this->textureCache.find(name);
+    if (textureIt != this->textureCache.end()) {
+        LogDebug("Reuse cached '%s' texture", name.c_str());
+        return textureIt->second;
+    }
+
+    LogDebug("Load texture from '%s'", name.c_str());
+    TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name, true);
+    auto texture = std::make_shared<ImageTexture>(textureImage);
+
+    return this->textureCache.emplace(name, texture).first->second;
+}
+
+const std::shared_ptr<Texture>& ObjectManager::createCubeTexture(const std::string& name) {
+    auto textureIt = this->textureCache.find(name);
+    if (textureIt != this->textureCache.end()) {
+        LogDebug("Reuse cached '%s/*.tga' textures", name.c_str());
+        return textureIt->second;
+    }
+
+    LogDebug("Load textures from '%s/*.tga'", name.c_str());
+
+    std::string textureRoot(GetEngineConfig().getDataDirectory() + '/' + name);
+    CubeImage textureCubeImage = {
+        std::make_shared<TgaImage>(textureRoot + "/positive_x.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/negative_x.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/positive_y.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/negative_y.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/positive_z.tga", false),
+        std::make_shared<TgaImage>(textureRoot + "/negative_z.tga", false)
+    };
+
+    auto texture = std::make_shared<ImageCubeTexture>(textureCubeImage);
+    return this->textureCache.emplace(name, texture).first->second;
+}
+
 void ObjectManager::teardown() {
     LogDebug("Clear shader cache (%d items)", this->shaderCache.size());
     this->shaderCache.clear();
@@ -392,43 +430,6 @@ void ObjectManager::validateHeader(std::ifstream& file, const std::string& magic
     if (headerVersion.str() != grapheneVersion) {
         throw std::runtime_error(LogFormat("Invalid version '%s', expected '%s'", headerVersion.str(), grapheneVersion));
     }
-}
-
-const std::shared_ptr<Texture>& ObjectManager::loadImageTexture(const std::string& name) {
-    auto textureIt = this->textureCache.find(name);
-    if (textureIt != this->textureCache.end()) {
-        LogDebug("Reuse cached '%s' texture", name.c_str());
-        return textureIt->second;
-    }
-
-    LogDebug("Load texture from '%s'", name.c_str());
-    TgaImage textureImage(GetEngineConfig().getDataDirectory() + '/' + name, true);
-    auto texture = std::make_shared<ImageTexture>(textureImage);
-
-    return this->textureCache.emplace(name, texture).first->second;
-}
-
-const std::shared_ptr<Texture>& ObjectManager::loadCubeTexture(const std::string& name) {
-    auto textureIt = this->textureCache.find(name);
-    if (textureIt != this->textureCache.end()) {
-        LogDebug("Reuse cached '%s/*.tga' textures", name.c_str());
-        return textureIt->second;
-    }
-
-    LogDebug("Load textures from '%s/*.tga'", name.c_str());
-
-    std::string textureRoot(GetEngineConfig().getDataDirectory() + '/' + name);
-    CubeImage textureCubeImage = {
-        std::make_shared<TgaImage>(textureRoot + "/positive_x.tga", false),
-        std::make_shared<TgaImage>(textureRoot + "/negative_x.tga", false),
-        std::make_shared<TgaImage>(textureRoot + "/positive_y.tga", false),
-        std::make_shared<TgaImage>(textureRoot + "/negative_y.tga", false),
-        std::make_shared<TgaImage>(textureRoot + "/positive_z.tga", false),
-        std::make_shared<TgaImage>(textureRoot + "/negative_z.tga", false)
-    };
-
-    auto texture = std::make_shared<ImageCubeTexture>(textureCubeImage);
-    return this->textureCache.emplace(name, texture).first->second;
 }
 
 const std::vector<std::shared_ptr<Mesh>>& ObjectManager::loadMeshes(const std::string& name) {
@@ -467,7 +468,7 @@ const std::vector<std::shared_ptr<Mesh>>& ObjectManager::loadMeshes(const std::s
         std::string diffuseTexture(objectMaterial.diffuseTexture);
         if (!diffuseTexture.empty()) {
             std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
-            material->setDiffuseTexture(this->loadImageTexture(parentDirectory + diffuseTexture));
+            material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
         }
 
         file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
