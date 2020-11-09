@@ -75,6 +75,7 @@ PFNGLGETSTRINGPROC glGetString;
 PFNGLGETSTRINGIPROC glGetStringi;
 PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+PFNGLLINEWIDTHPROC glLineWidth;
 PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLTEXPARAMETERIPROC glTexParameteri;
@@ -187,6 +188,7 @@ void loadCore() {
     LOAD_MANDATORY(glGetStringi);
     LOAD_MANDATORY(glGetUniformBlockIndex);
     LOAD_MANDATORY(glGetUniformLocation);
+    LOAD_MANDATORY(glLineWidth);
     LOAD_MANDATORY(glLinkProgram);
     LOAD_MANDATORY(glShaderSource);
     LOAD_MANDATORY(glTexParameteri);
