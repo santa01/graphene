@@ -43,14 +43,12 @@ void SceneNode::attachNode(const std::shared_ptr<SceneNode>& node) {
         throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
     }
 
-    auto inserted = this->nodes.insert(node);
-    if (inserted.second) {
-        if (!node->parent.expired()) {
-            node->getParent()->detachNode(node);
-        }
-
-        node->parent = this->shared_from_this();
+    if (!node->parent.expired()) {
+        throw std::invalid_argument(LogFormat("SceneNode is already attached elsewhere"));
     }
+
+    node->parent = this->shared_from_this();
+    this->nodes.insert(node);
 }
 
 void SceneNode::detachNode(const std::shared_ptr<SceneNode>& node) {
@@ -73,14 +71,12 @@ void SceneNode::attachObject(const std::shared_ptr<Object>& object) {
         throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
     }
 
-    auto inserted = this->objects.insert(object);
-    if (inserted.second) {
-        if (!object->parent.expired()) {
-            object->getParent()->detachObject(object);
-        }
-
-        object->parent = this->shared_from_this();
+    if (!object->parent.expired()) {
+        throw std::invalid_argument(LogFormat("Object is already attached elsewhere"));
     }
+
+    object->parent = this->shared_from_this();
+    this->objects.insert(object);
 }
 
 void SceneNode::detachObject(const std::shared_ptr<Object>& object) {
@@ -90,6 +86,7 @@ void SceneNode::detachObject(const std::shared_ptr<Object>& object) {
 
     auto objectIt = this->objects.find(object);
     if (objectIt != this->objects.end()) {
+        object->parent.reset();
         object->getParent()->objects.erase(objectIt);
     }
 }

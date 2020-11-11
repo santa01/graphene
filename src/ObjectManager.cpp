@@ -251,8 +251,6 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
     }
 
     auto& sceneRoot = scene->getRootNode();
-    sceneRoot->attachNode(player);
-
     float pi = static_cast<float>(M_PI);
 
     for (int i = 0; i < sceneDefinition.entities; i++) {
