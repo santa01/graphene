@@ -36,9 +36,6 @@ public:
     GRAPHENE_API FrameBuffer(int width, int height, GLenum format);
     GRAPHENE_API ~FrameBuffer();
 
-    GRAPHENE_API void setAlphaBlending(bool alphaBlending);
-    GRAPHENE_API bool isAlphaBlending() const;
-
     GRAPHENE_API const std::shared_ptr<Texture>& getOutputTexture() const;
     GRAPHENE_API const std::shared_ptr<DepthTexture>& getDepthTexture() const;
 
@@ -46,8 +43,6 @@ public:
     GRAPHENE_API void update() override;
 
 private:
-    bool alphaBlending = false;
-
     std::shared_ptr<Texture> outputTexture;
     std::shared_ptr<DepthTexture> depthTexture;
 };
