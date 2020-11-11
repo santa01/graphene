@@ -57,10 +57,10 @@ const std::unordered_set<std::string>& Window::getSupportedExtensions() const {
 
 const std::shared_ptr<Overlay>& Window::createOverlay(int left, int top, int width, int height) {
     auto overlay = std::make_shared<Overlay>(left, top, width, height);
-    return *this->overlays.insert(overlay).first;
+    return this->overlays.emplace_back(overlay);
 }
 
-const std::unordered_set<std::shared_ptr<Overlay>>& Window::getOverlays() const {
+const std::vector<std::shared_ptr<Overlay>>& Window::getOverlays() const {
     return this->overlays;
 }
 

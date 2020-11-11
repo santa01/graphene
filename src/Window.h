@@ -31,6 +31,7 @@
 #include <Overlay.h>
 #include <Signals.h>
 #include <string>
+#include <vector>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -57,7 +58,7 @@ public:
     GRAPHENE_API virtual void swapBuffers() = 0;
 
     GRAPHENE_API const std::shared_ptr<Overlay>& createOverlay(int left, int top, int width, int height);
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Overlay>>& getOverlays() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<Overlay>>& getOverlays() const;
 
     GRAPHENE_API const std::shared_ptr<Viewport>& createViewport(int left, int top, int width, int height) override;
     GRAPHENE_API void update() override;
@@ -78,7 +79,7 @@ protected:
     std::unordered_set<std::string> availableExtensions;
 
     std::unordered_map<std::shared_ptr<Viewport>, std::shared_ptr<GeometryBuffer>> geometryBuffers;
-    std::unordered_set<std::shared_ptr<Overlay>> overlays;
+    std::vector<std::shared_ptr<Overlay>> overlays;
 };
 
 }  // namespace Graphene

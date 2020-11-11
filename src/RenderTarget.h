@@ -27,7 +27,7 @@
 #include <NonCopyable.h>
 #include <Viewport.h>
 #include <OpenGL.h>
-#include <unordered_set>
+#include <vector>
 #include <memory>
 
 namespace Graphene {
@@ -41,7 +41,7 @@ public:
     GRAPHENE_API int getHeight() const;
 
     GRAPHENE_API virtual const std::shared_ptr<Viewport>& createViewport(int left, int top, int width, int height);
-    GRAPHENE_API virtual const std::unordered_set<std::shared_ptr<Viewport>>& getViewports() const;
+    GRAPHENE_API virtual const std::vector<std::shared_ptr<Viewport>>& getViewports() const;
 
     GRAPHENE_API virtual void update() = 0;
 
@@ -51,7 +51,7 @@ protected:
     int width = 0;
     int height = 0;
 
-    std::unordered_set<std::shared_ptr<Viewport>> viewports;
+    std::vector<std::shared_ptr<Viewport>> viewports;
 };
 
 }  // namespace Graphene

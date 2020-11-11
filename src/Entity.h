@@ -27,7 +27,7 @@
 #include <Scalable.h>
 #include <Mesh.h>
 #include <Object.h>
-#include <unordered_set>
+#include <vector>
 #include <memory>
 
 namespace Graphene {
@@ -40,13 +40,13 @@ public:
     GRAPHENE_API void setVisible(bool visible);
     GRAPHENE_API bool isVisible() const;
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Mesh>>& getMeshes() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<Mesh>>& getMeshes() const;
     GRAPHENE_API void addMesh(const std::shared_ptr<Mesh>& mesh);
 
 protected:
     bool visible = true;
 
-    std::unordered_set<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
 };
 
 }  // namespace Graphene

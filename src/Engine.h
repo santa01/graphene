@@ -31,7 +31,7 @@
 #include <Input.h>
 #include <OpenGL.h>
 #include <Signals.h>
-#include <unordered_set>
+#include <vector>
 #include <memory>
 #include <string>
 
@@ -42,10 +42,10 @@ public:
     GRAPHENE_API Engine();
     GRAPHENE_API virtual ~Engine() = default;
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<FrameBuffer>>& getFrameBuffers() const;
     GRAPHENE_API const std::shared_ptr<FrameBuffer>& createFrameBuffer(int width, int height, GLenum format);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Scene>>& getScenes() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<Scene>>& getScenes() const;
     GRAPHENE_API const std::shared_ptr<Scene>& createScene(const std::string& name);
     GRAPHENE_API const std::shared_ptr<Scene>& createScene();
 
@@ -76,8 +76,8 @@ private:
     Signals::Signal<> onIdleSignal;      // Empty event queue
     Signals::Signal<> onQuitSignal;      // User-requested quit
 
-    std::unordered_set<std::shared_ptr<FrameBuffer>> frameBuffers;
-    std::unordered_set<std::shared_ptr<Scene>> scenes;
+    std::vector<std::shared_ptr<FrameBuffer>> frameBuffers;
+    std::vector<std::shared_ptr<Scene>> scenes;
     std::shared_ptr<Window> window;
 
     float frameTime = 0.0f;

@@ -38,7 +38,7 @@ bool Entity::isVisible() const {
     return this->visible;
 }
 
-const std::unordered_set<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
+const std::vector<std::shared_ptr<Mesh>>& Entity::getMeshes() const {
     return this->meshes;
 }
 
@@ -47,7 +47,7 @@ void Entity::addMesh(const std::shared_ptr<Mesh>& mesh) {
         throw std::invalid_argument(LogFormat("Mesh cannot be nullptr"));
     }
 
-    this->meshes.insert(mesh);
+    this->meshes.emplace_back(mesh);
 }
 
 }  // namespace Graphene
