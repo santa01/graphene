@@ -34,7 +34,7 @@ SceneNode::SceneNode(const std::shared_ptr<Scene>& scene) {
     this->scene = scene;
 }
 
-const std::unordered_set<std::shared_ptr<SceneNode>>& SceneNode::getNodes() const {
+const std::vector<std::shared_ptr<SceneNode>>& SceneNode::getNodes() const {
     return this->nodes;
 }
 
@@ -48,21 +48,10 @@ void SceneNode::attachNode(const std::shared_ptr<SceneNode>& node) {
     }
 
     node->parent = this->shared_from_this();
-    this->nodes.insert(node);
+    this->nodes.emplace_back(node);
 }
 
-void SceneNode::detachNode(const std::shared_ptr<SceneNode>& node) {
-    if (node == nullptr) {
-        throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
-    }
-
-    auto nodeIt = this->nodes.find(node);
-    if (nodeIt != this->nodes.end()) {
-        this->nodes.erase(nodeIt);
-    }
-}
-
-const std::unordered_set<std::shared_ptr<Object>>& SceneNode::getObjects() const {
+const std::vector<std::shared_ptr<Object>>& SceneNode::getObjects() const {
     return this->objects;
 }
 
@@ -76,19 +65,7 @@ void SceneNode::attachObject(const std::shared_ptr<Object>& object) {
     }
 
     object->parent = this->shared_from_this();
-    this->objects.insert(object);
-}
-
-void SceneNode::detachObject(const std::shared_ptr<Object>& object) {
-    if (object == nullptr) {
-        throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
-    }
-
-    auto objectIt = this->objects.find(object);
-    if (objectIt != this->objects.end()) {
-        object->parent.reset();
-        object->getParent()->objects.erase(objectIt);
-    }
+    this->objects.emplace_back(object);
 }
 
 const std::shared_ptr<Scene> SceneNode::getScene() const {

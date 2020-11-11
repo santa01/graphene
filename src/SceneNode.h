@@ -29,7 +29,7 @@
 #include <Movable.h>
 #include <NonCopyable.h>
 #include <Object.h>
-#include <unordered_set>
+#include <vector>
 #include <memory>
 
 namespace Graphene {
@@ -41,20 +41,18 @@ class SceneNode: public std::enable_shared_from_this<SceneNode>,
 public:
     GRAPHENE_API SceneNode(const std::shared_ptr<Scene>& scene);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<SceneNode>>& getNodes() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<SceneNode>>& getNodes() const;
     GRAPHENE_API void attachNode(const std::shared_ptr<SceneNode>& node);
-    GRAPHENE_API void detachNode(const std::shared_ptr<SceneNode>& node);
 
-    GRAPHENE_API const std::unordered_set<std::shared_ptr<Object>>& getObjects() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<Object>>& getObjects() const;
     GRAPHENE_API void attachObject(const std::shared_ptr<Object>& object);
-    GRAPHENE_API void detachObject(const std::shared_ptr<Object>& object);
 
     GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
     GRAPHENE_API const std::shared_ptr<SceneNode> getParent() const;
 
 private:
-    std::unordered_set<std::shared_ptr<SceneNode>> nodes;
-    std::unordered_set<std::shared_ptr<Object>> objects;
+    std::vector<std::shared_ptr<SceneNode>> nodes;
+    std::vector<std::shared_ptr<Object>> objects;
 
     std::weak_ptr<Scene> scene;
     std::weak_ptr<SceneNode> parent;
