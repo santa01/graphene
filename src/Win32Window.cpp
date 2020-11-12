@@ -123,12 +123,16 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 
 Win32Window::Win32Window(int width, int height):
         Window(width, height) {
-    AllocConsole();
-    AttachConsole(GetCurrentProcessId());
+    this->hasConsole = AllocConsole();
+    if (this->hasConsole) {
+        AttachConsole(GetCurrentProcessId());
+        freopen_s(&this->stdoutStream, "CONOUT$", "w", stdout);
+        freopen_s(&this->stderrStream, "CONOUT$", "w", stderr);
+    }
 
-    FILE* stream;
-    freopen_s(&stream, "CONOUT$", "w", stdout);
-    freopen_s(&stream, "CONOUT$", "w", stderr);
+    // Unbuffer console regardless its origin
+    setvbuf(stdout, nullptr, _IONBF, 0);
+    setvbuf(stderr, nullptr, _IONBF, 0);
 
     this->instance = GetModuleHandle(nullptr);
     this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", windowProc);
@@ -148,7 +152,11 @@ Win32Window::~Win32Window() {
     this->destroyContext();
     this->destroyWindow(this->window);
 
-    FreeConsole();
+    if (this->hasConsole) {
+        fclose(this->stdoutStream);
+        fclose(this->stderrStream);
+        FreeConsole();
+    }
 }
 
 void Win32Window::captureMouse(bool captured) {

@@ -60,6 +60,10 @@ private:
     DWORD borderStyle = WS_CAPTION | WS_BORDER;
     DWORD windowStyle = WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX;
 
+    bool hasConsole = false;
+    FILE* stdoutStream = nullptr;
+    FILE* stderrStream = nullptr;
+
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
     HDC deviceContext = nullptr;
