@@ -89,8 +89,8 @@ void Example::onSetup() {
     auto& scene = this->createScene("worlds/desert.scene");
 
     this->player = scene->getPlayer();
-    this->player->attachObject(camera);
-    this->player->attachObject(flashLight);
+    this->player->addObject(camera);
+    this->player->addObject(flashLight);
 
     /* Keep mouse inside the window */
 

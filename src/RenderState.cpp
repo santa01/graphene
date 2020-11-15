@@ -54,7 +54,7 @@ void RenderState::enter(RenderManager* /*renderManager*/) {
 }
 
 RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
-    auto scene = camera->getParent()->getScene();
+    auto scene = camera->getScene();
 
     this->shader->setUniformBlock("Material", BIND_MATERIAL);
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
@@ -83,7 +83,7 @@ RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const s
 }
 
 RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
-    auto scene = camera->getParent()->getScene();
+    auto scene = camera->getScene();
     auto& skybox = scene->getSkybox();
 
     if (skybox == nullptr) {
@@ -112,7 +112,7 @@ RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std
 }
 
 RenderStateType RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
-    auto scene = camera->getParent()->getScene();
+    auto scene = camera->getScene();
     auto& frame = renderManager->getFrame();
 
     this->callback(this, nullptr);
@@ -143,7 +143,7 @@ RenderStateType RenderShadows::update(RenderManager* renderManager, const std::s
 }
 
 RenderStateType RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
-    auto scene = camera->getParent()->getScene();
+    auto scene = camera->getScene();
     auto& frame = renderManager->getFrame();
 
     this->shader->setUniformBlock("Light", BIND_LIGHT);

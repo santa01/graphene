@@ -250,7 +250,7 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
         scene->setSkybox(this->createSkybox(parentDirectory + skyboxTexture));
     }
 
-    auto& sceneRoot = scene->getRootNode();
+    auto& sceneRoot = scene->getRoot();
     float pi = static_cast<float>(M_PI);
 
     for (int i = 0; i < sceneDefinition.entities; i++) {
@@ -270,10 +270,7 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
         entity->rotate(Math::Vec3::UNIT_Y, entityDefinition.rotation[1] * 180.0f / pi);
         entity->rotate(Math::Vec3::UNIT_Z, entityDefinition.rotation[2] * 180.0f / pi);
 
-        auto node = scene->createNode();
-        node->attachObject(entity);
-
-        sceneRoot->attachNode(node);
+        sceneRoot->addObject(entity);
     }
 
     for (int i = 0; i < sceneDefinition.lights; i++) {
@@ -298,10 +295,7 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
         light->rotate(Math::Vec3::UNIT_Y, lightDefinition.rotation[1] * 180.0f / pi);
         light->rotate(Math::Vec3::UNIT_Z, lightDefinition.rotation[2] * 180.0f / pi);
 
-        auto node = scene->createNode();
-        node->attachObject(light);
-
-        sceneRoot->attachNode(node);
+        sceneRoot->addObject(light);
     }
 
     return scene;

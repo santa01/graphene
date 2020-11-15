@@ -24,10 +24,16 @@
 #include <Object.h>
 #include <Vec3.h>
 
+class GrapheneObject: public Graphene::Object {
+public:
+    // Graphene::Object() is protected, sub-class to test
+    GrapheneObject(): Graphene::Object(Graphene::ObjectType::ENTITY) { }
+};
+
 class TestObject: public CppUnit::TestFixture {
 public:
     void testTargetAt() {
-        Graphene::Object object(Graphene::ObjectType::ENTITY);
+        GrapheneObject object;
         ASSERT_VEC3_EQUAL(object.getRight(), Math::Vec3::UNIT_X);
         ASSERT_VEC3_EQUAL(object.getUp(), Math::Vec3::UNIT_Y);
         ASSERT_VEC3_EQUAL(object.getTarget(), Math::Vec3::UNIT_Z);

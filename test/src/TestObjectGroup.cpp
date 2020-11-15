@@ -21,12 +21,12 @@
  */
 
 #include <TestGraphene.h>
-#include <SceneNode.h>
+#include <ObjectGroup.h>
 
-class TestSceneNode: public CppUnit::TestFixture { };
+class TestObjectGroup: public CppUnit::TestFixture { };
 
 int main() {
-    CppUnit::TestSuite* suite = new CppUnit::TestSuite("TestSceneNode");
+    CppUnit::TestSuite* suite = new CppUnit::TestSuite("TestObjectGroup");
 
     CppUnit::TextTestRunner runner;
     runner.addTest(suite);

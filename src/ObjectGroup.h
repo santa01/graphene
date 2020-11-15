@@ -20,44 +20,28 @@
  * SOFTWARE.
  */
 
-#ifndef SCENENODE_H
-#define SCENENODE_H
+#ifndef OBJECTGROUP_H
+#define OBJECTGROUP_H
 
 #include <GrapheneApi.h>
-#include <Rotatable.h>
 #include <Scalable.h>
-#include <Movable.h>
-#include <NonCopyable.h>
 #include <Object.h>
 #include <vector>
 #include <memory>
 
 namespace Graphene {
 
-class Scene;
-
-class SceneNode: public std::enable_shared_from_this<SceneNode>,
-        public Rotatable, public Scalable, public Movable, public NonCopyable {
+class ObjectGroup: public std::enable_shared_from_this<ObjectGroup>, public Object, public Scalable {
 public:
-    GRAPHENE_API SceneNode(const std::shared_ptr<Scene>& scene);
-
-    GRAPHENE_API const std::vector<std::shared_ptr<SceneNode>>& getNodes() const;
-    GRAPHENE_API void attachNode(const std::shared_ptr<SceneNode>& node);
+    GRAPHENE_API ObjectGroup();
 
     GRAPHENE_API const std::vector<std::shared_ptr<Object>>& getObjects() const;
-    GRAPHENE_API void attachObject(const std::shared_ptr<Object>& object);
-
-    GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
-    GRAPHENE_API const std::shared_ptr<SceneNode> getParent() const;
+    GRAPHENE_API void addObject(const std::shared_ptr<Object>& object);
 
 private:
-    std::vector<std::shared_ptr<SceneNode>> nodes;
     std::vector<std::shared_ptr<Object>> objects;
-
-    std::weak_ptr<Scene> scene;
-    std::weak_ptr<SceneNode> parent;
 };
 
 }  // namespace Graphene
 
-#endif  // SCENENODE_H
+#endif  // OBJECTGROUP_H

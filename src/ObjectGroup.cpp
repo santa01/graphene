@@ -20,60 +20,31 @@
  * SOFTWARE.
  */
 
-#include <SceneNode.h>
+#include <ObjectGroup.h>
 #include <Logger.h>
 #include <stdexcept>
 
 namespace Graphene {
 
-SceneNode::SceneNode(const std::shared_ptr<Scene>& scene) {
-    if (scene == nullptr) {
-        throw std::invalid_argument(LogFormat("Scene cannot be nullptr"));
-    }
-
-    this->scene = scene;
+ObjectGroup::ObjectGroup():
+        Object(ObjectType::GROUP) {
 }
 
-const std::vector<std::shared_ptr<SceneNode>>& SceneNode::getNodes() const {
-    return this->nodes;
-}
-
-void SceneNode::attachNode(const std::shared_ptr<SceneNode>& node) {
-    if (node == nullptr) {
-        throw std::invalid_argument(LogFormat("SceneNode cannot be nullptr"));
-    }
-
-    if (!node->parent.expired()) {
-        throw std::invalid_argument(LogFormat("SceneNode is already attached elsewhere"));
-    }
-
-    node->parent = this->shared_from_this();
-    this->nodes.emplace_back(node);
-}
-
-const std::vector<std::shared_ptr<Object>>& SceneNode::getObjects() const {
+const std::vector<std::shared_ptr<Object>>& ObjectGroup::getObjects() const {
     return this->objects;
 }
 
-void SceneNode::attachObject(const std::shared_ptr<Object>& object) {
+void ObjectGroup::addObject(const std::shared_ptr<Object>& object) {
     if (object == nullptr) {
         throw std::invalid_argument(LogFormat("Object cannot be nullptr"));
     }
 
     if (!object->parent.expired()) {
-        throw std::invalid_argument(LogFormat("Object is already attached elsewhere"));
+        throw std::invalid_argument(LogFormat("Object is already in another group"));
     }
 
     object->parent = this->shared_from_this();
     this->objects.emplace_back(object);
-}
-
-const std::shared_ptr<Scene> SceneNode::getScene() const {
-    return this->scene.lock();
-}
-
-const std::shared_ptr<SceneNode> SceneNode::getParent() const {
-    return this->parent.lock();
 }
 
 }  // namespace Graphene

@@ -25,11 +25,11 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
-#include <SceneNode.h>
 #include <Camera.h>
 #include <Entity.h>
 #include <Skybox.h>
 #include <Object.h>
+#include <ObjectGroup.h>
 #include <Light.h>
 #include <Mat4.h>
 #include <Vec3.h>
@@ -46,9 +46,8 @@ class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
     GRAPHENE_API Scene();
 
-    GRAPHENE_API const std::shared_ptr<SceneNode> createNode();
-    GRAPHENE_API const std::shared_ptr<SceneNode>& getRootNode();
-    GRAPHENE_API const std::shared_ptr<SceneNode>& getPlayer();
+    GRAPHENE_API const std::shared_ptr<ObjectGroup>& getRoot();
+    GRAPHENE_API const std::shared_ptr<ObjectGroup>& getPlayer();
 
     GRAPHENE_API void setSkybox(const std::shared_ptr<Skybox>& skybox);
     GRAPHENE_API const std::shared_ptr<Skybox>& getSkybox() const;
@@ -71,8 +70,8 @@ public:
     GRAPHENE_API void iterateLights(LightHandler handler);
 
 private:
-    std::shared_ptr<SceneNode> rootNode;
-    std::shared_ptr<SceneNode> player;
+    std::shared_ptr<ObjectGroup> root;
+    std::shared_ptr<ObjectGroup> player;
     std::shared_ptr<Skybox> skybox;
 
     std::string sceneName;

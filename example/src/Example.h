@@ -25,7 +25,7 @@
 
 #include <Engine.h>
 #include <Input.h>
-#include <SceneNode.h>
+#include <ObjectGroup.h>
 #include <memory>
 
 #define MOVE_SPEED  4.0f
@@ -41,7 +41,7 @@ private:
     void onSetup() override;
     void onIdle() override;
 
-    std::shared_ptr<Graphene::SceneNode> player;
+    std::shared_ptr<Graphene::ObjectGroup> player;
 };
 
 #endif  // EXAMPLE_H

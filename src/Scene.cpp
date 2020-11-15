@@ -32,29 +32,25 @@ namespace Graphene {
 
 Scene::Scene() {
     std::ostringstream defaultName;
-    defaultName << std::hex << this;
+    defaultName << std::hex << "Scene (0x" << this << ")";
     this->sceneName = defaultName.str();
 }
 
-const std::shared_ptr<SceneNode> Scene::createNode() {
-    /* const version of shared_from_this() is selected otherwise */
-    return std::make_shared<SceneNode>(this->shared_from_this());
-}
-
-const std::shared_ptr<SceneNode>& Scene::getRootNode() {
+const std::shared_ptr<ObjectGroup>& Scene::getRoot() {
     /* shared_from_this() cannot be called from constructor */
-    if (this->rootNode == nullptr) {
-        this->rootNode = this->createNode();
+    if (this->root == nullptr) {
+        this->root = std::make_shared<ObjectGroup>();
+        this->root->scene = this->shared_from_this();
     }
 
-    return this->rootNode;
+    return this->root;
 }
 
-const std::shared_ptr<SceneNode>& Scene::getPlayer() {
+const std::shared_ptr<ObjectGroup>& Scene::getPlayer() {
     /* shared_from_this() cannot be called from constructor */
     if (this->player == nullptr) {
-        this->player = this->createNode();
-        this->getRootNode()->attachNode(this->player);
+        this->player = std::make_shared<ObjectGroup>();
+        this->getRoot()->addObject(this->player);
     }
 
     return this->player;
@@ -101,14 +97,14 @@ float Scene::getAmbientEnergy() const {
 }
 
 Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera>& camera) {
-    auto node = camera->getParent();
+    auto objectGroup = camera->getParent();
     Math::Mat4 modelView;
 
-    while (node != nullptr) {
-        // Moving to the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Eventually root node's transformation will be the last one.
-        modelView = node->getCameraRotation() * node->getCameraTranslation() * modelView;
-        node = node->getParent();
+    while (objectGroup != nullptr) {
+        // Moving to the root object group, current groups's transformation matrix is the left operand
+        // to be the last operation. Eventually root object group's transformation will be the last one.
+        modelView = objectGroup->getCameraRotation() * objectGroup->getCameraTranslation() * modelView;
+        objectGroup = objectGroup->getParent();
     }
 
     modelView = camera->getCameraRotation() * camera->getCameraTranslation() * modelView;
@@ -116,14 +112,14 @@ Math::Mat4 Scene::calculateModelView(const std::shared_ptr<Camera>& camera) {
 }
 
 Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera>& camera) {
-    auto node = camera->getParent();
+    auto objectGroup = camera->getParent();
     Math::Mat4 view;
 
-    while (node != nullptr) {
-        // Moving to the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Eventually root node's transformation will be the last one.
-        view = node->getCameraRotation() * view;
-        node = node->getParent();
+    while (objectGroup != nullptr) {
+        // Moving to the root object group, current group's transformation matrix is the left operand
+        // to be the last operation. Eventually root object group's transformation will be the last one.
+        view = objectGroup->getCameraRotation() * view;
+        objectGroup = objectGroup->getParent();
     }
 
     view = camera->getCameraRotation() * view;
@@ -131,14 +127,14 @@ Math::Mat4 Scene::calculateView(const std::shared_ptr<Camera>& camera) {
 }
 
 Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera>& camera) {
-    auto node = camera->getParent();
+    auto objectGroup = camera->getParent();
     Math::Mat4 translation;
 
-    while (node != nullptr) {
-        // Moving to the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Eventually root node's transformation will be the last one.
-        translation = node->getTranslation() * translation;
-        node = node->getParent();
+    while (objectGroup != nullptr) {
+        // Moving to the root object group, current group's transformation matrix is the left operand
+        // to be the last operation. Eventually root object group's transformation will be the last one.
+        translation = objectGroup->getTranslation() * translation;
+        objectGroup = objectGroup->getParent();
     }
 
     translation = camera->getTranslation() * translation;
@@ -146,64 +142,63 @@ Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera>& camera) {
 }
 
 void Scene::iterateEntities(EntityHandler handler) {
-    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode>& node, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
-        // Moving from the root node, current node's transformation matrix is the right operand
-        // to be the first operation. Keep the root node's transformation the last one.
-        localWorld = localWorld * node->getTranslation() * node->getRotation() * node->getScaling();
-        normalRotation = normalRotation * node->getRotation();
+    std::function<void(const std::shared_ptr<ObjectGroup>, Math::Mat4, Math::Mat4)> traverser;
+    traverser = [&handler, &traverser](const std::shared_ptr<ObjectGroup>& objectGroup, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
+        // Moving from the root object group, current group's transformation matrix is the right operand
+        // to be the first operation. Keep the root object groups's transformation the last one.
+        localWorld = localWorld * objectGroup->getTranslation() * objectGroup->getRotation() * objectGroup->getScaling();
+        normalRotation = normalRotation * objectGroup->getRotation();
 
-        auto& objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld, &normalRotation](const std::shared_ptr<Object>& object) {
-            if (object->getType() == ObjectType::ENTITY) {
+        auto& objects = objectGroup->getObjects();
+        std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld, &normalRotation](const std::shared_ptr<Object>& object) {
+            ObjectType objectType = object->getType();
+            if (objectType == ObjectType::ENTITY) {
                 auto entity = std::dynamic_pointer_cast<Entity>(object);
-
                 if (entity->isVisible()) {
                     Math::Mat4 entityModelView(localWorld * entity->getTranslation() * entity->getRotation() * entity->getScaling());
                     Math::Mat4 entityNormalRotation(normalRotation * entity->getRotation());
 
                     handler(entity, entityModelView, entityNormalRotation);
                 }
-            }
-        });
+            } else if (objectType == ObjectType::GROUP) {
+                auto objectGroup = std::dynamic_pointer_cast<ObjectGroup>(object);
 
-        auto& nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld, &normalRotation](const std::shared_ptr<SceneNode>& node) {
-            traverser(node, localWorld, normalRotation);
+                traverser(objectGroup, localWorld, normalRotation);
+            } 
         });
     };
 
     Math::Mat4 localWorld;
     Math::Mat4 normalRotation;
-    traverser(this->rootNode, localWorld, normalRotation);
+    traverser(this->root, localWorld, normalRotation);
 }
 
 void Scene::iterateLights(LightHandler handler) {
-    std::function<void(const std::shared_ptr<SceneNode>, Math::Mat4)> traverser;
-    traverser = [&handler, &traverser](const std::shared_ptr<SceneNode>& node, Math::Mat4 localWorld) {
-        // Moving from the root node, current node's transformation matrix is the left operand
-        // to be the last operation. Keep the root node's transformation the last one.
-        localWorld = localWorld * node->getTranslation() * node->getRotation();
+    std::function<void(const std::shared_ptr<ObjectGroup>, Math::Mat4)> traverser;
+    traverser = [&handler, &traverser](const std::shared_ptr<ObjectGroup>& objectGroup, Math::Mat4 localWorld) {
+        // Moving from the root object group, current group's transformation matrix is the left operand
+        // to be the last operation. Keep the root object group's transformation the last one.
+        localWorld = localWorld * objectGroup->getTranslation() * objectGroup->getRotation();
 
-        auto& objects = node->getObjects();
-        std::for_each(objects.begin(), objects.end(), [&handler, &localWorld](const std::shared_ptr<Object>& object) {
-            if (object->getType() == ObjectType::LIGHT) {
+        auto& objects = objectGroup->getObjects();
+        std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld](const std::shared_ptr<Object>& object) {
+            ObjectType objectType = object->getType();
+            if (objectType == ObjectType::LIGHT) {
                 auto light = std::dynamic_pointer_cast<Light>(object);
 
                 Math::Vec4 lightPosition(localWorld * Math::Vec4(light->getPosition(), 1.0f));
                 Math::Vec4 lightDirection(localWorld * Math::Vec4(light->getDirection(), 0.0f));  // Ignore translation
                 handler(light, lightPosition.extractVec3(), lightDirection.extractVec3());
-            }
-        });
+            } else if (objectType == ObjectType::GROUP) {
+                auto objectGroup = std::dynamic_pointer_cast<ObjectGroup>(object);
 
-        auto& nodes = node->getNodes();
-        std::for_each(nodes.begin(), nodes.end(), [&traverser, &localWorld](const std::shared_ptr<SceneNode>& node) {
-            traverser(node, localWorld);
+                traverser(objectGroup, localWorld);
+            }
         });
     };
 
     Math::Mat4 localWorld;
-    traverser(this->rootNode, localWorld);
+    traverser(this->root, localWorld);
 }
 
 }  // namespace Graphene

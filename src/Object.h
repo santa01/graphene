@@ -32,19 +32,20 @@
 
 namespace Graphene {
 
-class SceneNode;
+class Scene;
 
 typedef int ObjectId;
-enum class ObjectType { ENTITY, LIGHT, CAMERA };
+enum class ObjectType { ENTITY, LIGHT, CAMERA, GROUP };
 
 class Object: public Rotatable, public Movable, public NonCopyable {
 public:
-    GRAPHENE_API Object(ObjectType objectType);
     GRAPHENE_API virtual ~Object() = default;
 
     GRAPHENE_API ObjectId getId() const;
     GRAPHENE_API ObjectType getType() const;
-    GRAPHENE_API const std::shared_ptr<SceneNode> getParent() const;
+
+    GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
+    GRAPHENE_API const std::shared_ptr<Object> getParent() const;
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& objectName);
@@ -52,13 +53,18 @@ public:
     GRAPHENE_API void targetAt(float x, float y, float z);
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
 
-private:
+protected:
+    Object(ObjectType objectType);
+
     ObjectId objectId = 0;
     ObjectType objectType = ObjectType::ENTITY;
     std::string objectName;
 
-    friend class SceneNode;
-    std::weak_ptr<SceneNode> parent;
+    friend class Scene;
+    std::weak_ptr<Scene> scene;
+
+    friend class ObjectGroup;
+    std::weak_ptr<Object> parent;
 };
 
 }  // namespace Graphene

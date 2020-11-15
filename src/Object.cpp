@@ -22,6 +22,7 @@
 
 #include <Object.h>
 #include <Logger.h>
+#include <unordered_map>
 #include <stdexcept>
 #include <sstream>
 #include <cassert>
@@ -30,6 +31,13 @@
 
 namespace Graphene {
 
+std::unordered_map<ObjectType, std::string> typeMap = {
+    { ObjectType::ENTITY,   "Entity" },
+    { ObjectType::LIGHT,    "Light" },
+    { ObjectType::CAMERA,   "Camera" },
+    { ObjectType::GROUP,    "ObjectGroup" }
+};
+
 Object::Object(ObjectType objectType):
         objectType(objectType) {
     static ObjectId nextObjectId = 0;
@@ -37,7 +45,7 @@ Object::Object(ObjectType objectType):
     this->objectId = nextObjectId++;
 
     std::ostringstream defaultName;
-    defaultName << std::hex << this;
+    defaultName << std::hex << typeMap.at(this->objectType) << " (0x" << this << ")";
     this->objectName = defaultName.str();
 }
 
@@ -49,7 +57,22 @@ ObjectType Object::getType() const {
     return this->objectType;
 }
 
-const std::shared_ptr<SceneNode> Object::getParent() const {
+const std::shared_ptr<Scene> Object::getScene() const {
+    auto parentObject = this->getParent();
+    if (parentObject == nullptr) {
+        return this->scene.lock();
+    }
+
+    auto currentObject = parentObject;
+    while (parentObject != nullptr) {
+        currentObject = parentObject;
+        parentObject = currentObject->getParent();
+    }
+
+    return currentObject->scene.lock();
+}
+
+const std::shared_ptr<Object> Object::getParent() const {
     return this->parent.lock();
 }
 

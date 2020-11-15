@@ -52,7 +52,7 @@ set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)
 
 set (TEST_GRAPHENE_SOURCES
      Scalable.cpp Movable.cpp Rotatable.cpp
-     Object.cpp Entity.cpp Camera.cpp Light.cpp SceneNode.cpp
+     Object.cpp Entity.cpp Camera.cpp Light.cpp ObjectGroup.cpp
      UniformBuffer.cpp Logger.cpp)
 list (TRANSFORM TEST_GRAPHENE_SOURCES PREPEND ../src/)
 add_library (TEST_GRAPHENE_LIBRARY OBJECT ${TEST_GRAPHENE_SOURCES})
@@ -92,7 +92,7 @@ add_test (${TEST_LIGHT_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_LIGHT_EXECUTABLE})
 add_executable (${TEST_LIGHT_EXECUTABLE} src/TestLight.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
 target_link_libraries (${TEST_LIGHT_EXECUTABLE} ${TEST_LINK_LIBRARIES})
 
-set (TEST_SCENE_NODE_EXECUTABLE test-scenenode)
-add_test (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_SCENE_NODE_EXECUTABLE})
-add_executable (${TEST_SCENE_NODE_EXECUTABLE} src/TestSceneNode.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
-target_link_libraries (${TEST_SCENE_NODE_EXECUTABLE} ${TEST_LINK_LIBRARIES})
+set (TEST_OBJECT_GROUP_EXECUTABLE test-objectgroup)
+add_test (${TEST_OBJECT_GROUP_EXECUTABLE} ${TEST_BINARY_DIR}/${TEST_OBJECT_GROUP_EXECUTABLE})
+add_executable (${TEST_OBJECT_GROUP_EXECUTABLE} src/TestObjectGroup.cpp $<TARGET_OBJECTS:TEST_GRAPHENE_LIBRARY>)
+target_link_libraries (${TEST_OBJECT_GROUP_EXECUTABLE} ${TEST_LINK_LIBRARIES})
