@@ -37,6 +37,8 @@
 
 namespace Graphene {
 
+namespace {
+
 std::unordered_map<GLenum, std::string> sourceMap = {
     { GL_DEBUG_SOURCE_API_ARB,             "OpenGL" },
     { GL_DEBUG_SOURCE_SHADER_COMPILER_ARB, "GLSL" },
@@ -59,6 +61,8 @@ void debugHandler(GLenum source, GLenum type, GLuint /*id*/, GLenum /*severity*/
         GLsizei /*length*/, const GLchar* message, const GLvoid* /*userParam*/) {
     LogDebug("%s [%s]: %s", sourceMap[source].c_str(), typeMap[type].c_str(), message);
 }
+
+}  // namespace
 
 Engine::Engine() {
     if (GetEngineConfig().isDebug()) {

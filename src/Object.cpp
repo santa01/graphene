@@ -31,12 +31,16 @@
 
 namespace Graphene {
 
+namespace {
+
 std::unordered_map<ObjectType, std::string> typeMap = {
     { ObjectType::ENTITY,   "Entity" },
     { ObjectType::LIGHT,    "Light" },
     { ObjectType::CAMERA,   "Camera" },
     { ObjectType::GROUP,    "ObjectGroup" }
 };
+
+}  // namespace
 
 Object::Object(ObjectType objectType):
         objectType(objectType) {

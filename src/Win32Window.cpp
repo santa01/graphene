@@ -30,10 +30,12 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace Graphene {
-
 #define SetWindowObject(window, object) SetWindowLongPtr((window), GWLP_USERDATA, reinterpret_cast<LONG_PTR>((object)))
 #define GetWindowObject(window) reinterpret_cast<Win32Window*>(GetWindowLongPtr((window), GWLP_USERDATA))
+
+namespace Graphene {
+
+namespace {
 
 LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     Win32Window* self = GetWindowObject(window);
@@ -120,6 +122,8 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 
     return DefWindowProc(window, message, wParam, lParam);
 }
+
+}  // namespace
 
 Win32Window::Win32Window(int width, int height):
         Window(width, height) {
