@@ -37,7 +37,7 @@ class Scene;
 typedef int ObjectId;
 enum class ObjectType { ENTITY, LIGHT, CAMERA, GROUP };
 
-class Object: public Rotatable, public Movable, public NonCopyable {
+class Object: public std::enable_shared_from_this<Object>, public Rotatable, public Movable, public NonCopyable {
 public:
     GRAPHENE_API virtual ~Object() = default;
 

@@ -58,12 +58,9 @@ ObjectType Object::getType() const {
 }
 
 const std::shared_ptr<Scene> Object::getScene() const {
+    auto currentObject = this->shared_from_this();
     auto parentObject = this->getParent();
-    if (parentObject == nullptr) {
-        return this->scene.lock();
-    }
 
-    auto currentObject = parentObject;
     while (parentObject != nullptr) {
         currentObject = parentObject;
         parentObject = currentObject->getParent();

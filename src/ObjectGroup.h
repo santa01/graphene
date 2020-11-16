@@ -31,7 +31,7 @@
 
 namespace Graphene {
 
-class ObjectGroup: public std::enable_shared_from_this<ObjectGroup>, public Object, public Scalable {
+class ObjectGroup: public Object, public Scalable {
 public:
     GRAPHENE_API ObjectGroup();
 
