@@ -45,7 +45,7 @@ public:
     GRAPHENE_API void swapBuffers() override;
 
 private:
-    friend LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
     HWND createWindow(LPCWSTR className, LPCWSTR windowName, WNDPROC windowProc);
     void destroyWindow(HWND window);

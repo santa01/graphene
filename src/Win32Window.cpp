@@ -35,9 +35,7 @@
 
 namespace Graphene {
 
-namespace {
-
-LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK Win32Window::windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     Win32Window* self = GetWindowObject(window);
 
     switch (message) {
@@ -123,8 +121,6 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     return DefWindowProc(window, message, wParam, lParam);
 }
 
-}  // namespace
-
 Win32Window::Win32Window(int width, int height):
         Window(width, height) {
     this->hasConsole = AllocConsole();
@@ -139,7 +135,7 @@ Win32Window::Win32Window(int width, int height):
     setvbuf(stderr, nullptr, _IONBF, 0);
 
     this->instance = GetModuleHandle(nullptr);
-    this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", windowProc);
+    this->window = this->createWindow(L"OpenGL Class", L"OpenGL Window", Win32Window::windowProc);
     this->createContext();
 
     SetWindowObject(this->window, this);
