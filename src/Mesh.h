@@ -24,28 +24,27 @@
 #define MESH_H
 
 #include <GrapheneApi.h>
-#include <Material.h>
-#include <Geometry.h>
-#include <memory>
+#include <NonCopyable.h>
+#include <OpenGL.h>
 
 namespace Graphene {
 
-class Mesh {
+class Mesh: public NonCopyable {
 public:
-    GRAPHENE_API Mesh(const std::shared_ptr<Geometry>& geometry);
-    GRAPHENE_API Mesh(const std::shared_ptr<Material>& material, const std::shared_ptr<Geometry>& geometry);
+    GRAPHENE_API Mesh(const void* data, int vertices, int faces);
+    GRAPHENE_API ~Mesh();
 
-    GRAPHENE_API const std::shared_ptr<Material>& getMaterial() const;
-    GRAPHENE_API void setMaterial(const std::shared_ptr<Material>& material);
-
-    GRAPHENE_API const std::shared_ptr<Geometry>& getGeometry() const;
-    GRAPHENE_API void setGeometry(const std::shared_ptr<Geometry>& geometry);
+    GRAPHENE_API int getVertices() const;
+    GRAPHENE_API int getFaces() const;
 
     GRAPHENE_API void render();
 
 private:
-    std::shared_ptr<Material> material;
-    std::shared_ptr<Geometry> geometry;
+    GLuint vao = 0;
+    GLuint buffers[2] = { };
+
+    int vertices = 0;
+    int faces = 0;
 };
 
 }  // namespace Graphene

@@ -20,35 +20,27 @@
  * SOFTWARE.
  */
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef COMPONENT_H
+#define COMPONENT_H
 
 #include <GrapheneApi.h>
-#include <Scalable.h>
-#include <Component.h>
-#include <Object.h>
-#include <vector>
-#include <memory>
+#include <NonCopyable.h>
 
 namespace Graphene {
 
-class Entity: public Object, public Scalable {
+enum class ComponentType { RENDER, PHYSICS };
+
+class Component: public NonCopyable {
 public:
-    GRAPHENE_API Entity();
-    GRAPHENE_API virtual ~Entity() = default;
-
-    GRAPHENE_API void setVisible(bool visible);
-    GRAPHENE_API bool isVisible() const;
-
-    GRAPHENE_API const std::vector<std::shared_ptr<Component>>& getComponents() const;
-    GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
+    GRAPHENE_API ~Component() = default;
+    GRAPHENE_API virtual void update() = 0;
 
 protected:
-    bool visible = true;
+    Component(ComponentType componentType);
 
-    std::vector<std::shared_ptr<Component>> components;
+    ComponentType componentType = ComponentType::RENDER;
 };
 
 }  // namespace Graphene
 
-#endif  // ENTITY_H
+#endif  // COMPONENT_H

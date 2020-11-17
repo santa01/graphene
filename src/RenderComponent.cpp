@@ -20,34 +20,53 @@
  * SOFTWARE.
  */
 
-#include <Entity.h>
+#include <RenderComponent.h>
 #include <Logger.h>
 #include <stdexcept>
 
 namespace Graphene {
 
-Entity::Entity():
-        Object(ObjectType::ENTITY) {
+RenderComponent::RenderComponent(const std::shared_ptr<Mesh>& mesh):
+        Component(ComponentType::RENDER) {
+    this->setMesh(mesh);
 }
 
-void Entity::setVisible(bool visible) {
-    this->visible = visible;
+RenderComponent::RenderComponent(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh):
+        RenderComponent(mesh) {
+    this->setMaterial(material);
 }
 
-bool Entity::isVisible() const {
-    return this->visible;
+const std::shared_ptr<Material>& RenderComponent::getMaterial() const {
+    return this->material;
 }
 
-const std::vector<std::shared_ptr<Component>>& Entity::getComponents() const {
-    return this->components;
+void RenderComponent::setMaterial(const std::shared_ptr<Material>& material) {
+    this->material = material;
 }
 
-void Entity::addComponent(const std::shared_ptr<Component>& components) {
-    if (components == nullptr) {
-        throw std::invalid_argument(LogFormat("Component cannot be nullptr"));
+const std::shared_ptr<Mesh>& RenderComponent::getMesh() const {
+    return this->mesh;
+}
+
+void RenderComponent::setMesh(const std::shared_ptr<Mesh>& mesh) {
+    if (mesh == nullptr) {
+        throw std::invalid_argument(LogFormat("Mesh cannot be nullptr"));
     }
 
-    this->components.emplace_back(components);
+    this->mesh = mesh;
+}
+
+void RenderComponent::update() {
+    if (material != nullptr) {
+        material->bind(BIND_MATERIAL);
+
+        auto& texture = material->getDiffuseTexture();
+        if (texture != nullptr) {
+            texture->bind(TEXTURE_DIFFUSE);
+        }
+    }
+
+    mesh->render();
 }
 
 }  // namespace Graphene

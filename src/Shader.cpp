@@ -160,7 +160,7 @@ void Shader::buildShader() {
         modifiedSource.replace(modifiedSource.find(TOKEN_VERSION), sizeof(TOKEN_VERSION), version.str());
         modifiedSource.replace(modifiedSource.find(TOKEN_TYPE), sizeof(TOKEN_TYPE), shaderType.first);
 
-        shaders.push_back(this->compile(modifiedSource, shaderType.second));
+        shaders.emplace_back(this->compile(modifiedSource, shaderType.second));
     }
 
     this->program = this->link(shaders);

@@ -103,7 +103,7 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
         stringBox.yMax = std::max<int>(stringBox.yMax, charGlyph->box->yMax);
         stringBox.xMax += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
 
-        stringGlyphs.push_back(charGlyph);
+        stringGlyphs.emplace_back(charGlyph);
     }
 
     auto stringImage = std::make_shared<RawImage>(stringBox.xMax, stringBox.yMax - stringBox.yMin, 32);

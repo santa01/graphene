@@ -20,33 +20,36 @@
  * SOFTWARE.
  */
 
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#ifndef RENDERCOMPONENT_H
+#define RENDERCOMPONENT_H
 
 #include <GrapheneApi.h>
-#include <NonCopyable.h>
-#include <OpenGL.h>
+#include <Component.h>
+#include <Material.h>
+#include <Mesh.h>
+#include <vector>
+#include <memory>
 
 namespace Graphene {
 
-class Geometry: public NonCopyable {
+class RenderComponent: public Component {
 public:
-    GRAPHENE_API Geometry(const void* data, int vertices, int faces);
-    GRAPHENE_API ~Geometry();
+    GRAPHENE_API RenderComponent(const std::shared_ptr<Mesh>& mesh);
+    GRAPHENE_API RenderComponent(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh);
 
-    GRAPHENE_API int getVertices() const;
-    GRAPHENE_API int getFaces() const;
+    GRAPHENE_API const std::shared_ptr<Material>& getMaterial() const;
+    GRAPHENE_API void setMaterial(const std::shared_ptr<Material>& material);
 
-    GRAPHENE_API void render();
+    GRAPHENE_API const std::shared_ptr<Mesh>& getMesh() const;
+    GRAPHENE_API void setMesh(const std::shared_ptr<Mesh>& mesh);
+
+    GRAPHENE_API void update() override;
 
 private:
-    GLuint vao = 0;
-    GLuint buffers[2] = { };
-
-    int vertices = 0;
-    int faces = 0;
+    std::vector<std::shared_ptr<Material>> materials;
+    std::vector<std::shared_ptr<Mesh>> meshes;
 };
 
 }  // namespace Graphene
 
-#endif  // GEOMETRY_H
+#endif  // RENDERCOMPONENT_H

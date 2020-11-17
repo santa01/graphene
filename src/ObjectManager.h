@@ -30,9 +30,11 @@
 #include <Skybox.h>
 #include <Shader.h>
 #include <Scene.h>
+#include <Material.h>
 #include <Mesh.h>
 #include <Texture.h>
 #include <ImageTexture.h>
+#include <unordered_set>
 #include <unordered_map>
 #include <vector>
 #include <functional>
@@ -69,16 +71,19 @@ public:
 
 private:
     ObjectManager() = default;
+
     void validateHeader(std::ifstream& file, const std::string& magic);
+    void loadObjects(const std::string& name);
 
-    const std::vector<std::shared_ptr<Mesh>>& loadMeshes(const std::string& name);
+    template<typename T>
+    const std::shared_ptr<Mesh> createMesh(const std::string& alias, FaceWinding winding);
 
-    typedef std::function<std::shared_ptr<Geometry>()> GeometryFactory;
-    const std::shared_ptr<Mesh> createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory);
+    std::unordered_set<std::string> entityCache;
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Material>>> materialCache;
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Mesh>>> meshCache;
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
-    std::unordered_map<std::string, std::vector<std::shared_ptr<Mesh>>> meshCache;
 };
 
 }  // namespace Graphene

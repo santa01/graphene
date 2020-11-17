@@ -21,42 +21,61 @@
  */
 
 #include <Mesh.h>
-#include <Logger.h>
-#include <stdexcept>
 
 namespace Graphene {
 
-Mesh::Mesh(const std::shared_ptr<Geometry>& geometry) {
-    this->setGeometry(geometry);
+enum DataBuffer { BUFFER_VERTICES, BUFFER_FACES };
+enum VertexAttribute { ATTRIBUTE_POSITION, ATTRIBUTE_NORMAL, ATTRIBUTE_UV };
+
+Mesh::Mesh(const void* data, int vertices, int faces):
+        vertices(vertices),
+        faces(faces) {
+    const char* meshData = reinterpret_cast<const char*>(data);
+
+    const void* vertexData = meshData;
+    size_t vertexDataSize = sizeof(float) * this->vertices * (3 + 3 + 2);
+
+    const void* faceData = meshData + vertexDataSize;
+    size_t faceDataSize = sizeof(int) * this->faces * 3;
+
+    glGenVertexArrays(1, &this->vao);
+    glBindVertexArray(this->vao);
+
+    glGenBuffers(2, this->buffers);
+    glBindBuffer(GL_ARRAY_BUFFER, this->buffers[BUFFER_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, vertexDataSize, vertexData, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(ATTRIBUTE_POSITION);
+    glEnableVertexAttribArray(ATTRIBUTE_NORMAL);
+    glEnableVertexAttribArray(ATTRIBUTE_UV);
+
+    ptrdiff_t normalDataOffset = sizeof(float) * this->vertices * 3;
+    ptrdiff_t uvDataOffset = normalDataOffset * 2;
+
+    glVertexAttribPointer(ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void*>(normalDataOffset));
+    glVertexAttribPointer(ATTRIBUTE_UV, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void*>(uvDataOffset));
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[BUFFER_FACES]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceDataSize, faceData, GL_STATIC_DRAW);
 }
 
-Mesh::Mesh(const std::shared_ptr<Material>& material, const std::shared_ptr<Geometry>& geometry):
-        Mesh(geometry) {
-    this->setMaterial(material);
+Mesh::~Mesh() {
+    glDeleteVertexArrays(1, &this->vao);
+    glDeleteBuffers(2, this->buffers);
 }
 
-const std::shared_ptr<Material>& Mesh::getMaterial() const {
-    return this->material;
+int Mesh::getFaces() const {
+    return this->faces;
 }
 
-void Mesh::setMaterial(const std::shared_ptr<Material>& material) {
-    this->material = material;
-}
-
-const std::shared_ptr<Geometry>& Mesh::getGeometry() const {
-    return this->geometry;
-}
-
-void Mesh::setGeometry(const std::shared_ptr<Geometry>& geometry) {
-    if (geometry == nullptr) {
-        throw std::invalid_argument(LogFormat("Geometry cannot be nullptr"));
-    }
-
-    this->geometry = geometry;
+int Mesh::getVertices() const {
+    return this->vertices;
 }
 
 void Mesh::render() {
-    this->geometry->render();
+    glBindVertexArray(this->vao);
+    glDrawElements(GL_TRIANGLES, this->faces * 3, GL_UNSIGNED_INT, 0);
 }
 
 }  // namespace Graphene

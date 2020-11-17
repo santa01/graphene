@@ -23,9 +23,8 @@
 #include <ObjectManager.h>
 #include <EngineConfig.h>
 #include <Logger.h>
-#include <Material.h>
-#include <Geometry.h>
 #include <TgaImage.h>
+#include <RenderComponent.h>
 #include <Vec3.h>
 #include <stdexcept>
 #include <utility>
@@ -90,7 +89,7 @@ typedef struct {
     float position[3];
 } LightDefinition;
 
-struct QuadGeometry {
+struct QuadMesh {
     float vertices[18] = {  1.0f, -1.0f,  0.0f, -1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,
                             1.0f, -1.0f,  0.0f, -1.0f,  1.0f, -0.0f,  1.0f,  1.0f, -0.0f };
     float normals[18]  = {  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, -1.0f,
@@ -101,7 +100,7 @@ struct QuadGeometry {
                             3,  4,  5 };  // Clockwise face winding
 };
 
-struct CubeGeometry {
+struct CubeMesh {
     float vertices[108] = {  1.0, -1.0, -1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0,
                             -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,
                              1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,
@@ -154,28 +153,6 @@ struct CubeGeometry {
 
 #pragma pack(pop)
 
-template<typename T>
-const std::shared_ptr<Geometry> createGeometry(bool flipGeometry) {
-    T geometry;
-    int vertexElements = sizeof(geometry.vertices) / sizeof(float);
-    int vertexIndices = sizeof(geometry.faces) / sizeof(int);
-
-    if (flipGeometry) {
-        // Flip normals
-        for (int i = 0; i < vertexElements; i += 3) {
-            geometry.normals[i + 0] = -geometry.normals[i + 0];
-            geometry.normals[i + 1] = -geometry.normals[i + 1];
-            geometry.normals[i + 2] = -geometry.normals[i + 2];
-        }
-        // Flip face winding
-        for (int i = 0; i < vertexIndices; i += 3) {
-            std::swap(geometry.faces[i + 0], geometry.faces[i + 2]);
-        }
-    }
-
-    return std::make_shared<Geometry>(&geometry, vertexElements / 3, vertexIndices / 3);
-}
-
 ObjectManager& ObjectManager::getInstance() {
     static ObjectManager instance;
     return instance;
@@ -198,21 +175,22 @@ const std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& nam
 }
 
 const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
-    std::vector<std::shared_ptr<Mesh>> meshes;
-
-    auto meshesIt = this->meshCache.find(name);
-    if (meshesIt != this->meshCache.end()) {
+    auto entityIt = this->entityCache.find(name);
+    if (entityIt != this->entityCache.end()) {
         LogDebug("Reuse cached '%s' entity", name.c_str());
-        meshes = meshesIt->second;
     } else {
         LogDebug("Load entity from '%s'", name.c_str());
-        meshes = this->loadMeshes(name);
+        this->loadObjects(name);
     }
 
+    auto& materials = this->materialCache.at(name);
+    auto& meshes = this->meshCache.at(name);
+
+    auto renderComponent = std::make_shared<RenderComponent>();
+    //renderComponent.add();
+
     auto entity = std::make_shared<Entity>();
-    for (auto& mesh: meshes) {
-        entity->addMesh(mesh);
-    }
+    entity->addComponent(renderComponent);
 
     return entity;
 }
@@ -345,15 +323,11 @@ const std::shared_ptr<Shader>& ObjectManager::createShader() {
 }
 
 const std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
-    return this->createMesh("QuadMesh", winding, [winding]() {
-        return createGeometry<QuadGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);
-    });
+    return this->createMesh<QuadMesh>("QuadMesh", winding);
 }
 
 const std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
-    return this->createMesh("CubeMesh", winding, [winding]() {
-        return createGeometry<CubeGeometry>(winding == FaceWinding::WINDING_COUNTER_CLOCKWISE);
-    });
+    return this->createMesh<CubeMesh>("CubeMesh", winding);
 }
 
 const std::shared_ptr<Texture>& ObjectManager::createTexture(const std::string& name) {
@@ -424,7 +398,7 @@ void ObjectManager::validateHeader(std::ifstream& file, const std::string& magic
     }
 }
 
-const std::vector<std::shared_ptr<Mesh>>& ObjectManager::loadMeshes(const std::string& name) {
+void ObjectManager::loadObjects(const std::string& name) {
     std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
@@ -432,16 +406,18 @@ const std::vector<std::shared_ptr<Mesh>>& ObjectManager::loadMeshes(const std::s
 
     this->validateHeader(file, "GPNE");
 
-    int meshesCount;
-    file.read(reinterpret_cast<char*>(&meshesCount), sizeof(meshesCount));
+    int objectsCount;
+    file.read(reinterpret_cast<char*>(&objectsCount), sizeof(objectsCount));
 
-    LogDebug("Load %d meshes from '%s'", meshesCount, name.c_str());
+    LogDebug("Load %d objects from '%s'", objectsCount, name.c_str());
 
     ObjectMaterial objectMaterial;
     ObjectGeometry objectGeometry;
+
+    std::vector<std::shared_ptr<Material>>& materials = this->materialCache[name];
     std::vector<std::shared_ptr<Mesh>>& meshes = this->meshCache[name];
 
-    for (int i = 0; i < meshesCount; i++) {
+    for (int i = 0; i < objectsCount; i++) {
         file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
 
         auto material = std::make_shared<Material>();
@@ -470,16 +446,15 @@ const std::vector<std::shared_ptr<Mesh>>& ObjectManager::loadMeshes(const std::s
         std::unique_ptr<char[]> meshData(new char[meshDataSize]);
         file.read(meshData.get(), meshDataSize);
 
-        auto geometry = std::make_shared<Geometry>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
-        auto mesh = std::make_shared<Mesh>(material, geometry);
+        auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
 
-        meshes.push_back(mesh);
+        materials.emplace_back(material);
+        meshes.emplace_back(mesh);
     }
-
-    return meshes;
 }
 
-const std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, FaceWinding winding, GeometryFactory factory) {
+template<typename T>
+const std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, FaceWinding winding) {
     auto meshesIt = this->meshCache.find(alias);
     if (meshesIt == this->meshCache.end()) {
         std::vector<std::shared_ptr<Mesh>> meshes = { nullptr, nullptr };
@@ -488,7 +463,24 @@ const std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, 
 
     std::vector<std::shared_ptr<Mesh>>& meshes = meshesIt->second;
     if (meshes.at(winding) == nullptr) {
-        meshes.at(winding) = std::make_shared<Mesh>(factory());
+        T meshData;
+        int vertexElements = sizeof(meshData.vertices) / sizeof(float);
+        int vertexIndices = sizeof(meshData.faces) / sizeof(int);
+
+        if (winding == FaceWinding::WINDING_COUNTER_CLOCKWISE) {
+            // Flip normals
+            for (int i = 0; i < vertexElements; i += 3) {
+                meshData.normals[i + 0] = -meshData.normals[i + 0];
+                meshData.normals[i + 1] = -meshData.normals[i + 1];
+                meshData.normals[i + 2] = -meshData.normals[i + 2];
+            }
+            // Flip face winding
+            for (int i = 0; i < vertexIndices; i += 3) {
+                std::swap(meshData.faces[i + 0], meshData.faces[i + 2]);
+            }
+        }
+
+        meshes.at(winding) = std::make_shared<Mesh>(&meshData, vertexElements / 3, vertexIndices / 3);
     }
 
     // Return a Mesh copy (same geometry, different materials)
