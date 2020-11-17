@@ -24,7 +24,6 @@
 #include <RenderManager.h>
 #include <Texture.h>
 #include <Logger.h>
-#include <Skybox.h>
 #include <Scene.h>
 #include <Light.h>
 #include <Entity.h>
@@ -66,17 +65,7 @@ RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const s
         this->shader->setUniform("localWorld", localWorld);
         this->shader->setUniform("normalRotation", normalRotation);
 
-        for (auto& mesh: entity->getMeshes()) {
-            auto& material = mesh->getMaterial();
-            material->bind(BIND_MATERIAL);
-
-            auto& texture = material->getDiffuseTexture();
-            if (texture != nullptr) {
-                texture->bind(TEXTURE_DIFFUSE);
-            }
-
-            mesh->render();
-        }
+        entity->update(ComponentType::GRAPHICS);
     });
 
     return RenderStateType::SKYBOX;
@@ -96,17 +85,7 @@ RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->shader->setUniform("modelViewProjection", camera->getProjection() * Scene::calculateView(camera));
 
-    for (auto& mesh: skybox->getMeshes()) {
-        auto& material = mesh->getMaterial();
-        material->bind(BIND_MATERIAL);
-
-        auto& texture = material->getDiffuseTexture();
-        if (texture != nullptr) {
-            texture->bind(TEXTURE_DIFFUSE);
-        }
-
-        mesh->render();
-    }
+    skybox->update(ComponentType::GRAPHICS);
 
     return RenderStateType::NONE;
 }

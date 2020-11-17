@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#ifndef RENDERCOMPONENT_H
-#define RENDERCOMPONENT_H
+#ifndef GRAPHICSCOMPONENT_H
+#define GRAPHICSCOMPONENT_H
 
 #include <GrapheneApi.h>
 #include <Component.h>
@@ -32,16 +32,14 @@
 
 namespace Graphene {
 
-class RenderComponent: public Component {
+class GraphicsComponent: public Component {
 public:
-    GRAPHENE_API RenderComponent(const std::shared_ptr<Mesh>& mesh);
-    GRAPHENE_API RenderComponent(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh);
+    GRAPHENE_API GraphicsComponent();
 
-    GRAPHENE_API const std::shared_ptr<Material>& getMaterial() const;
-    GRAPHENE_API void setMaterial(const std::shared_ptr<Material>& material);
+    GRAPHENE_API const std::vector<std::shared_ptr<Material>>& getMaterials() const;
+    GRAPHENE_API const std::vector<std::shared_ptr<Mesh>>& getMeshes() const;
 
-    GRAPHENE_API const std::shared_ptr<Mesh>& getMesh() const;
-    GRAPHENE_API void setMesh(const std::shared_ptr<Mesh>& mesh);
+    GRAPHENE_API void addGraphics(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh);
 
     GRAPHENE_API void update() override;
 
@@ -52,4 +50,4 @@ private:
 
 }  // namespace Graphene
 
-#endif  // RENDERCOMPONENT_H
+#endif  // GRAPHICSCOMPONENT_H

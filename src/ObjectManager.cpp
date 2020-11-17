@@ -24,12 +24,13 @@
 #include <EngineConfig.h>
 #include <Logger.h>
 #include <TgaImage.h>
-#include <RenderComponent.h>
+#include <GraphicsComponent.h>
 #include <Vec3.h>
 #include <stdexcept>
 #include <utility>
 #include <sstream>
 #include <cmath>
+#include <cassert>
 
 namespace Graphene {
 
@@ -169,9 +170,19 @@ const std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
     return std::make_shared<Light>(type);
 }
 
-const std::shared_ptr<Skybox> ObjectManager::createSkybox(const std::string& name) {
-    auto& texture = this->createCubeTexture(name);
-    return std::make_shared<Skybox>(std::dynamic_pointer_cast<TextureCubeMap>(texture));
+const std::shared_ptr<Entity> ObjectManager::createSkybox(const std::string& name) {
+    auto material = std::make_shared<Material>();
+    material->setDiffuseTexture(this->createCubeTexture(name));
+
+    auto mesh = GetObjectManager().createCube(FaceWinding::WINDING_COUNTER_CLOCKWISE);
+
+    auto graphicsComponent = std::make_shared<GraphicsComponent>();
+    graphicsComponent->addGraphics(material, mesh);
+
+    auto skybox = std::make_shared<Entity>();
+    skybox->addComponent(graphicsComponent);
+
+    return skybox;
 }
 
 const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
@@ -186,11 +197,17 @@ const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& nam
     auto& materials = this->materialCache.at(name);
     auto& meshes = this->meshCache.at(name);
 
-    auto renderComponent = std::make_shared<RenderComponent>();
-    //renderComponent.add();
+    size_t materialsCount = materials.size();
+    size_t meshesCount = meshes.size();
+    assert(materialsCount == meshesCount);
+
+    auto graphicsComponent = std::make_shared<GraphicsComponent>();
+    for (size_t i = 0; i < materialsCount; i++) {
+        graphicsComponent->addGraphics(materials.at(i), meshes.at(i));
+    }
 
     auto entity = std::make_shared<Entity>();
-    entity->addComponent(renderComponent);
+    entity->addComponent(graphicsComponent);
 
     return entity;
 }
@@ -461,8 +478,8 @@ const std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, 
         meshesIt = this->meshCache.emplace(alias, meshes).first;
     }
 
-    std::vector<std::shared_ptr<Mesh>>& meshes = meshesIt->second;
-    if (meshes.at(winding) == nullptr) {
+    auto& mesh = meshesIt->second.at(winding);
+    if (mesh == nullptr) {
         T meshData;
         int vertexElements = sizeof(meshData.vertices) / sizeof(float);
         int vertexIndices = sizeof(meshData.faces) / sizeof(int);
@@ -480,11 +497,10 @@ const std::shared_ptr<Mesh> ObjectManager::createMesh(const std::string& alias, 
             }
         }
 
-        meshes.at(winding) = std::make_shared<Mesh>(&meshData, vertexElements / 3, vertexIndices / 3);
+        mesh = std::make_shared<Mesh>(&meshData, vertexElements / 3, vertexIndices / 3);
     }
 
-    // Return a Mesh copy (same geometry, different materials)
-    return std::make_shared<Mesh>(*meshes.at(winding));
+    return mesh;
 }
 
 }  // namespace Graphene

@@ -28,4 +28,8 @@ Component::Component(ComponentType componentType):
         componentType(componentType) {
 }
 
+ComponentType Component::getType() const {
+    return this->componentType;
+}
+
 }  // namespace Graphene

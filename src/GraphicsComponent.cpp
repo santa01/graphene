@@ -20,53 +20,55 @@
  * SOFTWARE.
  */
 
-#include <RenderComponent.h>
+#include <GraphicsComponent.h>
 #include <Logger.h>
 #include <stdexcept>
+#include <cassert>
 
 namespace Graphene {
 
-RenderComponent::RenderComponent(const std::shared_ptr<Mesh>& mesh):
-        Component(ComponentType::RENDER) {
-    this->setMesh(mesh);
+GraphicsComponent::GraphicsComponent():
+        Component(ComponentType::GRAPHICS) {
 }
 
-RenderComponent::RenderComponent(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh):
-        RenderComponent(mesh) {
-    this->setMaterial(material);
+const std::vector<std::shared_ptr<Material>>& GraphicsComponent::getMaterials() const {
+    return this->materials;
 }
 
-const std::shared_ptr<Material>& RenderComponent::getMaterial() const {
-    return this->material;
+const std::vector<std::shared_ptr<Mesh>>& GraphicsComponent::getMeshes() const {
+    return this->meshes;
 }
 
-void RenderComponent::setMaterial(const std::shared_ptr<Material>& material) {
-    this->material = material;
-}
+void GraphicsComponent::addGraphics(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh) {
+    if (material == nullptr) {
+        throw std::invalid_argument(LogFormat("Material cannot be nullptr"));
+    }
 
-const std::shared_ptr<Mesh>& RenderComponent::getMesh() const {
-    return this->mesh;
-}
-
-void RenderComponent::setMesh(const std::shared_ptr<Mesh>& mesh) {
     if (mesh == nullptr) {
         throw std::invalid_argument(LogFormat("Mesh cannot be nullptr"));
     }
 
-    this->mesh = mesh;
+    this->materials.emplace_back(material);
+    this->meshes.emplace_back(mesh);
 }
 
-void RenderComponent::update() {
-    if (material != nullptr) {
+void GraphicsComponent::update() {
+    size_t materialsCount = this->materials.size();
+    size_t meshesCount = this->meshes.size();
+    assert(materialsCount == meshesCount);
+
+    for (size_t i = 0; i < materialsCount; i++) {
+        auto& material = this->materials.at(i);
         material->bind(BIND_MATERIAL);
 
         auto& texture = material->getDiffuseTexture();
         if (texture != nullptr) {
             texture->bind(TEXTURE_DIFFUSE);
         }
-    }
 
-    mesh->render();
+        auto& mesh = this->meshes.at(i);
+        mesh->render();
+    }
 }
 
 }  // namespace Graphene

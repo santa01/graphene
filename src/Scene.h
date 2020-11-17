@@ -27,7 +27,6 @@
 #include <NonCopyable.h>
 #include <Camera.h>
 #include <Entity.h>
-#include <Skybox.h>
 #include <Object.h>
 #include <ObjectGroup.h>
 #include <Light.h>
@@ -49,8 +48,8 @@ public:
     GRAPHENE_API const std::shared_ptr<ObjectGroup>& getRoot();
     GRAPHENE_API const std::shared_ptr<ObjectGroup>& getPlayer();
 
-    GRAPHENE_API void setSkybox(const std::shared_ptr<Skybox>& skybox);
-    GRAPHENE_API const std::shared_ptr<Skybox>& getSkybox() const;
+    GRAPHENE_API void setSkybox(const std::shared_ptr<Entity>& skybox);
+    GRAPHENE_API const std::shared_ptr<Entity>& getSkybox() const;
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& sceneName);
@@ -72,7 +71,7 @@ public:
 private:
     std::shared_ptr<ObjectGroup> root;
     std::shared_ptr<ObjectGroup> player;
-    std::shared_ptr<Skybox> skybox;
+    std::shared_ptr<Entity> skybox;
 
     std::string sceneName;
     Math::Vec3 ambientColor = { 1.0f, 1.0f, 1.0f };

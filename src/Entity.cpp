@@ -50,4 +50,12 @@ void Entity::addComponent(const std::shared_ptr<Component>& components) {
     this->components.emplace_back(components);
 }
 
+void Entity::update(ComponentType componentType) {
+    for (auto& component: this->components) {
+        if (component->getType() == componentType) {
+            component->update();
+        }
+    }
+}
+
 }  // namespace Graphene

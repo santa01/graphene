@@ -25,6 +25,7 @@
 
 #include <GrapheneApi.h>
 #include <Entity.h>
+#include <ImageTexture.h>
 #include <Font.h>
 #include <string>
 #include <memory>
@@ -47,6 +48,7 @@ public:
 private:
     void renderText();
 
+    std::shared_ptr<ImageTexture> texture;
     std::shared_ptr<Font> font;
     std::wstring text;
 };

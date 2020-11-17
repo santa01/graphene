@@ -22,9 +22,9 @@
 
 #include <Label.h>
 #include <ObjectManager.h>
-#include <Mesh.h>
+#include <GraphicsComponent.h>
 #include <Material.h>
-#include <ImageTexture.h>
+#include <Mesh.h>
 #include <RawImage.h>
 #include <algorithm>
 #include <cstring>
@@ -33,24 +33,26 @@ namespace Graphene {
 
 Label::Label(int width, int height, const std::shared_ptr<Font>& font):
         font(font) {
-    auto mesh = GetObjectManager().createQuad(FaceWinding::WINDING_CLOCKWISE);
-    this->addMesh(mesh);
+    RawImage textureImage(width, height, 32);  // Data zeroed
+    this->texture = std::make_shared<ImageTexture>(textureImage);
 
     auto material = std::make_shared<Material>();
-    mesh->setMaterial(material);
+    material->setDiffuseTexture(this->texture);
 
-    RawImage textureImage(width, height, 32);  // Data zeroed
-    material->setDiffuseTexture(std::make_shared<ImageTexture>(textureImage));
+    auto mesh = GetObjectManager().createQuad(FaceWinding::WINDING_CLOCKWISE);
+
+    auto graphicsComponent = std::make_shared<GraphicsComponent>();
+    graphicsComponent->addGraphics(material, mesh);
+
+    this->addComponent(graphicsComponent);
 }
 
 int Label::getWidth() const {
-    auto& mesh = *this->meshes.begin();
-    return mesh->getMaterial()->getDiffuseTexture()->getWidth();
+    return this->texture->getWidth();
 }
 
 int Label::getHeight() const {
-    auto& mesh = *this->meshes.begin();
-    return mesh->getMaterial()->getDiffuseTexture()->getHeight();
+    return this->texture->getHeight();
 }
 
 void Label::setFont(const std::shared_ptr<Font>& font) {
@@ -96,10 +98,7 @@ void Label::renderText() {
         memcpy(imagePixels + imageRowOffset, textPixels + textRowOffset, minRowSize);
     }
 
-    auto& mesh = *this->meshes.begin();
-    auto texture = std::dynamic_pointer_cast<ImageTexture>(mesh->getMaterial()->getDiffuseTexture());
-
-    texture->update(textureImage);
+    this->texture->update(textureImage);
 }
 
 }  // namespace Graphene

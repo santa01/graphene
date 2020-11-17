@@ -27,7 +27,6 @@
 #include <Camera.h>
 #include <Light.h>
 #include <Entity.h>
-#include <Skybox.h>
 #include <Shader.h>
 #include <Scene.h>
 #include <Material.h>
@@ -54,7 +53,7 @@ public:
 
     GRAPHENE_API const std::shared_ptr<Camera> createCamera(ProjectionType type) const;
     GRAPHENE_API const std::shared_ptr<Light> createLight(LightType type) const;
-    GRAPHENE_API const std::shared_ptr<Skybox> createSkybox(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Entity> createSkybox(const std::string& name);
     GRAPHENE_API const std::shared_ptr<Entity> createEntity(const std::string& name);
     GRAPHENE_API const std::shared_ptr<Scene> createScene(const std::string& name);
 

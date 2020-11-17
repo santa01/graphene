@@ -28,17 +28,20 @@
 
 namespace Graphene {
 
-enum class ComponentType { RENDER, PHYSICS };
+enum class ComponentType { GRAPHICS, PHYSICS };
 
 class Component: public NonCopyable {
 public:
     GRAPHENE_API ~Component() = default;
+
+    GRAPHENE_API ComponentType getType() const;
+
     GRAPHENE_API virtual void update() = 0;
 
 protected:
     Component(ComponentType componentType);
 
-    ComponentType componentType = ComponentType::RENDER;
+    ComponentType componentType = ComponentType::GRAPHICS;
 };
 
 }  // namespace Graphene

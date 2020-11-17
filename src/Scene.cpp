@@ -56,11 +56,11 @@ const std::shared_ptr<ObjectGroup>& Scene::getPlayer() {
     return this->player;
 }
 
-void Scene::setSkybox(const std::shared_ptr<Skybox>& skybox) {
+void Scene::setSkybox(const std::shared_ptr<Entity>& skybox) {
     this->skybox = skybox;
 }
 
-const std::shared_ptr<Skybox>& Scene::getSkybox() const {
+const std::shared_ptr<Entity>& Scene::getSkybox() const {
     return this->skybox;
 }
 

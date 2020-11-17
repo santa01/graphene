@@ -52,7 +52,7 @@ set (TEST_BINARY_DIR ${GRAPHENE_BINARY_DIR}/test)
 
 set (TEST_GRAPHENE_SOURCES
      Scalable.cpp Movable.cpp Rotatable.cpp
-     Object.cpp Entity.cpp Camera.cpp Light.cpp ObjectGroup.cpp
+     Object.cpp Entity.cpp Camera.cpp Light.cpp ObjectGroup.cpp Component.cpp
      UniformBuffer.cpp Logger.cpp)
 list (TRANSFORM TEST_GRAPHENE_SOURCES PREPEND ../src/)
 add_library (TEST_GRAPHENE_LIBRARY OBJECT ${TEST_GRAPHENE_SOURCES})
