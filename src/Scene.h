@@ -38,8 +38,8 @@
 
 namespace Graphene {
 
-typedef std::function<void(const std::shared_ptr<Entity>, const Math::Mat4&, const Math::Mat4&)> EntityHandler;
-typedef std::function<void(const std::shared_ptr<Light>, const Math::Vec3&, const Math::Vec3&)> LightHandler;
+typedef std::function<void(const std::shared_ptr<Entity>&, const Math::Mat4&, const Math::Mat4&)> EntityHandler;
+typedef std::function<void(const std::shared_ptr<Light>&, const Math::Vec3&, const Math::Vec3&)> LightHandler;
 
 class Scene: public std::enable_shared_from_this<Scene>, public NonCopyable {
 public:
@@ -65,8 +65,8 @@ public:
     GRAPHENE_API static Math::Mat4 calculateView(const std::shared_ptr<Camera>& camera);
     GRAPHENE_API static Math::Vec3 calculatePosition(const std::shared_ptr<Camera>& camera);
 
-    GRAPHENE_API void iterateEntities(EntityHandler handler);
-    GRAPHENE_API void iterateLights(LightHandler handler);
+    GRAPHENE_API void iterateEntities(const EntityHandler& handler) const;
+    GRAPHENE_API void iterateLights(const LightHandler& handler) const;
 
 private:
     std::shared_ptr<ObjectGroup> root;

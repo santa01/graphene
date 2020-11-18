@@ -141,7 +141,7 @@ Math::Vec3 Scene::calculatePosition(const std::shared_ptr<Camera>& camera) {
     return Math::Vec3(translation.get(0, 3), translation.get(1, 3), translation.get(2, 3));
 }
 
-void Scene::iterateEntities(EntityHandler handler) {
+void Scene::iterateEntities(const EntityHandler& handler) const {
     std::function<void(const std::shared_ptr<ObjectGroup>, Math::Mat4, Math::Mat4)> traverser;
     traverser = [&handler, &traverser](const std::shared_ptr<ObjectGroup>& objectGroup, Math::Mat4 localWorld, Math::Mat4 normalRotation) {
         // Moving from the root object group, current group's transformation matrix is the right operand
@@ -173,7 +173,7 @@ void Scene::iterateEntities(EntityHandler handler) {
     traverser(this->root, localWorld, normalRotation);
 }
 
-void Scene::iterateLights(LightHandler handler) {
+void Scene::iterateLights(const LightHandler& handler) const {
     std::function<void(const std::shared_ptr<ObjectGroup>, Math::Mat4)> traverser;
     traverser = [&handler, &traverser](const std::shared_ptr<ObjectGroup>& objectGroup, Math::Mat4 localWorld) {
         // Moving from the root object group, current group's transformation matrix is the left operand

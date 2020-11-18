@@ -95,7 +95,7 @@ void Label::renderText() {
     for (int textRow = 0; textRow < minHeight; textRow++) {
         int imageRowOffset = textRow * imageRowSize;
         int textRowOffset = (minHeight - textRow - 1) * textRowSize;
-        memcpy(imagePixels + imageRowOffset, textPixels + textRowOffset, minRowSize);
+        std::memcpy(imagePixels + imageRowOffset, textPixels + textRowOffset, minRowSize);
     }
 
     this->texture->update(textureImage);

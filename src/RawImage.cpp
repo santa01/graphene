@@ -33,7 +33,7 @@ RawImage::RawImage(int width, int height, int pixelDepth) {
 
     this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
     this->pixels.reset(new char[this->pixelsSize]);
-    memset(this->pixels.get(), 0, this->pixelsSize);
+    std::memset(this->pixels.get(), 0, this->pixelsSize);
 }
 
 RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels):

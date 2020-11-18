@@ -123,7 +123,7 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
         for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++, stringRow++) {
             int pixelsOffset = (stringRow * stringImage->getWidth() + stringAdvance) * pixelBytes;
             int charPixelsOffset = charRow * charBitmapRowSize;
-            memcpy(pixels + pixelsOffset, charPixels + charPixelsOffset, charBitmapRowSize);
+            std::memcpy(pixels + pixelsOffset, charPixels + charPixelsOffset, charBitmapRowSize);
         }
 
         stringAdvance += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
@@ -173,7 +173,7 @@ std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
     for (int pixel = 0; pixel < bitmapSize; pixel++) {
         unsigned char pixelData[] = { 0, 0, 0, charBitmap.buffer[pixel] };
         int pixelOffset = pixel * sizeof(pixelData);
-        memcpy(pixels + pixelOffset, pixelData, sizeof(pixelData));
+        std::memcpy(pixels + pixelOffset, pixelData, sizeof(pixelData));
     }
 
     return charGlyph;

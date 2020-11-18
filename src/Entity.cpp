@@ -42,12 +42,12 @@ const std::vector<std::shared_ptr<Component>>& Entity::getComponents() const {
     return this->components;
 }
 
-void Entity::addComponent(const std::shared_ptr<Component>& components) {
-    if (components == nullptr) {
+void Entity::addComponent(const std::shared_ptr<Component>& component) {
+    if (component == nullptr) {
         throw std::invalid_argument(LogFormat("Component cannot be nullptr"));
     }
 
-    this->components.emplace_back(components);
+    this->components.emplace_back(component);
 }
 
 void Entity::update(ComponentType componentType) {
