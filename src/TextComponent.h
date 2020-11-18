@@ -20,38 +20,48 @@
  * SOFTWARE.
  */
 
-#ifndef COMPONENT_H
-#define COMPONENT_H
+#ifndef TEXTCOMPONENT_H
+#define TEXTCOMPONENT_H
 
 #include <GrapheneApi.h>
-#include <NonCopyable.h>
+#include <Component.h>
+#include <RawImage.h>
+#include <Font.h>
+#include <string>
 #include <memory>
 
 namespace Graphene {
 
-class Entity;
-
-enum class ComponentType { GRAPHICS, TEXT };
-
-class Component: public NonCopyable {
+class TextComponent: public Component {
 public:
-    GRAPHENE_API ~Component() = default;
+    GRAPHENE_API TextComponent(int width, int height, const std::shared_ptr<Font>& font);
 
-    GRAPHENE_API ComponentType getType() const;
-    GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
+    GRAPHENE_API int getWidth() const;
+    GRAPHENE_API int getHeight() const;
+    GRAPHENE_API const std::shared_ptr<RawImage>& getTextImage() const;
 
-    GRAPHENE_API virtual void receiveEvent() = 0;
-    GRAPHENE_API virtual void update() = 0;
+    GRAPHENE_API void setFont(const std::shared_ptr<Font>& font);
+    GRAPHENE_API const std::shared_ptr<Font>& getFont() const;
 
-protected:
-    Component(ComponentType componentType);
+    GRAPHENE_API void setText(const std::wstring& text);
+    GRAPHENE_API const std::wstring& getText() const;
 
-    ComponentType componentType = ComponentType::GRAPHICS;
+    GRAPHENE_API void receiveEvent() override { }
+    GRAPHENE_API void update() override;
 
-    friend class Entity;
-    std::weak_ptr<Entity> parent;
+private:
+    void renderText();
+
+    int width = 0;
+    int height = 0;
+    std::shared_ptr<RawImage> textImage;
+
+    std::shared_ptr<Font> font;
+    std::wstring text;
+
+    bool parametersDirty = true;
 };
 
 }  // namespace Graphene
 
-#endif  // COMPONENT_H
+#endif  // TEXTCOMPONENT_H
