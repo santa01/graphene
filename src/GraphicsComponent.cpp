@@ -52,7 +52,7 @@ void GraphicsComponent::addGraphics(const std::shared_ptr<Material>& material, c
     this->meshes.emplace_back(mesh);
 }
 
-void GraphicsComponent::update() {
+void GraphicsComponent::render() {
     size_t materialsCount = this->materials.size();
     size_t meshesCount = this->meshes.size();
     assert(materialsCount == meshesCount);

@@ -40,6 +40,7 @@ public:
     GRAPHENE_API ComponentType getType() const;
     GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
 
+    GRAPHENE_API virtual void receiveEvent() = 0;
     GRAPHENE_API virtual void update() = 0;
 
 protected:

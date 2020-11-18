@@ -40,8 +40,10 @@ public:
     GRAPHENE_API const std::vector<std::shared_ptr<Mesh>>& getMeshes() const;
 
     GRAPHENE_API void addGraphics(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh);
+    GRAPHENE_API void render();
 
-    GRAPHENE_API void update() override;
+    GRAPHENE_API void receiveEvent() override { }
+    GRAPHENE_API void update() override { };
 
 private:
     std::vector<std::shared_ptr<Material>> materials;

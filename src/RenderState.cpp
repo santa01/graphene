@@ -22,6 +22,7 @@
 
 #include <RenderState.h>
 #include <RenderManager.h>
+#include <GraphicsComponent.h>
 #include <Texture.h>
 #include <Logger.h>
 #include <Scene.h>
@@ -65,7 +66,12 @@ RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const s
         this->shader->setUniform("localWorld", localWorld);
         this->shader->setUniform("normalRotation", normalRotation);
 
-        entity->update(ComponentType::GRAPHICS);
+        for (auto& component: entity->getComponents()) {
+            if (component->getType() == ComponentType::GRAPHICS) {
+                auto graphicsComponent = std::dynamic_pointer_cast<GraphicsComponent>(component);
+                graphicsComponent->render();
+            }
+        }
     });
 
     return RenderStateType::SKYBOX;
@@ -85,7 +91,12 @@ RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std
     this->shader->setUniform("diffuseSampler", TEXTURE_DIFFUSE);
     this->shader->setUniform("modelViewProjection", camera->getProjection() * Scene::calculateView(camera));
 
-    skybox->update(ComponentType::GRAPHICS);
+    for (auto& component: skybox->getComponents()) {
+        if (component->getType() == ComponentType::GRAPHICS) {
+            auto graphicsComponent = std::dynamic_pointer_cast<GraphicsComponent>(component);
+            graphicsComponent->render();
+        }
+    }
 
     return RenderStateType::NONE;
 }

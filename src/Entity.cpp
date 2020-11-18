@@ -51,11 +51,15 @@ void Entity::addComponent(const std::shared_ptr<Component>& component) {
     this->components.emplace_back(component);
 }
 
-void Entity::update(ComponentType componentType) {
+void Entity::sendEvent() const {
     for (auto& component: this->components) {
-        if (component->getType() == componentType) {
-            component->update();
-        }
+        component->receiveEvent();
+    }
+}
+
+void Entity::update() const {
+    for (auto& component: this->components) {
+        component->update();
     }
 }
 

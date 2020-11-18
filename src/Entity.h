@@ -43,7 +43,8 @@ public:
     GRAPHENE_API const std::vector<std::shared_ptr<Component>>& getComponents() const;
     GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
 
-    GRAPHENE_API void update(ComponentType componentType);
+    GRAPHENE_API void sendEvent() const;
+    GRAPHENE_API void update() const;
 
 protected:
     bool visible = true;
