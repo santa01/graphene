@@ -47,6 +47,7 @@ void Entity::addComponent(const std::shared_ptr<Component>& component) {
         throw std::invalid_argument(LogFormat("Component cannot be nullptr"));
     }
 
+    component->parent = std::dynamic_pointer_cast<Entity>(this->shared_from_this());
     this->components.emplace_back(component);
 }
 

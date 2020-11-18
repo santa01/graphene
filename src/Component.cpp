@@ -21,6 +21,7 @@
  */
 
 #include <Component.h>
+#include <Entity.h>
 
 namespace Graphene {
 
@@ -30,6 +31,10 @@ Component::Component(ComponentType componentType):
 
 ComponentType Component::getType() const {
     return this->componentType;
+}
+
+const std::shared_ptr<Entity> Component::getParent() const {
+    return this->parent.lock();
 }
 
 }  // namespace Graphene

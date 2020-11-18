@@ -25,8 +25,11 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <memory>
 
 namespace Graphene {
+
+class Entity;
 
 enum class ComponentType { GRAPHICS, PHYSICS };
 
@@ -35,6 +38,7 @@ public:
     GRAPHENE_API ~Component() = default;
 
     GRAPHENE_API ComponentType getType() const;
+    GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
 
     GRAPHENE_API virtual void update() = 0;
 
@@ -42,6 +46,9 @@ protected:
     Component(ComponentType componentType);
 
     ComponentType componentType = ComponentType::GRAPHICS;
+
+    friend class Entity;
+    std::weak_ptr<Entity> parent;
 };
 
 }  // namespace Graphene

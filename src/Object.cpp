@@ -21,6 +21,7 @@
  */
 
 #include <Object.h>
+#include <ObjectGroup.h>
 #include <Logger.h>
 #include <unordered_map>
 #include <stdexcept>
@@ -73,7 +74,7 @@ const std::shared_ptr<Scene> Object::getScene() const {
     return currentObject->scene.lock();
 }
 
-const std::shared_ptr<Object> Object::getParent() const {
+const std::shared_ptr<ObjectGroup> Object::getParent() const {
     return this->parent.lock();
 }
 

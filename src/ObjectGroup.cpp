@@ -43,7 +43,7 @@ void ObjectGroup::addObject(const std::shared_ptr<Object>& object) {
         throw std::invalid_argument(LogFormat("Object is already in another group"));
     }
 
-    object->parent = this->shared_from_this();
+    object->parent = std::dynamic_pointer_cast<ObjectGroup>(this->shared_from_this());
     this->objects.emplace_back(object);
 }
 

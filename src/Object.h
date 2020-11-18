@@ -33,6 +33,7 @@
 namespace Graphene {
 
 class Scene;
+class ObjectGroup;
 
 typedef int ObjectId;
 enum class ObjectType { ENTITY, LIGHT, CAMERA, GROUP };
@@ -45,7 +46,7 @@ public:
     GRAPHENE_API ObjectType getType() const;
 
     GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
-    GRAPHENE_API const std::shared_ptr<Object> getParent() const;
+    GRAPHENE_API const std::shared_ptr<ObjectGroup> getParent() const;
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& objectName);
@@ -64,7 +65,7 @@ protected:
     std::weak_ptr<Scene> scene;
 
     friend class ObjectGroup;
-    std::weak_ptr<Object> parent;
+    std::weak_ptr<ObjectGroup> parent;
 };
 
 }  // namespace Graphene
