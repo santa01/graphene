@@ -40,18 +40,18 @@ RenderManager::RenderManager() {
     auto& shader = objectManager.createShader();
 
     this->renderStates = {
-        { RenderStateType::GEOMETRY, std::make_shared<RenderGeometry>() },
-        { RenderStateType::OVERLAY,  std::make_shared<RenderOverlay>() },
-        { RenderStateType::BUFFER,   std::make_shared<RenderBuffer>() },
-        { RenderStateType::SKYBOX,   std::make_shared<RenderSkybox>() },
-        { RenderStateType::FRAME,    std::make_shared<RenderFrame>() },
-        { RenderStateType::SHADOWS,  std::make_shared<RenderShadows>() },
-        { RenderStateType::LIGHTS,   std::make_shared<RenderLights>() },
-        { RenderStateType::NONE,     std::make_shared<RenderNone>() }
+        { std::type_index(typeid(RenderGeometry)), std::make_shared<RenderGeometry>() },
+        { std::type_index(typeid(RenderOverlay)),  std::make_shared<RenderOverlay>() },
+        { std::type_index(typeid(RenderBuffer)),   std::make_shared<RenderBuffer>() },
+        { std::type_index(typeid(RenderSkybox)),   std::make_shared<RenderSkybox>() },
+        { std::type_index(typeid(RenderFrame)),    std::make_shared<RenderFrame>() },
+        { std::type_index(typeid(RenderShadows)),  std::make_shared<RenderShadows>() },
+        { std::type_index(typeid(RenderLights)),   std::make_shared<RenderLights>() },
+        { std::type_index(typeid(RenderNone)),     std::make_shared<RenderNone>() }
     };
 
-    this->getRenderState(RenderStateType::NONE)->setShader(shader);
-    this->setRenderState(RenderStateType::NONE);
+    this->getRenderState<RenderNone>()->setShader(shader);
+    this->setRenderState<RenderNone>();
 }
 
 void RenderManager::setShadowPass(bool shadowPass) {
@@ -74,13 +74,13 @@ const std::shared_ptr<Mesh>& RenderManager::getFrame() const {
     return this->frame;
 }
 
-void RenderManager::setRenderState(RenderStateType stateType) {
-    this->renderState = this->renderStates.at(stateType);
+void RenderManager::setRenderState(const std::type_info& stateType) {
+    this->renderState = this->renderStates.at(std::type_index(stateType));
     this->renderState->enter(this);
 }
 
-const std::shared_ptr<RenderState>& RenderManager::getRenderState(RenderStateType stateType) const {
-    return this->renderStates.at(stateType);
+const std::shared_ptr<RenderState>& RenderManager::getRenderState(const std::type_info& stateType) const {
+    return this->renderStates.at(std::type_index(stateType));
 }
 
 void RenderManager::update(const std::shared_ptr<Camera>& camera) {
@@ -88,7 +88,7 @@ void RenderManager::update(const std::shared_ptr<Camera>& camera) {
         throw std::invalid_argument(LogFormat("Camera cannot be nullptr"));
     }
 
-    auto renderNone = this->renderStates.at(RenderStateType::NONE);
+    auto renderNone = this->getRenderState<RenderNone>();
     while (this->renderState != renderNone) {
         this->setRenderState(this->renderState->update(this, camera));
     }

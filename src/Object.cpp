@@ -23,7 +23,6 @@
 #include <Object.h>
 #include <ObjectGroup.h>
 #include <Logger.h>
-#include <unordered_map>
 #include <stdexcept>
 #include <sstream>
 #include <cassert>
@@ -32,34 +31,31 @@
 
 namespace Graphene {
 
-namespace {
-
-std::unordered_map<ObjectType, std::string> typeMap = {
-    { ObjectType::ENTITY,   "Entity" },
-    { ObjectType::LIGHT,    "Light" },
-    { ObjectType::CAMERA,   "Camera" },
-    { ObjectType::GROUP,    "ObjectGroup" }
-};
-
-}  // namespace
-
-Object::Object(ObjectType objectType):
+Object::Object(const std::type_info& objectType):
         objectType(objectType) {
-    static ObjectId nextObjectId = 0;
+    static int nextObjectId = 0;
     assert(nextObjectId < INT_MAX);
     this->objectId = nextObjectId++;
 
     std::ostringstream defaultName;
-    defaultName << std::hex << typeMap.at(this->objectType) << " (0x" << this << ")";
+    defaultName << std::hex << this->objectType.name() << " (0x" << this << ")";
     this->objectName = defaultName.str();
 }
 
-ObjectId Object::getId() const {
+int Object::getId() const {
     return this->objectId;
 }
 
-ObjectType Object::getType() const {
+const std::type_info& Object::getType() const {
     return this->objectType;
+}
+
+const std::string& Object::getName() const {
+    return this->objectName;
+}
+
+void Object::setName(const std::string& objectName) {
+    this->objectName = objectName;
 }
 
 const std::shared_ptr<Scene> Object::getScene() const {
@@ -76,14 +72,6 @@ const std::shared_ptr<Scene> Object::getScene() const {
 
 const std::shared_ptr<ObjectGroup> Object::getParent() const {
     return this->parent.lock();
-}
-
-const std::string& Object::getName() const {
-    return this->objectName;
-}
-
-void Object::setName(const std::string& objectName) {
-    this->objectName = objectName;
 }
 
 void Object::targetAt(float x, float y, float z) {

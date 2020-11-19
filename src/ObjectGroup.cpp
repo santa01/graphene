@@ -27,7 +27,7 @@
 namespace Graphene {
 
 ObjectGroup::ObjectGroup():
-        Object(ObjectType::GROUP) {
+        Object(typeid(ObjectGroup)) {
 }
 
 const std::vector<std::shared_ptr<Object>>& ObjectGroup::getObjects() const {
@@ -43,7 +43,7 @@ void ObjectGroup::addObject(const std::shared_ptr<Object>& object) {
         throw std::invalid_argument(LogFormat("Object is already in another group"));
     }
 
-    object->parent = std::dynamic_pointer_cast<ObjectGroup>(this->shared_from_this());
+    object->parent = this->toShared<ObjectGroup>();
     this->objects.emplace_back(object);
 }
 

@@ -28,7 +28,7 @@
 namespace Graphene {
 
 TextComponent::TextComponent(int width, int height, const std::shared_ptr<Font>& font):
-        Component(ComponentType::TEXT),
+        Component(typeid(TextComponent)),
         width(width),
         height(height),
         font(font) {

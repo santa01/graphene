@@ -30,6 +30,8 @@
 #include <Mesh.h>
 #include <unordered_map>
 #include <memory>
+#include <typeinfo>
+#include <typeindex>
 
 #define GetRenderManager() RenderManager::getInstance()
 
@@ -47,8 +49,14 @@ public:
 
     GRAPHENE_API const std::shared_ptr<Mesh>& getFrame() const;
 
-    GRAPHENE_API void setRenderState(RenderStateType stateType);
-    GRAPHENE_API const std::shared_ptr<RenderState>& getRenderState(RenderStateType stateType) const;
+    template<typename T>
+    void setRenderState() { this->setRenderState(typeid(T)); }
+
+    template<typename T>
+    const std::shared_ptr<RenderState>& getRenderState() const { return this->getRenderState(typeid(T)); }
+
+    GRAPHENE_API void setRenderState(const std::type_info& stateType);
+    GRAPHENE_API const std::shared_ptr<RenderState>& getRenderState(const std::type_info& stateType) const;
 
     GRAPHENE_API void update(const std::shared_ptr<Camera>& camera);
 
@@ -62,7 +70,7 @@ private:
 
     std::shared_ptr<Mesh> frame;
 
-    std::unordered_map<RenderStateType, std::shared_ptr<RenderState>> renderStates;
+    std::unordered_map<std::type_index, std::shared_ptr<RenderState>> renderStates;
     std::shared_ptr<RenderState> renderState;
 };
 

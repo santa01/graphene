@@ -53,7 +53,7 @@ void RenderState::enter(RenderManager* /*renderManager*/) {
     this->shader->enable();
 }
 
-RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
+const std::type_info& RenderGeometry::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
 
     this->shader->setUniformBlock("Material", BIND_MATERIAL);
@@ -67,22 +67,21 @@ RenderStateType RenderGeometry::update(RenderManager* /*renderManager*/, const s
         this->shader->setUniform("normalRotation", normalRotation);
 
         for (auto& component: entity->getComponents()) {
-            if (component->getType() == ComponentType::GRAPHICS) {
-                auto graphicsComponent = std::dynamic_pointer_cast<GraphicsComponent>(component);
-                graphicsComponent->render();
+            if (component->isA<GraphicsComponent>()) {
+                component->toA<GraphicsComponent>()->render();
             }
         }
     });
 
-    return RenderStateType::SKYBOX;
+    return typeid(RenderSkybox);
 }
 
-RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
+const std::type_info& RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
     auto& skybox = scene->getSkybox();
 
     if (skybox == nullptr) {
-        return RenderStateType::NONE;
+        return typeid(RenderNone);
     }
 
     this->callback(this, skybox);
@@ -92,16 +91,15 @@ RenderStateType RenderSkybox::update(RenderManager* /*renderManager*/, const std
     this->shader->setUniform("modelViewProjection", camera->getProjection() * Scene::calculateView(camera));
 
     for (auto& component: skybox->getComponents()) {
-        if (component->getType() == ComponentType::GRAPHICS) {
-            auto graphicsComponent = std::dynamic_pointer_cast<GraphicsComponent>(component);
-            graphicsComponent->render();
+        if (component->isA<GraphicsComponent>()) {
+            component->toA<GraphicsComponent>()->render();
         }
     }
 
-    return RenderStateType::NONE;
+    return typeid(RenderNone);
 }
 
-RenderStateType RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
+const std::type_info& RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
     auto& frame = renderManager->getFrame();
 
@@ -114,25 +112,25 @@ RenderStateType RenderFrame::update(RenderManager* renderManager, const std::sha
     frame->render();
 
     if (renderManager->hasShadowPass()) {
-        return RenderStateType::SHADOWS;
+        return typeid(RenderShadows);
     }
 
     if (renderManager->hasLightPass()) {
-        return RenderStateType::LIGHTS;
+        return typeid(RenderLights);
     }
 
-    return RenderStateType::NONE;
+    return typeid(RenderNone);
 }
 
-RenderStateType RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera>& /*camera*/) {
+const std::type_info& RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera>& /*camera*/) {
     if (renderManager->hasLightPass()) {
-        return RenderStateType::LIGHTS;
+        return typeid(RenderLights);
     }
 
-    return RenderStateType::NONE;
+    return typeid(RenderNone);
 }
 
-RenderStateType RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
+const std::type_info& RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
     auto& frame = renderManager->getFrame();
 
@@ -154,10 +152,10 @@ RenderStateType RenderLights::update(RenderManager* renderManager, const std::sh
         frame->render();
     });
 
-    return RenderStateType::NONE;
+    return typeid(RenderNone);
 }
 
-RenderStateType RenderNone::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& /*camera*/) {
+const std::type_info& RenderNone::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& /*camera*/) {
     throw std::runtime_error(LogFormat("RenderNone state cannot be updated"));
 }
 

@@ -27,12 +27,13 @@
 #include <algorithm>
 #include <stdexcept>
 #include <sstream>
+#include <typeinfo>
 
 namespace Graphene {
 
 Scene::Scene() {
     std::ostringstream defaultName;
-    defaultName << std::hex << "Scene (0x" << this << ")";
+    defaultName << std::hex << typeid(Scene).name() << " (0x" << this << ")";
     this->sceneName = defaultName.str();
 }
 
@@ -151,17 +152,16 @@ void Scene::iterateEntities(const EntityHandler& handler) const {
 
         auto& objects = objectGroup->getObjects();
         std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld, &normalRotation](const std::shared_ptr<Object>& object) {
-            ObjectType objectType = object->getType();
-            if (objectType == ObjectType::ENTITY) {
-                auto entity = std::dynamic_pointer_cast<Entity>(object);
+            if (object->isA<Entity>()) {
+                auto entity = object->toShared<Entity>();
                 if (entity->isVisible()) {
                     Math::Mat4 entityModelView(localWorld * entity->getTranslation() * entity->getRotation() * entity->getScaling());
                     Math::Mat4 entityNormalRotation(normalRotation * entity->getRotation());
 
                     handler(entity, entityModelView, entityNormalRotation);
                 }
-            } else if (objectType == ObjectType::GROUP) {
-                auto objectGroup = std::dynamic_pointer_cast<ObjectGroup>(object);
+            } else if (object->isA<ObjectGroup>()) {
+                auto objectGroup = object->toShared<ObjectGroup>();
 
                 traverser(objectGroup, localWorld, normalRotation);
             } 
@@ -182,15 +182,14 @@ void Scene::iterateLights(const LightHandler& handler) const {
 
         auto& objects = objectGroup->getObjects();
         std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld](const std::shared_ptr<Object>& object) {
-            ObjectType objectType = object->getType();
-            if (objectType == ObjectType::LIGHT) {
-                auto light = std::dynamic_pointer_cast<Light>(object);
+            if (object->isA<Light>()) {
+                auto light = object->toShared<Light>();
 
                 Math::Vec4 lightPosition(localWorld * Math::Vec4(light->getPosition(), 1.0f));
                 Math::Vec4 lightDirection(localWorld * Math::Vec4(light->getDirection(), 0.0f));  // Ignore translation
                 handler(light, lightPosition.extractVec3(), lightDirection.extractVec3());
-            } else if (objectType == ObjectType::GROUP) {
-                auto objectGroup = std::dynamic_pointer_cast<ObjectGroup>(object);
+            } else if (object->isA<ObjectGroup>()) {
+                auto objectGroup = object->toShared<ObjectGroup>();
 
                 traverser(objectGroup, localWorld);
             }

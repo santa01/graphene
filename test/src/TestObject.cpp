@@ -27,7 +27,7 @@
 class GrapheneObject: public Graphene::Object {
 public:
     // Graphene::Object() is protected, sub-class to test
-    GrapheneObject(): Graphene::Object(Graphene::ObjectType::ENTITY) { }
+    GrapheneObject(): Graphene::Object(typeid(GrapheneObject)) { }
 };
 
 class TestObject: public CppUnit::TestFixture {

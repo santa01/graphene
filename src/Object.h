@@ -29,37 +29,44 @@
 #include <Movable.h>
 #include <memory>
 #include <string>
+#include <typeinfo>
 
 namespace Graphene {
 
 class Scene;
 class ObjectGroup;
 
-typedef int ObjectId;
-enum class ObjectType { ENTITY, LIGHT, CAMERA, GROUP };
-
 class Object: public std::enable_shared_from_this<Object>, public Rotatable, public Movable, public NonCopyable {
 public:
     GRAPHENE_API virtual ~Object() = default;
 
-    GRAPHENE_API ObjectId getId() const;
-    GRAPHENE_API ObjectType getType() const;
+    GRAPHENE_API int getId() const;
+    GRAPHENE_API const std::type_info& getType() const;
 
-    GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
-    GRAPHENE_API const std::shared_ptr<ObjectGroup> getParent() const;
+    template<typename T>
+    bool isA() const { return typeid(T) == this->getType(); }
+
+    template<typename T>
+    T* toA() { return dynamic_cast<T*>(this); }
+
+    template<typename T>
+    std::shared_ptr<T> toShared() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& objectName);
+
+    GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
+    GRAPHENE_API const std::shared_ptr<ObjectGroup> getParent() const;
 
     GRAPHENE_API void targetAt(float x, float y, float z);
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
 
 protected:
-    Object(ObjectType objectType);
+    Object(const std::type_info& objectType);
 
-    ObjectId objectId = 0;
-    ObjectType objectType = ObjectType::ENTITY;
+    int objectId = 0;
     std::string objectName;
+    const std::type_info& objectType;
 
     friend class Scene;
     std::weak_ptr<Scene> scene;
