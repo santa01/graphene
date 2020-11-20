@@ -41,11 +41,11 @@ const std::shared_ptr<Shader>& RenderState::getShader() const {
     return this->shader;
 }
 
-void RenderState::setCallback(const RenderCallback& callback) {
+void RenderState::setCallback(const RenderStateCallback& callback) {
     this->callback = callback;
 }
 
-const RenderCallback& RenderState::getCallback() const {
+const RenderStateCallback& RenderState::getCallback() const {
     return this->callback;
 }
 
@@ -53,7 +53,7 @@ void RenderState::enter(RenderManager* /*renderManager*/) {
     this->shader->enable();
 }
 
-const std::type_info& RenderGeometry::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
+MetaType RenderState::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
 
     this->shader->setUniformBlock("Material", BIND_MATERIAL);
@@ -73,15 +73,15 @@ const std::type_info& RenderGeometry::update(RenderManager* /*renderManager*/, c
         }
     });
 
-    return typeid(RenderSkybox);
+    return RenderSkybox::ID;
 }
 
-const std::type_info& RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
+MetaType RenderSkybox::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
     auto& skybox = scene->getSkybox();
 
     if (skybox == nullptr) {
-        return typeid(RenderNone);
+        return RenderNone::ID;
     }
 
     this->callback(this, skybox);
@@ -96,10 +96,10 @@ const std::type_info& RenderSkybox::update(RenderManager* /*renderManager*/, con
         }
     }
 
-    return typeid(RenderNone);
+    return RenderNone::ID;
 }
 
-const std::type_info& RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
+MetaType RenderFrame::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
     auto& frame = renderManager->getFrame();
 
@@ -112,25 +112,25 @@ const std::type_info& RenderFrame::update(RenderManager* renderManager, const st
     frame->render();
 
     if (renderManager->hasShadowPass()) {
-        return typeid(RenderShadows);
+        return RenderShadows::ID;
     }
 
     if (renderManager->hasLightPass()) {
-        return typeid(RenderLights);
+        return RenderLights::ID;
     }
 
-    return typeid(RenderNone);
+    return RenderNone::ID;
 }
 
-const std::type_info& RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera>& /*camera*/) {
+MetaType RenderShadows::update(RenderManager* renderManager, const std::shared_ptr<Camera>& /*camera*/) {
     if (renderManager->hasLightPass()) {
-        return typeid(RenderLights);
+        return RenderLights::ID;
     }
 
-    return typeid(RenderNone);
+    return RenderNone::ID;
 }
 
-const std::type_info& RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
+MetaType RenderLights::update(RenderManager* renderManager, const std::shared_ptr<Camera>& camera) {
     auto scene = camera->getScene();
     auto& frame = renderManager->getFrame();
 
@@ -152,10 +152,10 @@ const std::type_info& RenderLights::update(RenderManager* renderManager, const s
         frame->render();
     });
 
-    return typeid(RenderNone);
+    return RenderNone::ID;
 }
 
-const std::type_info& RenderNone::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& /*camera*/) {
+MetaType RenderNone::update(RenderManager* /*renderManager*/, const std::shared_ptr<Camera>& /*camera*/) {
     throw std::runtime_error(LogFormat("RenderNone state cannot be updated"));
 }
 

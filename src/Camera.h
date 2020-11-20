@@ -24,6 +24,7 @@
 #define CAMERA_H
 
 #include <GrapheneApi.h>
+#include <MetaObject.h>
 #include <Object.h>
 #include <Mat4.h>
 #include <Vec3.h>
@@ -32,7 +33,7 @@ namespace Graphene {
 
 enum class ProjectionType { PERSPECTIVE, ORTHOGRAPHIC };
 
-class Camera: public Object {
+class Camera: public MetaObject<Camera>, public Object {
 public:
     GRAPHENE_API Camera(ProjectionType type);
 

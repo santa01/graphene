@@ -64,7 +64,7 @@ void FrameBuffer::update() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto& viewport: this->viewports) {
-        GetRenderManager().setRenderState<RenderBuffer>();
+        GetRenderManager().setRenderState(RenderBuffer::ID);
         viewport->update();
     }
 }

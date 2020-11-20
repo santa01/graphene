@@ -20,39 +20,8 @@
  * SOFTWARE.
  */
 
-#ifndef ENTITY_H
-#define ENTITY_H
-
-#include <GrapheneApi.h>
-#include <Scalable.h>
-#include <Component.h>
 #include <MetaObject.h>
-#include <Object.h>
-#include <vector>
-#include <memory>
 
 namespace Graphene {
 
-class Entity: public MetaObject<Entity>, public Object, public Scalable {
-public:
-    GRAPHENE_API Entity();
-    GRAPHENE_API virtual ~Entity() = default;
-
-    GRAPHENE_API void setVisible(bool visible);
-    GRAPHENE_API bool isVisible() const;
-
-    GRAPHENE_API const std::vector<std::shared_ptr<Component>>& getComponents() const;
-    GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
-
-    GRAPHENE_API void sendEvent() const;
-    GRAPHENE_API void update() const;
-
-protected:
-    bool visible = true;
-
-    std::vector<std::shared_ptr<Component>> components;
-};
-
 }  // namespace Graphene
-
-#endif  // ENTITY_H

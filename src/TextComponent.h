@@ -24,6 +24,7 @@
 #define TEXTCOMPONENT_H
 
 #include <GrapheneApi.h>
+#include <MetaObject.h>
 #include <Component.h>
 #include <RawImage.h>
 #include <Font.h>
@@ -32,7 +33,7 @@
 
 namespace Graphene {
 
-class TextComponent: public Component {
+class TextComponent: public MetaObject<TextComponent>, public Component {
 public:
     GRAPHENE_API TextComponent(int width, int height, const std::shared_ptr<Font>& font);
 

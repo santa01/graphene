@@ -25,13 +25,14 @@
 
 #include <GrapheneApi.h>
 #include <Scalable.h>
+#include <MetaObject.h>
 #include <Object.h>
 #include <vector>
 #include <memory>
 
 namespace Graphene {
 
-class ObjectGroup: public Object, public Scalable {
+class ObjectGroup: public MetaObject<ObjectGroup>, public Object, public Scalable {
 public:
     GRAPHENE_API ObjectGroup();
 

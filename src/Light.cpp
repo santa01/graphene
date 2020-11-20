@@ -45,7 +45,7 @@ typedef struct {
 #pragma pack(pop)
 
 Light::Light(LightType lightType):
-        Object(typeid(Light)),
+        Object(Light::ID),
         lightType(lightType) {
     LightBuffer buffer = { };
     this->lightBuffer = std::make_shared<UniformBuffer>(&buffer, sizeof(buffer));

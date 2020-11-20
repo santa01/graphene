@@ -20,39 +20,31 @@
  * SOFTWARE.
  */
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef METAOBJECT_H
+#define METAOBJECT_H
 
 #include <GrapheneApi.h>
-#include <Scalable.h>
-#include <Component.h>
-#include <MetaObject.h>
-#include <Object.h>
-#include <vector>
-#include <memory>
+#include <typeinfo>
+#include <typeindex>
 
 namespace Graphene {
 
-class Entity: public MetaObject<Entity>, public Object, public Scalable {
+typedef const std::type_info& MetaType;
+typedef std::type_index MetaIndex;
+
+template<typename T>
+class MetaObject {
 public:
-    GRAPHENE_API Entity();
-    GRAPHENE_API virtual ~Entity() = default;
-
-    GRAPHENE_API void setVisible(bool visible);
-    GRAPHENE_API bool isVisible() const;
-
-    GRAPHENE_API const std::vector<std::shared_ptr<Component>>& getComponents() const;
-    GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
-
-    GRAPHENE_API void sendEvent() const;
-    GRAPHENE_API void update() const;
-
-protected:
-    bool visible = true;
-
-    std::vector<std::shared_ptr<Component>> components;
+    static MetaType ID;
+    static MetaIndex INDEX;
 };
+
+template<typename T>
+MetaType MetaObject<T>::ID = typeid(T);
+
+template<typename T>
+MetaIndex MetaObject<T>::INDEX = MetaIndex(MetaObject<T>::ID);
 
 }  // namespace Graphene
 
-#endif  // ENTITY_H
+#endif  // METAOBJECT_H

@@ -28,7 +28,7 @@
 namespace Graphene {
 
 GraphicsComponent::GraphicsComponent():
-        Component(typeid(GraphicsComponent)) {
+        Component(GraphicsComponent::ID) {
 }
 
 const std::vector<std::shared_ptr<Material>>& GraphicsComponent::getMaterials() const {

@@ -27,7 +27,7 @@
 namespace Graphene {
 
 Entity::Entity():
-        Object(typeid(Entity)) {
+        Object(Entity::ID) {
 }
 
 void Entity::setVisible(bool visible) {
@@ -47,7 +47,7 @@ void Entity::addComponent(const std::shared_ptr<Component>& component) {
         throw std::invalid_argument(LogFormat("Component cannot be nullptr"));
     }
 
-    component->parent = this->toShared<Entity>();
+    component->parent = this->toA<Entity>();
     this->components.emplace_back(component);
 }
 

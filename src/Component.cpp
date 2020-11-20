@@ -25,11 +25,11 @@
 
 namespace Graphene {
 
-Component::Component(const std::type_info& componentType):
+Component::Component(MetaType componentType):
         componentType(componentType) {
 }
 
-const std::type_info& Component::getType() const {
+MetaType Component::getType() const {
     return this->componentType;
 }
 

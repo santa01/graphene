@@ -21,6 +21,7 @@
  */
 
 #include <TextComponent.h>
+#include <MetaObject.h>
 #include <Entity.h>
 #include <algorithm>
 #include <cstring>
@@ -28,7 +29,7 @@
 namespace Graphene {
 
 TextComponent::TextComponent(int width, int height, const std::shared_ptr<Font>& font):
-        Component(typeid(TextComponent)),
+        Component(TextComponent::ID),
         width(width),
         height(height),
         font(font) {

@@ -26,7 +26,7 @@
 namespace Graphene {
 
 Camera::Camera(ProjectionType projectionType):
-        Object(typeid(Camera)),
+        Object(Camera::ID),
         projectionType(projectionType) {
     this->updateProjection();
 }

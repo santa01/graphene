@@ -31,14 +31,14 @@
 
 namespace Graphene {
 
-Object::Object(const std::type_info& objectType):
+Object::Object(MetaType objectType):
         objectType(objectType) {
     static int nextObjectId = 0;
     assert(nextObjectId < INT_MAX);
     this->objectId = nextObjectId++;
 
     std::ostringstream defaultName;
-    defaultName << std::hex << this->objectType.name() << " (0x" << this << ")";
+    defaultName << std::hex << "Object (0x" << this << ")";
     this->objectName = defaultName.str();
 }
 
@@ -46,7 +46,7 @@ int Object::getId() const {
     return this->objectId;
 }
 
-const std::type_info& Object::getType() const {
+MetaType Object::getType() const {
     return this->objectType;
 }
 

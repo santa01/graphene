@@ -78,7 +78,7 @@ void GeometryBuffer::update() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto& viewport: this->viewports) {
-        GetRenderManager().setRenderState<RenderGeometry>();
+        GetRenderManager().setRenderState(RenderGeometry::ID);
         viewport->update();
     }
 }

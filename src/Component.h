@@ -25,8 +25,8 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <MetaObject.h>
 #include <memory>
-#include <typeinfo>
 
 namespace Graphene {
 
@@ -36,16 +36,13 @@ class Component: public NonCopyable {
 public:
     GRAPHENE_API ~Component() = default;
 
-    GRAPHENE_API const std::type_info& getType() const;
+    GRAPHENE_API MetaType getType() const;
 
     template<typename T>
-    bool isA() const { return typeid(T) == this->getType(); }
+    bool isA() const { return MetaObject<T>::ID == this->getType(); }
 
     template<typename T>
     T* toA() { return dynamic_cast<T*>(this); }
-
-    template<typename T>
-    std::shared_ptr<T> toShared() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
 
     GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
 
@@ -53,9 +50,9 @@ public:
     GRAPHENE_API virtual void update() = 0;
 
 protected:
-    Component(const std::type_info& componentType);
+    Component(MetaType componentType);
 
-    const std::type_info& componentType;
+    MetaType componentType;
 
     friend class Entity;
     std::weak_ptr<Entity> parent;

@@ -27,13 +27,12 @@
 #include <algorithm>
 #include <stdexcept>
 #include <sstream>
-#include <typeinfo>
 
 namespace Graphene {
 
 Scene::Scene() {
     std::ostringstream defaultName;
-    defaultName << std::hex << typeid(Scene).name() << " (0x" << this << ")";
+    defaultName << std::hex << "Scene (0x" << this << ")";
     this->sceneName = defaultName.str();
 }
 
@@ -153,7 +152,7 @@ void Scene::iterateEntities(const EntityHandler& handler) const {
         auto& objects = objectGroup->getObjects();
         std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld, &normalRotation](const std::shared_ptr<Object>& object) {
             if (object->isA<Entity>()) {
-                auto entity = object->toShared<Entity>();
+                auto entity = object->toA<Entity>();
                 if (entity->isVisible()) {
                     Math::Mat4 entityModelView(localWorld * entity->getTranslation() * entity->getRotation() * entity->getScaling());
                     Math::Mat4 entityNormalRotation(normalRotation * entity->getRotation());
@@ -161,7 +160,7 @@ void Scene::iterateEntities(const EntityHandler& handler) const {
                     handler(entity, entityModelView, entityNormalRotation);
                 }
             } else if (object->isA<ObjectGroup>()) {
-                auto objectGroup = object->toShared<ObjectGroup>();
+                auto objectGroup = object->toA<ObjectGroup>();
 
                 traverser(objectGroup, localWorld, normalRotation);
             } 
@@ -183,13 +182,13 @@ void Scene::iterateLights(const LightHandler& handler) const {
         auto& objects = objectGroup->getObjects();
         std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld](const std::shared_ptr<Object>& object) {
             if (object->isA<Light>()) {
-                auto light = object->toShared<Light>();
+                auto light = object->toA<Light>();
 
                 Math::Vec4 lightPosition(localWorld * Math::Vec4(light->getPosition(), 1.0f));
                 Math::Vec4 lightDirection(localWorld * Math::Vec4(light->getDirection(), 0.0f));  // Ignore translation
                 handler(light, lightPosition.extractVec3(), lightDirection.extractVec3());
             } else if (object->isA<ObjectGroup>()) {
-                auto objectGroup = object->toShared<ObjectGroup>();
+                auto objectGroup = object->toA<ObjectGroup>();
 
                 traverser(objectGroup, localWorld);
             }

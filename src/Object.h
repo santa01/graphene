@@ -25,11 +25,11 @@
 
 #include <GrapheneApi.h>
 #include <NonCopyable.h>
+#include <MetaObject.h>
 #include <Rotatable.h>
 #include <Movable.h>
 #include <memory>
 #include <string>
-#include <typeinfo>
 
 namespace Graphene {
 
@@ -41,16 +41,13 @@ public:
     GRAPHENE_API virtual ~Object() = default;
 
     GRAPHENE_API int getId() const;
-    GRAPHENE_API const std::type_info& getType() const;
+    GRAPHENE_API MetaType getType() const;
 
     template<typename T>
-    bool isA() const { return typeid(T) == this->getType(); }
+    bool isA() const { return MetaObject<T>::ID == this->getType(); }
 
     template<typename T>
-    T* toA() { return dynamic_cast<T*>(this); }
-
-    template<typename T>
-    std::shared_ptr<T> toShared() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
+    std::shared_ptr<T> toA() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& objectName);
@@ -62,11 +59,11 @@ public:
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
 
 protected:
-    Object(const std::type_info& objectType);
+    Object(MetaType objectType);
 
     int objectId = 0;
+    MetaType objectType;
     std::string objectName;
-    const std::type_info& objectType;
 
     friend class Scene;
     std::weak_ptr<Scene> scene;

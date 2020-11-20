@@ -24,6 +24,7 @@
 #define GRAPHICSCOMPONENT_H
 
 #include <GrapheneApi.h>
+#include <MetaObject.h>
 #include <Component.h>
 #include <Material.h>
 #include <Mesh.h>
@@ -32,7 +33,7 @@
 
 namespace Graphene {
 
-class GraphicsComponent: public Component {
+class GraphicsComponent: public MetaObject<GraphicsComponent>, public Component {
 public:
     GRAPHENE_API GraphicsComponent();
 

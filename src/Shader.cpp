@@ -26,7 +26,6 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
-#include <typeinfo>
 
 namespace Graphene {
 
@@ -35,7 +34,7 @@ GLuint Shader::activeProgram = 0;
 Shader::Shader(const std::string& shaderSource):
         shaderSource(shaderSource) {
     std::ostringstream defaultName;
-    defaultName << std::hex << typeid(Shader).name() << " (0x" << this << ")";
+    defaultName << std::hex << "Shader (0x" << this << ")";
     this->shaderName = defaultName.str();
 
     this->shaderTypes = {

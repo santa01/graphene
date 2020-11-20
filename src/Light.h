@@ -25,6 +25,7 @@
 
 #include <GrapheneApi.h>
 #include <UniformBuffer.h>
+#include <MetaObject.h>
 #include <Object.h>
 #include <Vec3.h>
 #include <memory>
@@ -33,7 +34,7 @@ namespace Graphene {
 
 enum LightType { POINT, SPOT, DIRECTED };
 
-class Light: public Object {
+class Light: public MetaObject<Light>, public Object {
 public:
     GRAPHENE_API Light(LightType lightType);
 

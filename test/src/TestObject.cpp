@@ -21,13 +21,16 @@
  */
 
 #include <TestGraphene.h>
+#include <MetaObject.h>
 #include <Object.h>
 #include <Vec3.h>
 
-class GrapheneObject: public Graphene::Object {
+class GrapheneObject: public Graphene::MetaObject<GrapheneObject>, public Graphene::Object {
 public:
     // Graphene::Object() is protected, sub-class to test
-    GrapheneObject(): Graphene::Object(typeid(GrapheneObject)) { }
+    GrapheneObject():
+            Graphene::Object(GrapheneObject::ID) {
+    }
 };
 
 class TestObject: public CppUnit::TestFixture {
