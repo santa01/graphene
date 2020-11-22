@@ -101,7 +101,7 @@ LRESULT CALLBACK Win32Window::windowProc(HWND window, UINT message, WPARAM wPara
                 if (xPosition != 0 || yPosition != 0) {
                     self->warpMousePointer(windowCenter.x, windowCenter.y);
                 } else {
-                    mouseMoved = false; // WM_MOUSEMOVE after SetCursorPos() to window center
+                    mouseMoved = false;  // WM_MOUSEMOVE after SetCursorPos() to window center
                 }
             }
 

@@ -26,6 +26,7 @@
 #include <GrapheneApi.h>
 #include <Scalable.h>
 #include <Component.h>
+#include <ComponentEvent.h>
 #include <MetaObject.h>
 #include <Object.h>
 #include <vector>
@@ -36,15 +37,21 @@ namespace Graphene {
 class Entity: public MetaObject<Entity>, public Object, public Scalable {
 public:
     GRAPHENE_API Entity();
-    GRAPHENE_API virtual ~Entity() = default;
 
     GRAPHENE_API void setVisible(bool visible);
     GRAPHENE_API bool isVisible() const;
 
+    template<typename T>
+    std::shared_ptr<T> getComponent() const {
+        auto predicate = [](const std::shared_ptr<Component>& component) { return component->isA<T>(); };
+        auto componentIt = std::find_if(this->components.begin(), this->components.end(), predicate);
+        return (componentIt != this->components.end()) ? (*componentIt)->toA<T>() : nullptr;
+    }
+
     GRAPHENE_API const std::vector<std::shared_ptr<Component>>& getComponents() const;
     GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
 
-    GRAPHENE_API void sendEvent() const;
+    GRAPHENE_API void sendEvent(const std::shared_ptr<ComponentEvent>& event) const;
     GRAPHENE_API void update() const;
 
 protected:

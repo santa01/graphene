@@ -20,39 +20,28 @@
  * SOFTWARE.
  */
 
-#ifndef LABEL_H
-#define LABEL_H
-
-#include <GrapheneApi.h>
-#include <Entity.h>
-#include <ImageTexture.h>
-#include <Font.h>
-#include <string>
-#include <memory>
+#include <ComponentEvent.h>
 
 namespace Graphene {
 
-class Label: public Entity {
-public:
-    GRAPHENE_API Label(int width, int height, const std::shared_ptr<Font>& font);
+ComponentEvent::ComponentEvent(MetaType eventType):
+        eventType(eventType) {
+}
 
-    GRAPHENE_API int getWidth() const;
-    GRAPHENE_API int getHeight() const;
+MetaType ComponentEvent::getType() const {
+    return this->eventType;
+}
 
-    GRAPHENE_API void setFont(const std::shared_ptr<Font>& font);
-    GRAPHENE_API const std::shared_ptr<Font>& getFont() const;
+TextureUpdateEvent::TextureUpdateEvent():
+        ComponentEvent(TextureUpdateEvent::ID) {
+}
 
-    GRAPHENE_API void setText(const std::wstring& text);
-    GRAPHENE_API const std::wstring& getText() const;
+const std::shared_ptr<Image>& TextureUpdateEvent::getImage() const {
+    return this->image;
+}
 
-private:
-    void renderText();
-
-    std::shared_ptr<ImageTexture> texture;
-    std::shared_ptr<Font> font;
-    std::wstring text;
-};
+void TextureUpdateEvent::setImage(const std::shared_ptr<Image>& image) {
+    this->image = image;
+}
 
 }  // namespace Graphene
-
-#endif  // LABEL_H

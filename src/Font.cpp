@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <vector>
 #include <cstring>
+#include <cassert>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -106,7 +107,8 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
         stringGlyphs.emplace_back(charGlyph);
     }
 
-    auto stringImage = std::make_shared<RawImage>(stringBox.xMax, stringBox.yMax - stringBox.yMin, 32);
+    // Extra pixel in case string box is miscalculated
+    auto stringImage = std::make_shared<RawImage>(stringBox.xMax + 1, stringBox.yMax - stringBox.yMin, 32);
     int stringAdvance = 0;
 
     int pixelBytes = stringImage->getPixelDepth() >> 3;
@@ -123,6 +125,8 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
         for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++, stringRow++) {
             int pixelsOffset = (stringRow * stringImage->getWidth() + stringAdvance) * pixelBytes;
             int charPixelsOffset = charRow * charBitmapRowSize;
+
+            assert(pixelsOffset + charBitmapRowSize < stringImage->getPixelsSize());
             std::memcpy(pixels + pixelsOffset, charPixels + charPixelsOffset, charBitmapRowSize);
         }
 

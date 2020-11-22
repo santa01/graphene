@@ -23,6 +23,7 @@
 #include <Entity.h>
 #include <Logger.h>
 #include <stdexcept>
+#include <algorithm>
 
 namespace Graphene {
 
@@ -51,9 +52,9 @@ void Entity::addComponent(const std::shared_ptr<Component>& component) {
     this->components.emplace_back(component);
 }
 
-void Entity::sendEvent() const {
+void Entity::sendEvent(const std::shared_ptr<ComponentEvent>& event) const {
     for (auto& component: this->components) {
-        component->receiveEvent();
+        component->receiveEvent(event);
     }
 }
 

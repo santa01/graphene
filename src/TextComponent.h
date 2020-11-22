@@ -26,6 +26,7 @@
 #include <GrapheneApi.h>
 #include <MetaObject.h>
 #include <Component.h>
+#include <ComponentEvent.h>
 #include <RawImage.h>
 #include <Font.h>
 #include <string>
@@ -47,7 +48,7 @@ public:
     GRAPHENE_API void setText(const std::wstring& text);
     GRAPHENE_API const std::wstring& getText() const;
 
-    GRAPHENE_API void receiveEvent() override { }
+    GRAPHENE_API void receiveEvent(const std::shared_ptr<ComponentEvent>& /*event*/) override { }
     GRAPHENE_API void update() override;
 
 private:

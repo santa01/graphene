@@ -109,7 +109,7 @@ public:
         ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3::UNIT_Z);
         ASSERT_VEC3_EQUAL(rotatable.getRotationAngles(), Math::Vec3(0.0f, 0.0f, 90.0f));
 
-        rotatable.pitch(89.9999f); // 90.0f gives asinf(1.00000012f) -> nan
+        rotatable.pitch(89.9999f);  // 90.0f gives asinf(1.00000012f) -> nan
         ASSERT_VEC3_EQUAL(rotatable.getRight(), -Math::Vec3::UNIT_X);
         ASSERT_VEC3_EQUAL(rotatable.getUp(), -Math::Vec3::UNIT_Y);
         ASSERT_VEC3_EQUAL(rotatable.getTarget(), Math::Vec3::UNIT_Z);

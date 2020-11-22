@@ -23,8 +23,10 @@
 #include <ObjectManager.h>
 #include <EngineConfig.h>
 #include <Logger.h>
+#include <RawImage.h>
 #include <TgaImage.h>
 #include <GraphicsComponent.h>
+#include <TextComponent.h>
 #include <Vec3.h>
 #include <stdexcept>
 #include <utility>
@@ -159,32 +161,6 @@ ObjectManager& ObjectManager::getInstance() {
     return instance;
 }
 
-const std::shared_ptr<Camera> ObjectManager::createCamera(ProjectionType type) const {
-    auto camera = std::make_shared<Camera>(type);
-    camera->setFov(GetEngineConfig().getFov());
-
-    return camera;
-}
-
-const std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
-    return std::make_shared<Light>(type);
-}
-
-const std::shared_ptr<Entity> ObjectManager::createSkybox(const std::string& name) {
-    auto material = std::make_shared<Material>();
-    material->setDiffuseTexture(this->createCubeTexture(name));
-
-    auto mesh = GetObjectManager().createCube(FaceWinding::WINDING_COUNTER_CLOCKWISE);
-
-    auto graphicsComponent = std::make_shared<GraphicsComponent>();
-    graphicsComponent->addGraphics(material, mesh);
-
-    auto skybox = std::make_shared<Entity>();
-    skybox->addComponent(graphicsComponent);
-
-    return skybox;
-}
-
 const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& name) {
     auto entityIt = this->entityCache.find(name);
     if (entityIt != this->entityCache.end()) {
@@ -296,6 +272,58 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
     return scene;
 }
 
+const std::shared_ptr<Camera> ObjectManager::createCamera(ProjectionType type) const {
+    auto camera = std::make_shared<Camera>(type);
+    camera->setFov(GetEngineConfig().getFov());
+
+    return camera;
+}
+
+const std::shared_ptr<Light> ObjectManager::createLight(LightType type) const {
+    return std::make_shared<Light>(type);
+}
+
+const std::shared_ptr<Entity> ObjectManager::createSkybox(const std::string& name) {
+    auto material = std::make_shared<Material>();
+    material->setDiffuseTexture(this->createCubeTexture(name));
+
+    auto graphicsComponent = std::make_shared<GraphicsComponent>();
+    graphicsComponent->addGraphics(material, this->createCube(FaceWinding::WINDING_COUNTER_CLOCKWISE));
+
+    auto skybox = std::make_shared<Entity>();
+    skybox->addComponent(graphicsComponent);
+
+    return skybox;
+}
+
+const std::shared_ptr<Entity> ObjectManager::createLabel(int width, int height, const std::string& name, int size) {
+    RawImage textureImage(width, height, 32);
+    auto texture = std::make_shared<ImageTexture>(textureImage);
+
+    auto material = std::make_shared<Material>();
+    material->setDiffuseTexture(texture);
+
+    auto graphicsComponent = std::make_shared<GraphicsComponent>();
+    graphicsComponent->addGraphics(material, this->createQuad(FaceWinding::WINDING_CLOCKWISE));
+
+    auto font = this->createFont(name, size);
+    auto textComponent = std::make_shared<TextComponent>(width, height, font);
+
+    auto label = std::make_shared<Entity>();
+    label->addComponent(graphicsComponent);
+    label->addComponent(textComponent);
+
+    return label;
+}
+
+const std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
+    return this->createMesh<QuadMesh>("QuadMesh", winding);
+}
+
+const std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
+    return this->createMesh<CubeMesh>("CubeMesh", winding);
+}
+
 const std::shared_ptr<Shader>& ObjectManager::createShader(const std::string& name) {
     auto shaderIt = this->shaderCache.find(name);
     if (shaderIt != this->shaderCache.end()) {
@@ -339,14 +367,6 @@ const std::shared_ptr<Shader>& ObjectManager::createShader() {
     return this->shaderCache.emplace(shaderName, shader).first->second;
 }
 
-const std::shared_ptr<Mesh> ObjectManager::createQuad(FaceWinding winding) {
-    return this->createMesh<QuadMesh>("QuadMesh", winding);
-}
-
-const std::shared_ptr<Mesh> ObjectManager::createCube(FaceWinding winding) {
-    return this->createMesh<CubeMesh>("CubeMesh", winding);
-}
-
 const std::shared_ptr<Texture>& ObjectManager::createTexture(const std::string& name) {
     auto textureIt = this->textureCache.find(name);
     if (textureIt != this->textureCache.end()) {
@@ -382,6 +402,23 @@ const std::shared_ptr<Texture>& ObjectManager::createCubeTexture(const std::stri
 
     auto texture = std::make_shared<ImageCubeTexture>(textureCubeImage);
     return this->textureCache.emplace(name, texture).first->second;
+}
+
+const std::shared_ptr<Font>& ObjectManager::createFont(const std::string& name, int size) {
+    std::ostringstream nameStream;
+    nameStream << name << "_" << size;
+
+    std::string nameAlias(nameStream.str());
+    auto fontIt = this->fontCache.find(nameAlias);
+    if (fontIt != this->fontCache.end()) {
+        LogDebug("Reuse cached '%s' font (%dpt)", name.c_str(), size);
+        return fontIt->second;
+    }
+
+    LogDebug("Load font (%dpt) from '%s'", size, name.c_str());
+    auto font = std::make_shared<Font>(GetEngineConfig().getDataDirectory() + '/' + name, size);
+
+    return this->fontCache.emplace(nameAlias, font).first->second;
 }
 
 void ObjectManager::teardown() {

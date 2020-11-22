@@ -25,6 +25,7 @@
 #include <Entity.h>
 #include <algorithm>
 #include <cstring>
+#include <cassert>
 
 namespace Graphene {
 
@@ -69,7 +70,12 @@ void TextComponent::update() {
     if (this->parametersDirty) {
         this->parametersDirty = false;
         this->renderText();
-        this->getParent()->sendEvent();
+
+        auto event = std::make_shared<TextureUpdateEvent>();
+        event->setImage(this->textImage);
+
+        auto entity = this->getParent();
+        entity->sendEvent(event);
     }
 }
 
@@ -91,6 +97,8 @@ void TextComponent::renderText() {
     for (int textRow = 0; textRow < minHeight; textRow++) {
         int imageRowOffset = textRow * imageRowSize;
         int textRowOffset = (minHeight - textRow - 1) * textRowSize;
+
+        assert(imageRowOffset + minRowSize < this->textImage->getPixelsSize());
         std::memcpy(imagePixels + imageRowOffset, textPixels + textRowOffset, minRowSize);
     }
 }

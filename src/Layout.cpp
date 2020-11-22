@@ -22,6 +22,7 @@
 
 #include <Layout.h>
 #include <Overlay.h>
+#include <TextComponent.h>
 #include <Mat4.h>
 #include <Vec4.h>
 #include <Vec3.h>
@@ -32,23 +33,23 @@ const std::shared_ptr<Overlay> Layout::getOverlay() const {
     return this->overlay.lock();
 }
 
-void Layout::addComponent(const std::shared_ptr<Label>& component, int x, int y) {
-    this->componentPositions.emplace(component, std::make_pair(x, y));
+void Layout::addComponent(const std::shared_ptr<Entity>& entity, int x, int y) {
+    this->entityPositions.emplace(entity, std::make_pair(x, y));
 }
 
-void Layout::removeComponent(const std::shared_ptr<Label>& component) {
-    auto componentPositionsIt = this->componentPositions.find(component);
-    if (componentPositionsIt != this->componentPositions.end()) {
-        this->componentPositions.erase(componentPositionsIt);
+void Layout::removeComponent(const std::shared_ptr<Entity>& entity) {
+    auto entityPositionsIt = this->entityPositions.find(entity);
+    if (entityPositionsIt != this->entityPositions.end()) {
+        this->entityPositions.erase(entityPositionsIt);
     }
 
-    auto componentScaleFactorsIt = this->componentScaleFactors.find(component);
-    if (componentScaleFactorsIt != this->componentScaleFactors.end()) {
-        // Restore component scale factors to initial values
-        auto& scaleFactors = componentScaleFactorsIt->second;
-        component->scale(1.0f / scaleFactors.first, 1.0f / scaleFactors.second, 1.0f);
+    auto entityScaleFactorsIt = this->entityScaleFactors.find(entity);
+    if (entityScaleFactorsIt != this->entityScaleFactors.end()) {
+        // Restore entity scale factors to initial values
+        auto& scaleFactors = entityScaleFactorsIt->second;
+        entity->scale(1.0f / scaleFactors.first, 1.0f / scaleFactors.second, 1.0f);
 
-        this->componentScaleFactors.erase(componentScaleFactorsIt);
+        this->entityScaleFactors.erase(entityScaleFactorsIt);
     }
 }
 
@@ -65,7 +66,7 @@ void Layout::arrangeComponents() {
      * Y(ndc) = 2 * (Y(window) - y) / height - 1
      *
      */
-    if (this->componentPositions.empty()) {
+    if (this->entityPositions.empty()) {
         return;
     }
 
@@ -88,31 +89,37 @@ void Layout::arrangeComponents() {
     Math::Mat4 inversePerspective(camera->getProjection());
     inversePerspective.invert();
 
-    for (auto& componentPosition: this->componentPositions) {
-        auto& component = componentPosition.first;
-        float componentWidth = static_cast<float>(component->getWidth());
-        float componentHeight = static_cast<float>(component->getHeight());
+    for (auto& entityPosition: this->entityPositions) {
+        auto& entity = entityPosition.first;
 
-        // Move component by the half of their dimentions to shift origin to the bottom-left
-        auto& position = componentPosition.second;
-        float x = position.first + componentWidth / 2.0f;
-        float y = position.second + componentHeight / 2.0f;
+        auto textComponent = entity->getComponent<TextComponent>();
+        if (textComponent == nullptr) {
+            continue;  // TextComponent is the only UI component at the moment
+        }
+
+        float entityWidth = static_cast<float>(textComponent->getWidth());
+        float entityHeight = static_cast<float>(textComponent->getHeight());
+
+        // Move entity by the half of their dimentions to shift origin to the bottom-left
+        auto& position = entityPosition.second;
+        float x = position.first + entityWidth / 2.0f;
+        float y = position.second + entityHeight / 2.0f;
         float xNdc = 2.0f * (x - overlayLeft) / overlayWidth - 1.0f;
         float yNdc = 2.0f * (y - overlayTop) / overlayHeight - 1.0f;
 
         Math::Vec4 ndcPosition(xNdc, yNdc, 1.0f, 1.0f);
         Math::Vec4 worldPosition(inversePerspective * ndcPosition);
-        worldPosition.set(Math::Vec4::Z, component->getPosition().get(Math::Vec4::Z));
-        component->translate(worldPosition.extractVec3());
+        worldPosition.set(Math::Vec4::Z, entity->getPosition().get(Math::Vec4::Z));
+        entity->translate(worldPosition.extractVec3());
 
-        float scaleX = 2.0f * overlayAspectRatio * componentWidth / overlayWidth;
-        float scaleY = 2.0f * componentHeight / overlayHeight;
-        component->scale(scaleX, scaleY, 1.0f);
+        float scaleX = 2.0f * overlayAspectRatio * entityWidth / overlayWidth;
+        float scaleY = 2.0f * entityHeight / overlayHeight;
+        entity->scale(scaleX, scaleY, 1.0f);
 
-        this->componentScaleFactors.emplace(component, std::make_pair(scaleX, scaleY));
+        this->entityScaleFactors.emplace(entity, std::make_pair(scaleX, scaleY));
     }
 
-    this->componentPositions.clear();
+    this->entityPositions.clear();
 }
 
 }  // namespace Graphene

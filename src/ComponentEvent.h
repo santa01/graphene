@@ -20,22 +20,19 @@
  * SOFTWARE.
  */
 
-#ifndef COMPONENT_H
-#define COMPONENT_H
+#ifndef COMPONENTEVENT_H
+#define COMPONENTEVENT_H
 
 #include <GrapheneApi.h>
-#include <NonCopyable.h>
 #include <MetaObject.h>
-#include <ComponentEvent.h>
+#include <Image.h>
 #include <memory>
 
 namespace Graphene {
 
-class Entity;
-
-class Component: public std::enable_shared_from_this<Component>, public NonCopyable {
+class ComponentEvent: public std::enable_shared_from_this<ComponentEvent> {
 public:
-    GRAPHENE_API ~Component() = default;
+    GRAPHENE_API virtual ~ComponentEvent() = default;
 
     GRAPHENE_API MetaType getType() const;
 
@@ -45,20 +42,23 @@ public:
     template<typename T>
     std::shared_ptr<T> toA() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
 
-    GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
-
-    GRAPHENE_API virtual void receiveEvent(const std::shared_ptr<ComponentEvent>& event) = 0;
-    GRAPHENE_API virtual void update() = 0;
-
 protected:
-    Component(MetaType componentType);
+    ComponentEvent(MetaType eventType);
 
-    MetaType componentType;
+    MetaType eventType;
+};
 
-    friend class Entity;
-    std::weak_ptr<Entity> parent;
+class TextureUpdateEvent: public MetaObject<TextureUpdateEvent>, public ComponentEvent {
+public:
+    GRAPHENE_API TextureUpdateEvent();
+
+    GRAPHENE_API const std::shared_ptr<Image>& getImage() const;
+    GRAPHENE_API void setImage(const std::shared_ptr<Image>& image);
+
+private:
+    std::shared_ptr<Image> image;
 };
 
 }  // namespace Graphene
 
-#endif  // COMPONENT_H
+#endif  // COMPONENTEVENT_H

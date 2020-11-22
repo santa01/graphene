@@ -25,6 +25,7 @@
 #include <ObjectManager.h>
 #include <RenderManager.h>
 #include <EngineConfig.h>
+#include <TextComponent.h>
 #if defined(_WIN32)
 #include <Win32Window.h>
 #elif defined(__linux__)
@@ -33,6 +34,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <iomanip>
 #include <unordered_map>
 
 namespace Graphene {
@@ -143,15 +145,20 @@ int Engine::exec() {
             }
         }
 
-        this->renderTime += this->getFrameTime();
-        this->frames++;
+        if (config.isDebug()) {
+            this->renderTime += this->getFrameTime();
+            this->frames++;
 
-        if (this->renderTime >= 1.0f) {
-            float fps = this->frames / this->renderTime;
-            LogInfo("%d frames in %.1f seconds = %.3f fps", this->frames, this->renderTime, fps);
+            if (this->renderTime >= 0.1f) {
+                float fps = this->frames / this->renderTime;
+                this->renderTime = 0.0f;
+                this->frames = 0;
 
-            this->renderTime = 0.0f;
-            this->frames = 0;
+                std::wostringstream fpsText;
+                fpsText << L"FPS: " << std::fixed << std::setprecision(2) << fps;
+                this->fps->getComponent<TextComponent>()->setText(fpsText.str());
+                this->fps->update();  // TODO
+            }
         }
     }
 
@@ -243,9 +250,33 @@ void Engine::setupEngine() {
     this->onTeardownSignal.connect(Signals::Slot<>(&Engine::onTeardown, this));
     this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdle, this));
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));
+
+    if (GetEngineConfig().isDebug()) {
+        auto& debugScene = this->createScene();
+        auto& debugRoot = debugScene->getRoot();
+
+        auto debugCamera = objectManager.createCamera(Graphene::ProjectionType::ORTHOGRAPHIC);
+        debugCamera->setNearPlane(-1.0f);
+        debugCamera->setFarPlane(1.0f);
+        debugRoot->addObject(debugCamera);
+
+        this->fps = objectManager.createLabel(200, 20, "fonts/dejavu-sans.ttf", 14);
+        debugRoot->addObject(this->fps);
+
+        auto& window = this->getWindow();
+
+        auto debugLayout = std::make_shared<Graphene::Layout>();
+        debugLayout->addComponent(this->fps, 10, window->getHeight() - 30);
+
+        auto& debugOverlay = window->createOverlay(0, 0, window->getWidth(), window->getHeight());
+        debugOverlay->setCamera(debugCamera);
+        debugOverlay->setLayout(debugLayout);
+    }
 }
 
 void Engine::teardownEngine() {
+    this->fps.reset();
+
     this->frameBuffers.clear();
     this->scenes.clear();
 

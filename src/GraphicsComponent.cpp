@@ -71,4 +71,24 @@ void GraphicsComponent::render() {
     }
 }
 
+void GraphicsComponent::receiveEvent(const std::shared_ptr<ComponentEvent>& event) {
+    if (event->isA<TextureUpdateEvent>()) {
+        auto& image = event->toA<TextureUpdateEvent>()->getImage();
+
+        for (auto& material: this->materials) {
+            auto& texture = material->getDiffuseTexture();
+            if (texture == nullptr) {
+                continue;
+            }
+
+            auto imageTexture = std::dynamic_pointer_cast<ImageTexture>(texture);
+            if (imageTexture == nullptr) {
+                continue;
+            }
+
+            imageTexture->update(*image);
+        }
+    }
+}
+
 }  // namespace Graphene

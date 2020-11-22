@@ -30,6 +30,7 @@
 #include <Scene.h>
 #include <Input.h>
 #include <OpenGL.h>
+#include <Entity.h>
 #include <Signals.h>
 #include <vector>
 #include <memory>
@@ -79,6 +80,7 @@ private:
     std::vector<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::vector<std::shared_ptr<Scene>> scenes;
     std::shared_ptr<Window> window;
+    std::shared_ptr<Entity> fps;
 
     float frameTime = 0.0f;
     float renderTime = 0.0f;

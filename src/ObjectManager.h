@@ -33,6 +33,7 @@
 #include <Mesh.h>
 #include <Texture.h>
 #include <ImageTexture.h>
+#include <Font.h>
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
@@ -51,20 +52,22 @@ class ObjectManager: public NonCopyable {
 public:
     GRAPHENE_API static ObjectManager& getInstance();
 
-    GRAPHENE_API const std::shared_ptr<Camera> createCamera(ProjectionType type) const;
-    GRAPHENE_API const std::shared_ptr<Light> createLight(LightType type) const;
-    GRAPHENE_API const std::shared_ptr<Entity> createSkybox(const std::string& name);
     GRAPHENE_API const std::shared_ptr<Entity> createEntity(const std::string& name);
     GRAPHENE_API const std::shared_ptr<Scene> createScene(const std::string& name);
 
-    GRAPHENE_API const std::shared_ptr<Shader>& createShader(const std::string& name);
-    GRAPHENE_API const std::shared_ptr<Shader>& createShader();
+    GRAPHENE_API const std::shared_ptr<Camera> createCamera(ProjectionType type) const;
+    GRAPHENE_API const std::shared_ptr<Light> createLight(LightType type) const;
+    GRAPHENE_API const std::shared_ptr<Entity> createSkybox(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Entity> createLabel(int width, int height, const std::string& name, int size);
 
     GRAPHENE_API const std::shared_ptr<Mesh> createQuad(FaceWinding winding);
     GRAPHENE_API const std::shared_ptr<Mesh> createCube(FaceWinding winding);
 
+    GRAPHENE_API const std::shared_ptr<Shader>& createShader(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Shader>& createShader();
     GRAPHENE_API const std::shared_ptr<Texture>& createTexture(const std::string& name);
     GRAPHENE_API const std::shared_ptr<Texture>& createCubeTexture(const std::string& name);
+    GRAPHENE_API const std::shared_ptr<Font>& createFont(const std::string& name, int size);
 
     GRAPHENE_API void teardown();
 
@@ -83,6 +86,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
+    std::unordered_map<std::string, std::shared_ptr<Font>> fontCache;
 };
 
 }  // namespace Graphene

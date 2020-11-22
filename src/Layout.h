@@ -24,7 +24,7 @@
 #define LAYOUT_H
 
 #include <GrapheneApi.h>
-#include <Label.h>
+#include <Entity.h>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -37,14 +37,14 @@ class Layout {
 public:
     GRAPHENE_API const std::shared_ptr<Overlay> getOverlay() const;
 
-    GRAPHENE_API void addComponent(const std::shared_ptr<Label>& component, int x, int y);
-    GRAPHENE_API void removeComponent(const std::shared_ptr<Label>& component);
+    GRAPHENE_API void addComponent(const std::shared_ptr<Entity>& entity, int x, int y);
+    GRAPHENE_API void removeComponent(const std::shared_ptr<Entity>& entity);
 
     GRAPHENE_API void arrangeComponents();
 
 private:
-    std::unordered_map<std::shared_ptr<Label>, std::pair<int, int>> componentPositions;
-    std::unordered_map<std::shared_ptr<Label>, std::pair<float, float>> componentScaleFactors;
+    std::unordered_map<std::shared_ptr<Entity>, std::pair<int, int>> entityPositions;
+    std::unordered_map<std::shared_ptr<Entity>, std::pair<float, float>> entityScaleFactors;
 
     friend class Overlay;
     std::weak_ptr<Overlay> overlay;
