@@ -21,8 +21,11 @@
  */
 
 #include <RawImage.h>
+#include <Logger.h>
 #include <algorithm>
 #include <cstring>
+#include <cassert>
+#include <stdexcept>
 
 namespace Graphene {
 
@@ -33,7 +36,8 @@ RawImage::RawImage(int width, int height, int pixelDepth) {
 
     this->pixelsSize = this->height * this->width * (this->pixelDepth >> 3);
     this->pixels.reset(new char[this->pixelsSize]);
-    std::memset(this->pixels.get(), 0, this->pixelsSize);
+
+    this->clear();
 }
 
 RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels):
@@ -42,7 +46,26 @@ RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels):
     std::copy(pixelsData, pixelsData + this->pixelsSize, this->pixels.get());
 }
 
-char* RawImage::getRawData() {
+void RawImage::clear(const void* pixel, int pixelDepth) const {
+    if (pixelDepth != this->pixelDepth) {
+        throw std::runtime_error(LogFormat("Pixel depth is %d but image requires %d", pixelDepth, this->pixelDepth));
+    }
+
+    int pixelBytes = pixelDepth >> 3;
+    int imageSize = this->height * this->width;
+    char* imagePixels = this->pixels.get();
+
+    for (int pixelOffset = 0; pixelOffset < this->pixelsSize; pixelOffset += pixelBytes) {
+        assert(pixelOffset + pixelBytes <= this->pixelsSize);
+        std::memcpy(imagePixels + pixelOffset, pixel, pixelBytes);
+    }
+}
+
+void RawImage::clear() const {
+    std::memset(this->pixels.get(), 0, this->pixelsSize);
+}
+
+void* RawImage::getPixels() const {
     return this->pixels.get();
 }
 

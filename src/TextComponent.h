@@ -29,6 +29,7 @@
 #include <ComponentEvent.h>
 #include <RawImage.h>
 #include <Font.h>
+#include <Vec3.h>
 #include <string>
 #include <memory>
 
@@ -45,6 +46,9 @@ public:
     GRAPHENE_API void setFont(const std::shared_ptr<Font>& font);
     GRAPHENE_API const std::shared_ptr<Font>& getFont() const;
 
+    GRAPHENE_API const Math::Vec3& getColor() const;
+    GRAPHENE_API void setColor(const Math::Vec3& color);
+
     GRAPHENE_API void setText(const std::wstring& text);
     GRAPHENE_API const std::wstring& getText() const;
 
@@ -59,6 +63,7 @@ private:
     std::shared_ptr<RawImage> textImage;
 
     std::shared_ptr<Font> font;
+    Math::Vec3 color;
     std::wstring text;
 
     bool parametersDirty = true;

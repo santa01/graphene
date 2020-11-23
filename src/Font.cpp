@@ -111,8 +111,9 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
     auto stringImage = std::make_shared<RawImage>(stringBox.xMax + 1, stringBox.yMax - stringBox.yMin, 32);
     int stringAdvance = 0;
 
+    int pixelsSize = stringImage->getPixelsSize();
     int pixelBytes = stringImage->getPixelDepth() >> 3;
-    char* pixels = stringImage->getRawData();
+    char* pixels = reinterpret_cast<char*>(stringImage->getPixels());
 
     for (auto& charGlyph: stringGlyphs) {
         FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
@@ -126,7 +127,7 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
             int pixelsOffset = (stringRow * stringImage->getWidth() + stringAdvance) * pixelBytes;
             int charPixelsOffset = charRow * charBitmapRowSize;
 
-            assert(pixelsOffset + charBitmapRowSize < stringImage->getPixelsSize());
+            assert(pixelsOffset + charBitmapRowSize <= pixelsSize);
             std::memcpy(pixels + pixelsOffset, charPixels + charPixelsOffset, charBitmapRowSize);
         }
 

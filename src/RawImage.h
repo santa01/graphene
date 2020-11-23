@@ -33,7 +33,10 @@ public:
     GRAPHENE_API RawImage(int width, int height, int pixelDepth);
     GRAPHENE_API RawImage(int width, int height, int pixelDepth, const void* pixels);
 
-    GRAPHENE_API char* getRawData();
+    GRAPHENE_API void clear(const void* pixel, int pixelDepth) const;
+    GRAPHENE_API void clear() const;
+
+    GRAPHENE_API void* getPixels() const;
 };
 
 }  // namespace Graphene

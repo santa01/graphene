@@ -24,7 +24,6 @@
 #include <MetaObject.h>
 #include <Entity.h>
 #include <algorithm>
-#include <cstring>
 #include <cassert>
 
 namespace Graphene {
@@ -34,6 +33,7 @@ TextComponent::TextComponent(int width, int height, const std::shared_ptr<Font>&
         width(width),
         height(height),
         font(font) {
+    this->textImage = std::make_shared<RawImage>(this->width, this->height, 32);
 }
 
 int TextComponent::getWidth() const {
@@ -55,6 +55,15 @@ void TextComponent::setFont(const std::shared_ptr<Font>& font) {
 
 const std::shared_ptr<Font>& TextComponent::getFont() const {
     return this->font;
+}
+
+const Math::Vec3& TextComponent::getColor() const {
+    return this->color;
+}
+
+void TextComponent::setColor(const Math::Vec3& color) {
+    this->color = color;
+    this->parametersDirty = true;
 }
 
 void TextComponent::setText(const std::wstring& text) {
@@ -80,26 +89,34 @@ void TextComponent::update(float /*deltaTime*/) {
 }
 
 void TextComponent::renderText() {
-    auto textBitmap = this->font->renderString(this->text);
-    this->textImage = std::make_shared<RawImage>(this->width, this->height, textBitmap->getPixelDepth());
+    unsigned char colorPixel[] = { 255, 255, 255, 0 };  // RGBA
+    colorPixel[0] = static_cast<unsigned char>(colorPixel[0] * this->color.get(Math::Vec3::X));
+    colorPixel[1] = static_cast<unsigned char>(colorPixel[1] * this->color.get(Math::Vec3::Y));
+    colorPixel[2] = static_cast<unsigned char>(colorPixel[2] * this->color.get(Math::Vec3::Z));
 
+    this->textImage->clear(colorPixel, 32);
+
+    auto textBitmap = this->font->renderString(this->text);  // TODO
     int minWidth = std::min<int>(this->width, textBitmap->getWidth());
     int minHeight = std::min<int>(this->height, textBitmap->getHeight());
 
     int pixelBytes = textBitmap->getPixelDepth() >> 3;
-    int minRowSize = minWidth * pixelBytes;
     int imageRowSize = this->width * pixelBytes;
     int textRowSize = textBitmap->getWidth() * pixelBytes;
+    int minRowSize = minWidth * pixelBytes;
 
-    char* imagePixels = this->textImage->getRawData();
+    int pixelsSize = this->textImage->getPixelsSize();
+    char* imagePixels = reinterpret_cast<char*>(this->textImage->getPixels());
     const char* textPixels = reinterpret_cast<const char*>(textBitmap->getPixels());
 
     for (int textRow = 0; textRow < minHeight; textRow++) {
         int imageRowOffset = textRow * imageRowSize;
         int textRowOffset = (minHeight - textRow - 1) * textRowSize;
 
-        assert(imageRowOffset + minRowSize < this->textImage->getPixelsSize());
-        std::memcpy(imagePixels + imageRowOffset, textPixels + textRowOffset, minRowSize);
+        for (int alphaOffset = 3; alphaOffset < minRowSize; alphaOffset += pixelBytes) {
+            assert(imageRowOffset + alphaOffset < pixelsSize);
+            imagePixels[imageRowOffset + alphaOffset] = textPixels[textRowOffset + alphaOffset];
+        }
     }
 }
 

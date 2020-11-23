@@ -34,7 +34,7 @@ namespace Graphene {
 Object::Object(MetaType objectType):
         objectType(objectType) {
     static int nextObjectId = 0;
-    assert(nextObjectId < INT_MAX);
+    assert(nextObjectId <= INT_MAX);
     this->objectId = nextObjectId++;
 
     std::ostringstream defaultName;

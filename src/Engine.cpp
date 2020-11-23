@@ -98,6 +98,10 @@ const std::shared_ptr<Window>& Engine::getWindow() const {
     return this->window;
 }
 
+unsigned int Engine::getFrame() const {
+    return this->frame;
+}
+
 float Engine::getFrameTime() const {
     return this->frameTime;
 }
@@ -120,6 +124,7 @@ int Engine::exec() {
 
     while (this->running) {
         timestamp = std::chrono::steady_clock::now();
+        this->frame++;
 
         if (this->window->dispatchEvents()) {
             this->onQuitSignal();
@@ -145,18 +150,21 @@ int Engine::exec() {
         }
 
         if (config.isDebug()) {
-            if (this->fpsCounts > 60) {
+            static float fpsAverage = 1.0f / this->frameTime;
+            static int frameRange = 1;
+
+            int frameCount = this->frame % frameRange;
+            if (frameCount == 0) {
                 std::wostringstream fpsText;
-                fpsText << L"FPS: " << static_cast<int>(this->fpsAverage);
+                fpsText << L"FPS: " << static_cast<int>(fpsAverage);
                 this->fpsText->setText(fpsText.str());
 
-                this->fpsCounts = 0;
-                this->fpsAverage = 0.0f;
+                fpsAverage = 0.0f;
+                frameRange = 30;
+            } else {
+                // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
+                fpsAverage += ((1.0f / this->frameTime) - fpsAverage) / frameCount;
             }
-
-            // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-            this->fpsCounts++;
-            this->fpsAverage += ((1.0f / this->frameTime) - this->fpsAverage) / this->fpsCounts;
         }
     }
 
@@ -264,13 +272,14 @@ void Engine::setupEngine() {
         auto& window = this->getWindow();
 
         auto debugLayout = std::make_shared<Graphene::Layout>();
-        debugLayout->addComponent(fpsLabel, 10, window->getHeight() - 30);
+        debugLayout->addComponent(fpsLabel, 10, window->getHeight() - 20);
 
         auto& debugOverlay = window->createOverlay(0, 0, window->getWidth(), window->getHeight());
         debugOverlay->setCamera(debugCamera);
         debugOverlay->setLayout(debugLayout);
 
         this->fpsText = fpsLabel->getComponent<TextComponent>();
+        this->fpsText->setColor(Math::Vec3(0.0f, 1.0f, 0.0f));  // Green
     }
 }
 

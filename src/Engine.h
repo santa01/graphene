@@ -51,6 +51,8 @@ public:
     GRAPHENE_API const std::shared_ptr<Scene>& createScene();
 
     GRAPHENE_API const std::shared_ptr<Window>& getWindow() const;
+
+    GRAPHENE_API unsigned int getFrame() const;
     GRAPHENE_API float getFrameTime() const;
 
     GRAPHENE_API void exit(int result);
@@ -80,12 +82,11 @@ private:
     std::vector<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::vector<std::shared_ptr<Scene>> scenes;
     std::shared_ptr<Window> window;
-
     std::shared_ptr<TextComponent> fpsText;  // Debug overlay
-    float fpsAverage = 0.0f;
-    int fpsCounts = 0;
 
+    unsigned int frame = 0;
     float frameTime = 0.0f;
+
     bool running = true;
     int result = 0;
 };
