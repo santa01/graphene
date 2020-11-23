@@ -66,7 +66,7 @@ const std::wstring& TextComponent::getText() const {
     return this->text;
 }
 
-void TextComponent::update() {
+void TextComponent::update(float /*deltaTime*/) {
     if (this->parametersDirty) {
         this->parametersDirty = false;
         this->renderText();

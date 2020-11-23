@@ -48,7 +48,7 @@ public:
     GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
 
     GRAPHENE_API virtual void receiveEvent(const std::shared_ptr<ComponentEvent>& event) = 0;
-    GRAPHENE_API virtual void update() = 0;
+    GRAPHENE_API virtual void update(float deltaTime) = 0;
 
 protected:
     Component(MetaType componentType);

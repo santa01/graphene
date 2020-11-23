@@ -30,7 +30,7 @@
 #include <Scene.h>
 #include <Input.h>
 #include <OpenGL.h>
-#include <Entity.h>
+#include <TextComponent.h>
 #include <Signals.h>
 #include <vector>
 #include <memory>
@@ -80,12 +80,12 @@ private:
     std::vector<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::vector<std::shared_ptr<Scene>> scenes;
     std::shared_ptr<Window> window;
-    std::shared_ptr<Entity> fps;
+
+    std::shared_ptr<TextComponent> fpsText;  // Debug overlay
+    float fpsAverage = 0.0f;
+    int fpsCounts = 0;
 
     float frameTime = 0.0f;
-    float renderTime = 0.0f;
-    int frames = 0;
-
     bool running = true;
     int result = 0;
 };

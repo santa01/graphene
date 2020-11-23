@@ -58,9 +58,9 @@ void Entity::sendEvent(const std::shared_ptr<ComponentEvent>& event) const {
     }
 }
 
-void Entity::update() const {
+void Entity::update(float deltaTime) const {
     for (auto& component: this->components) {
-        component->update();
+        component->update(deltaTime);
     }
 }
 

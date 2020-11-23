@@ -52,7 +52,7 @@ public:
     GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
 
     GRAPHENE_API void sendEvent(const std::shared_ptr<ComponentEvent>& event) const;
-    GRAPHENE_API void update() const;
+    GRAPHENE_API void update(float deltaTime) const;
 
 protected:
     bool visible = true;

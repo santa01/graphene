@@ -49,7 +49,7 @@ public:
     GRAPHENE_API const std::wstring& getText() const;
 
     GRAPHENE_API void receiveEvent(const std::shared_ptr<ComponentEvent>& /*event*/) override { }
-    GRAPHENE_API void update() override;
+    GRAPHENE_API void update(float deltaTime) override;
 
 private:
     void renderText();

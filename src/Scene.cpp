@@ -163,7 +163,7 @@ void Scene::iterateEntities(const EntityHandler& handler) const {
                 auto objectGroup = object->toA<ObjectGroup>();
 
                 traverser(objectGroup, localWorld, normalRotation);
-            } 
+            }
         });
     };
 
@@ -183,9 +183,9 @@ void Scene::iterateLights(const LightHandler& handler) const {
         std::for_each(objects.begin(), objects.end(), [&handler, &traverser, &localWorld](const std::shared_ptr<Object>& object) {
             if (object->isA<Light>()) {
                 auto light = object->toA<Light>();
-
                 Math::Vec4 lightPosition(localWorld * Math::Vec4(light->getPosition(), 1.0f));
                 Math::Vec4 lightDirection(localWorld * Math::Vec4(light->getDirection(), 0.0f));  // Ignore translation
+
                 handler(light, lightPosition.extractVec3(), lightDirection.extractVec3());
             } else if (object->isA<ObjectGroup>()) {
                 auto objectGroup = object->toA<ObjectGroup>();
@@ -197,6 +197,26 @@ void Scene::iterateLights(const LightHandler& handler) const {
 
     Math::Mat4 localWorld;
     traverser(this->root, localWorld);
+}
+
+void Scene::update(float deltaTime) const {
+    std::function<void(const std::shared_ptr<ObjectGroup>)> traverser;
+    traverser = [&traverser, deltaTime](const std::shared_ptr<ObjectGroup>& objectGroup) {
+        auto& objects = objectGroup->getObjects();
+        std::for_each(objects.begin(), objects.end(), [&traverser, deltaTime](const std::shared_ptr<Object>& object) {
+            if (object->isA<Entity>()) {
+                auto entity = object->toA<Entity>();
+
+                entity->update(deltaTime);
+            } else if (object->isA<ObjectGroup>()) {
+                auto objectGroup = object->toA<ObjectGroup>();
+
+                traverser(objectGroup);
+            }
+        });
+    };
+
+    traverser(this->root);
 }
 
 }  // namespace Graphene

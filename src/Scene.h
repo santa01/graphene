@@ -68,6 +68,8 @@ public:
     GRAPHENE_API void iterateEntities(const EntityHandler& handler) const;
     GRAPHENE_API void iterateLights(const LightHandler& handler) const;
 
+    GRAPHENE_API void update(float deltaTime) const;
+
 private:
     std::shared_ptr<ObjectGroup> root;
     std::shared_ptr<ObjectGroup> player;

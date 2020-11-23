@@ -34,7 +34,6 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
-#include <iomanip>
 #include <unordered_map>
 
 namespace Graphene {
@@ -146,19 +145,18 @@ int Engine::exec() {
         }
 
         if (config.isDebug()) {
-            this->renderTime += this->getFrameTime();
-            this->frames++;
-
-            if (this->renderTime >= 0.1f) {
-                float fps = this->frames / this->renderTime;
-                this->renderTime = 0.0f;
-                this->frames = 0;
-
+            if (this->fpsCounts > 60) {
                 std::wostringstream fpsText;
-                fpsText << L"FPS: " << std::fixed << std::setprecision(2) << fps;
-                this->fps->getComponent<TextComponent>()->setText(fpsText.str());
-                this->fps->update();  // TODO
+                fpsText << L"FPS: " << static_cast<int>(this->fpsAverage);
+                this->fpsText->setText(fpsText.str());
+
+                this->fpsCounts = 0;
+                this->fpsAverage = 0.0f;
             }
+
+            // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
+            this->fpsCounts++;
+            this->fpsAverage += ((1.0f / this->frameTime) - this->fpsAverage) / this->fpsCounts;
         }
     }
 
@@ -258,24 +256,26 @@ void Engine::setupEngine() {
         auto debugCamera = objectManager.createCamera(Graphene::ProjectionType::ORTHOGRAPHIC);
         debugCamera->setNearPlane(-1.0f);
         debugCamera->setFarPlane(1.0f);
-        debugRoot->addObject(debugCamera);
 
-        this->fps = objectManager.createLabel(200, 20, "fonts/dejavu-sans.ttf", 14);
-        debugRoot->addObject(this->fps);
+        auto fpsLabel = objectManager.createLabel(200, 20, "fonts/dejavu-sans.ttf", 14);
+        debugRoot->addObject(debugCamera);
+        debugRoot->addObject(fpsLabel);
 
         auto& window = this->getWindow();
 
         auto debugLayout = std::make_shared<Graphene::Layout>();
-        debugLayout->addComponent(this->fps, 10, window->getHeight() - 30);
+        debugLayout->addComponent(fpsLabel, 10, window->getHeight() - 30);
 
         auto& debugOverlay = window->createOverlay(0, 0, window->getWidth(), window->getHeight());
         debugOverlay->setCamera(debugCamera);
         debugOverlay->setLayout(debugLayout);
+
+        this->fpsText = fpsLabel->getComponent<TextComponent>();
     }
 }
 
 void Engine::teardownEngine() {
-    this->fps.reset();
+    this->fpsText.reset();
 
     this->frameBuffers.clear();
     this->scenes.clear();
@@ -290,6 +290,10 @@ void Engine::teardownEngine() {
 }
 
 void Engine::update() {
+    for (auto& scene: this->scenes) {
+        scene->update(this->frameTime);
+    }
+
     for (auto& frameBuffer: this->frameBuffers) {
         frameBuffer->update();
     }
