@@ -24,7 +24,7 @@
 #define FONT_H
 
 #include <GrapheneApi.h>
-#include <Image.h>
+#include <RawImage.h>
 #include <string>
 #include <memory>
 #include <unordered_map>
@@ -45,14 +45,14 @@ public:
     GRAPHENE_API int getSize() const;
     GRAPHENE_API int getDPI() const;
 
-    GRAPHENE_API const std::shared_ptr<Image> renderChar(wchar_t charCode);
-    GRAPHENE_API const std::shared_ptr<Image> renderString(const std::wstring& stringText);
+    GRAPHENE_API void renderChar(wchar_t charCode, const std::shared_ptr<RawImage>& image);
+    GRAPHENE_API void renderString(const std::wstring& stringText, const std::shared_ptr<RawImage>& image);
 
 private:
     typedef struct {
         std::shared_ptr<FT_BBox> box;
         std::shared_ptr<FT_GlyphRec> record;
-        std::shared_ptr<char[]> pixels;
+        std::shared_ptr<unsigned char[]> pixels;
     } CharGlyph;
 
     std::shared_ptr<CharGlyph> getCharGlyph(wchar_t charCode);

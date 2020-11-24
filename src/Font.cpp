@@ -22,12 +22,12 @@
 
 #include <Font.h>
 #include <Logger.h>
-#include <RawImage.h>
 #include <stdexcept>
 #include <algorithm>
 #include <vector>
 #include <cstring>
 #include <cassert>
+#include <stdexcept>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -78,26 +78,63 @@ int Font::getDPI() const {
     return this->dpi;
 }
 
-const std::shared_ptr<Image> Font::renderChar(wchar_t charCode) {
+void Font::renderChar(wchar_t charCode, const std::shared_ptr<RawImage>& image) {
+    int imagePixelBytes = image->getPixelDepth() >> 3;
+    if (imagePixelBytes != 4) {
+        throw std::invalid_argument(LogFormat("Image should have 32 bits per pixel"));
+    }
+
     auto charGlyph = this->getCharGlyph(charCode);
     if (charGlyph == nullptr) {
-        return nullptr;
+        throw std::runtime_error(LogFormat("Failed to fetch glyph"));
     }
 
     FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
     FT_Bitmap charBitmap = bitmapGlyph->bitmap;
 
-    return std::make_shared<RawImage>(charBitmap.width, charBitmap.rows, 32, charGlyph->pixels.get());
+    int imageWidth = image->getWidth();
+    if (static_cast<unsigned int>(imageWidth) < charBitmap.width) {
+        throw std::runtime_error(LogFormat("Image width is %d but character requires %d", imageWidth, charBitmap.width));
+    }
+
+    int imageHeight = image->getHeight();
+    if (static_cast<unsigned int>(imageHeight) < charBitmap.rows) {
+        throw std::runtime_error(LogFormat("Image height is %d but character requires %d", imageHeight, charBitmap.rows));
+    }
+
+    int imagePixelsSize = image->getPixelsSize();
+    int imageRowSize = imageWidth * imagePixelBytes;
+    int charRowSize = charBitmap.width;  // Single byte (alpha)
+
+    unsigned char* imagePixels = reinterpret_cast<unsigned char*>(image->getPixels());
+    const unsigned char* charPixels = charGlyph->pixels.get();
+
+    for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++) {
+        int imageRowOffset = charRow * imageRowSize;
+        int charRowOffset = charRow * charRowSize;
+
+        for (unsigned int alphaPixel = 0; alphaPixel < charBitmap.width; alphaPixel++) {
+            int alphaOffset = (alphaPixel * imagePixelBytes) + 3;  // Offset to RGB[A] alpha
+
+            assert(imageRowOffset + alphaOffset < imagePixelsSize);
+            imagePixels[imageRowOffset + alphaOffset] = charPixels[charRowOffset + alphaPixel];
+        }
+    }
 }
 
-const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) {
+void Font::renderString(const std::wstring& stringText, const std::shared_ptr<RawImage>& image) {
+    int imagePixelBytes = image->getPixelDepth() >> 3;
+    if (imagePixelBytes != 4) {
+        throw std::invalid_argument(LogFormat("RawImage should have 32 bits per pixel"));
+    }
+
     FT_BBox stringBox = { };
     std::vector<std::shared_ptr<CharGlyph>> stringGlyphs;
 
     for (auto charCode: stringText) {
         auto charGlyph = this->getCharGlyph(charCode);
         if (charGlyph == nullptr) {
-            continue;
+            throw std::runtime_error(LogFormat("Failed to fetch glyph"));
         }
 
         stringBox.yMin = std::min<int>(stringBox.yMin, charGlyph->box->yMin);
@@ -107,34 +144,45 @@ const std::shared_ptr<Image> Font::renderString(const std::wstring& stringText) 
         stringGlyphs.emplace_back(charGlyph);
     }
 
-    // Extra pixel in case string box is miscalculated
-    auto stringImage = std::make_shared<RawImage>(stringBox.xMax + 1, stringBox.yMax - stringBox.yMin, 32);
+    int stringWidth = stringBox.xMax + 1;  // Extra pixel in case string box is miscalculated
+    int stringHeight = stringBox.yMax - stringBox.yMin;
     int stringAdvance = 0;
 
-    int pixelsSize = stringImage->getPixelsSize();
-    int pixelBytes = stringImage->getPixelDepth() >> 3;
-    char* pixels = reinterpret_cast<char*>(stringImage->getPixels());
+    int imageWidth = image->getWidth();
+    if (imageWidth < stringWidth) {
+        throw std::runtime_error(LogFormat("Image width is %d but string requires %d", imageWidth, stringWidth));
+    }
+
+    int imageHeight = image->getHeight();
+    if (imageHeight < stringHeight) {
+        throw std::runtime_error(LogFormat("Image height is %d but string requires %d", imageHeight, stringHeight));
+    }
+
+    int imagePixelsSize = image->getPixelsSize();
+    unsigned char* imagePixels = reinterpret_cast<unsigned char*>(image->getPixels());
 
     for (auto& charGlyph: stringGlyphs) {
         FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
         FT_Bitmap charBitmap = bitmapGlyph->bitmap;
-        char* charPixels = charGlyph->pixels.get();
+        unsigned char* charPixels = charGlyph->pixels.get();
 
         int stringRow = stringBox.yMax - charGlyph->box->yMax;  // Character Y offset in string
-        int charBitmapRowSize = charBitmap.width * pixelBytes;
+        int charRowSize = charBitmap.width;  // Single byte (alpha)
 
         for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++, stringRow++) {
-            int pixelsOffset = (stringRow * stringImage->getWidth() + stringAdvance) * pixelBytes;
-            int charPixelsOffset = charRow * charBitmapRowSize;
+            int imagePixelsOffset = (stringRow * imageWidth + stringAdvance) * imagePixelBytes;
+            int charRowOffset = charRow * charRowSize;
 
-            assert(pixelsOffset + charBitmapRowSize <= pixelsSize);
-            std::memcpy(pixels + pixelsOffset, charPixels + charPixelsOffset, charBitmapRowSize);
+            for (unsigned int alphaPixel = 0; alphaPixel < charBitmap.width; alphaPixel++) {
+                int alphaOffset = (alphaPixel * imagePixelBytes) + 3;  // Offset to RGB[A] alpha
+
+                assert(imagePixelsOffset + alphaOffset < imagePixelsSize);
+                imagePixels[imagePixelsOffset + alphaOffset] = charPixels[charRowOffset + alphaPixel];
+            }
         }
 
         stringAdvance += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
     }
-
-    return stringImage;
 }
 
 std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
@@ -168,18 +216,23 @@ std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
     FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
     FT_Bitmap charBitmap = bitmapGlyph->bitmap;
 
-    int pixelBytes = 4;  // RGBA
-    int pixelsSize = charBitmap.width * charBitmap.rows * pixelBytes;
     int bitmapSize = charBitmap.width * charBitmap.rows;
+    charGlyph->pixels = std::shared_ptr<unsigned char[]>(new unsigned char[bitmapSize]);
+    unsigned char* pixels = charGlyph->pixels.get();
 
-    charGlyph->pixels = std::shared_ptr<char[]>(new char[pixelsSize]);
-    char* pixels = charGlyph->pixels.get();
-
-    for (int pixel = 0; pixel < bitmapSize; pixel++) {
-        unsigned char pixelData[] = { 0, 0, 0, charBitmap.buffer[pixel] };
-        int pixelOffset = pixel * sizeof(pixelData);
-        std::memcpy(pixels + pixelOffset, pixelData, sizeof(pixelData));
+    // Bitmap is inverted vertically relative to the texture coordinates space
+    // and contains alpha (transparency) values only (no color information).
+    for (unsigned int charRow = 0; charRow < charBitmap.rows; charRow++) {
+        int pixelsRowOffset = charRow * charBitmap.width;
+        int charRowOffset = (charBitmap.rows - charRow - 1) * charBitmap.width;
+        std::memcpy(pixels + pixelsRowOffset, charBitmap.buffer + charRowOffset, charBitmap.width);
     }
+
+    // Invert the control box Y coordinates to reposition inverted bitmap
+    int yMin = charGlyph->box->yMin;
+    int yMax = charGlyph->box->yMax;
+    charGlyph->box->yMin = -yMax;
+    charGlyph->box->yMax = -yMin;
 
     return charGlyph;
 }

@@ -48,7 +48,7 @@ RawImage::RawImage(int width, int height, int pixelDepth, const void* pixels):
 
 void RawImage::clear(const void* pixel, int pixelDepth) const {
     if (pixelDepth != this->pixelDepth) {
-        throw std::runtime_error(LogFormat("Pixel depth is %d but image requires %d", pixelDepth, this->pixelDepth));
+        throw std::invalid_argument(LogFormat("Pixel depth is %d but image requires %d", pixelDepth, this->pixelDepth));
     }
 
     int pixelBytes = pixelDepth >> 3;

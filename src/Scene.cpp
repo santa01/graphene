@@ -86,7 +86,7 @@ const Math::Vec3& Scene::getAmbientColor() const {
 
 void Scene::setAmbientEnergy(float ambientEnergy) {
     if (ambientEnergy < 0.0f) {
-        throw std::runtime_error(LogFormat("Ambient energy is less than 0.0f"));
+        throw std::invalid_argument(LogFormat("Ambient energy is less than 0.0f"));
     }
 
     this->ambientEnergy = ambientEnergy;

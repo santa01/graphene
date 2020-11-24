@@ -62,7 +62,7 @@ float Material::getAmbientIntensity() const {
 
 void Material::setAmbientIntensity(float ambientIntensity) {
     if (ambientIntensity < 0.0f || ambientIntensity > 1.0f) {
-        throw std::runtime_error(LogFormat("Ambient intensity is not in [0.0f, 1.0f] range"));
+        throw std::invalid_argument(LogFormat("Ambient intensity is not in [0.0f, 1.0f] range"));
     }
 
     this->ambientIntensity = ambientIntensity;
@@ -75,7 +75,7 @@ float Material::getDiffuseIntensity() const {
 
 void Material::setDiffuseIntensity(float diffuseIntensity) {
     if (diffuseIntensity < 0.0f || diffuseIntensity > 1.0f) {
-        throw std::runtime_error(LogFormat("Diffuse intensity is not in [0.0f, 1.0f] range"));
+        throw std::invalid_argument(LogFormat("Diffuse intensity is not in [0.0f, 1.0f] range"));
     }
 
     this->diffuseIntensity = diffuseIntensity;
@@ -88,7 +88,7 @@ float Material::getSpecularIntensity() const {
 
 void Material::setSpecularIntensity(float specularIntensity) {
     if (specularIntensity < 0.0f || specularIntensity > 1.0f) {
-        throw std::runtime_error(LogFormat("Specular intensity is not in [0.0f, 1.0f] range"));
+        throw std::invalid_argument(LogFormat("Specular intensity is not in [0.0f, 1.0f] range"));
     }
 
     this->specularIntensity = specularIntensity;
@@ -101,7 +101,7 @@ int Material::getSpecularHardness() const {
 
 void Material::setSpecularHardness(int specularHardness) {
     if (specularHardness < 0) {
-        throw std::runtime_error(LogFormat("Specular hardness is less than 0"));
+        throw std::invalid_argument(LogFormat("Specular hardness is less than 0"));
     }
 
     this->specularHardness = specularHardness;

@@ -95,29 +95,7 @@ void TextComponent::renderText() {
     colorPixel[2] = static_cast<unsigned char>(colorPixel[2] * this->color.get(Math::Vec3::Z));
 
     this->textImage->clear(colorPixel, 32);
-
-    auto textBitmap = this->font->renderString(this->text);  // TODO
-    int minWidth = std::min<int>(this->width, textBitmap->getWidth());
-    int minHeight = std::min<int>(this->height, textBitmap->getHeight());
-
-    int pixelBytes = textBitmap->getPixelDepth() >> 3;
-    int imageRowSize = this->width * pixelBytes;
-    int textRowSize = textBitmap->getWidth() * pixelBytes;
-    int minRowSize = minWidth * pixelBytes;
-
-    int pixelsSize = this->textImage->getPixelsSize();
-    char* imagePixels = reinterpret_cast<char*>(this->textImage->getPixels());
-    const char* textPixels = reinterpret_cast<const char*>(textBitmap->getPixels());
-
-    for (int textRow = 0; textRow < minHeight; textRow++) {
-        int imageRowOffset = textRow * imageRowSize;
-        int textRowOffset = (minHeight - textRow - 1) * textRowSize;
-
-        for (int alphaOffset = 3; alphaOffset < minRowSize; alphaOffset += pixelBytes) {
-            assert(imageRowOffset + alphaOffset < pixelsSize);
-            imagePixels[imageRowOffset + alphaOffset] = textPixels[textRowOffset + alphaOffset];
-        }
-    }
+    this->font->renderString(this->text, this->textImage);
 }
 
 }  // namespace Graphene
