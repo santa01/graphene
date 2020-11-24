@@ -32,7 +32,7 @@
 namespace Graphene {
 
 Object::Object(MetaType objectType):
-        objectType(objectType) {
+        MetaBase(objectType) {
     static int nextObjectId = 0;
     assert(nextObjectId <= INT_MAX);
     this->objectId = nextObjectId++;
@@ -46,10 +46,6 @@ int Object::getId() const {
     return this->objectId;
 }
 
-MetaType Object::getType() const {
-    return this->objectType;
-}
-
 const std::string& Object::getName() const {
     return this->objectName;
 }
@@ -59,15 +55,12 @@ void Object::setName(const std::string& objectName) {
 }
 
 const std::shared_ptr<Scene> Object::getScene() const {
-    auto currentObject = this->shared_from_this();
-    auto parentObject = this->getParent();
+    std::shared_ptr<ObjectGroup> rootParent;
+    this->iterateParents([&rootParent](const std::shared_ptr<ObjectGroup>& parent) {
+        rootParent = parent;  // Preserve last parent
+    });
 
-    while (parentObject != nullptr) {
-        currentObject = parentObject;
-        parentObject = currentObject->getParent();
-    }
-
-    return currentObject->scene.lock();
+    return rootParent->scene.lock();
 }
 
 const std::shared_ptr<ObjectGroup> Object::getParent() const {

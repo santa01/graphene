@@ -30,22 +30,12 @@
 
 namespace Graphene {
 
-class ComponentEvent: public std::enable_shared_from_this<ComponentEvent> {
+class ComponentEvent: public MetaBase {
 public:
     GRAPHENE_API virtual ~ComponentEvent() = default;
 
-    GRAPHENE_API MetaType getType() const;
-
-    template<typename T>
-    bool isA() const { return MetaObject<T>::ID == this->getType(); }
-
-    template<typename T>
-    std::shared_ptr<T> toA() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
-
 protected:
-    ComponentEvent(MetaType eventType);
-
-    MetaType eventType;
+    ComponentEvent(MetaType objectType);
 };
 
 class TextureUpdateEvent: public MetaObject<TextureUpdateEvent>, public ComponentEvent {

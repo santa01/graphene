@@ -25,12 +25,8 @@
 
 namespace Graphene {
 
-Component::Component(MetaType componentType):
-        componentType(componentType) {
-}
-
-MetaType Component::getType() const {
-    return this->componentType;
+Component::Component(MetaType objectType):
+        MetaBase(objectType) {
 }
 
 const std::shared_ptr<Entity> Component::getParent() const {

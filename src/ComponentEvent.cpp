@@ -24,12 +24,8 @@
 
 namespace Graphene {
 
-ComponentEvent::ComponentEvent(MetaType eventType):
-        eventType(eventType) {
-}
-
-MetaType ComponentEvent::getType() const {
-    return this->eventType;
+ComponentEvent::ComponentEvent(MetaType objectType):
+        MetaBase(objectType) {
 }
 
 TextureUpdateEvent::TextureUpdateEvent():

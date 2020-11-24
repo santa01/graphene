@@ -26,11 +26,30 @@
 #include <GrapheneApi.h>
 #include <typeinfo>
 #include <typeindex>
+#include <memory>
 
 namespace Graphene {
 
 typedef const std::type_info& MetaType;
 typedef std::type_index MetaIndex;
+
+class MetaBase: public std::enable_shared_from_this<MetaBase> {
+public:
+    GRAPHENE_API virtual ~MetaBase() = default;
+
+    GRAPHENE_API MetaType getType() const;
+
+    template<typename T>
+    bool isA() const;
+
+    template<typename T>
+    std::shared_ptr<T> toA();
+
+protected:
+    MetaBase(MetaType objectType);
+
+    MetaType objectType;
+};
 
 template<typename T>
 class MetaObject {
@@ -38,6 +57,12 @@ public:
     static MetaType ID;
     static MetaIndex INDEX;
 };
+
+template<typename T>
+bool MetaBase::isA() const { return MetaObject<T>::ID == this->getType(); }
+
+template<typename T>
+std::shared_ptr<T> MetaBase::toA() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
 
 template<typename T>
 MetaType MetaObject<T>::ID = typeid(T);

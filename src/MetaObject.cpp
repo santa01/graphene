@@ -24,4 +24,12 @@
 
 namespace Graphene {
 
+MetaBase::MetaBase(MetaType objectType):
+        objectType(objectType) {
+}
+
+MetaType MetaBase::getType() const {
+    return this->objectType;
+}
+
 }  // namespace Graphene

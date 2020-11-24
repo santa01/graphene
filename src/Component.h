@@ -27,23 +27,14 @@
 #include <NonCopyable.h>
 #include <MetaObject.h>
 #include <ComponentEvent.h>
-#include <memory>
 
 namespace Graphene {
 
 class Entity;
 
-class Component: public std::enable_shared_from_this<Component>, public NonCopyable {
+class Component: public MetaBase, public NonCopyable {
 public:
-    GRAPHENE_API ~Component() = default;
-
-    GRAPHENE_API MetaType getType() const;
-
-    template<typename T>
-    bool isA() const { return MetaObject<T>::ID == this->getType(); }
-
-    template<typename T>
-    std::shared_ptr<T> toA() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
+    GRAPHENE_API virtual ~Component() = default;
 
     GRAPHENE_API const std::shared_ptr<Entity> getParent() const;
 
@@ -51,9 +42,7 @@ public:
     GRAPHENE_API virtual void update(float deltaTime) = 0;
 
 protected:
-    Component(MetaType componentType);
-
-    MetaType componentType;
+    Component(MetaType objectType);
 
     friend class Entity;
     std::weak_ptr<Entity> parent;

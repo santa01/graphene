@@ -39,18 +39,11 @@ class ObjectGroup;
 
 typedef std::function<void(const std::shared_ptr<ObjectGroup>&)> ParentHandler;
 
-class Object: public std::enable_shared_from_this<Object>, public Rotatable, public Movable, public NonCopyable {
+class Object: public MetaBase, public Rotatable, public Movable, public NonCopyable {
 public:
     GRAPHENE_API virtual ~Object() = default;
 
     GRAPHENE_API int getId() const;
-    GRAPHENE_API MetaType getType() const;
-
-    template<typename T>
-    bool isA() const { return MetaObject<T>::ID == this->getType(); }
-
-    template<typename T>
-    std::shared_ptr<T> toA() { return std::dynamic_pointer_cast<T>(this->shared_from_this()); }
 
     GRAPHENE_API const std::string& getName() const;
     GRAPHENE_API void setName(const std::string& objectName);
@@ -66,7 +59,6 @@ protected:
     Object(MetaType objectType);
 
     int objectId = 0;
-    MetaType objectType;
     std::string objectName;
 
     friend class Scene;
