@@ -112,6 +112,10 @@ const Math::Vec3& Material::getDiffuseColor() const {
     return this->diffuseColor;
 }
 
+void Material::setDiffuseColor(float red, float green, float blue) {
+    this->setDiffuseColor(Math::Vec3(red, green, blue));
+}
+
 void Material::setDiffuseColor(const Math::Vec3& diffuseColor) {
     this->diffuseColor = diffuseColor;
     this->parametersDirty = true;
@@ -119,6 +123,10 @@ void Material::setDiffuseColor(const Math::Vec3& diffuseColor) {
 
 const Math::Vec3& Material::getSpecularColor() const {
     return this->specularColor;
+}
+
+void Material::setSpecularColor(float red, float green, float blue) {
+    this->setSpecularColor(Math::Vec3(red, green, blue));
 }
 
 void Material::setSpecularColor(const Math::Vec3& specularColor) {

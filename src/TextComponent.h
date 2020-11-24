@@ -47,6 +47,7 @@ public:
     GRAPHENE_API const std::shared_ptr<Font>& getFont() const;
 
     GRAPHENE_API const Math::Vec3& getColor() const;
+    GRAPHENE_API void setColor(float red, float green, float blue);
     GRAPHENE_API void setColor(const Math::Vec3& color);
 
     GRAPHENE_API void setText(const std::wstring& text);

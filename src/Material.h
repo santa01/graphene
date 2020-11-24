@@ -52,9 +52,11 @@ public:
     GRAPHENE_API void setSpecularHardness(int specularHardness);
 
     GRAPHENE_API const Math::Vec3& getDiffuseColor() const;
+    GRAPHENE_API void setDiffuseColor(float red, float green, float blue);
     GRAPHENE_API void setDiffuseColor(const Math::Vec3& diffuseColor);
 
     GRAPHENE_API const Math::Vec3& getSpecularColor() const;
+    GRAPHENE_API void setSpecularColor(float red, float green, float blue);
     GRAPHENE_API void setSpecularColor(const Math::Vec3& specularColor);
 
     GRAPHENE_API void bind(BindPoint bindPoint);

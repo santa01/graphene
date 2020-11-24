@@ -61,6 +61,10 @@ const Math::Vec3& TextComponent::getColor() const {
     return this->color;
 }
 
+void TextComponent::setColor(float red, float green, float blue) {
+    this->setColor(Math::Vec3(red, green, blue));
+}
+
 void TextComponent::setColor(const Math::Vec3& color) {
     this->color = color;
     this->parametersDirty = true;

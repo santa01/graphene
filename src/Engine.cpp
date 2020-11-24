@@ -279,7 +279,7 @@ void Engine::setupEngine() {
         debugOverlay->setLayout(debugLayout);
 
         this->fpsText = fpsLabel->getComponent<TextComponent>();
-        this->fpsText->setColor(Math::Vec3(0.0f, 1.0f, 0.0f));  // Green
+        this->fpsText->setColor(0.0f, 1.0f, 0.0f);  // Green
     }
 }
 
