@@ -74,6 +74,15 @@ const std::shared_ptr<ObjectGroup> Object::getParent() const {
     return this->parent.lock();
 }
 
+void Object::iterateParents(const ParentHandler& handler) const {
+    auto parentObject = this->getParent();
+
+    while (parentObject != nullptr) {
+        handler(parentObject);
+        parentObject = parentObject->getParent();
+    }
+}
+
 void Object::targetAt(float x, float y, float z) {
     this->targetAt(Math::Vec3(x, y, z));
 }

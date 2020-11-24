@@ -30,11 +30,14 @@
 #include <Movable.h>
 #include <memory>
 #include <string>
+#include <functional>
 
 namespace Graphene {
 
 class Scene;
 class ObjectGroup;
+
+typedef std::function<void(const std::shared_ptr<ObjectGroup>&)> ParentHandler;
 
 class Object: public std::enable_shared_from_this<Object>, public Rotatable, public Movable, public NonCopyable {
 public:
@@ -54,6 +57,7 @@ public:
 
     GRAPHENE_API const std::shared_ptr<Scene> getScene() const;
     GRAPHENE_API const std::shared_ptr<ObjectGroup> getParent() const;
+    GRAPHENE_API void iterateParents(const ParentHandler& handler) const;
 
     GRAPHENE_API void targetAt(float x, float y, float z);
     GRAPHENE_API void targetAt(const Math::Vec3& vector);
