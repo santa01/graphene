@@ -75,14 +75,13 @@ private:
     ObjectManager() = default;
 
     void validateHeader(std::ifstream& file, const std::string& magic);
-    void loadObjects(const std::string& name);
 
     template<typename T>
     const std::shared_ptr<Mesh> createMesh(const std::string& alias, FaceWinding winding);
 
-    std::unordered_set<std::string> entityCache;
     std::unordered_map<std::string, std::vector<std::shared_ptr<Material>>> materialCache;
     std::unordered_map<std::string, std::vector<std::shared_ptr<Mesh>>> meshCache;
+    std::unordered_set<std::string> entityCache;
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaderCache;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;

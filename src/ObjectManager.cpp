@@ -167,7 +167,57 @@ const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& nam
         LogDebug("Reuse cached '%s' entity", name.c_str());
     } else {
         LogDebug("Load entity from '%s'", name.c_str());
-        this->loadObjects(name);
+
+        std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
+        if (!file) {
+            throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
+        }
+
+        this->validateHeader(file, "GPNE");
+
+        int objectsCount;
+        file.read(reinterpret_cast<char*>(&objectsCount), sizeof(objectsCount));
+
+        LogDebug("Load %d objects from '%s'", objectsCount, name.c_str());
+
+        ObjectMaterial objectMaterial;
+        ObjectGeometry objectGeometry;
+
+        auto& materials = this->materialCache[name];
+        auto& meshes = this->meshCache[name];
+
+        for (int i = 0; i < objectsCount; i++) {
+            file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
+
+            auto material = std::make_shared<Material>();
+            materials.emplace_back(material);
+
+            material->setAmbientIntensity(objectMaterial.ambientIntensity);
+            material->setDiffuseIntensity(objectMaterial.diffuseIntensity);
+            material->setDiffuseColor(objectMaterial.diffuseColor[0], objectMaterial.diffuseColor[1], objectMaterial.diffuseColor[2]);
+
+            material->setSpecularIntensity(objectMaterial.specularIntensity);
+            material->setSpecularHardness(objectMaterial.specularHardness);
+            material->setSpecularColor(objectMaterial.specularColor[0], objectMaterial.specularColor[1], objectMaterial.specularColor[2]);
+
+            std::string diffuseTexture(objectMaterial.diffuseTexture);
+            if (!diffuseTexture.empty()) {
+                std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
+                material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
+            }
+
+            file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
+            int meshDataSize = sizeof(float) * objectGeometry.vertices * (3 + 3 + 2) +
+                               sizeof(int) * objectGeometry.faces * 3;
+
+            std::unique_ptr<char[]> meshData(new char[meshDataSize]);
+            file.read(meshData.get(), meshDataSize);
+
+            auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
+            meshes.emplace_back(mesh);
+        }
+
+        this->entityCache.emplace(name);
     }
 
     auto& materials = this->materialCache.at(name);
@@ -189,28 +239,25 @@ const std::shared_ptr<Entity> ObjectManager::createEntity(const std::string& nam
 }
 
 const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name) {
+    LogDebug("Load world from '%s'", name.c_str());
+
     std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
     if (!file) {
         throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
     }
 
     this->validateHeader(file, "GPNW");
-    LogDebug("Load world from '%s'", name.c_str());
 
     SceneDefinition sceneDefinition;
     file.read(reinterpret_cast<char*>(&sceneDefinition), sizeof(sceneDefinition));
 
     auto scene = std::make_shared<Scene>();
     scene->setName(sceneDefinition.name);
-    scene->setAmbientColor(sceneDefinition.ambientColor[0],
-                           sceneDefinition.ambientColor[1],
-                           sceneDefinition.ambientColor[2]);
+    scene->setAmbientColor(sceneDefinition.ambientColor[0], sceneDefinition.ambientColor[1], sceneDefinition.ambientColor[2]);
     scene->setAmbientEnergy(sceneDefinition.ambientEnergy);
 
     auto& player = scene->getPlayer();
-    player->translate(sceneDefinition.playerPosition[0],
-                      sceneDefinition.playerPosition[1],
-                      sceneDefinition.playerPosition[2]);
+    player->translate(sceneDefinition.playerPosition[0], sceneDefinition.playerPosition[1], sceneDefinition.playerPosition[2]);
     player->rotate(Math::Vec3::UNIT_X, sceneDefinition.playerRotation[0]);
     player->rotate(Math::Vec3::UNIT_Y, sceneDefinition.playerRotation[1]);
     player->rotate(Math::Vec3::UNIT_Z, sceneDefinition.playerRotation[2]);
@@ -231,12 +278,8 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
         auto entity = this->createEntity(parentDirectory + std::string(entityDefinition.filepath));
         entity->setName(entityDefinition.name);
 
-        entity->scale(entityDefinition.scaling[0],
-                      entityDefinition.scaling[1],
-                      entityDefinition.scaling[2]);
-        entity->translate(entityDefinition.position[0],
-                          entityDefinition.position[1],
-                          entityDefinition.position[2]);
+        entity->scale(entityDefinition.scaling[0], entityDefinition.scaling[1], entityDefinition.scaling[2]);
+        entity->translate(entityDefinition.position[0], entityDefinition.position[1], entityDefinition.position[2]);
         entity->rotate(Math::Vec3::UNIT_X, entityDefinition.rotation[0] * 180.0f / pi);
         entity->rotate(Math::Vec3::UNIT_Y, entityDefinition.rotation[1] * 180.0f / pi);
         entity->rotate(Math::Vec3::UNIT_Z, entityDefinition.rotation[2] * 180.0f / pi);
@@ -255,13 +298,9 @@ const std::shared_ptr<Scene> ObjectManager::createScene(const std::string& name)
         light->setFalloff(lightDefinition.falloff);
         light->setAngle(lightDefinition.spotAngle * 180.0f / pi);
         light->setBlend(lightDefinition.spotBlend);
-        light->setColor(lightDefinition.color[0],
-                        lightDefinition.color[1],
-                        lightDefinition.color[2]);
+        light->setColor(lightDefinition.color[0], lightDefinition.color[1], lightDefinition.color[2]);
 
-        light->translate(lightDefinition.position[0],
-                         lightDefinition.position[1],
-                         lightDefinition.position[2]);
+        light->translate(lightDefinition.position[0], lightDefinition.position[1], lightDefinition.position[2]);
         light->rotate(Math::Vec3::UNIT_X, lightDefinition.rotation[0] * 180.0f / pi);
         light->rotate(Math::Vec3::UNIT_Y, lightDefinition.rotation[1] * 180.0f / pi);
         light->rotate(Math::Vec3::UNIT_Z, lightDefinition.rotation[2] * 180.0f / pi);
@@ -449,61 +488,6 @@ void ObjectManager::validateHeader(std::ifstream& file, const std::string& magic
     std::string grapheneVersion(GRAPHENE_VERSION);
     if (headerVersion.str() != grapheneVersion) {
         throw std::runtime_error(LogFormat("Invalid version '%s', expected '%s'", headerVersion.str(), grapheneVersion));
-    }
-}
-
-void ObjectManager::loadObjects(const std::string& name) {
-    std::ifstream file(GetEngineConfig().getDataDirectory() + '/' + name, std::ios::binary);
-    if (!file) {
-        throw std::runtime_error(LogFormat("Failed to open '%s'", name.c_str()));
-    }
-
-    this->validateHeader(file, "GPNE");
-
-    int objectsCount;
-    file.read(reinterpret_cast<char*>(&objectsCount), sizeof(objectsCount));
-
-    LogDebug("Load %d objects from '%s'", objectsCount, name.c_str());
-
-    ObjectMaterial objectMaterial;
-    ObjectGeometry objectGeometry;
-
-    std::vector<std::shared_ptr<Material>>& materials = this->materialCache[name];
-    std::vector<std::shared_ptr<Mesh>>& meshes = this->meshCache[name];
-
-    for (int i = 0; i < objectsCount; i++) {
-        file.read(reinterpret_cast<char*>(&objectMaterial), sizeof(objectMaterial));
-
-        auto material = std::make_shared<Material>();
-        material->setAmbientIntensity(objectMaterial.ambientIntensity);
-        material->setDiffuseIntensity(objectMaterial.diffuseIntensity);
-        material->setDiffuseColor(Math::Vec3(objectMaterial.diffuseColor[0],
-                                             objectMaterial.diffuseColor[1],
-                                             objectMaterial.diffuseColor[2]));
-
-        material->setSpecularIntensity(objectMaterial.specularIntensity);
-        material->setSpecularHardness(objectMaterial.specularHardness);
-        material->setSpecularColor(Math::Vec3(objectMaterial.specularColor[0],
-                                              objectMaterial.specularColor[1],
-                                              objectMaterial.specularColor[2]));
-
-        std::string diffuseTexture(objectMaterial.diffuseTexture);
-        if (!diffuseTexture.empty()) {
-            std::string parentDirectory(name.substr(0, name.find_last_of('/') + 1));
-            material->setDiffuseTexture(this->createTexture(parentDirectory + diffuseTexture));
-        }
-
-        file.read(reinterpret_cast<char*>(&objectGeometry), sizeof(objectGeometry));
-        int meshDataSize = sizeof(float) * objectGeometry.vertices * (3 + 3 + 2) +
-                           sizeof(int) * objectGeometry.faces * 3;
-
-        std::unique_ptr<char[]> meshData(new char[meshDataSize]);
-        file.read(meshData.get(), meshDataSize);
-
-        auto mesh = std::make_shared<Mesh>(meshData.get(), objectGeometry.vertices, objectGeometry.faces);
-
-        materials.emplace_back(material);
-        meshes.emplace_back(mesh);
     }
 }
 
