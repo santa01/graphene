@@ -55,7 +55,7 @@ private:
         std::shared_ptr<unsigned char[]> pixels;
     } CharGlyph;
 
-    std::shared_ptr<CharGlyph> getCharGlyph(wchar_t charCode);
+    const std::shared_ptr<CharGlyph>& getCharGlyph(wchar_t charCode);
 
     std::string filename;
     int size;

@@ -84,11 +84,7 @@ void Font::renderChar(wchar_t charCode, const std::shared_ptr<RawImage>& image) 
         throw std::invalid_argument(LogFormat("Image should have 32 bits per pixel"));
     }
 
-    auto charGlyph = this->getCharGlyph(charCode);
-    if (charGlyph == nullptr) {
-        throw std::runtime_error(LogFormat("Failed to fetch glyph"));
-    }
-
+    auto& charGlyph = this->getCharGlyph(charCode);
     FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(charGlyph->record.get());
     FT_Bitmap charBitmap = bitmapGlyph->bitmap;
 
@@ -132,11 +128,7 @@ void Font::renderString(const std::wstring& stringText, const std::shared_ptr<Ra
     std::vector<std::shared_ptr<CharGlyph>> stringGlyphs;
 
     for (auto charCode: stringText) {
-        auto charGlyph = this->getCharGlyph(charCode);
-        if (charGlyph == nullptr) {
-            throw std::runtime_error(LogFormat("Failed to fetch glyph"));
-        }
-
+        auto& charGlyph = this->getCharGlyph(charCode);
         stringBox.yMin = std::min<int>(stringBox.yMin, charGlyph->box->yMin);
         stringBox.yMax = std::max<int>(stringBox.yMax, charGlyph->box->yMax);
         stringBox.xMax += charGlyph->record->advance.x >> 16;  // 16.16 fixed float format
@@ -185,7 +177,7 @@ void Font::renderString(const std::wstring& stringText, const std::shared_ptr<Ra
     }
 }
 
-std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
+const std::shared_ptr<Font::CharGlyph>& Font::getCharGlyph(wchar_t charCode) {
     auto charGlyphIt = this->charGlyphs.find(charCode);
     if (charGlyphIt != this->charGlyphs.end()) {
         return charGlyphIt->second;
@@ -193,25 +185,30 @@ std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
 
     FT_UInt charIndex = FT_Get_Char_Index(this->face.get(), charCode);
     if (FT_Load_Glyph(this->face.get(), charIndex, FT_LOAD_RENDER) != FT_Err_Ok) {
-        return nullptr;
+        throw std::runtime_error(LogFormat("FT_Load_Glyph()"));
     }
 
     FT_GlyphSlot glyphSlot = this->face->glyph;
     if (glyphSlot->format != FT_GLYPH_FORMAT_BITMAP) {
-        return nullptr;
+        throw std::runtime_error(LogFormat("Invalid glyph format"));
     }
 
     FT_Glyph glyph;
     if (FT_Get_Glyph(glyphSlot, &glyph)) {
-        return nullptr;
+        throw std::runtime_error(LogFormat("FT_Get_Glyph()"));
     }
 
     auto charGlyph = std::make_shared<CharGlyph>();
-    this->charGlyphs.emplace(charCode, charGlyph);
+    charGlyph->record = std::shared_ptr<FT_GlyphRec>(glyph, FT_Done_Glyph);
 
     charGlyph->box = std::make_shared<FT_BBox>();
-    charGlyph->record = std::shared_ptr<FT_GlyphRec>(glyph, FT_Done_Glyph);
     FT_Glyph_Get_CBox(glyph, FT_GLYPH_BBOX_PIXELS, charGlyph->box.get());
+
+    // Invert the control box Y coordinates to reposition inverted bitmap
+    int yMin = charGlyph->box->yMin;
+    int yMax = charGlyph->box->yMax;
+    charGlyph->box->yMin = -yMax;
+    charGlyph->box->yMax = -yMin;
 
     FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
     FT_Bitmap charBitmap = bitmapGlyph->bitmap;
@@ -228,13 +225,7 @@ std::shared_ptr<Font::CharGlyph> Font::getCharGlyph(wchar_t charCode) {
         std::memcpy(pixels + pixelsRowOffset, charBitmap.buffer + charRowOffset, charBitmap.width);
     }
 
-    // Invert the control box Y coordinates to reposition inverted bitmap
-    int yMin = charGlyph->box->yMin;
-    int yMax = charGlyph->box->yMax;
-    charGlyph->box->yMin = -yMax;
-    charGlyph->box->yMax = -yMin;
-
-    return charGlyph;
+    return this->charGlyphs.emplace(charCode, charGlyph).first->second;
 }
 
 }  // namespace Graphene
