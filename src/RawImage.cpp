@@ -52,7 +52,6 @@ void RawImage::clear(const void* pixel, int pixelDepth) const {
     }
 
     int pixelBytes = pixelDepth >> 3;
-    int imageSize = this->height * this->width;
     char* imagePixels = this->pixels.get();
 
     for (int pixelOffset = 0; pixelOffset < this->pixelsSize; pixelOffset += pixelBytes) {

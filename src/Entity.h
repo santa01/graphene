@@ -31,22 +31,20 @@
 #include <Object.h>
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 namespace Graphene {
 
 class Entity: public MetaObject<Entity>, public Object, public Scalable {
 public:
     GRAPHENE_API Entity();
+    GRAPHENE_API virtual ~Entity() = default;
 
     GRAPHENE_API void setVisible(bool visible);
     GRAPHENE_API bool isVisible() const;
 
     template<typename T>
-    std::shared_ptr<T> getComponent() const {
-        auto predicate = [](const std::shared_ptr<Component>& component) { return component->isA<T>(); };
-        auto componentIt = std::find_if(this->components.begin(), this->components.end(), predicate);
-        return (componentIt != this->components.end()) ? (*componentIt)->toA<T>() : nullptr;
-    }
+    std::shared_ptr<T> getComponent() const;
 
     GRAPHENE_API const std::vector<std::shared_ptr<Component>>& getComponents() const;
     GRAPHENE_API void addComponent(const std::shared_ptr<Component>& component);
@@ -59,6 +57,22 @@ protected:
 
     std::vector<std::shared_ptr<Component>> components;
 };
+
+template<typename T>
+std::shared_ptr<T> Entity::getComponent() const {
+    auto predicate = [](const std::shared_ptr<Component>& component) {
+        return component->isA<T>();
+    };
+
+    auto componentIt = std::find_if(this->components.begin(), this->components.end(), predicate);
+    if (componentIt == this->components.end()) {
+        return nullptr;
+    }
+
+    // GCC 9.3.0 does not compile toA<T>() unless component has explicit type
+    const std::shared_ptr<Component>& component = *componentIt;
+    return component->toA<T>();
+}
 
 }  // namespace Graphene
 
