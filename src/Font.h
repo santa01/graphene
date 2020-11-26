@@ -39,7 +39,7 @@ namespace Graphene {
 
 class Font {
 public:
-    GRAPHENE_API Font(const std::string& filename, int size, int dpi = 72);
+    GRAPHENE_API Font(const std::string& filename, int size, int dpi = 96);
 
     GRAPHENE_API const std::string& getFilename() const;
     GRAPHENE_API int getSize() const;

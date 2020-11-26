@@ -148,24 +148,6 @@ int Engine::exec() {
                 this->frameTime = finalDuration.count();
             }
         }
-
-        if (config.isDebug()) {
-            static float fpsAverage = 1.0f / this->frameTime;
-            static int frameRange = 1;
-
-            int frameCount = this->frame % frameRange;
-            if (frameCount == 0) {
-                std::wostringstream fpsText;
-                fpsText << L"FPS: " << static_cast<int>(fpsAverage);
-                this->fpsText->setText(fpsText.str());
-
-                fpsAverage = 0.0f;
-                frameRange = 30;
-            } else {
-                // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-                fpsAverage += ((1.0f / this->frameTime) - fpsAverage) / frameCount;
-            }
-        }
     }
 
     this->onTeardownSignal();
@@ -262,10 +244,10 @@ void Engine::setupEngine() {
         auto& debugRoot = debugScene->getRoot();
 
         auto debugCamera = objectManager.createCamera(Graphene::ProjectionType::ORTHOGRAPHIC);
-        debugCamera->setNearPlane(-1.0f);
-        debugCamera->setFarPlane(1.0f);
+        debugCamera->setNearPlane(-1.0f);  // NDC for 1:1 scale
+        debugCamera->setFarPlane(1.0f);  // NDC for 1:1 scale
 
-        auto fpsLabel = objectManager.createLabel(200, 20, "fonts/dejavu-sans.ttf", 14);
+        auto fpsLabel = objectManager.createLabel(150, 20, "fonts/dejavu-sans.ttf", 10);
         debugRoot->addObject(debugCamera);
         debugRoot->addObject(fpsLabel);
 
@@ -299,6 +281,24 @@ void Engine::teardownEngine() {
 }
 
 void Engine::update() {
+    if (GetEngineConfig().isDebug()) {
+        static float fpsAverage = 1.0f / this->frameTime;
+        static int frameRange = 1;
+
+        int frameCount = this->frame % frameRange;
+        if (frameCount == 0) {
+            std::wostringstream fpsText;
+            fpsText << L"FPS: " << static_cast<int>(fpsAverage);
+            this->fpsText->setText(fpsText.str());
+
+            fpsAverage = 0.0f;
+            frameRange = 30;
+        } else {
+            // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
+            fpsAverage += ((1.0f / this->frameTime) - fpsAverage) / frameCount;
+        }
+    }
+
     for (auto& scene: this->scenes) {
         scene->update(this->frameTime);
     }
