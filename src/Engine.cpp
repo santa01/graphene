@@ -240,34 +240,13 @@ void Engine::setupEngine() {
     this->onQuitSignal.connect(Signals::Slot<>(&Engine::onQuit, this));
 
     if (GetEngineConfig().isDebug()) {
-        auto& debugScene = this->createScene();
-        auto& debugRoot = debugScene->getRoot();
-
-        auto debugCamera = objectManager.createCamera(Graphene::ProjectionType::ORTHOGRAPHIC);
-        debugCamera->setNearPlane(-1.0f);  // NDC for 1:1 scale
-        debugCamera->setFarPlane(1.0f);  // NDC for 1:1 scale
-
-        auto fpsLabel = objectManager.createLabel(150, 20, "fonts/dejavu-sans.ttf", 10);
-        debugRoot->addObject(debugCamera);
-        debugRoot->addObject(fpsLabel);
-
-        auto& window = this->getWindow();
-
-        auto debugLayout = std::make_shared<Graphene::Layout>();
-        debugLayout->addComponent(fpsLabel, 10, window->getHeight() - 20);
-
-        auto& debugOverlay = window->createOverlay(0, 0, window->getWidth(), window->getHeight());
-        debugOverlay->setCamera(debugCamera);
-        debugOverlay->setLayout(debugLayout);
-
-        this->fpsText = fpsLabel->getComponent<TextComponent>();
-        this->fpsText->setColor(0.0f, 1.0f, 0.0f);  // Green
+        this->onSetupSignal.connect(Signals::Slot<>(&Engine::onSetupDebug, this));
+        this->onTeardownSignal.connect(Signals::Slot<>(&Engine::onTeardownDebug, this));
+        this->onIdleSignal.connect(Signals::Slot<>(&Engine::onIdleDebug, this));
     }
 }
 
 void Engine::teardownEngine() {
-    this->fpsText.reset();
-
     this->frameBuffers.clear();
     this->scenes.clear();
 
@@ -281,24 +260,6 @@ void Engine::teardownEngine() {
 }
 
 void Engine::update() {
-    if (GetEngineConfig().isDebug()) {
-        static float fpsAverage = 1.0f / this->frameTime;
-        static int frameRange = 1;
-
-        int frameCount = this->frame % frameRange;
-        if (frameCount == 0) {
-            std::wostringstream fpsText;
-            fpsText << L"FPS: " << static_cast<int>(fpsAverage);
-            this->fpsText->setText(fpsText.str());
-
-            fpsAverage = 0.0f;
-            frameRange = 30;
-        } else {
-            // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-            fpsAverage += ((1.0f / this->frameTime) - fpsAverage) / frameCount;
-        }
-    }
-
     for (auto& scene: this->scenes) {
         scene->update(this->frameTime);
     }
@@ -308,6 +269,55 @@ void Engine::update() {
     }
 
     this->window->update();
+}
+
+void Engine::onSetupDebug() {
+    auto& objectManager = GetObjectManager();
+
+    auto& debugScene = this->createScene();
+    auto& debugRoot = debugScene->getRoot();
+
+    auto debugCamera = objectManager.createCamera(Graphene::ProjectionType::ORTHOGRAPHIC);
+    debugCamera->setNearPlane(-1.0f);  // NDC for 1:1 scale
+    debugCamera->setFarPlane(1.0f);  // NDC for 1:1 scale
+
+    auto fpsLabel = objectManager.createLabel(150, 20, "fonts/dejavu-sans.ttf", 10);
+    debugRoot->addObject(debugCamera);
+    debugRoot->addObject(fpsLabel);
+
+    auto& window = this->getWindow();
+
+    auto debugLayout = std::make_shared<Graphene::Layout>();
+    debugLayout->addComponent(fpsLabel, 10, window->getHeight() - 20);
+
+    auto& debugOverlay = window->createOverlay(0, 0, window->getWidth(), window->getHeight());
+    debugOverlay->setCamera(debugCamera);
+    debugOverlay->setLayout(debugLayout);
+
+    this->fpsDebug = fpsLabel->getComponent<TextComponent>();
+    this->fpsDebug->setColor(0.0f, 1.0f, 0.0f);  // Green
+}
+
+void Engine::onTeardownDebug() {
+    this->fpsDebug.reset();
+}
+
+void Engine::onIdleDebug() {
+    static float fpsAverage = 0.0f;
+    static int frameRange = 1;  // Update on the first frame
+
+    int frameCount = this->frame % frameRange;
+    if (frameCount == 0) {
+        std::wostringstream fpsText;
+        fpsText << L"FPS: " << static_cast<int>(fpsAverage);
+        this->fpsDebug->setText(fpsText.str());
+
+        fpsAverage = 0.0f;
+        frameRange = 30;
+    } else {
+        // See https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
+        fpsAverage += ((1.0f / this->frameTime) - fpsAverage) / frameCount;
+    }
 }
 
 }  // namespace Graphene

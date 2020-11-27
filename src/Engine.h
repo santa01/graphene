@@ -59,13 +59,13 @@ public:
     GRAPHENE_API int exec();
 
 protected:
-    virtual void onMouseMotion(int /*x*/, int /*y*/) {}
-    virtual void onMouseButton(MouseButton /*button*/, bool /*state*/) {}
-    virtual void onKeyboardKey(KeyboardKey /*key*/, bool /*state*/) {}
-    virtual void onSetup() {}
-    virtual void onTeardown() {}
-    virtual void onIdle() {}
-    virtual void onQuit() {}
+    virtual void onMouseMotion(int /*x*/, int /*y*/) { }
+    virtual void onMouseButton(MouseButton /*button*/, bool /*state*/) { }
+    virtual void onKeyboardKey(KeyboardKey /*key*/, bool /*state*/) { }
+    virtual void onSetup() { }
+    virtual void onTeardown() { }
+    virtual void onIdle() { }
+    virtual void onQuit() { }
 
 private:
     void setupWindow();
@@ -73,6 +73,10 @@ private:
     void setupEngine();
     void teardownEngine();
     void update();
+
+    void onSetupDebug();
+    void onTeardownDebug();
+    void onIdleDebug();
 
     Signals::Signal<> onSetupSignal;     // Once before event loop
     Signals::Signal<> onTeardownSignal;  // Once after event loop
@@ -82,7 +86,8 @@ private:
     std::vector<std::shared_ptr<FrameBuffer>> frameBuffers;
     std::vector<std::shared_ptr<Scene>> scenes;
     std::shared_ptr<Window> window;
-    std::shared_ptr<TextComponent> fpsText;  // Debug overlay
+
+    std::shared_ptr<TextComponent> fpsDebug;  // Debug overlay
 
     unsigned int frame = 0;
     float frameTime = 0.0f;
