@@ -37,14 +37,13 @@ class Layout {
 public:
     GRAPHENE_API const std::shared_ptr<Overlay> getOverlay() const;
 
-    GRAPHENE_API void addComponent(const std::shared_ptr<Entity>& entity, int x, int y);
-    GRAPHENE_API void removeComponent(const std::shared_ptr<Entity>& entity);
+    GRAPHENE_API void addEntity(const std::shared_ptr<Entity>& entity, int x, int y);
+    GRAPHENE_API void removeEntity(const std::shared_ptr<Entity>& entity);
 
-    GRAPHENE_API void arrangeComponents();
+    GRAPHENE_API void arrange();
 
 private:
-    std::unordered_map<std::shared_ptr<Entity>, std::pair<int, int>> entityPositions;
-    std::unordered_map<std::shared_ptr<Entity>, std::pair<float, float>> entityScaleFactors;
+    std::unordered_map<std::shared_ptr<Entity>, std::pair<int, int>> entities;
 
     friend class Overlay;
     std::weak_ptr<Overlay> overlay;

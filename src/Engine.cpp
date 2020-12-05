@@ -288,7 +288,7 @@ void Engine::onSetupDebug() {
     auto& window = this->getWindow();
 
     auto debugLayout = std::make_shared<Graphene::Layout>();
-    debugLayout->addComponent(fpsLabel, 10, window->getHeight() - 20);
+    debugLayout->addEntity(fpsLabel, 10, window->getHeight() - 20);
 
     auto& debugOverlay = window->createOverlay(0, 0, window->getWidth(), window->getHeight());
     debugOverlay->setCamera(debugCamera);

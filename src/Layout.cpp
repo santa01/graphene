@@ -33,27 +33,18 @@ const std::shared_ptr<Overlay> Layout::getOverlay() const {
     return this->overlay.lock();
 }
 
-void Layout::addComponent(const std::shared_ptr<Entity>& entity, int x, int y) {
-    this->entityPositions.emplace(entity, std::make_pair(x, y));
+void Layout::addEntity(const std::shared_ptr<Entity>& entity, int x, int y) {
+    this->entities.emplace(entity, std::make_pair(x, y));
 }
 
-void Layout::removeComponent(const std::shared_ptr<Entity>& entity) {
-    auto entityPositionsIt = this->entityPositions.find(entity);
-    if (entityPositionsIt != this->entityPositions.end()) {
-        this->entityPositions.erase(entityPositionsIt);
-    }
-
-    auto entityScaleFactorsIt = this->entityScaleFactors.find(entity);
-    if (entityScaleFactorsIt != this->entityScaleFactors.end()) {
-        // Restore entity scale factors to initial values
-        auto& scaleFactors = entityScaleFactorsIt->second;
-        entity->scale(1.0f / scaleFactors.first, 1.0f / scaleFactors.second, 1.0f);
-
-        this->entityScaleFactors.erase(entityScaleFactorsIt);
+void Layout::removeEntity(const std::shared_ptr<Entity>& entity) {
+    auto entityPositionsIt = this->entities.find(entity);
+    if (entityPositionsIt != this->entities.end()) {
+        this->entities.erase(entityPositionsIt);
     }
 }
 
-void Layout::arrangeComponents() {
+void Layout::arrange() {
     /*
      * See viewport transformation details: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glViewport.xhtml
      *
@@ -66,7 +57,7 @@ void Layout::arrangeComponents() {
      * Y(ndc) = 2 * (Y(window) - y) / height - 1
      *
      */
-    if (this->entityPositions.empty()) {
+    if (this->entities.empty()) {
         return;
     }
 
@@ -89,8 +80,9 @@ void Layout::arrangeComponents() {
     Math::Mat4 inversePerspective(camera->getProjection());
     inversePerspective.invert();
 
-    for (auto& entityPosition: this->entityPositions) {
+    for (auto& entityPosition: this->entities) {
         auto& entity = entityPosition.first;
+        auto& position = entityPosition.second;
 
         auto textComponent = entity->getComponent<TextComponent>();
         if (textComponent == nullptr) {
@@ -101,7 +93,6 @@ void Layout::arrangeComponents() {
         float entityHeight = static_cast<float>(textComponent->getHeight());
 
         // Move entity by the half of their dimentions to shift origin to the bottom-left
-        auto& position = entityPosition.second;
         float x = position.first + entityWidth / 2.0f;
         float y = position.second + entityHeight / 2.0f;
         float xNdc = 2.0f * (x - overlayLeft) / overlayWidth - 1.0f;
@@ -115,11 +106,9 @@ void Layout::arrangeComponents() {
         float scaleX = 2.0f * overlayAspectRatio * entityWidth / overlayWidth;
         float scaleY = 2.0f * entityHeight / overlayHeight;
         entity->scale(scaleX, scaleY, 1.0f);
-
-        this->entityScaleFactors.emplace(entity, std::make_pair(scaleX, scaleY));
     }
 
-    this->entityPositions.clear();
+    this->entities.clear();
 }
 
 }  // namespace Graphene

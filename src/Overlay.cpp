@@ -45,7 +45,7 @@ void Overlay::setLayout(const std::shared_ptr<Layout>& layout) {
 
 void Overlay::update() {
     if (this->layout != nullptr) {
-        this->layout->arrangeComponents();
+        this->layout->arrange();
     }
 
     Viewport::update();
