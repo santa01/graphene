@@ -22,7 +22,7 @@
 
 #include <Layout.h>
 #include <Overlay.h>
-#include <TextComponent.h>
+#include <QuadComponent.h>
 #include <Mat4.h>
 #include <Vec4.h>
 #include <Vec3.h>
@@ -34,7 +34,10 @@ const std::shared_ptr<Overlay> Layout::getOverlay() const {
 }
 
 void Layout::addEntity(const std::shared_ptr<Entity>& entity, int x, int y) {
-    this->entities.emplace(entity, std::make_pair(x, y));
+    auto quadComponent = entity->getComponent<QuadComponent>();
+    if (quadComponent != nullptr) {
+        this->entities.emplace(entity, std::make_pair(x, y));
+    }
 }
 
 void Layout::removeEntity(const std::shared_ptr<Entity>& entity) {
@@ -83,18 +86,11 @@ void Layout::arrange() {
     for (auto& entityPosition: this->entities) {
         auto& entity = entityPosition.first;
         auto& position = entityPosition.second;
+        auto quadComponent = entity->getComponent<QuadComponent>();
 
-        auto textComponent = entity->getComponent<TextComponent>();
-        if (textComponent == nullptr) {
-            continue;  // TextComponent is the only UI component at the moment
-        }
-
-        float entityWidth = static_cast<float>(textComponent->getWidth());
-        float entityHeight = static_cast<float>(textComponent->getHeight());
-
-        // Move entity by the half of their dimentions to shift origin to the bottom-left
-        float x = position.first + entityWidth / 2.0f;
-        float y = position.second + entityHeight / 2.0f;
+        auto& origin = quadComponent->getOrigin();
+        float x = static_cast<float>(position.first + origin.first);
+        float y = static_cast<float>(position.second + origin.second);
         float xNdc = 2.0f * (x - overlayLeft) / overlayWidth - 1.0f;
         float yNdc = 2.0f * (y - overlayTop) / overlayHeight - 1.0f;
 
@@ -103,9 +99,19 @@ void Layout::arrange() {
         worldPosition.set(Math::Vec4::Z, entity->getPosition().get(Math::Vec4::Z));
         entity->translate(worldPosition.extractVec3());
 
-        float scaleX = 2.0f * overlayAspectRatio * entityWidth / overlayWidth;
-        float scaleY = 2.0f * entityHeight / overlayHeight;
-        entity->scale(scaleX, scaleY, 1.0f);
+        // Reset scaling factors to 1.0f, reset initial scaling
+        Math::Vec3 scalingFactors(entity->getScalingFactors());
+        float scaleX = 1.0f / scalingFactors.get(Math::Vec3::X);
+        float scaleY = 1.0f / scalingFactors.get(Math::Vec3::Y);
+        float scaleZ = 1.0f / scalingFactors.get(Math::Vec3::Z);
+
+        float width = static_cast<float>(quadComponent->getWidth());
+        scaleX *= 2.0f * overlayAspectRatio * width / overlayWidth;
+
+        float height = static_cast<float>(quadComponent->getHeight());
+        scaleY *= 2.0f * height / overlayHeight;
+
+        entity->scale(scaleX, scaleY, scaleZ);
     }
 
     this->entities.clear();

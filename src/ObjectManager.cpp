@@ -27,6 +27,7 @@
 #include <TgaImage.h>
 #include <GraphicsComponent.h>
 #include <TextComponent.h>
+#include <QuadComponent.h>
 #include <Vec3.h>
 #include <stdexcept>
 #include <utility>
@@ -348,9 +349,13 @@ const std::shared_ptr<Entity> ObjectManager::createLabel(int width, int height, 
     auto font = this->createFont(name, size);
     auto textComponent = std::make_shared<TextComponent>(width, height, font);
 
+    auto quadComponent = std::make_shared<QuadComponent>(width, height);
+    quadComponent->setOrigin(width / 2, height / 2);
+
     auto label = std::make_shared<Entity>();
     label->addComponent(graphicsComponent);
     label->addComponent(textComponent);
+    label->addComponent(quadComponent);
 
     return label;
 }
